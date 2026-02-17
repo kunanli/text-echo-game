@@ -75,6 +75,23 @@
   .story-text::-webkit-scrollbar { width: 4px; }
   .story-text::-webkit-scrollbar-thumb { background: #2a2a3a; border-radius: 2px; }
 
+  .story-divider {
+    text-align: center;
+    color: #2a2a3a;
+    font-size: .7rem;
+    letter-spacing: 6px;
+    margin: 16px 0 12px;
+    border: none;
+    position: relative;
+  }
+  .story-divider::before {
+    content: '';
+    display: block;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, #2a2a3a 20%, #2a2a3a 80%, transparent);
+    margin-bottom: 6px;
+  }
+
   .story-text .combat-log {
     color: #a06040;
     font-size: .92rem;
@@ -1032,12 +1049,21 @@ function stopAuto() {
 // steps: array of { tag?, tagColor?, text?, html?, art?, delay?, effect?, noAmbient? }
 // choices: array of { text, action }
 // opts: { label? }
+function appendDivider() {
+  if ($story.children.length > 0) {
+    var div = document.createElement('div');
+    div.className = 'story-divider';
+    div.textContent = '· · ·';
+    $story.appendChild(div);
+  }
+}
+
 function autoExplore(steps, choices, opts) {
   stopAuto();
   autoFast = false;
   autoRunning = true;
   autoElapsed = 0;
-  $story.innerHTML = '';
+  appendDivider();
   $choices.innerHTML = '';
   currentChoices = [];
   renderStatus();
@@ -1141,7 +1167,11 @@ $story.addEventListener('touchend', tapFastForward);
 function renderScene(text, choices) {
   stopAuto();
   hideExploreBar();
-  $story.innerHTML = text;
+  appendDivider();
+  var block = document.createElement('div');
+  block.innerHTML = text;
+  $story.appendChild(block);
+  $story.scrollTop = $story.scrollHeight;
   $choices.innerHTML = '';
   currentChoices = [];
   renderStatus();
