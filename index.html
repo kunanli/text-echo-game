@@ -79,6 +79,14 @@
     white-space: pre-line;
     cursor: pointer;
   }
+  /* Typewriter-scroll spacers: keep reading focus near vertical center */
+  .story-text::before,
+  .story-text::after {
+    content: '';
+    display: block;
+    min-height: 38vh;
+    pointer-events: none;
+  }
   .story-text::-webkit-scrollbar { width: 4px; }
   .story-text::-webkit-scrollbar-thumb { background: #2a2a3a; border-radius: 2px; }
 
@@ -632,6 +640,10 @@
       min-height: 0;
       overflow-y: auto;
       -webkit-overflow-scrolling: touch;
+    }
+    .story-text::before,
+    .story-text::after {
+      min-height: 30vh;
     }
     .status-panel {
       width: 100%;
