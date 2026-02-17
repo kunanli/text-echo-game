@@ -144,6 +144,28 @@
     from { opacity: 0; transform: translateY(6px); }
     to   { opacity: 1; transform: translateY(0); }
   }
+
+  /* ── Pending indicator (thinking dots) ── */
+  .pending-indicator {
+    padding: 4px 0;
+    font-family: "Courier New", Courier, monospace;
+    font-size: .9rem;
+    color: #4a4a6a;
+    letter-spacing: 3px;
+    line-height: 1.7;
+  }
+  .pending-indicator .dot {
+    display: inline-block;
+    animation: dot-pulse 1.4s ease-in-out infinite;
+    opacity: .2;
+  }
+  .pending-indicator .dot:nth-child(2) { animation-delay: .2s; }
+  .pending-indicator .dot:nth-child(3) { animation-delay: .4s; }
+  @keyframes dot-pulse {
+    0%, 80%, 100% { opacity: .2; transform: translateY(0); }
+    40% { opacity: 1; transform: translateY(-3px); }
+  }
+
   .log-tag {
     font-family: "Courier New", Courier, monospace;
     font-size: .78rem;
@@ -1379,6 +1401,7 @@ function stopAuto() {
   if (autoTimer) { clearTimeout(autoTimer); autoTimer = null; }
   if (autoClockTimer) { clearInterval(autoClockTimer); autoClockTimer = null; }
   autoRunning = false;
+  removePending();
 }
 
 // ── Main autoExplore function ──
@@ -1392,6 +1415,25 @@ function appendDivider() {
     div.textContent = '· · ·';
     $story.appendChild(div);
   }
+}
+
+// ── Pending indicator (animated dots before new content) ──
+var $pendingEl = null;
+
+function showPending() {
+  removePending();
+  $pendingEl = document.createElement('div');
+  $pendingEl.className = 'pending-indicator';
+  $pendingEl.innerHTML = '<span class="dot">●</span><span class="dot">●</span><span class="dot">●</span>';
+  $story.appendChild($pendingEl);
+  $story.scrollTop = $story.scrollHeight;
+}
+
+function removePending() {
+  if ($pendingEl && $pendingEl.parentNode) {
+    $pendingEl.parentNode.removeChild($pendingEl);
+  }
+  $pendingEl = null;
 }
 
 function autoExplore(steps, choices, opts) {
@@ -1428,6 +1470,7 @@ function autoExplore(steps, choices, opts) {
 
   function showNext() {
     if (idx >= expanded.length) {
+      removePending();
       autoRunning = false;
       if (autoClockTimer) { clearInterval(autoClockTimer); autoClockTimer = null; }
       finishExploreBar();
@@ -1438,6 +1481,22 @@ function autoExplore(steps, choices, opts) {
     var step = expanded[idx];
     idx++;
 
+    // In fast mode, skip pending indicator
+    if (autoFast) {
+      renderStep(step);
+      return;
+    }
+
+    // Show pending indicator, then render the actual step after a short pause
+    showPending();
+    var pendingDelay = step.art ? 400 : 600;
+    autoTimer = setTimeout(function() {
+      removePending();
+      renderStep(step);
+    }, pendingDelay);
+  }
+
+  function renderStep(step) {
     // Build line element
     var line = document.createElement('div');
 
@@ -1538,15 +1597,21 @@ $story.addEventListener('touchend', tapFastForward);
 function renderScene(text, choices) {
   stopAuto();
   hideExploreBar();
+  removePending();
   appendDivider();
-  var block = document.createElement('div');
-  block.innerHTML = text;
-  $story.appendChild(block);
-  $story.scrollTop = $story.scrollHeight;
   $choices.innerHTML = '';
   currentChoices = [];
-  renderStatus();
-  showChoices(choices);
+
+  showPending();
+  setTimeout(function() {
+    removePending();
+    var block = document.createElement('div');
+    block.innerHTML = text;
+    $story.appendChild(block);
+    $story.scrollTop = $story.scrollHeight;
+    renderStatus();
+    showChoices(choices);
+  }, 500);
 }
 
 function showChoices(choices) {
