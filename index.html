@@ -1073,7 +1073,7 @@ var autoTimer = null;
 var autoClockTimer = null;
 var autoFast = false;
 var autoRunning = false;
-var autoElapsed = 0;    // elapsed milliseconds
+var autoElapsed = 0;    // cumulative game-time in milliseconds (never resets)
 let currentChoices = [];
 
 // DOM refs for explore bar
@@ -1112,9 +1112,13 @@ function pickAmbient() {
 // ── Format time ──
 function fmtTime(ms) {
   var totalSec = Math.floor(ms / 1000);
-  var m = Math.floor(totalSec / 60);
+  var h = Math.floor(totalSec / 3600);
+  var m = Math.floor((totalSec % 3600) / 60);
   var s = totalSec % 60;
-  return (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
+  var pad = function(n) { return (n < 10 ? '0' : '') + n; };
+  return h > 0
+    ? pad(h) + ':' + pad(m) + ':' + pad(s)
+    : pad(m) + ':' + pad(s);
 }
 
 // ── Dots animation ──
@@ -1138,7 +1142,7 @@ function showExploreBar(label) {
   $exploreBar.classList.add('active');
   $exploreBar.classList.remove('done');
   $ebLabel.textContent = label || L('自動探索中', 'Auto-exploring');
-  $ebTimer.textContent = '00:00';
+  $ebTimer.textContent = fmtTime(autoElapsed);
   startDots();
 }
 function updateExploreTimer() {
@@ -1180,7 +1184,6 @@ function autoExplore(steps, choices, opts) {
   stopAuto();
   autoFast = false;
   autoRunning = true;
-  autoElapsed = 0;
   appendDivider();
   $choices.innerHTML = '';
   currentChoices = [];
