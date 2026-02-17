@@ -293,7 +293,7 @@
   /* ── Responsive ── */
   @media (max-width: 760px) {
     .game-container { flex-direction: column; }
-    .story-panel { border-right: none; padding: 16px 14px; }
+    .story-panel { border-right: none; padding: 16px 14px; min-height: 50vh; }
     .status-panel {
       width: 100%;
       border-top: 1px solid #1e1e2e;
@@ -484,30 +484,53 @@ let twSkip = false;
 let twDone = false;
 let pendingChoices = [];
 
-function parseHtmlSegments(html) {
+// Split HTML into blocks: <pre>...</pre> as whole chunks, rest as chars/tags
+function parseBlocks(html) {
+  const blocks = [];
+  let cursor = 0;
+  const preRe = /<pre[^>]*>[\s\S]*?<\/pre>/gi;
+  let m;
+  while ((m = preRe.exec(html)) !== null) {
+    // text before this <pre>
+    if (m.index > cursor) {
+      blocks.push({ type: 'text', val: html.slice(cursor, m.index) });
+    }
+    // the entire <pre>...</pre> block
+    blocks.push({ type: 'pre', val: m[0] });
+    cursor = m.index + m[0].length;
+  }
+  // remaining text after last <pre>
+  if (cursor < html.length) {
+    blocks.push({ type: 'text', val: html.slice(cursor) });
+  }
+  return blocks;
+}
+
+// Parse a text chunk (non-pre) into char-level segments
+function parseTextSegments(text) {
   const segs = [];
   let i = 0;
-  while (i < html.length) {
-    if (html[i] === '<') {
-      const end = html.indexOf('>', i);
+  while (i < text.length) {
+    if (text[i] === '<') {
+      const end = text.indexOf('>', i);
       if (end >= 0) {
-        segs.push({ type: 'tag', val: html.slice(i, end + 1) });
+        segs.push({ type: 'tag', val: text.slice(i, end + 1) });
         i = end + 1;
       } else {
-        segs.push({ type: 'char', val: html[i] });
+        segs.push({ type: 'char', val: text[i] });
         i++;
       }
-    } else if (html[i] === '&') {
-      const semi = html.indexOf(';', i);
+    } else if (text[i] === '&') {
+      const semi = text.indexOf(';', i);
       if (semi >= 0 && semi - i < 10) {
-        segs.push({ type: 'entity', val: html.slice(i, semi + 1) });
+        segs.push({ type: 'entity', val: text.slice(i, semi + 1) });
         i = semi + 1;
       } else {
-        segs.push({ type: 'char', val: html[i] });
+        segs.push({ type: 'char', val: text[i] });
         i++;
       }
     } else {
-      segs.push({ type: 'char', val: html[i] });
+      segs.push({ type: 'char', val: text[i] });
       i++;
     }
   }
@@ -519,38 +542,57 @@ function typewrite(html, onDone) {
   twDone = false;
   twSkip = false;
 
-  const segs = parseHtmlSegments(html);
-  let idx = 0;
-  let buf = '';
+  try {
+    const blocks = parseBlocks(html);
+    // Flatten into segments: pre blocks are single segments, text blocks are char-level
+    const segs = [];
+    blocks.forEach(function(b) {
+      if (b.type === 'pre') {
+        segs.push({ type: 'block', val: b.val });
+      } else {
+        parseTextSegments(b.val).forEach(function(s) { segs.push(s); });
+      }
+    });
 
-  // Speed: faster for ASCII art lines, normal for prose
-  const baseSpeed = 18;
+    let idx = 0;
+    let buf = '';
+    const speed = 22;
 
-  function finish() {
-    if (twTimer) { clearInterval(twTimer); twTimer = null; }
+    function finish() {
+      if (twTimer) { clearInterval(twTimer); twTimer = null; }
+      $story.innerHTML = html;
+      twDone = true;
+      onDone();
+    }
+
+    twTimer = setInterval(function() {
+      try {
+        if (twSkip) { finish(); return; }
+        if (idx >= segs.length) { finish(); return; }
+
+        let count = 0;
+        var batchSize = 3;
+        while (count < batchSize && idx < segs.length) {
+          var seg = segs[idx];
+          buf += seg.val;
+          idx++;
+          // Only chars count toward batch; tags/entities/blocks are free
+          if (seg.type === 'char') count++;
+        }
+
+        $story.innerHTML = buf + '<span class="tw-cursor"></span>';
+        $story.scrollTop = $story.scrollHeight;
+      } catch (e) {
+        // Fallback: show everything
+        finish();
+      }
+    }, speed);
+  } catch (e) {
+    // Total fallback: just render immediately
     $story.innerHTML = html;
     twDone = true;
     onDone();
   }
-
-  twTimer = setInterval(() => {
-    if (twSkip) { finish(); return; }
-    if (idx >= segs.length) { finish(); return; }
-
-    // Batch: reveal multiple chars per tick for speed
-    let count = 0;
-    const batchSize = 2;
-    while (count < batchSize && idx < segs.length) {
-      const seg = segs[idx];
-      buf += seg.val;
-      idx++;
-      if (seg.type === 'char') count++;
-      // Tags and entities don't count toward batch
-    }
-
-    $story.innerHTML = buf + '<span class="tw-cursor"></span>';
-    $story.scrollTop = $story.scrollHeight;
-  }, baseSpeed);
 }
 
 function skipTypewriter() {
@@ -560,6 +602,7 @@ function skipTypewriter() {
 }
 
 $story.addEventListener('click', skipTypewriter);
+$story.addEventListener('touchend', skipTypewriter);
 
 function renderScene(text, choices) {
   $choices.innerHTML = '';
@@ -567,27 +610,27 @@ function renderScene(text, choices) {
   currentChoices = [];
   renderStatus();
 
-  typewrite(text, () => {
+  typewrite(text, function() {
     showChoices(choices);
   });
 }
 
 function showChoices(choices) {
   $choices.innerHTML = '';
-  const keys = ['A','B','C','D'];
-  choices.forEach((c, i) => {
-    const btn = document.createElement('button');
+  var keys = ['A','B','C','D'];
+  choices.forEach(function(c, i) {
+    var btn = document.createElement('button');
     btn.className = 'choice-btn';
     btn.innerHTML = '<span class="key-hint">' + keys[i] + '</span><span>' + c.text + '</span>';
-    btn.addEventListener('click', () => selectChoice(i));
+    btn.addEventListener('click', function() { selectChoice(i); });
     btn.style.opacity = '0';
     btn.style.transform = 'translateY(8px)';
     $choices.appendChild(btn);
-    setTimeout(() => {
+    setTimeout(function() {
       btn.style.transition = 'opacity .3s, transform .3s';
       btn.style.opacity = '1';
       btn.style.transform = 'translateY(0)';
-    }, 60 * i);
+    }, 80 * i);
   });
   currentChoices = choices;
 }
