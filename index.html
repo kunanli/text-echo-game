@@ -495,6 +495,70 @@
     text-shadow: 0 0 8px rgba(232,208,128,.3);
   }
 
+  /* ── Title Phases ── */
+  .title-phase {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    opacity: 0;
+    transition: opacity .5s;
+    position: absolute;
+    pointer-events: none;
+  }
+  .title-phase.active {
+    opacity: 1;
+    position: relative;
+    pointer-events: all;
+  }
+  .click-prompt {
+    color: #5a5a6a;
+    font-size: .9rem;
+    letter-spacing: 3px;
+    margin-top: 10px;
+    animation: prompt-pulse 2.5s ease-in-out infinite;
+    cursor: pointer;
+  }
+  @keyframes prompt-pulse {
+    0%, 100% { opacity: .3; }
+    50% { opacity: 1; }
+  }
+  .lang-select {
+    display: flex;
+    gap: 24px;
+  }
+  .lang-btn {
+    background: #12121e;
+    border: 1px solid #2a2a3a;
+    color: #c8c8d0;
+    padding: 28px 44px;
+    font-family: inherit;
+    cursor: pointer;
+    border-radius: 6px;
+    transition: all .2s;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .lang-btn:hover {
+    border-color: #d4a843;
+    color: #d4a843;
+    background: #1a1a2e;
+  }
+  .lang-btn .lang-label {
+    font-size: 1.3rem;
+    font-weight: bold;
+  }
+  .lang-btn .lang-desc {
+    font-size: .75rem;
+    color: #5a5a6a;
+  }
+  .lang-btn:hover .lang-desc {
+    color: #8a7a4a;
+  }
+
   /* ── Notification ── */
   .notification {
     position: fixed;
@@ -550,7 +614,9 @@
 <body>
 
 <div class="title-screen" id="title-screen">
-  <pre class="title-ascii">
+  <!-- Phase 1: Splash -->
+  <div class="title-phase active" id="phase-splash">
+    <pre class="title-ascii">
           <span class="star">·  ✦  ·</span>                              <span class="star">·  ✦  ·</span>
       <span class="star">˚</span>            <span class="star">·</span>                  <span class="star">·</span>            <span class="star">˚</span>
 
@@ -558,8 +624,7 @@
        ║ ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ ║
        ║ ░                                       ░ ║
        ║ ░        石    化    深    淵           ░ ║
-       ║ ░                                       ░ ║
-       ║ ░     —— 從祭獻之坑，向光攀升 ——      ░ ║
+       ║ ░      PETRIFICATION  ABYSS            ░ ║
        ║ ░                                       ░ ║
        ║ ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ ║
        ╚═══════════════════════════════════════════╝
@@ -581,51 +646,71 @@
                          / ░░░░░░░░░ \
                         / ░░ 深  淵 ░░ \
                        /░░░░░░░░░░░░░░░░\
-  </pre>
-  <div class="title-form">
-    <div class="title-section">
-      <span class="title-label">角 色 命 名</span>
-      <input class="title-input" id="name-input" type="text" placeholder="輸入你的名字……" maxlength="12">
+    </pre>
+    <div class="click-prompt">— 點擊開始 · Click to Start —</div>
+  </div>
+
+  <!-- Phase 2: Language Selection -->
+  <div class="title-phase" id="phase-lang">
+    <div class="lang-select">
+      <button class="lang-btn" data-lang="zh">
+        <span class="lang-label">中文</span>
+        <span class="lang-desc">繁體中文介面</span>
+      </button>
+      <button class="lang-btn" data-lang="en">
+        <span class="lang-label">English</span>
+        <span class="lang-desc">English Interface</span>
+      </button>
     </div>
-    <div class="title-section">
-      <span class="title-label">能 力 分 配</span>
-      <div id="stat-alloc">
-        <div class="stat-alloc-row">
-          <span class="stat-alloc-name">力量</span>
-          <span class="stat-alloc-desc">攻擊·攀爬</span>
-          <div class="stat-alloc-controls">
-            <button class="stat-alloc-btn" data-stat="str" data-dir="-1">&minus;</button>
-            <span class="stat-alloc-val" id="alloc-str">3</span>
-            <button class="stat-alloc-btn" data-stat="str" data-dir="1">+</button>
-          </div>
-        </div>
-        <div class="stat-alloc-row">
-          <span class="stat-alloc-name">敏捷</span>
-          <span class="stat-alloc-desc">閃避·潛行</span>
-          <div class="stat-alloc-controls">
-            <button class="stat-alloc-btn" data-stat="agi" data-dir="-1">&minus;</button>
-            <span class="stat-alloc-val" id="alloc-agi">3</span>
-            <button class="stat-alloc-btn" data-stat="agi" data-dir="1">+</button>
-          </div>
-        </div>
-        <div class="stat-alloc-row">
-          <span class="stat-alloc-name">意志</span>
-          <span class="stat-alloc-desc">抗石化·精神</span>
-          <div class="stat-alloc-controls">
-            <button class="stat-alloc-btn" data-stat="wil" data-dir="-1">&minus;</button>
-            <span class="stat-alloc-val" id="alloc-wil">3</span>
-            <button class="stat-alloc-btn" data-stat="wil" data-dir="1">+</button>
-          </div>
-        </div>
+  </div>
+
+  <!-- Phase 3: Character Creation -->
+  <div class="title-phase" id="phase-create">
+    <div class="title-form">
+      <div class="title-section">
+        <span class="title-label" id="label-name">角 色 命 名</span>
+        <input class="title-input" id="name-input" type="text" placeholder="輸入你的名字……" maxlength="12">
       </div>
-      <div class="stat-alloc-remain">剩餘點數：<span id="alloc-remain">6</span></div>
+      <div class="title-section">
+        <span class="title-label" id="label-stat-alloc">能 力 分 配</span>
+        <div id="stat-alloc">
+          <div class="stat-alloc-row">
+            <span class="stat-alloc-name" id="alloc-str-name">力量</span>
+            <span class="stat-alloc-desc" id="alloc-str-desc">攻擊·攀爬</span>
+            <div class="stat-alloc-controls">
+              <button class="stat-alloc-btn" data-stat="str" data-dir="-1">&minus;</button>
+              <span class="stat-alloc-val" id="alloc-str">3</span>
+              <button class="stat-alloc-btn" data-stat="str" data-dir="1">+</button>
+            </div>
+          </div>
+          <div class="stat-alloc-row">
+            <span class="stat-alloc-name" id="alloc-agi-name">敏捷</span>
+            <span class="stat-alloc-desc" id="alloc-agi-desc">閃避·潛行</span>
+            <div class="stat-alloc-controls">
+              <button class="stat-alloc-btn" data-stat="agi" data-dir="-1">&minus;</button>
+              <span class="stat-alloc-val" id="alloc-agi">3</span>
+              <button class="stat-alloc-btn" data-stat="agi" data-dir="1">+</button>
+            </div>
+          </div>
+          <div class="stat-alloc-row">
+            <span class="stat-alloc-name" id="alloc-wil-name">意志</span>
+            <span class="stat-alloc-desc" id="alloc-wil-desc">抗石化·精神</span>
+            <div class="stat-alloc-controls">
+              <button class="stat-alloc-btn" data-stat="wil" data-dir="-1">&minus;</button>
+              <span class="stat-alloc-val" id="alloc-wil">3</span>
+              <button class="stat-alloc-btn" data-stat="wil" data-dir="1">+</button>
+            </div>
+          </div>
+        </div>
+        <div class="stat-alloc-remain"><span id="alloc-remain-label">剩餘點數：</span><span id="alloc-remain">6</span></div>
+      </div>
+      <button class="start-btn" id="start-btn">開 始 冒 險</button>
     </div>
-    <button class="start-btn" id="start-btn">開 始 冒 險</button>
   </div>
 </div>
 
 <header>
-  <h1>石 化 深 淵</h1>
+  <h1 id="header-title">石 化 深 淵</h1>
   <div class="subtitle">—— 從祭獻之坑，向光攀升 ——</div>
 </header>
 
@@ -643,30 +728,30 @@
   </div>
   <div class="status-panel">
     <div class="status-section">
-      <h3>生命</h3>
+      <h3 id="label-life">生命</h3>
       <div class="stat-row">
-        <span class="stat-label">HP</span>
+        <span class="stat-label" id="label-hp">HP</span>
         <span class="stat-value hp" id="stat-hp">100 / 100</span>
       </div>
       <div class="bar-container"><div class="bar-fill hp-bar" id="bar-hp"></div></div>
       <div class="stat-row">
-        <span class="stat-label">石化度</span>
+        <span class="stat-label" id="label-petri">石化度</span>
         <span class="stat-value petri" id="stat-petri">0%</span>
       </div>
       <div class="bar-container"><div class="bar-fill petri-bar" id="bar-petri"></div></div>
     </div>
     <div class="status-section">
-      <h3>屬性</h3>
-      <div class="stat-row"><span class="stat-label">力量</span><span class="stat-value" id="stat-str">5</span></div>
-      <div class="stat-row"><span class="stat-label">敏捷</span><span class="stat-value" id="stat-agi">5</span></div>
-      <div class="stat-row"><span class="stat-label">意志</span><span class="stat-value" id="stat-wil">5</span></div>
+      <h3 id="label-stats">屬性</h3>
+      <div class="stat-row"><span class="stat-label" id="label-str">力量</span><span class="stat-value" id="stat-str">5</span></div>
+      <div class="stat-row"><span class="stat-label" id="label-agi">敏捷</span><span class="stat-value" id="stat-agi">5</span></div>
+      <div class="stat-row"><span class="stat-label" id="label-wil">意志</span><span class="stat-value" id="stat-wil">5</span></div>
     </div>
     <div class="status-section">
-      <h3>物品欄</h3>
+      <h3 id="label-inv">物品欄</h3>
       <ul class="inventory-list" id="inventory"></ul>
     </div>
     <div class="status-section">
-      <h3>位置</h3>
+      <h3 id="label-loc">位置</h3>
       <div class="stat-row"><span class="stat-label" id="location-text">祭獻坑</span></div>
     </div>
   </div>
@@ -687,7 +772,7 @@
      .   .:!googl/. :                                 .  :\
     :.!gooogle/  :                                     . |
   </pre>
-  <h2>石 化</h2>
+  <h2 id="death-title">石 化</h2>
   <p id="death-msg">你的身體已完全化為冰冷的石頭……</p>
   <button id="revive-btn">掙脫石殼，重新站起</button>
 </div>
@@ -708,9 +793,56 @@ const state = {
   node: 'start',
   flags: {},
   deathCount: 0,
+  lang: 'zh',
 };
 
-const REGIONS = ['祭獻坑','石脈迴廊','灰燼神殿','裂隙天穹'];
+// ── i18n helpers ──
+function L(zh, en) { return state.lang === 'en' ? en : zh; }
+
+const TAG_EN = {
+  '系統':'SYS','意識':'MIND','感知':'SENSE','身體':'BODY',
+  '石化':'PETRI','警告':'WARN','情報':'INFO','決意':'RESOLVE',
+  '行動':'ACT','探索':'EXPLORE','發現':'FOUND','物品':'ITEM',
+  '移動':'MOVE','記憶':'MEMORY','成功':'SUCCESS','失敗':'FAIL',
+  '遭遇':'ENCOUNTER','戰鬥':'COMBAT','勝利':'VICTORY','潛行':'STEALTH',
+  '撤退':'RETREAT','休息':'REST','恢復':'RECOVER','環境':'ENV',
+  '意志':'WILL','傷害':'DMG',
+};
+
+const REGIONS_ZH = ['祭獻坑','石脈迴廊','灰燼神殿','裂隙天穹'];
+const REGIONS_EN = ['Sacrificial Pit','Vein Corridor','Ash Sanctum','Rift Canopy'];
+function getRegion(i) { return state.lang === 'en' ? REGIONS_EN[i] : REGIONS_ZH[i]; }
+
+function applyLang() {
+  var en = state.lang === 'en';
+  // Title screen
+  document.getElementById('label-name').textContent = en ? 'CHARACTER NAME' : '角 色 命 名';
+  document.getElementById('name-input').placeholder = en ? 'Enter your name...' : '輸入你的名字……';
+  document.getElementById('label-stat-alloc').textContent = en ? 'STAT ALLOCATION' : '能 力 分 配';
+  document.getElementById('alloc-str-name').textContent = en ? 'STR' : '力量';
+  document.getElementById('alloc-agi-name').textContent = en ? 'AGI' : '敏捷';
+  document.getElementById('alloc-wil-name').textContent = en ? 'WIL' : '意志';
+  document.getElementById('alloc-str-desc').textContent = en ? 'Attack·Climb' : '攻擊·攀爬';
+  document.getElementById('alloc-agi-desc').textContent = en ? 'Dodge·Stealth' : '閃避·潛行';
+  document.getElementById('alloc-wil-desc').textContent = en ? 'Anti-Petri·Mind' : '抗石化·精神';
+  document.getElementById('alloc-remain-label').textContent = en ? 'Points left: ' : '剩餘點數：';
+  document.getElementById('start-btn').textContent = en ? 'BEGIN ADVENTURE' : '開 始 冒 險';
+  // Header
+  document.getElementById('header-title').textContent = en ? 'PETRIFICATION ABYSS' : '石 化 深 淵';
+  // Status panel
+  document.getElementById('label-life').textContent = en ? 'LIFE' : '生命';
+  document.getElementById('label-hp').textContent = 'HP';
+  document.getElementById('label-petri').textContent = en ? 'Petrification' : '石化度';
+  document.getElementById('label-stats').textContent = en ? 'STATS' : '屬性';
+  document.getElementById('label-str').textContent = en ? 'STR' : '力量';
+  document.getElementById('label-agi').textContent = en ? 'AGI' : '敏捷';
+  document.getElementById('label-wil').textContent = en ? 'WIL' : '意志';
+  document.getElementById('label-inv').textContent = en ? 'INVENTORY' : '物品欄';
+  document.getElementById('label-loc').textContent = en ? 'LOCATION' : '位置';
+  // Death overlay
+  document.getElementById('death-title').textContent = en ? 'PETRIFIED' : '石 化';
+  document.getElementById('revive-btn').textContent = en ? 'Break free and rise again' : '掙脫石殼，重新站起';
+}
 
 // ── DOM refs ──
 const $story   = document.getElementById('story-text');
@@ -749,7 +881,7 @@ function hasItem(name) { return state.inventory.includes(name); }
 function addItem(name) {
   if (!hasItem(name)) {
     state.inventory.push(name);
-    notify('獲得物品：' + name);
+    notify(L('獲得物品：', 'Acquired: ') + name);
   }
 }
 
@@ -760,12 +892,12 @@ function removeItem(name) {
 
 function changeHp(delta) {
   state.hp = clamp(state.hp + delta, 0, state.maxHp);
-  if (state.hp <= 0) die('你的生命力耗盡，倒在了冰冷的石地上……');
+  if (state.hp <= 0) die(L('你的生命力耗盡，倒在了冰冷的石地上……', 'Your life force fades... You collapse on the cold stone floor...'));
 }
 
 function changePetri(delta) {
   state.petri = clamp(state.petri + delta, 0, 100);
-  if (state.petri >= 100) die('你的身體已完全化為冰冷的石頭……');
+  if (state.petri >= 100) die(L('你的身體已完全化為冰冷的石頭……', 'Your body has completely turned to cold stone...'));
 }
 
 function changeStat(stat, delta) {
@@ -783,12 +915,17 @@ function renderStatus() {
   $str.textContent = state.str;
   $agi.textContent = state.agi;
   $wil.textContent = state.wil;
-  $loc.textContent = REGIONS[state.region] || '';
-  $region.textContent = '第' + '一二三四'[state.region] + '層 — ' + REGIONS[state.region];
-  $subtitle.textContent = state.name + ' —— 石化度 ' + state.petri + '%';
+  $loc.textContent = getRegion(state.region) || '';
+  if (state.lang === 'en') {
+    $region.textContent = 'Floor ' + (state.region + 1) + ' — ' + getRegion(state.region);
+    $subtitle.textContent = state.name + ' — Petri ' + state.petri + '%';
+  } else {
+    $region.textContent = '第' + '一二三四'[state.region] + '層 — ' + getRegion(state.region);
+    $subtitle.textContent = state.name + ' —— 石化度 ' + state.petri + '%';
+  }
 
   if (state.inventory.length === 0) {
-    $inv.innerHTML = '<li class="inventory-empty">空</li>';
+    $inv.innerHTML = '<li class="inventory-empty">' + L('空', 'Empty') + '</li>';
   } else {
     $inv.innerHTML = state.inventory.map(it => '<li>' + it + '</li>').join('');
   }
@@ -812,20 +949,20 @@ const $ebTimer      = document.getElementById('eb-timer');
 
 // ── Ambient / filler events ──
 const AMBIENT_POOL = [
-  { tag: '環境', tagColor: 'tag-system', text: '一陣冷風從遠處吹來……' },
-  { tag: '感知', tagColor: 'tag-sense', text: '遠處傳來微弱的水滴聲。' },
-  { tag: '環境', tagColor: 'tag-system', text: '空氣中的石化粒子在微光中閃爍。' },
-  { tag: '感知', tagColor: 'tag-sense', text: '你感覺到腳下的地面微微震動。' },
-  { tag: '環境', tagColor: 'tag-system', text: '某處傳來石塊碎裂的聲響。' },
-  { tag: '感知', tagColor: 'tag-sense', text: '一股潮濕的氣息撲面而來。' },
-  { tag: '環境', tagColor: 'tag-system', text: '牆壁上的礦脈閃爍了一下。' },
-  { tag: '石化', tagColor: 'tag-petri', text: '你的指尖隱隱發麻——石化在緩慢蔓延。' },
-  { tag: '感知', tagColor: 'tag-sense', text: '你聽到了自己的心跳聲。' },
-  { tag: '環境', tagColor: 'tag-system', text: '洞穴深處傳來不明的回聲。' },
-  { tag: '感知', tagColor: 'tag-sense', text: '你的影子在礦脈的冷光中微微搖晃。' },
-  { tag: '環境', tagColor: 'tag-system', text: '腳下的碎石發出細微的響聲。' },
-  { tag: '感知', tagColor: 'tag-sense', text: '空氣變得更加沉重了。' },
-  { tag: '環境', tagColor: 'tag-system', text: '你嗅到了一絲腐朽的氣味。' },
+  { tag: '環境', tagColor: 'tag-system', text: '一陣冷風從遠處吹來……', textEn: 'A cold wind blows from the depths...' },
+  { tag: '感知', tagColor: 'tag-sense', text: '遠處傳來微弱的水滴聲。', textEn: 'Faint dripping echoes in the distance.' },
+  { tag: '環境', tagColor: 'tag-system', text: '空氣中的石化粒子在微光中閃爍。', textEn: 'Petrification particles glimmer in the faint light.' },
+  { tag: '感知', tagColor: 'tag-sense', text: '你感覺到腳下的地面微微震動。', textEn: 'You feel the ground trembling beneath your feet.' },
+  { tag: '環境', tagColor: 'tag-system', text: '某處傳來石塊碎裂的聲響。', textEn: 'The sound of crumbling stone echoes nearby.' },
+  { tag: '感知', tagColor: 'tag-sense', text: '一股潮濕的氣息撲面而來。', textEn: 'A wave of damp air washes over you.' },
+  { tag: '環境', tagColor: 'tag-system', text: '牆壁上的礦脈閃爍了一下。', textEn: 'The ore veins on the wall flicker briefly.' },
+  { tag: '石化', tagColor: 'tag-petri', text: '你的指尖隱隱發麻——石化在緩慢蔓延。', textEn: 'Your fingertips tingle — petrification slowly spreads.' },
+  { tag: '感知', tagColor: 'tag-sense', text: '你聽到了自己的心跳聲。', textEn: 'You hear your own heartbeat.' },
+  { tag: '環境', tagColor: 'tag-system', text: '洞穴深處傳來不明的回聲。', textEn: 'Unknown echoes reverberate from deep within the cave.' },
+  { tag: '感知', tagColor: 'tag-sense', text: '你的影子在礦脈的冷光中微微搖晃。', textEn: 'Your shadow sways in the cold glow of ore veins.' },
+  { tag: '環境', tagColor: 'tag-system', text: '腳下的碎石發出細微的響聲。', textEn: 'Gravel crunches softly underfoot.' },
+  { tag: '感知', tagColor: 'tag-sense', text: '空氣變得更加沉重了。', textEn: 'The air grows heavier.' },
+  { tag: '環境', tagColor: 'tag-system', text: '你嗅到了一絲腐朽的氣味。', textEn: 'You catch a faint scent of decay.' },
 ];
 var lastAmbientIdx = -1;
 
@@ -865,7 +1002,7 @@ function stopDots() {
 function showExploreBar(label) {
   $exploreBar.classList.add('active');
   $exploreBar.classList.remove('done');
-  $ebLabel.textContent = label || '自動探索中';
+  $ebLabel.textContent = label || L('自動探索中', 'Auto-exploring');
   $ebTimer.textContent = '00:00';
   startDots();
 }
@@ -875,7 +1012,7 @@ function updateExploreTimer() {
 function finishExploreBar() {
   stopDots();
   $exploreBar.classList.add('done');
-  $ebLabel.textContent = '等待決策';
+  $ebLabel.textContent = L('等待決策', 'Awaiting decision');
   $ebTimer.textContent = fmtTime(autoElapsed);
 }
 function hideExploreBar() {
@@ -943,8 +1080,9 @@ function autoExplore(steps, choices, opts) {
     // Build line element
     var line = document.createElement('div');
 
-    if (step.art) {
-      line.innerHTML = step.art;
+    var artContent = (state.lang === 'en' && step.artEn) ? step.artEn : step.art;
+    if (artContent) {
+      line.innerHTML = artContent;
     } else {
       line.className = 'log-line';
 
@@ -958,17 +1096,20 @@ function autoExplore(steps, choices, opts) {
       if (step.tag) {
         var tagEl = document.createElement('span');
         tagEl.className = 'log-tag ' + (step.tagColor || 'tag-explore');
-        tagEl.textContent = '[' + step.tag + ']';
+        var tagText = (state.lang === 'en' && TAG_EN[step.tag]) ? TAG_EN[step.tag] : step.tag;
+        tagEl.textContent = '[' + tagText + ']';
         line.appendChild(tagEl);
       }
 
       // Content
-      if (step.html) {
+      var htmlContent = (state.lang === 'en' && step.htmlEn) ? step.htmlEn : step.html;
+      var textContent = (state.lang === 'en' && step.textEn) ? step.textEn : step.text;
+      if (htmlContent) {
         var span = document.createElement('span');
-        span.innerHTML = step.html;
+        span.innerHTML = htmlContent;
         line.appendChild(span);
-      } else if (step.text) {
-        line.appendChild(document.createTextNode(step.text));
+      } else if (textContent) {
+        line.appendChild(document.createTextNode(textContent));
       }
     }
 
@@ -1013,7 +1154,8 @@ function showChoices(choices) {
   choices.forEach(function(c, i) {
     var btn = document.createElement('button');
     btn.className = 'choice-btn';
-    btn.innerHTML = '<span class="key-hint">' + keys[i] + '</span><span>' + c.text + '</span>';
+    var choiceLabel = (state.lang === 'en' && c.textEn) ? c.textEn : c.text;
+    btn.innerHTML = '<span class="key-hint">' + keys[i] + '</span><span>' + choiceLabel + '</span>';
     btn.addEventListener('click', function() { selectChoice(i); });
     btn.style.opacity = '0';
     btn.style.transform = 'translateY(8px)';
@@ -1063,7 +1205,7 @@ function selectChoice(idx) {
 //  Death / Revive
 // ═══════════════════════════════════════════════════
 function die(msg) {
-  $deathMsg.textContent = msg || '你死了……';
+  $deathMsg.textContent = msg || L('你死了……', 'You died...');
   $deathOv.classList.add('active');
 }
 
@@ -1072,7 +1214,7 @@ function revive() {
   state.hp = Math.floor(state.maxHp * 0.6);
   state.petri = Math.max(0, state.petri - 30);
   $deathOv.classList.remove('active');
-  notify('你從石殼中掙脫，重新站起。（復活次數：' + state.deathCount + '）');
+  notify(L('你從石殼中掙脫，重新站起。（復活次數：' + state.deathCount + '）', 'You break free from the stone shell. (Deaths: ' + state.deathCount + ')'));
   renderStatus();
   // Return to current region start
   loadNode(state.node.includes('combat') ? regionStartNode() : state.node);
@@ -1097,23 +1239,25 @@ function startCombat(enemy, onWin, onFlee) {
     const myPct = Math.max(0, Math.floor(state.hp / state.maxHp * 10));
     const myBar = '█'.repeat(myPct) + '░'.repeat(10 - myPct);
 
+    var combatTitle = L('戰  鬥', 'COMBAT');
+    var youLabel = L('你', 'You').padEnd(6);
     const text = `<pre class="ascii-art red">
   ╔══════════════════════════════╗
-  ║     ⚔  戰  鬥  ⚔           ║
+  ║     ⚔  ${combatTitle}  ⚔           ║
   ╠══════════════════════════════╣
   ║  ${eName.padEnd(6)}  [${hpBar}]  ${String(enemyHp).padStart(3)}  ║
-  ║  你      [${myBar}]  ${String(state.hp).padStart(3)}  ║
+  ║  ${youLabel}[${myBar}]  ${String(state.hp).padStart(3)}  ║
   ╚══════════════════════════════╝
 </pre>
 ${enemy.desc || ''}`;
 
     const choices = [
-      { text: '攻擊', action: () => doAttack() },
-      { text: '閃避', action: () => doDodge() },
-      { text: '防守', action: () => doDefend() },
+      { text: L('攻擊', 'Attack'), action: () => doAttack() },
+      { text: L('閃避', 'Dodge'), action: () => doDodge() },
+      { text: L('防守', 'Defend'), action: () => doDefend() },
     ];
     if (onFlee) {
-      choices.push({ text: '逃跑', action: () => onFlee() });
+      choices.push({ text: L('逃跑', 'Flee'), action: () => onFlee() });
     }
     renderScene(text, choices);
   }
@@ -1123,36 +1267,36 @@ ${enemy.desc || ''}`;
     const enemyDmg = Math.max(0, rng(enemy.atkMin, enemy.atkMax) - Math.floor(state.agi * 0.3));
     enemyHp -= dmg;
 
-    let log = `<div class="combat-log">你揮出攻擊，造成 ${dmg} 點傷害。</div>`;
+    let log = `<div class="combat-log">${L('你揮出攻擊，造成 ' + dmg + ' 點傷害。', 'You attack, dealing ' + dmg + ' damage.')}</div>`;
 
     if (enemyHp <= 0) {
-      log += `<div class="combat-log">${eName} 被擊敗了！</div>`;
-      renderScene(log, [{ text: '繼續', action: () => onWin() }]);
+      log += `<div class="combat-log">${L(eName + ' 被擊敗了！', eName + ' has been defeated!')}</div>`;
+      renderScene(log, [{ text: L('繼續', 'Continue'), action: () => onWin() }]);
       return;
     }
 
     changeHp(-enemyDmg);
     if (enemy.petriDmg) changePetri(enemy.petriDmg);
-    log += `<div class="combat-log">${eName} 反擊，對你造成 ${enemyDmg} 點傷害。${enemy.petriDmg ? '石化度 +' + enemy.petriDmg + '%' : ''}</div>`;
+    log += `<div class="combat-log">${L(eName + ' 反擊，對你造成 ' + enemyDmg + ' 點傷害。', eName + ' strikes back, dealing ' + enemyDmg + ' damage.')}${enemy.petriDmg ? L(' 石化度 +' + enemy.petriDmg + '%', ' Petri +' + enemy.petriDmg + '%') : ''}</div>`;
 
-    if (state.hp <= 0) return; // die() already called
+    if (state.hp <= 0) return;
 
-    renderScene(log, [{ text: '繼續戰鬥', action: () => combatRound() }]);
+    renderScene(log, [{ text: L('繼續戰鬥', 'Continue fighting'), action: () => combatRound() }]);
   }
 
   function doDodge() {
     const dodgeRoll = rng(1, 10) + state.agi;
     let log;
     if (dodgeRoll >= 10) {
-      log = `<div class="combat-log">你靈巧地閃開了攻擊！</div>`;
+      log = `<div class="combat-log">${L('你靈巧地閃開了攻擊！', 'You nimbly dodge the attack!')}</div>`;
     } else {
       const enemyDmg = Math.max(1, rng(enemy.atkMin, enemy.atkMax) - state.agi);
       changeHp(-enemyDmg);
       if (enemy.petriDmg) changePetri(Math.floor(enemy.petriDmg / 2));
-      log = `<div class="combat-log">閃避失敗！受到 ${enemyDmg} 點傷害。</div>`;
+      log = `<div class="combat-log">${L('閃避失敗！受到 ' + enemyDmg + ' 點傷害。', 'Dodge failed! Took ' + enemyDmg + ' damage.')}</div>`;
       if (state.hp <= 0) return;
     }
-    renderScene(log, [{ text: '繼續戰鬥', action: () => combatRound() }]);
+    renderScene(log, [{ text: L('繼續戰鬥', 'Continue fighting'), action: () => combatRound() }]);
   }
 
   function doDefend() {
@@ -1161,9 +1305,9 @@ ${enemy.desc || ''}`;
     changeHp(-enemyDmg);
     const petriReduce = state.wil >= 7 ? 2 : 0;
     if (petriReduce) changePetri(-petriReduce);
-    let log = `<div class="combat-log">你舉起防禦，承受了 ${enemyDmg} 點傷害。${petriReduce ? '意志集中，石化度 -' + petriReduce + '%' : ''}</div>`;
+    let log = `<div class="combat-log">${L('你舉起防禦，承受了 ' + enemyDmg + ' 點傷害。', 'You raise your guard, taking ' + enemyDmg + ' damage.')}${petriReduce ? L(' 意志集中，石化度 -' + petriReduce + '%', ' Focus! Petri -' + petriReduce + '%') : ''}</div>`;
     if (state.hp <= 0) return;
-    renderScene(log, [{ text: '繼續戰鬥', action: () => combatRound() }]);
+    renderScene(log, [{ text: L('繼續戰鬥', 'Continue fighting'), action: () => combatRound() }]);
   }
 
   combatRound();
@@ -1181,8 +1325,8 @@ function loadNode(id) {
   if (nodes[id]) {
     nodes[id]();
   } else {
-    renderScene('<i>（未實裝的節點：' + id + '）</i>', [
-      { text: '返回', action: () => loadNode(regionStartNode()) }
+    renderScene('<i>' + L('（未實裝的節點：' + id + '）', '(Unimplemented node: ' + id + ')') + '</i>', [
+      { text: '返回', textEn: 'Return', action: () => loadNode(regionStartNode()) }
     ]);
   }
 }
@@ -1194,8 +1338,8 @@ function loadNode(id) {
 registerNode('r0_start', () => {
   state.region = 0;
   autoExplore([
-    { tag: '系統', tagColor: 'tag-system', text: '意識逐漸恢復……', delay: 2500 },
-    { tag: '系統', tagColor: 'tag-system', text: '正在載入感官……', delay: 2000 },
+    { tag: '系統', tagColor: 'tag-system', text: '意識逐漸恢復……', textEn: 'Consciousness slowly returning...', delay: 2500 },
+    { tag: '系統', tagColor: 'tag-system', text: '正在載入感官……', textEn: 'Senses loading...', delay: 2000 },
     { art: `<pre class="ascii-art">
         .         .            .        .
     .        .          .                     .
@@ -1214,23 +1358,41 @@ registerNode('r0_start', () => {
       /   (  獻  )   \\   .          .
      /    (  坑  )    \\       .
     /______=======______\\          .
+</pre>`, artEn: `<pre class="ascii-art">
+        .         .            .        .
+    .        .          .                     .
+         ___===___         .        .
+        /  \\   /  \\    .                .
+   .   |    \\ /    |        .
+       |     V     |   .         .        .
+  .     \\   ___   /         .
+         \\_/   \\_/      .            .
+    .     |  |  |                         .
+          |  |  |    .        .      .
+   .      |__|__|          .
+     .   /       \\    .            .
+        /  ~   ~  \\        .             .
+  .    / Sacrifi-  \\           .
+      /   -cial     \\   .          .
+     /     Pit       \\       .
+    /______=======______\\          .
 </pre>`, delay: 1000 },
-    { tag: '意識', tagColor: 'tag-petri', text: '你在黑暗中睜開眼睛。', delay: 2500 },
-    { tag: '感知', tagColor: 'tag-sense', text: '……什麼都看不見。只有無盡的黑暗。', delay: 2800 },
-    { tag: '感知', tagColor: 'tag-sense', text: '冰冷的石地貼著你的背脊。', delay: 2500 },
-    { tag: '感知', tagColor: 'tag-sense', text: '空氣中瀰漫著潮濕與石灰石的苦味。', delay: 2200 },
-    { tag: '身體', tagColor: 'tag-petri', text: '你嘗試動一動手指……', delay: 3000 },
-    { tag: '警告', tagColor: 'tag-warn', html: '你的四肢僵硬——左手的指尖已經泛灰，隱隱有<b>石化</b>的紋路蔓延。', delay: 2800 },
-    { tag: '感知', tagColor: 'tag-sense', text: '頭頂上方，遙遠的裂縫透出一絲微光。', delay: 2500 },
-    { tag: '情報', tagColor: 'tag-info', html: '你被扔進了<b>祭獻坑</b>——地下世界最深處的垃圾場。', delay: 2800 },
-    { tag: '情報', tagColor: 'tag-info', text: '被石化詛咒侵蝕、不再有利用價值的人，都會被丟到這裡。', delay: 2500 },
-    { tag: '環境', tagColor: 'tag-system', text: '遠處傳來石塊掉落的聲音。', delay: 2200 },
-    { tag: '決意', tagColor: 'tag-info', text: '你知道——你必須向上攀升。', delay: 2000 },
+    { tag: '意識', tagColor: 'tag-petri', text: '你在黑暗中睜開眼睛。', textEn: 'You open your eyes in the darkness.', delay: 2500 },
+    { tag: '感知', tagColor: 'tag-sense', text: '……什麼都看不見。只有無盡的黑暗。', textEn: '...Nothing visible. Only endless darkness.', delay: 2800 },
+    { tag: '感知', tagColor: 'tag-sense', text: '冰冷的石地貼著你的背脊。', textEn: 'Cold stone presses against your back.', delay: 2500 },
+    { tag: '感知', tagColor: 'tag-sense', text: '空氣中瀰漫著潮濕與石灰石的苦味。', textEn: 'The air reeks of moisture and bitter limestone.', delay: 2200 },
+    { tag: '身體', tagColor: 'tag-petri', text: '你嘗試動一動手指……', textEn: 'You try to wiggle your fingers...', delay: 3000 },
+    { tag: '警告', tagColor: 'tag-warn', html: '你的四肢僵硬——左手的指尖已經泛灰，隱隱有<b>石化</b>的紋路蔓延。', htmlEn: 'Your limbs are stiff — the fingertips of your left hand have turned grey, with <b>petrification</b> patterns spreading.', delay: 2800 },
+    { tag: '感知', tagColor: 'tag-sense', text: '頭頂上方，遙遠的裂縫透出一絲微光。', textEn: 'Far above, a faint gleam seeps through a distant crack.', delay: 2500 },
+    { tag: '情報', tagColor: 'tag-info', html: '你被扔進了<b>祭獻坑</b>——地下世界最深處的垃圾場。', htmlEn: 'You were thrown into the <b>Sacrificial Pit</b> — the deepest dumping ground of the underworld.', delay: 2800 },
+    { tag: '情報', tagColor: 'tag-info', text: '被石化詛咒侵蝕、不再有利用價值的人，都會被丟到這裡。', textEn: 'Those consumed by the petrification curse, no longer of use, are cast down here.', delay: 2500 },
+    { tag: '環境', tagColor: 'tag-system', text: '遠處傳來石塊掉落的聲音。', textEn: 'The sound of falling stones echoes in the distance.', delay: 2200 },
+    { tag: '決意', tagColor: 'tag-info', text: '你知道——你必須向上攀升。', textEn: 'You know — you must climb upward.', delay: 2000 },
   ], [
-    { text: '檢查自己的身體', action: () => loadNode('r0_body') },
-    { text: '觀察周圍環境', action: () => loadNode('r0_look') },
-    { text: '直接尋找出路', action: () => loadNode('r0_path') },
-  ], { label: '正在甦醒' });
+    { text: '檢查自己的身體', textEn: 'Examine your body', action: () => loadNode('r0_body') },
+    { text: '觀察周圍環境', textEn: 'Survey your surroundings', action: () => loadNode('r0_look') },
+    { text: '直接尋找出路', textEn: 'Search for an exit', action: () => loadNode('r0_path') },
+  ], { label: L('正在甦醒', 'Awakening') });
 });
 
 registerNode('r0_body', () => {
@@ -1245,36 +1407,46 @@ registerNode('r0_body', () => {
      / \\   /
     /   \\ /
    石化紋路蔓延中…
+</pre>`, artEn: `<pre class="ascii-art purple">
+      o
+     /|\\
+    / | \\
+   /  |  \\
+  ~~~~|    \\
+      |     |
+     / \\   /
+    /   \\ /
+   Petrification spreads...
 </pre>`, delay: 800 },
-    { tag: '行動', tagColor: 'tag-move', text: '你低頭審視自己。', delay: 2000 },
-    { tag: '感知', tagColor: 'tag-sense', text: '衣衫襤褸，腳上沒有鞋。', delay: 2200 },
-    { tag: '身體', tagColor: 'tag-sense', text: '你活動了一下手臂……關節僵硬但還能動。', delay: 2500 },
-    { tag: '石化', tagColor: 'tag-petri', text: '左手的石化紋路從指尖延伸到手腕。', delay: 2800 },
-    { tag: '石化', tagColor: 'tag-petri', text: '那股冰涼的麻痺感正在緩慢擴散……', delay: 2500 },
-    { tag: '感知', tagColor: 'tag-sense', text: '你的身體還算結實，也許是最近才被丟下來的。', delay: 2500 },
-    { tag: '記憶', tagColor: 'tag-system', text: '記憶一片模糊……', delay: 3000 },
-    { tag: '記憶', tagColor: 'tag-system', text: '唯一記得的，是墜落前那些穿著灰袍的祭司，和他們面無表情的臉。', delay: 2500 },
+    { tag: '行動', tagColor: 'tag-move', text: '你低頭審視自己。', textEn: 'You look down at yourself.', delay: 2000 },
+    { tag: '感知', tagColor: 'tag-sense', text: '衣衫襤褸，腳上沒有鞋。', textEn: 'Ragged clothes, no shoes.', delay: 2200 },
+    { tag: '身體', tagColor: 'tag-sense', text: '你活動了一下手臂……關節僵硬但還能動。', textEn: 'You move your arms... stiff joints, but functional.', delay: 2500 },
+    { tag: '石化', tagColor: 'tag-petri', text: '左手的石化紋路從指尖延伸到手腕。', textEn: 'Petrification patterns spread from fingertips to wrist on your left hand.', delay: 2800 },
+    { tag: '石化', tagColor: 'tag-petri', text: '那股冰涼的麻痺感正在緩慢擴散……', textEn: 'That cold, numbing sensation is slowly expanding...', delay: 2500 },
+    { tag: '感知', tagColor: 'tag-sense', text: '你的身體還算結實，也許是最近才被丟下來的。', textEn: 'Your body is still sturdy — you were probably thrown down recently.', delay: 2500 },
+    { tag: '記憶', tagColor: 'tag-system', text: '記憶一片模糊……', textEn: 'Memories are hazy...', delay: 3000 },
+    { tag: '記憶', tagColor: 'tag-system', text: '唯一記得的，是墜落前那些穿著灰袍的祭司，和他們面無表情的臉。', textEn: 'The only memory — grey-robed priests before the fall, their expressionless faces.', delay: 2500 },
   ], [
-    { text: '嘗試活動關節，恢復身體機能', action: () => {
+    { text: '嘗試活動關節，恢復身體機能', textEn: 'Stretch your joints to restore mobility', action: () => {
       changeStat('agi', 1);
-      notify('敏捷 +1');
+      notify(L('敏捷 +1', 'AGI +1'));
       loadNode('r0_look');
     }},
-    { text: '集中精神，抵抗石化的侵蝕', action: () => {
+    { text: '集中精神，抵抗石化的侵蝕', textEn: 'Focus your mind to resist petrification', action: () => {
       changeStat('wil', 1);
       changePetri(-3);
-      notify('意志 +1，石化度 -3%');
+      notify(L('意志 +1，石化度 -3%', 'WIL +1, Petri -3%'));
       loadNode('r0_look');
     }},
-  ], { label: '檢查身體' });
+  ], { label: L('檢查身體', 'Examining body') });
 });
 
 registerNode('r0_look', () => {
   state.flags.lookedAround = true;
   autoExplore([
-    { tag: '行動', tagColor: 'tag-move', text: '你緩緩站起身來。', delay: 2000 },
-    { tag: '探索', tagColor: 'tag-explore', text: '環顧四周……', delay: 2500 },
-    { tag: '感知', tagColor: 'tag-sense', text: '等待眼睛適應黑暗……', delay: 3000 },
+    { tag: '行動', tagColor: 'tag-move', text: '你緩緩站起身來。', textEn: 'You slowly rise to your feet.', delay: 2000 },
+    { tag: '探索', tagColor: 'tag-explore', text: '環顧四周……', textEn: 'Looking around...', delay: 2500 },
+    { tag: '感知', tagColor: 'tag-sense', text: '等待眼睛適應黑暗……', textEn: 'Waiting for your eyes to adjust to the darkness...', delay: 3000 },
     { art: `<pre class="ascii-art">
   [北：攀爬痕跡]
     |  /|  ^  ^
@@ -1288,25 +1460,39 @@ registerNode('r0_look', () => {
 ----+---+--+--+----
     |   ~~~    |
     | [南：裂縫] |
+</pre>`, artEn: `<pre class="ascii-art">
+  [N: Climbing marks]
+    |  /|  ^  ^
+    | / | /| /|
+    |/  |/ |/ |
+----+---+--+--+----
+   .  .  @@  . .
+  . , Corpse  ,.
+ ~ite~  .  . ~ite~
+  You←  .  . → .
+----+---+--+--+----
+    |   ~~~    |
+    | [S: Crack] |
 </pre>`, delay: 800 },
-    { tag: '探索', tagColor: 'tag-explore', text: '祭獻坑是一個不規則的天然洞穴，大約十來步寬。', delay: 2500 },
-    { tag: '感知', tagColor: 'tag-sense', text: '地面散落著碎石和……那些是骨頭，還是石化殘肢，你分不清楚。', delay: 2800 },
-    { tag: '探索', tagColor: 'tag-explore', text: '掃描東側……什麼都沒有，只有光滑的岩壁。', delay: 2500 },
-    { tag: '探索', tagColor: 'tag-explore', text: '掃描西側……幾個已經完全石化的人形，蜷縮在角落。', delay: 2800 },
-    { tag: '發現', tagColor: 'tag-item', html: '角落裡有一具<b>半石化的屍體</b>，手中似乎還握著什麼。', delay: 2500 },
-    { tag: '發現', tagColor: 'tag-item', html: '北面岩壁上有模糊的<b>攀爬痕跡</b>——有人嘗試過往上爬。', delay: 2500 },
-    { tag: '發現', tagColor: 'tag-item', html: '南面有一條狹窄的<b>裂縫</b>，黑暗中傳來微弱的水聲。', delay: 2200 },
+    { tag: '探索', tagColor: 'tag-explore', text: '祭獻坑是一個不規則的天然洞穴，大約十來步寬。', textEn: 'The Sacrificial Pit is an irregular natural cave, roughly ten paces wide.', delay: 2500 },
+    { tag: '感知', tagColor: 'tag-sense', text: '地面散落著碎石和……那些是骨頭，還是石化殘肢，你分不清楚。', textEn: 'The ground is littered with rubble and... bones? Petrified limbs? Hard to tell.', delay: 2800 },
+    { tag: '探索', tagColor: 'tag-explore', text: '掃描東側……什麼都沒有，只有光滑的岩壁。', textEn: 'Scanning east... nothing but smooth rock wall.', delay: 2500 },
+    { tag: '探索', tagColor: 'tag-explore', text: '掃描西側……幾個已經完全石化的人形，蜷縮在角落。', textEn: 'Scanning west... several fully petrified figures, curled up in the corner.', delay: 2800 },
+    { tag: '發現', tagColor: 'tag-item', html: '角落裡有一具<b>半石化的屍體</b>，手中似乎還握著什麼。', htmlEn: 'In the corner, a <b>half-petrified corpse</b> seems to be clutching something.', delay: 2500 },
+    { tag: '發現', tagColor: 'tag-item', html: '北面岩壁上有模糊的<b>攀爬痕跡</b>——有人嘗試過往上爬。', htmlEn: 'The north wall bears faint <b>climbing marks</b> — someone tried to climb up.', delay: 2500 },
+    { tag: '發現', tagColor: 'tag-item', html: '南面有一條狹窄的<b>裂縫</b>，黑暗中傳來微弱的水聲。', htmlEn: 'To the south, a narrow <b>crack</b> — faint sounds of water echo from within.', delay: 2200 },
   ], [
-    { text: '檢查半石化的屍體', action: () => loadNode('r0_corpse') },
-    { text: '查看攀爬痕跡', action: () => loadNode('r0_climb_check') },
-    { text: '探索裂縫', action: () => loadNode('r0_crack') },
-  ], { label: '觀察環境' });
+    { text: '檢查半石化的屍體', textEn: 'Examine the half-petrified corpse', action: () => loadNode('r0_corpse') },
+    { text: '查看攀爬痕跡', textEn: 'Check the climbing marks', action: () => loadNode('r0_climb_check') },
+    { text: '探索裂縫', textEn: 'Explore the crack', action: () => loadNode('r0_crack') },
+  ], { label: L('觀察環境', 'Observing area') });
 });
 
 registerNode('r0_corpse', () => {
   if (state.flags.corpseSearched) {
-    renderScene('你已經搜過這具屍體了。石化的手指保持著握緊的姿態，再也無法鬆開。',
-      [{ text: '返回', action: () => loadNode('r0_look') }]);
+    renderScene(L('你已經搜過這具屍體了。石化的手指保持著握緊的姿態，再也無法鬆開。',
+      'You\'ve already searched this corpse. The petrified fingers remain clenched, never to open again.'),
+      [{ text: '返回', textEn: 'Return', action: () => loadNode('r0_look') }]);
     return;
   }
   state.flags.corpseSearched = true;
@@ -1323,22 +1509,34 @@ registerNode('r0_corpse', () => {
    |_/  ||_|
   /石化  殘軀\\
  /=============\\
+</pre>`, artEn: `<pre class="ascii-art">
+     _____
+    / R.I \\
+   | .P.   |
+   | _____ |
+   |/##   \\|     ______
+   |##  @@ |----/      \\
+   |#  /|| |   |Dagger |
+   |# / || |    \\______/
+   |_/  ||_|
+  /  Petrified  \\
+ /=============\\
 </pre>`, delay: 600 },
-    { tag: '行動', tagColor: 'tag-move', text: '你蹲在那具半石化的屍體旁。', delay: 1500 },
-    { tag: '探索', tagColor: 'tag-explore', text: '這個人已經死了很久。右半身完全石化，左半部已腐朽。', delay: 2200 },
-    { tag: '探索', tagColor: 'tag-explore', text: '他的石化手中緊握著一把碎石磨成的粗糙匕首。', delay: 2000 },
-    { tag: '物品', tagColor: 'tag-item', html: '你費了些力氣，把匕首撬了出來。<b>獲得：碎石匕首</b>', delay: 2000, effect: () => addItem('碎石匕首') },
-    { tag: '警告', tagColor: 'tag-warn', html: '屍體胸口刻著歪歪斜斜的字：<b>「別走南邊」</b>', delay: 2000 },
+    { tag: '行動', tagColor: 'tag-move', text: '你蹲在那具半石化的屍體旁。', textEn: 'You crouch beside the half-petrified corpse.', delay: 1500 },
+    { tag: '探索', tagColor: 'tag-explore', text: '這個人已經死了很久。右半身完全石化，左半部已腐朽。', textEn: 'This person has been dead for a long time. Right side fully petrified, left side decayed.', delay: 2200 },
+    { tag: '探索', tagColor: 'tag-explore', text: '他的石化手中緊握著一把碎石磨成的粗糙匕首。', textEn: 'In their petrified hand, a crude dagger ground from broken stone.', delay: 2000 },
+    { tag: '物品', tagColor: 'tag-item', html: '你費了些力氣，把匕首撬了出來。<b>獲得：碎石匕首</b>', htmlEn: 'With some effort, you pry the dagger free. <b>Acquired: Stone Dagger</b>', delay: 2000, effect: () => addItem(L('碎石匕首', 'Stone Dagger')) },
+    { tag: '警告', tagColor: 'tag-warn', html: '屍體胸口刻著歪歪斜斜的字：<b>「別走南邊」</b>', htmlEn: 'Carved crookedly on the corpse\'s chest: <b>"DON\'T GO SOUTH"</b>', delay: 2000 },
   ], [
-    { text: '記住警告，去查看攀爬痕跡', action: () => { state.flags.corpseWarning = true; loadNode('r0_climb_check'); } },
-    { text: '無視警告，探索南面裂縫', action: () => loadNode('r0_crack') },
-  ], { label: '調查屍體' });
+    { text: '記住警告，去查看攀爬痕跡', textEn: 'Heed the warning, check climbing marks', action: () => { state.flags.corpseWarning = true; loadNode('r0_climb_check'); } },
+    { text: '無視警告，探索南面裂縫', textEn: 'Ignore the warning, explore the southern crack', action: () => loadNode('r0_crack') },
+  ], { label: L('調查屍體', 'Examining corpse') });
 });
 
 registerNode('r0_crack', () => {
   var warnStep = state.flags.corpseWarning
-    ? { tag: '記憶', tagColor: 'tag-warn', text: '你想起屍體上的警告，心中一緊——', delay: 1500 }
-    : { tag: '感知', tagColor: 'tag-sense', text: '腳下的石地越來越濕滑。', delay: 1200 };
+    ? { tag: '記憶', tagColor: 'tag-warn', text: '你想起屍體上的警告，心中一緊——', textEn: 'You recall the warning on the corpse — your heart tightens.', delay: 1500 }
+    : { tag: '感知', tagColor: 'tag-sense', text: '腳下的石地越來越濕滑。', textEn: 'The stone beneath your feet grows increasingly slippery.', delay: 1200 };
   autoExplore([
     { art: `<pre class="ascii-art blue">
     |  |        |  |
@@ -1351,54 +1549,65 @@ registerNode('r0_crack', () => {
     |######~~~~~~~~|
     |####  ~~~~~~~~|
     |##  腳  ~~~~~~|
+</pre>`, artEn: `<pre class="ascii-art blue">
+    |  |        |  |
+    |  |________|  |
+    | /~~~~~~~~~~\\ |
+    |/ ~~~ ~~ ~~~ \\|
+    | ~~~~~~~~~~~~ |
+    |~ Petri-Water~|
+    |~~~~~~~~~~~~~~|
+    |######~~~~~~~~|
+    |####  ~~~~~~~~|
+    |## Foot ~~~~~~|
 </pre>`, delay: 600 },
-    { tag: '移動', tagColor: 'tag-move', text: '你側身擠進南面的裂縫。', delay: 1500 },
-    { tag: '感知', tagColor: 'tag-sense', text: '通道越來越窄，空氣越來越潮濕。', delay: 1800 },
-    { tag: '感知', tagColor: 'tag-sense', text: '水聲漸漸清晰——前方似乎有一池地下水。', delay: 2000 },
-    { tag: '警告', tagColor: 'tag-warn', text: '突然，你的腳下一滑！', delay: 1200 },
+    { tag: '移動', tagColor: 'tag-move', text: '你側身擠進南面的裂縫。', textEn: 'You squeeze sideways into the southern crack.', delay: 1500 },
+    { tag: '感知', tagColor: 'tag-sense', text: '通道越來越窄，空氣越來越潮濕。', textEn: 'The passage narrows, the air grows damper.', delay: 1800 },
+    { tag: '感知', tagColor: 'tag-sense', text: '水聲漸漸清晰——前方似乎有一池地下水。', textEn: 'The sound of water grows clearer — an underground pool ahead.', delay: 2000 },
+    { tag: '警告', tagColor: 'tag-warn', text: '突然，你的腳下一滑！', textEn: 'Suddenly, your foot slips!', delay: 1200 },
     warnStep,
-    { tag: '警告', tagColor: 'tag-warn', text: '你勉強抓住岩壁穩住身體，但小腿浸入了冰冷的水中。', delay: 2200 },
-    { tag: '石化', tagColor: 'tag-petri', html: '水面泛著灰色的微光——<b>石化之水。</b>', delay: 1800 },
+    { tag: '警告', tagColor: 'tag-warn', text: '你勉強抓住岩壁穩住身體，但小腿浸入了冰冷的水中。', textEn: 'You barely grab the wall to steady yourself, but your calves plunge into the icy water.', delay: 2200 },
+    { tag: '石化', tagColor: 'tag-petri', html: '水面泛著灰色的微光——<b>石化之水。</b>', htmlEn: 'The water glows with a grey shimmer — <b>Petrification Water.</b>', delay: 1800 },
   ], [
-    { text: '立刻退回（考驗敏捷）', action: () => {
+    { text: '立刻退回（考驗敏捷）', textEn: 'Retreat immediately (Agility check)', action: () => {
       if (state.agi >= 6) {
-        notify('敏捷檢定成功！');
+        notify(L('敏捷檢定成功！', 'Agility check passed!'));
         changePetri(3);
         autoExplore([
-          { tag: '行動', tagColor: 'tag-explore', text: '你反應迅速，一把抽回雙腳！', delay: 1200 },
-          { tag: '石化', tagColor: 'tag-petri', text: '小腿處的皮膚微微泛灰，但不算嚴重。', delay: 1800 },
-          { tag: '物品', tagColor: 'tag-item', text: '水邊有一塊發光的礦石，你順手撿了起來。', delay: 1500 },
-        ], [{ text: '返回坑底', action: () => { addItem('微光石'); loadNode('r0_look'); } }]);
+          { tag: '行動', tagColor: 'tag-explore', text: '你反應迅速，一把抽回雙腳！', textEn: 'Quick reflexes! You yank your feet back!', delay: 1200 },
+          { tag: '石化', tagColor: 'tag-petri', text: '小腿處的皮膚微微泛灰，但不算嚴重。', textEn: 'Your calves show a faint grey tinge, but nothing serious.', delay: 1800 },
+          { tag: '物品', tagColor: 'tag-item', text: '水邊有一塊發光的礦石，你順手撿了起來。', textEn: 'A glowing mineral sits by the water\'s edge. You grab it.', delay: 1500 },
+        ], [{ text: '返回坑底', textEn: 'Return to the pit', action: () => { addItem(L('微光石', 'Glowstone')); loadNode('r0_look'); } }]);
       } else {
         changePetri(10);
         changeHp(-8);
         autoExplore([
-          { tag: '失敗', tagColor: 'tag-warn', text: '你慌忙後退，但滑了一跤！', delay: 1200 },
-          { tag: '石化', tagColor: 'tag-petri', text: '整條小腿都泡進了石化之水——劇痛蔓延。', delay: 2000 },
-          { tag: '警告', tagColor: 'tag-warn', text: '你拼命爬出裂縫，但皮膚上留下了大片灰色紋路。', delay: 2000 },
-        ], [{ text: '返回坑底', action: () => loadNode('r0_look') }]);
+          { tag: '失敗', tagColor: 'tag-warn', text: '你慌忙後退，但滑了一跤！', textEn: 'You scramble back, but slip and fall!', delay: 1200 },
+          { tag: '石化', tagColor: 'tag-petri', text: '整條小腿都泡進了石化之水——劇痛蔓延。', textEn: 'Your entire calves submerge in the petrification water — searing pain.', delay: 2000 },
+          { tag: '警告', tagColor: 'tag-warn', text: '你拼命爬出裂縫，但皮膚上留下了大片灰色紋路。', textEn: 'You crawl desperately out of the crack, grey patterns covering your skin.', delay: 2000 },
+        ], [{ text: '返回坑底', textEn: 'Return to the pit', action: () => loadNode('r0_look') }]);
       }
     }},
-    { text: '嘗試用意志抵抗石化，採集水邊礦石', action: () => {
+    { text: '嘗試用意志抵抗石化，採集水邊礦石', textEn: 'Resist petrification with willpower, gather minerals', action: () => {
       if (state.wil >= 6) {
         changePetri(5);
-        notify('意志檢定成功！');
+        notify(L('意志檢定成功！', 'Willpower check passed!'));
         autoExplore([
-          { tag: '意志', tagColor: 'tag-petri', text: '你閉上眼睛，集中精神……', delay: 1500 },
-          { tag: '成功', tagColor: 'tag-explore', text: '意志力化為溫熱的力量，暫時壓制住石化侵蝕。', delay: 2000 },
-          { tag: '物品', tagColor: 'tag-item', html: '採集了<b>微光石</b>和<b>石化水瓶</b>。', delay: 1500, effect: () => { addItem('微光石'); addItem('石化水瓶'); } },
-        ], [{ text: '返回坑底', action: () => loadNode('r0_look') }]);
+          { tag: '意志', tagColor: 'tag-petri', text: '你閉上眼睛，集中精神……', textEn: 'You close your eyes, focusing your mind...', delay: 1500 },
+          { tag: '成功', tagColor: 'tag-explore', text: '意志力化為溫熱的力量，暫時壓制住石化侵蝕。', textEn: 'Your willpower becomes a warm force, suppressing the petrification.', delay: 2000 },
+          { tag: '物品', tagColor: 'tag-item', html: '採集了<b>微光石</b>和<b>石化水瓶</b>。', htmlEn: 'Gathered <b>Glowstone</b> and <b>Petri-Water Flask</b>.', delay: 1500, effect: () => { addItem(L('微光石', 'Glowstone')); addItem(L('石化水瓶', 'Petri-Water Flask')); } },
+        ], [{ text: '返回坑底', textEn: 'Return to the pit', action: () => loadNode('r0_look') }]);
       } else {
         changePetri(12);
         changeHp(-5);
         autoExplore([
-          { tag: '意志', tagColor: 'tag-petri', text: '你嘗試以精神力抵抗……', delay: 1500 },
-          { tag: '失敗', tagColor: 'tag-warn', text: '石化的力量太過強大！冰冷感迅速爬上你的雙腿。', delay: 2000 },
-          { tag: '撤退', tagColor: 'tag-move', text: '你不得不放棄，連滾帶爬地退了出來。', delay: 1800 },
-        ], [{ text: '返回坑底', action: () => loadNode('r0_look') }]);
+          { tag: '意志', tagColor: 'tag-petri', text: '你嘗試以精神力抵抗……', textEn: 'You try to resist with willpower...', delay: 1500 },
+          { tag: '失敗', tagColor: 'tag-warn', text: '石化的力量太過強大！冰冷感迅速爬上你的雙腿。', textEn: 'The petrifying force is too powerful! Cold numbness races up your legs.', delay: 2000 },
+          { tag: '撤退', tagColor: 'tag-move', text: '你不得不放棄，連滾帶爬地退了出來。', textEn: 'You abandon the attempt, scrambling out on all fours.', delay: 1800 },
+        ], [{ text: '返回坑底', textEn: 'Return to the pit', action: () => loadNode('r0_look') }]);
       }
     }},
-  ], { label: '探索裂縫' });
+  ], { label: L('探索裂縫', 'Exploring crack') });
 });
 
 registerNode('r0_climb_check', () => {
@@ -1417,16 +1626,30 @@ registerNode('r0_climb_check', () => {
 ~~    |/   ||   \\   |
 ~~~~~~+~~~~||~~~~+~~~~~~
       |    你    |
+</pre>`, artEn: `<pre class="ascii-art">
+  ___________________________
+ |  ~~~~~~~Tunnel~~~~~~~  |
+ |_________======_________|
+           |    |
+      ┌────┘    └────┐Ledge
+      |              |
+    ~~|##  ^^  ##  ~~|~~
+   ~~ | # /||\\ # ~~ | ~~
+  ~~  |  / || \\  ~~ | Moss
+ ~~   | /  ||  \\ ~  |
+~~    |/   ||   \\   |
+~~~~~~+~~~~||~~~~+~~~~~~
+      |   You    |
 </pre>`, delay: 600 },
-    { tag: '移動', tagColor: 'tag-move', text: '你走到北面岩壁前。', delay: 1500 },
-    { tag: '探索', tagColor: 'tag-explore', text: '牆面上有模糊的抓痕和鑿出的凹陷——有人嘗試過向上攀爬。', delay: 2000 },
-    { tag: '探索', tagColor: 'tag-explore', text: '大約三個人高處有一個突出的岩棚。', delay: 1800 },
-    { tag: '警告', tagColor: 'tag-warn', text: '岩壁濕滑，牆上有奇怪的灰色苔蘚——接觸可能加速石化。', delay: 2200 },
+    { tag: '移動', tagColor: 'tag-move', text: '你走到北面岩壁前。', textEn: 'You approach the north wall.', delay: 1500 },
+    { tag: '探索', tagColor: 'tag-explore', text: '牆面上有模糊的抓痕和鑿出的凹陷——有人嘗試過向上攀爬。', textEn: 'The wall bears faint scratch marks and carved footholds — someone tried to climb.', delay: 2000 },
+    { tag: '探索', tagColor: 'tag-explore', text: '大約三個人高處有一個突出的岩棚。', textEn: 'About three body-lengths up, a protruding ledge.', delay: 1800 },
+    { tag: '警告', tagColor: 'tag-warn', text: '岩壁濕滑，牆上有奇怪的灰色苔蘚——接觸可能加速石化。', textEn: 'The wall is slick, covered in strange grey moss — contact may accelerate petrification.', delay: 2200 },
   ], [
-    { text: '直接攀爬（考驗力量）', action: () => loadNode('r0_climb_str') },
-    { text: '尋找其他可以借力的東西', action: () => loadNode('r0_climb_alt') },
-    { text: '返回觀察', action: () => loadNode('r0_look') },
-  ], { label: '查看岩壁' });
+    { text: '直接攀爬（考驗力量）', textEn: 'Climb directly (Strength check)', action: () => loadNode('r0_climb_str') },
+    { text: '尋找其他可以借力的東西', textEn: 'Look for alternative handholds', action: () => loadNode('r0_climb_alt') },
+    { text: '返回觀察', textEn: 'Go back', action: () => loadNode('r0_look') },
+  ], { label: L('查看岩壁', 'Checking wall') });
 });
 
 registerNode('r0_climb_str', () => {
@@ -1434,72 +1657,76 @@ registerNode('r0_climb_str', () => {
   if (strCheck >= 9) {
     changePetri(3);
     autoExplore([
-      { tag: '行動', tagColor: 'tag-move', text: '你深吸一口氣，找準落腳點，開始攀爬。', delay: 1500 },
-      { tag: '行動', tagColor: 'tag-move', text: '岩壁比想像中更滑……手掌幾次差點鬆開。', delay: 2000 },
-      { tag: '石化', tagColor: 'tag-petri', text: '灰色苔蘚沾上手臂，帶來一陣麻痺感——你咬牙撐住。', delay: 2200 },
-      { tag: '成功', tagColor: 'tag-explore', text: '手指扣住了岩棚邊緣——你用盡全力拉了上去！', delay: 2000 },
-      { tag: '探索', tagColor: 'tag-explore', text: '岩棚上方，一條蜿蜒的隧道延伸向黑暗深處。', delay: 1800 },
-    ], [{ text: '進入隧道', action: () => loadNode('r0_tunnel') }]);
+      { tag: '行動', tagColor: 'tag-move', text: '你深吸一口氣，找準落腳點，開始攀爬。', textEn: 'You take a deep breath, find your footholds, and begin climbing.', delay: 1500 },
+      { tag: '行動', tagColor: 'tag-move', text: '岩壁比想像中更滑……手掌幾次差點鬆開。', textEn: 'The wall is slicker than expected... your grip nearly slips several times.', delay: 2000 },
+      { tag: '石化', tagColor: 'tag-petri', text: '灰色苔蘚沾上手臂，帶來一陣麻痺感——你咬牙撐住。', textEn: 'Grey moss clings to your arms, bringing numbness — you grit your teeth.', delay: 2200 },
+      { tag: '成功', tagColor: 'tag-explore', text: '手指扣住了岩棚邊緣——你用盡全力拉了上去！', textEn: 'Your fingers hook the ledge — you haul yourself up with all your might!', delay: 2000 },
+      { tag: '探索', tagColor: 'tag-explore', text: '岩棚上方，一條蜿蜒的隧道延伸向黑暗深處。', textEn: 'Above the ledge, a winding tunnel stretches into the darkness.', delay: 1800 },
+    ], [{ text: '進入隧道', textEn: 'Enter the tunnel', action: () => loadNode('r0_tunnel') }]);
   } else {
     changePetri(5);
     changeHp(-10);
     autoExplore([
-      { tag: '行動', tagColor: 'tag-move', text: '你奮力向上攀爬……', delay: 1500 },
-      { tag: '失敗', tagColor: 'tag-warn', text: '到了一半，腳下的岩石突然碎裂！', delay: 1500 },
-      { tag: '傷害', tagColor: 'tag-warn', text: '你重重摔回地面，背部傳來劇痛。', delay: 2000 },
-      { tag: '石化', tagColor: 'tag-petri', text: '摔落時手臂蹭過灰色苔蘚，石化感迅速蔓延。', delay: 2000 },
+      { tag: '行動', tagColor: 'tag-move', text: '你奮力向上攀爬……', textEn: 'You climb with all your strength...', delay: 1500 },
+      { tag: '失敗', tagColor: 'tag-warn', text: '到了一半，腳下的岩石突然碎裂！', textEn: 'Halfway up, the rock beneath your foot crumbles!', delay: 1500 },
+      { tag: '傷害', tagColor: 'tag-warn', text: '你重重摔回地面，背部傳來劇痛。', textEn: 'You crash to the ground, searing pain in your back.', delay: 2000 },
+      { tag: '石化', tagColor: 'tag-petri', text: '摔落時手臂蹭過灰色苔蘚，石化感迅速蔓延。', textEn: 'Your arms scrape against the grey moss as you fall — petrification spreads rapidly.', delay: 2000 },
     ], [
-      { text: '休息一下再嘗試', action: () => { changeHp(5); loadNode('r0_climb_check'); } },
-      { text: '放棄攀爬，尋找其他路', action: () => loadNode('r0_climb_alt') },
+      { text: '休息一下再嘗試', textEn: 'Rest before trying again', action: () => { changeHp(5); loadNode('r0_climb_check'); } },
+      { text: '放棄攀爬，尋找其他路', textEn: 'Give up climbing, find another way', action: () => loadNode('r0_climb_alt') },
     ]);
   }
 });
 
 registerNode('r0_climb_alt', () => {
-  const hasMikouStone = hasItem('微光石');
+  const hasMikouStone = hasItem(L('微光石', 'Glowstone'));
   var steps = [
-    { tag: '探索', tagColor: 'tag-explore', text: '你退後幾步，打量整個岩壁。', delay: 1500 },
-    { tag: '發現', tagColor: 'tag-item', text: '角落裡有幾塊碎石可以堆起來墊腳。', delay: 1800 },
-    { tag: '發現', tagColor: 'tag-item', text: '岩壁裂縫中卡著一根朽木——也許可以當支撐。', delay: 1800 },
+    { tag: '探索', tagColor: 'tag-explore', text: '你退後幾步，打量整個岩壁。', textEn: 'You step back and survey the entire wall.', delay: 1500 },
+    { tag: '發現', tagColor: 'tag-item', text: '角落裡有幾塊碎石可以堆起來墊腳。', textEn: 'Some rubble in the corner could be stacked as footholds.', delay: 1800 },
+    { tag: '發現', tagColor: 'tag-item', text: '岩壁裂縫中卡著一根朽木——也許可以當支撐。', textEn: 'A rotting beam is wedged in a crack — might work as support.', delay: 1800 },
   ];
   if (hasMikouStone) {
-    steps.push({ tag: '物品', tagColor: 'tag-item', text: '微光石散發的光芒讓你看到一條苔蘚稀疏的隱蔽路線。', delay: 2000 });
+    steps.push({ tag: '物品', tagColor: 'tag-item', text: '微光石散發的光芒讓你看到一條苔蘚稀疏的隱蔽路線。', textEn: 'The Glowstone\'s light reveals a hidden path with less moss.', delay: 2000 });
   }
   autoExplore(steps, [
-    { text: hasMikouStone ? '沿著隱蔽路線攀爬' : '堆石頭後攀爬', action: () => {
+    { text: hasMikouStone ? '沿著隱蔽路線攀爬' : '堆石頭後攀爬', textEn: hasMikouStone ? 'Climb along the hidden path' : 'Stack stones and climb', action: () => {
       changePetri(hasMikouStone ? 1 : 4);
       autoExplore(
         hasMikouStone
         ? [
-          { tag: '行動', tagColor: 'tag-move', text: '借助微光石的光照，你找到了苔蘚稀疏的路線。', delay: 1800 },
-          { tag: '行動', tagColor: 'tag-move', text: '攀爬依然不容易，但你順利避開了大部分石化苔蘚。', delay: 2000 },
-          { tag: '成功', tagColor: 'tag-explore', text: '你翻上了岩棚。微光石的光芒照亮了前方的隧道。', delay: 1800 },
+          { tag: '行動', tagColor: 'tag-move', text: '借助微光石的光照，你找到了苔蘚稀疏的路線。', textEn: 'Guided by the Glowstone, you find a path with sparse moss.', delay: 1800 },
+          { tag: '行動', tagColor: 'tag-move', text: '攀爬依然不容易，但你順利避開了大部分石化苔蘚。', textEn: 'Still a tough climb, but you avoid most of the petrifying moss.', delay: 2000 },
+          { tag: '成功', tagColor: 'tag-explore', text: '你翻上了岩棚。微光石的光芒照亮了前方的隧道。', textEn: 'You crest the ledge. The Glowstone illuminates a tunnel ahead.', delay: 1800 },
         ]
         : [
-          { tag: '行動', tagColor: 'tag-move', text: '你花了些時間堆好碎石，然後小心翼翼地攀爬。', delay: 2000 },
-          { tag: '石化', tagColor: 'tag-petri', text: '中途碰到了一些灰色苔蘚，但比硬爬好多了。', delay: 1800 },
-          { tag: '成功', tagColor: 'tag-explore', text: '你成功爬上了岩棚。前方是一條黑暗的隧道。', delay: 1800 },
+          { tag: '行動', tagColor: 'tag-move', text: '你花了些時間堆好碎石，然後小心翼翼地攀爬。', textEn: 'You spend time stacking rubble, then carefully climb.', delay: 2000 },
+          { tag: '石化', tagColor: 'tag-petri', text: '中途碰到了一些灰色苔蘚，但比硬爬好多了。', textEn: 'You brush some grey moss, but much better than a brute climb.', delay: 1800 },
+          { tag: '成功', tagColor: 'tag-explore', text: '你成功爬上了岩棚。前方是一條黑暗的隧道。', textEn: 'You reach the ledge successfully. A dark tunnel lies ahead.', delay: 1800 },
         ],
-        [{ text: '進入隧道', action: () => loadNode('r0_tunnel') }]
+        [{ text: '進入隧道', textEn: 'Enter the tunnel', action: () => loadNode('r0_tunnel') }]
       );
     }},
-    { text: '返回', action: () => loadNode('r0_look') },
+    { text: '返回', textEn: 'Go back', action: () => loadNode('r0_look') },
   ]);
 });
 
 registerNode('r0_tunnel', () => {
+  var lizardName = L('石蜥蜴', 'Stone Lizard');
+  var lizardDesc = L('石蜥蜴的眼睛閃爍著紫光，每次攻擊都帶有石化效果。', 'The Stone Lizard\'s eyes flash purple. Each attack carries petrification.');
+  var lizardDescShort = L('石蜥蜴的眼睛閃爍著紫光。', 'The Stone Lizard\'s eyes flash purple.');
+  var daggerName = L('碎石匕首', 'Stone Dagger');
   autoExplore([
-    { tag: '移動', tagColor: 'tag-move', text: '你進入了隧道。狹窄而曲折，只能弓著身子前進。', delay: 2500 },
-    { tag: '感知', tagColor: 'tag-sense', text: '牆壁上偶爾閃爍著石化礦脈的灰色光芒。你不敢觸碰。', delay: 2800 },
-    { tag: '移動', tagColor: 'tag-move', text: '小心翼翼地前行……', delay: 3000 },
-    { tag: '感知', tagColor: 'tag-sense', text: '腳下的碎石發出細碎的聲響。', delay: 2500 },
-    { tag: '移動', tagColor: 'tag-move', text: '隧道開始向上傾斜。', delay: 2800 },
-    { tag: '感知', tagColor: 'tag-sense', text: '空氣的溫度微微下降了。', delay: 2500 },
-    { tag: '移動', tagColor: 'tag-move', text: '繼續深入……隧道的氣流似乎在變化。', delay: 3200 },
-    { tag: '環境', tagColor: 'tag-system', text: '某處傳來了低沉的嘶嘶聲……', delay: 2500 },
-    { tag: '警告', tagColor: 'tag-warn', text: '你停下腳步，屏住呼吸，仔細聆聽。', delay: 3000 },
-    { tag: '移動', tagColor: 'tag-move', text: '繼續向前……前方似乎有一個較大的空間。', delay: 2800 },
-    { tag: '探索', tagColor: 'tag-explore', text: '走了一段路，隧道突然變寬——', delay: 2000 },
+    { tag: '移動', tagColor: 'tag-move', text: '你進入了隧道。狹窄而曲折，只能弓著身子前進。', textEn: 'You enter the tunnel. Narrow and winding, forcing you to crouch.', delay: 2500 },
+    { tag: '感知', tagColor: 'tag-sense', text: '牆壁上偶爾閃爍著石化礦脈的灰色光芒。你不敢觸碰。', textEn: 'Petrification ore veins flicker on the walls. You dare not touch them.', delay: 2800 },
+    { tag: '移動', tagColor: 'tag-move', text: '小心翼翼地前行……', textEn: 'Moving cautiously...', delay: 3000 },
+    { tag: '感知', tagColor: 'tag-sense', text: '腳下的碎石發出細碎的聲響。', textEn: 'Gravel crunches softly underfoot.', delay: 2500 },
+    { tag: '移動', tagColor: 'tag-move', text: '隧道開始向上傾斜。', textEn: 'The tunnel begins to slope upward.', delay: 2800 },
+    { tag: '感知', tagColor: 'tag-sense', text: '空氣的溫度微微下降了。', textEn: 'The air temperature drops slightly.', delay: 2500 },
+    { tag: '移動', tagColor: 'tag-move', text: '繼續深入……隧道的氣流似乎在變化。', textEn: 'Pressing on... the airflow seems to shift.', delay: 3200 },
+    { tag: '環境', tagColor: 'tag-system', text: '某處傳來了低沉的嘶嘶聲……', textEn: 'A low hissing sound from somewhere...', delay: 2500 },
+    { tag: '警告', tagColor: 'tag-warn', text: '你停下腳步，屏住呼吸，仔細聆聽。', textEn: 'You freeze, hold your breath, and listen.', delay: 3000 },
+    { tag: '移動', tagColor: 'tag-move', text: '繼續向前……前方似乎有一個較大的空間。', textEn: 'Moving forward... a larger chamber seems to lie ahead.', delay: 2800 },
+    { tag: '探索', tagColor: 'tag-explore', text: '走了一段路，隧道突然變寬——', textEn: 'After a stretch, the tunnel suddenly widens —', delay: 2000 },
     { art: `<pre class="ascii-art purple">
          ___....----""""----....___
     .-'""                         ""'-.
@@ -1514,83 +1741,97 @@ registerNode('r0_tunnel', () => {
                |  \\#######/  |
                 \\  '.___.'  /
          ~~~~~~~~\\________/~~~~~~~~
+</pre>`, artEn: `<pre class="ascii-art purple">
+         ___....----""""----....___
+    .-'""                         ""'-.
+   /   ___                     ___     \\
+  |  .'   '. Stone  Lizard .'   '.   |
+  | /  ◉    \\  ~~Hissss~~  /    ◉  \\ |
+  | |        |  .-------.  |        | |
+   \\ '.___.' /.'  /#####\\'. '.___.' /
+    '-.____.'\\ |  /#######\\ |/'.____.-'
+              \\| |#########| |
+               | |# Scales #| |
+               |  \\#######/  |
+                \\  '.___.'  /
+         ~~~~~~~~\\________/~~~~~~~~
 </pre>`, delay: 800 },
-    { tag: '遭遇', tagColor: 'tag-combat', html: '一隻<b>石蜥蜴</b>蹲伏在前方！', delay: 1500, noAmbient: true },
-    { tag: '感知', tagColor: 'tag-sense', text: '全身覆蓋灰色石鱗，嘴裡發出低沉的嘶嘶聲。', delay: 2000, noAmbient: true },
-    { tag: '警告', tagColor: 'tag-warn', text: '那雙眼睛閃著不自然的紫色光芒——石化凝視的前兆。', delay: 2000 },
+    { tag: '遭遇', tagColor: 'tag-combat', html: '一隻<b>石蜥蜴</b>蹲伏在前方！', htmlEn: 'A <b>Stone Lizard</b> crouches ahead!', delay: 1500, noAmbient: true },
+    { tag: '感知', tagColor: 'tag-sense', text: '全身覆蓋灰色石鱗，嘴裡發出低沉的嘶嘶聲。', textEn: 'Covered in grey stone scales, hissing lowly.', delay: 2000, noAmbient: true },
+    { tag: '警告', tagColor: 'tag-warn', text: '那雙眼睛閃著不自然的紫色光芒——石化凝視的前兆。', textEn: 'Its eyes glow with an unnatural purple — a sign of petrifying gaze.', delay: 2000 },
   ], [
-    { text: '戰鬥', action: () => {
+    { text: '戰鬥', textEn: 'Fight', action: () => {
       startCombat(
-        { name: '石蜥蜴', hp: 30, atkMin: 4, atkMax: 9, petriDmg: 3, desc: '石蜥蜴的眼睛閃爍著紫光，每次攻擊都帶有石化效果。' },
-        () => { changeStat('str', 1); notify('力量 +1'); loadNode('r0_after_lizard'); },
+        { name: lizardName, hp: 30, atkMin: 4, atkMax: 9, petriDmg: 3, desc: lizardDesc },
+        () => { changeStat('str', 1); notify(L('力量 +1', 'STR +1')); loadNode('r0_after_lizard'); },
         () => {
           changePetri(5);
           autoExplore([
-            { tag: '撤退', tagColor: 'tag-move', text: '你轉身拔腿就跑！', delay: 1200 },
-            { tag: '石化', tagColor: 'tag-petri', text: '石蜥蜴用石化凝視掃了你一眼……後背一陣發麻。', delay: 1800 },
-          ], [{ text: '退回岩棚', action: () => loadNode('r0_climb_check') }]);
+            { tag: '撤退', tagColor: 'tag-move', text: '你轉身拔腿就跑！', textEn: 'You turn and run!', delay: 1200 },
+            { tag: '石化', tagColor: 'tag-petri', text: '石蜥蜴用石化凝視掃了你一眼……後背一陣發麻。', textEn: 'The lizard\'s petrifying gaze sweeps you... your back goes numb.', delay: 1800 },
+          ], [{ text: '退回岩棚', textEn: 'Retreat to the ledge', action: () => loadNode('r0_climb_check') }]);
         }
       );
     }},
-    { text: '嘗試悄悄繞過去（考驗敏捷）', action: () => {
+    { text: '嘗試悄悄繞過去（考驗敏捷）', textEn: 'Sneak past it (Agility check)', action: () => {
       if (state.agi >= 7) {
         autoExplore([
-          { tag: '潛行', tagColor: 'tag-move', text: '你壓低身體，沿著洞穴邊緣慢慢移動……', delay: 2000 },
-          { tag: '感知', tagColor: 'tag-sense', text: '石蜥蜴抬起頭嗅了嗅空氣……隨後又趴了下去。', delay: 2500 },
-          { tag: '成功', tagColor: 'tag-explore', text: '你屏住呼吸，從它身後悄悄溜了過去！', delay: 1800 },
-        ], [{ text: '繼續前進', action: () => loadNode('r0_after_lizard') }]);
+          { tag: '潛行', tagColor: 'tag-move', text: '你壓低身體，沿著洞穴邊緣慢慢移動……', textEn: 'You crouch low, inching along the cave wall...', delay: 2000 },
+          { tag: '感知', tagColor: 'tag-sense', text: '石蜥蜴抬起頭嗅了嗅空氣……隨後又趴了下去。', textEn: 'The lizard lifts its head to sniff the air... then settles back down.', delay: 2500 },
+          { tag: '成功', tagColor: 'tag-explore', text: '你屏住呼吸，從它身後悄悄溜了過去！', textEn: 'Holding your breath, you slip past it silently!', delay: 1800 },
+        ], [{ text: '繼續前進', textEn: 'Continue forward', action: () => loadNode('r0_after_lizard') }]);
       } else {
         changePetri(4);
         changeHp(-5);
         autoExplore([
-          { tag: '潛行', tagColor: 'tag-move', text: '你嘗試潛行……踩到了一塊碎石！', delay: 1500 },
-          { tag: '遭遇', tagColor: 'tag-combat', text: '石蜥蜴猛地轉頭，紫色凝視直射向你！', delay: 1500 },
-          { tag: '石化', tagColor: 'tag-petri', text: '你的皮膚瞬間僵硬了幾秒——石蜥蜴擺出攻擊姿態。', delay: 2000 },
-        ], [{ text: '被迫戰鬥', action: () => {
+          { tag: '潛行', tagColor: 'tag-move', text: '你嘗試潛行……踩到了一塊碎石！', textEn: 'You try to sneak... and step on a loose rock!', delay: 1500 },
+          { tag: '遭遇', tagColor: 'tag-combat', text: '石蜥蜴猛地轉頭，紫色凝視直射向你！', textEn: 'The lizard snaps its head around — purple gaze locks onto you!', delay: 1500 },
+          { tag: '石化', tagColor: 'tag-petri', text: '你的皮膚瞬間僵硬了幾秒——石蜥蜴擺出攻擊姿態。', textEn: 'Your skin goes rigid for seconds — the lizard assumes attack stance.', delay: 2000 },
+        ], [{ text: '被迫戰鬥', textEn: 'Forced to fight', action: () => {
           startCombat(
-            { name: '石蜥蜴', hp: 30, atkMin: 4, atkMax: 9, petriDmg: 3, desc: '石蜥蜴的眼睛閃爍著紫光。' },
-            () => { changeStat('str', 1); notify('力量 +1'); loadNode('r0_after_lizard'); },
+            { name: lizardName, hp: 30, atkMin: 4, atkMax: 9, petriDmg: 3, desc: lizardDescShort },
+            () => { changeStat('str', 1); notify(L('力量 +1', 'STR +1')); loadNode('r0_after_lizard'); },
             null
           );
         }}]);
       }
     }},
-    { text: hasItem('碎石匕首') ? '投擲碎石匕首（先發制人）' : '大聲威嚇', action: () => {
-      if (hasItem('碎石匕首')) {
-        removeItem('碎石匕首');
+    { text: hasItem(daggerName) ? L('投擲碎石匕首（先發制人）', 'Throw the Stone Dagger (preemptive)') : L('大聲威嚇', 'Shout to intimidate'), action: () => {
+      if (hasItem(daggerName)) {
+        removeItem(daggerName);
         autoExplore([
-          { tag: '行動', tagColor: 'tag-combat', text: '你抽出碎石匕首，瞄準石蜥蜴的眼睛擲出！', delay: 1500 },
-          { tag: '戰鬥', tagColor: 'tag-combat', text: '匕首準確擊中目標——石蜥蜴發出刺耳慘叫！', delay: 2000 },
-          { tag: '勝利', tagColor: 'tag-explore', text: '紫色的眼睛暗淡下來，它變回了一塊普通灰石。', delay: 2000 },
-        ], [{ text: '繼續前進', action: () => { changeStat('str', 1); loadNode('r0_after_lizard'); } }]);
+          { tag: '行動', tagColor: 'tag-combat', text: '你抽出碎石匕首，瞄準石蜥蜴的眼睛擲出！', textEn: 'You draw the Stone Dagger and hurl it at the lizard\'s eye!', delay: 1500 },
+          { tag: '戰鬥', tagColor: 'tag-combat', text: '匕首準確擊中目標——石蜥蜴發出刺耳慘叫！', textEn: 'A perfect hit — the lizard lets out a piercing shriek!', delay: 2000 },
+          { tag: '勝利', tagColor: 'tag-explore', text: '紫色的眼睛暗淡下來，它變回了一塊普通灰石。', textEn: 'The purple eyes dim, and it crumbles into ordinary grey stone.', delay: 2000 },
+        ], [{ text: '繼續前進', textEn: 'Continue forward', action: () => { changeStat('str', 1); loadNode('r0_after_lizard'); } }]);
       } else {
         autoExplore([
-          { tag: '行動', tagColor: 'tag-move', text: '你大喊一聲，試圖嚇退石蜥蜴。', delay: 1500 },
-          { tag: '失敗', tagColor: 'tag-warn', text: '石蜥蜴歪了歪頭……然後直接撲了過來！', delay: 1800 },
-        ], [{ text: '戰鬥', action: () => {
+          { tag: '行動', tagColor: 'tag-move', text: '你大喊一聲，試圖嚇退石蜥蜴。', textEn: 'You shout, trying to scare the lizard off.', delay: 1500 },
+          { tag: '失敗', tagColor: 'tag-warn', text: '石蜥蜴歪了歪頭……然後直接撲了過來！', textEn: 'The lizard tilts its head... then lunges at you!', delay: 1800 },
+        ], [{ text: '戰鬥', textEn: 'Fight', action: () => {
           startCombat(
-            { name: '石蜥蜴', hp: 30, atkMin: 4, atkMax: 9, petriDmg: 3, desc: '石蜥蜴的眼睛閃爍著紫光。' },
-            () => { changeStat('str', 1); notify('力量 +1'); loadNode('r0_after_lizard'); },
+            { name: lizardName, hp: 30, atkMin: 4, atkMax: 9, petriDmg: 3, desc: lizardDescShort },
+            () => { changeStat('str', 1); notify(L('力量 +1', 'STR +1')); loadNode('r0_after_lizard'); },
             () => { changePetri(5); loadNode('r0_climb_check'); }
           );
         }}]);
       }
     }},
-  ], { label: '穿越隧道' });
+  ], { label: L('穿越隧道', 'Traversing tunnel') });
 });
 
 registerNode('r0_after_lizard', () => {
   autoExplore([
-    { tag: '移動', tagColor: 'tag-move', text: '石蜥蜴的巢穴後方，隧道繼續向上延伸。', delay: 2500 },
-    { tag: '感知', tagColor: 'tag-sense', text: '牆壁上的礦脈越來越密集。', delay: 2800 },
-    { tag: '移動', tagColor: 'tag-move', text: '繼續向前走……', delay: 3200 },
-    { tag: '石化', tagColor: 'tag-petri', text: '空氣中的石化氣息越來越濃。你的皮膚微微刺痛。', delay: 2800 },
-    { tag: '移動', tagColor: 'tag-move', text: '隧道在這裡分出了一條支路……你選擇繼續向上。', delay: 3000 },
-    { tag: '感知', tagColor: 'tag-sense', text: '前方的光線似乎變得更亮了。', delay: 2500 },
-    { tag: '移動', tagColor: 'tag-move', text: '加快腳步……', delay: 2800 },
-    { tag: '感知', tagColor: 'tag-sense', text: '腳下的地面從粗糙的岩石變成了平整的石板。', delay: 2500 },
-    { tag: '移動', tagColor: 'tag-move', text: '再往前走了一段路……', delay: 3000 },
-    { tag: '感知', tagColor: 'tag-sense', text: '你聽到了迴盪的腳步聲和敲擊聲——不是天然的，是人為的。', delay: 2800 },
+    { tag: '移動', tagColor: 'tag-move', text: '石蜥蜴的巢穴後方，隧道繼續向上延伸。', textEn: 'Beyond the lizard\'s lair, the tunnel continues upward.', delay: 2500 },
+    { tag: '感知', tagColor: 'tag-sense', text: '牆壁上的礦脈越來越密集。', textEn: 'Ore veins on the walls grow denser.', delay: 2800 },
+    { tag: '移動', tagColor: 'tag-move', text: '繼續向前走……', textEn: 'Pressing forward...', delay: 3200 },
+    { tag: '石化', tagColor: 'tag-petri', text: '空氣中的石化氣息越來越濃。你的皮膚微微刺痛。', textEn: 'Petrification grows stronger in the air. Your skin prickles.', delay: 2800 },
+    { tag: '移動', tagColor: 'tag-move', text: '隧道在這裡分出了一條支路……你選擇繼續向上。', textEn: 'The tunnel forks here... you choose to keep going up.', delay: 3000 },
+    { tag: '感知', tagColor: 'tag-sense', text: '前方的光線似乎變得更亮了。', textEn: 'The light ahead seems to grow brighter.', delay: 2500 },
+    { tag: '移動', tagColor: 'tag-move', text: '加快腳步……', textEn: 'Picking up the pace...', delay: 2800 },
+    { tag: '感知', tagColor: 'tag-sense', text: '腳下的地面從粗糙的岩石變成了平整的石板。', textEn: 'The ground shifts from rough rock to smooth flagstone.', delay: 2500 },
+    { tag: '移動', tagColor: 'tag-move', text: '再往前走了一段路……', textEn: 'Walking a bit further...', delay: 3000 },
+    { tag: '感知', tagColor: 'tag-sense', text: '你聽到了迴盪的腳步聲和敲擊聲——不是天然的，是人為的。', textEn: 'You hear echoing footsteps and hammering — not natural, but man-made.', delay: 2800 },
     { art: `<pre class="ascii-art gold">
      _______________________
     |   |             |   |
@@ -1607,27 +1848,43 @@ registerNode('r0_after_lizard', () => {
    /                       \\
   /     ···  石  門  ···     \\
  /___________________________\\
+</pre>`, artEn: `<pre class="ascii-art gold">
+     _______________________
+    |   |             |   |
+    |   |     VEIN    |   |
+    |   |             |   |
+    |   |   CORRIDOR  |   |
+    |   |             |   |
+    |   |  FORBIDDEN  |   |
+    |   |             |   |
+    |   |      ___    |   |
+    |   |     | | |   |   |
+    |   |     | | |   |   |
+    |___|_____|_|_|___|___|
+   /                       \\
+  /     ···  GATE   ···     \\
+ /___________________________\\
 </pre>`, delay: 800 },
-    { tag: '發現', tagColor: 'tag-item', text: '隧道盡頭，一扇粗糙的石門半掩著。', delay: 2000 },
-    { tag: '情報', tagColor: 'tag-info', html: '門上刻著模糊的古文字：<b>「……石脈……迴廊……禁入……」</b>', delay: 2200 },
-    { tag: '情報', tagColor: 'tag-info', html: '石門的另一邊是下一層——<b>石脈迴廊</b>。', delay: 1800 },
+    { tag: '發現', tagColor: 'tag-item', text: '隧道盡頭，一扇粗糙的石門半掩著。', textEn: 'At the tunnel\'s end, a rough stone gate stands ajar.', delay: 2000 },
+    { tag: '情報', tagColor: 'tag-info', html: '門上刻著模糊的古文字：<b>「……石脈……迴廊……禁入……」</b>', htmlEn: 'Faded ancient text carved on the gate: <b>"...Vein...Corridor...Forbidden..."</b>', delay: 2200 },
+    { tag: '情報', tagColor: 'tag-info', html: '石門的另一邊是下一層——<b>石脈迴廊</b>。', htmlEn: 'Beyond the gate lies the next floor — <b>Vein Corridor</b>.', delay: 1800 },
   ], [
-    { text: '推開石門，進入石脈迴廊', action: () => {
+    { text: '推開石門，進入石脈迴廊', textEn: 'Push open the gate, enter the Vein Corridor', action: () => {
       state.region = 1;
       loadNode('r1_start');
     }},
-    { text: '在門口稍作休息', action: () => {
+    { text: '在門口稍作休息', textEn: 'Rest by the gate', action: () => {
       changeHp(15);
       changePetri(-2);
-      notify('HP +15，石化度 -2%');
+      notify(L('HP +15，石化度 -2%', 'HP +15, Petri -2%'));
       autoExplore([
-        { tag: '休息', tagColor: 'tag-explore', text: '你靠著石門坐下，閉上眼睛。', delay: 1800 },
-        { tag: '恢復', tagColor: 'tag-explore', text: '呼吸逐漸平穩，傷痛稍稍緩解。', delay: 2500 },
-        { tag: '警告', tagColor: 'tag-warn', text: '但不能停留太久——空氣中帶有微量石化粒子。', delay: 2200 },
-        { tag: '行動', tagColor: 'tag-move', text: '你站起身來，準備好面對下一段旅程。', delay: 1800 },
-      ], [{ text: '推開石門，進入石脈迴廊', action: () => { state.region = 1; loadNode('r1_start'); } }]);
+        { tag: '休息', tagColor: 'tag-explore', text: '你靠著石門坐下，閉上眼睛。', textEn: 'You sit against the gate and close your eyes.', delay: 1800 },
+        { tag: '恢復', tagColor: 'tag-explore', text: '呼吸逐漸平穩，傷痛稍稍緩解。', textEn: 'Your breathing steadies, pain easing slightly.', delay: 2500 },
+        { tag: '警告', tagColor: 'tag-warn', text: '但不能停留太久——空氣中帶有微量石化粒子。', textEn: 'But you can\'t linger — the air carries trace petrification particles.', delay: 2200 },
+        { tag: '行動', tagColor: 'tag-move', text: '你站起身來，準備好面對下一段旅程。', textEn: 'You stand, ready for the next leg of the journey.', delay: 1800 },
+      ], [{ text: '推開石門，進入石脈迴廊', textEn: 'Push open the gate, enter the Vein Corridor', action: () => { state.region = 1; loadNode('r1_start'); } }]);
     }},
-  ], { label: '向上攀升' });
+  ], { label: L('向上攀升', 'Ascending') });
 });
 
 // ═══════════════════════════════════════════════════
@@ -1636,7 +1893,7 @@ registerNode('r0_after_lizard', () => {
 registerNode('r1_start', () => {
   state.region = 1;
   autoExplore([
-    { tag: '移動', tagColor: 'tag-move', text: '石門在你身後緩緩關閉。', delay: 1500 },
+    { tag: '移動', tagColor: 'tag-move', text: '石門在你身後緩緩關閉。', textEn: 'The stone gate slowly closes behind you.', delay: 1500 },
     { art: `<pre class="ascii-art blue">
   ╔═══╦═══════════════════╦═══╗
   ║///║                   ║///║
@@ -1650,19 +1907,32 @@ registerNode('r1_start', () => {
   ║///║        . 你 .      ║///║
   ║///║         '''        ║///║
   ╚═══╩═══════════════════╩═══╝
+</pre>`, artEn: `<pre class="ascii-art blue">
+  ╔═══╦═══════════════════╦═══╗
+  ║///║                   ║///║
+  ║///║  VEIN  CORRIDOR   ║///║
+  ║///║                   ║///║
+  ║///╠═══════════════════╣///║
+  ║///║  .:*~*:.   .:*~*:.║///║
+  ║///║  Ore Vein  Ore Vein║///║
+  ║///║  .:*~*:.   .:*~*:.║///║
+  ║///║         ...        ║///║
+  ║///║        .You .      ║///║
+  ║///║         '''        ║///║
+  ╚═══╩═══════════════════╩═══╝
 </pre>`, delay: 800 },
-    { tag: '探索', tagColor: 'tag-explore', html: '你踏入了<b>石脈迴廊</b>。', delay: 1800 },
-    { tag: '感知', tagColor: 'tag-sense', text: '這裡不再是天然洞穴——走廊由切割整齊的石磚砌成。', delay: 2200 },
-    { tag: '感知', tagColor: 'tag-sense', text: '牆壁上鑲嵌著發光的石化礦脈，散發出幽藍冷光。', delay: 2000 },
-    { tag: '石化', tagColor: 'tag-petri', text: '空氣中的石化氣息比坑底更濃。', delay: 1800 },
-    { tag: '感知', tagColor: 'tag-sense', text: '遠處傳來金屬碰撞的迴音。', delay: 2200 },
-    { tag: '系統', tagColor: 'tag-system', html: '<i>（第二層 — 石脈迴廊的冒險將在後續更新中展開……）</i>', delay: 1500 },
+    { tag: '探索', tagColor: 'tag-explore', html: '你踏入了<b>石脈迴廊</b>。', htmlEn: 'You step into the <b>Vein Corridor</b>.', delay: 1800 },
+    { tag: '感知', tagColor: 'tag-sense', text: '這裡不再是天然洞穴——走廊由切割整齊的石磚砌成。', textEn: 'No longer a natural cave — the corridor is built of precisely cut stone bricks.', delay: 2200 },
+    { tag: '感知', tagColor: 'tag-sense', text: '牆壁上鑲嵌著發光的石化礦脈，散發出幽藍冷光。', textEn: 'Glowing petrification ore veins are embedded in the walls, casting cold blue light.', delay: 2000 },
+    { tag: '石化', tagColor: 'tag-petri', text: '空氣中的石化氣息比坑底更濃。', textEn: 'The petrification in the air is denser than in the pit below.', delay: 1800 },
+    { tag: '感知', tagColor: 'tag-sense', text: '遠處傳來金屬碰撞的迴音。', textEn: 'The echo of clanging metal resonates in the distance.', delay: 2200 },
+    { tag: '系統', tagColor: 'tag-system', html: '<i>（第二層 — 石脈迴廊的冒險將在後續更新中展開……）</i>', htmlEn: '<i>(Floor 2 — Vein Corridor adventures coming in a future update...)</i>', delay: 1500 },
   ], [
-    { text: '繼續探索（即將開放）', action: () => {
-      notify('此區域尚未開放');
+    { text: '繼續探索（即將開放）', textEn: 'Continue exploring (coming soon)', action: () => {
+      notify(L('此區域尚未開放', 'This area is not yet available'));
       loadNode('r1_start');
     }},
-  ], { label: '進入石脈迴廊' });
+  ], { label: L('進入石脈迴廊', 'Entering Vein Corridor') });
 });
 
 // ═══════════════════════════════════════════════════
@@ -1670,18 +1940,43 @@ registerNode('r1_start', () => {
 // ═══════════════════════════════════════════════════
 registerNode('r0_path', () => {
   autoExplore([
-    { tag: '決意', tagColor: 'tag-info', text: '你不想在這個死亡之坑裡多待一秒。', delay: 2000 },
-    { tag: '探索', tagColor: 'tag-explore', text: '快速掃視洞穴——北面岩壁上的攀爬痕跡最為明顯。', delay: 2500 },
-    { tag: '情報', tagColor: 'tag-info', text: '那應該是唯一的出路。但也許應該先做些準備。', delay: 2200 },
+    { tag: '決意', tagColor: 'tag-info', text: '你不想在這個死亡之坑裡多待一秒。', textEn: 'You don\'t want to spend another second in this death pit.', delay: 2000 },
+    { tag: '探索', tagColor: 'tag-explore', text: '快速掃視洞穴——北面岩壁上的攀爬痕跡最為明顯。', textEn: 'Quick scan of the cave — climbing marks on the north wall are the most obvious.', delay: 2500 },
+    { tag: '情報', tagColor: 'tag-info', text: '那應該是唯一的出路。但也許應該先做些準備。', textEn: 'That seems to be the only exit. But perhaps some preparation first.', delay: 2200 },
   ], [
-    { text: '先仔細觀察環境再說', action: () => loadNode('r0_look') },
-    { text: '不管了，直接爬', action: () => loadNode('r0_climb_str') },
-  ], { label: '尋找出路' });
+    { text: '先仔細觀察環境再說', textEn: 'Survey the area first', action: () => loadNode('r0_look') },
+    { text: '不管了，直接爬', textEn: 'Forget it, just climb', action: () => loadNode('r0_climb_str') },
+  ], { label: L('尋找出路', 'Finding exit') });
 });
 
 // ═══════════════════════════════════════════════════
-//  Title Screen — Name & Stat Allocation
+//  Title Screen — 3-Phase Flow
 // ═══════════════════════════════════════════════════
+
+// ── Phase management ──
+function showPhase(id) {
+  document.querySelectorAll('.title-phase').forEach(function(el) {
+    el.classList.remove('active');
+  });
+  var phase = document.getElementById(id);
+  setTimeout(function() { phase.classList.add('active'); }, 80);
+}
+
+// ── Phase 1: Splash → click to proceed ──
+document.getElementById('phase-splash').addEventListener('click', function() {
+  showPhase('phase-lang');
+});
+
+// ── Phase 2: Language selection ──
+document.querySelectorAll('.lang-btn').forEach(function(btn) {
+  btn.addEventListener('click', function() {
+    state.lang = btn.dataset.lang;
+    applyLang();
+    showPhase('phase-create');
+  });
+});
+
+// ── Phase 3: Character Creation ──
 const allocStats = { str: 3, agi: 3, wil: 3 };
 const ALLOC_BASE = 3;
 const ALLOC_MAX = 9;
@@ -1724,7 +2019,7 @@ updateAllocUI();
 
 function startGame() {
   var nameInput = document.getElementById('name-input');
-  var name = nameInput.value.trim() || '無名旅者';
+  var name = nameInput.value.trim() || L('無名旅者', 'Nameless Wanderer');
   state.name = name;
   state.str = allocStats.str;
   state.agi = allocStats.agi;
@@ -1746,7 +2041,7 @@ document.getElementById('name-input').addEventListener('keydown', function(e) {
 // ═══════════════════════════════════════════════════
 //  Init
 // ═══════════════════════════════════════════════════
-// Game starts when player clicks "開始冒險" on the title screen
+// Game starts when player clicks through: Splash → Language → Character → Begin
 </script>
 </body>
 </html>
