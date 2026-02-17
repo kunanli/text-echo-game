@@ -510,6 +510,62 @@
     color: #d4a843;
     font-weight: bold;
   }
+  /* ── Sex selection toggle ── */
+  .sex-select {
+    display: flex;
+    justify-content: center;
+    gap: 14px;
+    margin-top: 6px;
+  }
+  .sex-btn {
+    background: #12121e;
+    border: 1px solid #2a2a3a;
+    color: #6a6a7a;
+    padding: 8px 28px;
+    font-family: inherit;
+    font-size: .95rem;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: all .2s;
+    letter-spacing: 2px;
+  }
+  .sex-btn:hover {
+    border-color: #5a5a7a;
+    color: #c8c8d0;
+  }
+  .sex-btn.selected {
+    border-color: #d4a843;
+    color: #d4a843;
+    background: #1a1a2e;
+  }
+
+  /* ── ASCII avatar in status panel ── */
+  .avatar-box {
+    font-family: "Courier New", Courier, monospace;
+    font-size: .7rem;
+    line-height: 1.15;
+    color: #8a8a9a;
+    white-space: pre;
+    text-align: center;
+    padding: 6px 0 2px;
+    user-select: none;
+    min-height: 80px;
+    transition: color .4s;
+  }
+  .avatar-box.mood-happy  { color: #8aaa6a; }
+  .avatar-box.mood-normal { color: #8a8a9a; }
+  .avatar-box.mood-hurt   { color: #b07040; }
+  .avatar-box.mood-danger { color: #c04040; }
+  .avatar-box.mood-petri  { color: #7a7ac0; }
+  .avatar-box.mood-combat { color: #a05030; }
+  .avatar-name {
+    font-size: .72rem;
+    color: #d4a843;
+    letter-spacing: 2px;
+    text-align: center;
+    margin-top: 2px;
+  }
+
   .start-btn {
     background: none;
     border: 1px solid #d4a843;
@@ -783,6 +839,13 @@
         <input class="title-input" id="name-input" type="text" placeholder="輸入你的名字……" maxlength="12">
       </div>
       <div class="title-section">
+        <span class="title-label" id="label-sex">性 別</span>
+        <div class="sex-select">
+          <button class="sex-btn selected" data-sex="male" id="sex-male">♂ 男</button>
+          <button class="sex-btn" data-sex="female" id="sex-female">♀ 女</button>
+        </div>
+      </div>
+      <div class="title-section">
         <span class="title-label" id="label-stat-alloc">能 力 分 配</span>
         <div id="stat-alloc">
           <div class="stat-alloc-row">
@@ -838,6 +901,10 @@
     <div class="choices" id="choices"></div>
   </div>
   <div class="status-panel">
+    <div class="status-section" id="avatar-section">
+      <div class="avatar-box mood-normal" id="avatar-box"></div>
+      <div class="avatar-name" id="avatar-name"></div>
+    </div>
     <div class="status-section">
       <h3 id="label-life">生命</h3>
       <div class="stat-row">
@@ -904,6 +971,7 @@
 // ═══════════════════════════════════════════════════
 const state = {
   name: '旅者',
+  sex: 'male',       // 'male' | 'female'
   hp: 100, maxHp: 100,
   petri: 0,          // 石化度 0-100
   str: 5, agi: 5, wil: 5,
@@ -913,6 +981,7 @@ const state = {
   flags: {},
   deathCount: 0,
   lang: 'zh',
+  mood: 'normal',    // avatar mood: normal, happy, hurt, danger, petri, combat
 };
 
 // ── i18n helpers ──
@@ -937,6 +1006,9 @@ function applyLang() {
   // Title screen
   document.getElementById('label-name').textContent = en ? 'CHARACTER NAME' : '角 色 命 名';
   document.getElementById('name-input').placeholder = en ? 'Enter your name...' : '輸入你的名字……';
+  document.getElementById('label-sex').textContent = en ? 'SEX' : '性 別';
+  document.getElementById('sex-male').textContent = en ? '♂ Male' : '♂ 男';
+  document.getElementById('sex-female').textContent = en ? '♀ Female' : '♀ 女';
   document.getElementById('label-stat-alloc').textContent = en ? 'STAT ALLOCATION' : '能 力 分 配';
   document.getElementById('alloc-str-name').textContent = en ? 'STR' : '力量';
   document.getElementById('alloc-agi-name').textContent = en ? 'AGI' : '敏捷';
@@ -986,6 +1058,8 @@ const $mstHp    = document.getElementById('mst-hp');
 const $mstPetri = document.getElementById('mst-petri');
 const $mstLoc   = document.getElementById('mst-loc');
 const $statusPanel  = document.querySelector('.status-panel');
+const $avatarBox    = document.getElementById('avatar-box');
+const $avatarName   = document.getElementById('avatar-name');
 
 // ── Mobile status toggle ──
 $mobileToggle.addEventListener('click', function() {
@@ -1035,6 +1109,144 @@ function changeStat(stat, delta) {
 }
 
 // ═══════════════════════════════════════════════════
+//  ASCII Avatar System
+// ═══════════════════════════════════════════════════
+var AVATAR = {
+  male: {
+    normal: [
+      "   ┌───────┐",
+      "   │ ·   · │",
+      "   │   ▲   │",
+      "   │  ───  │",
+      "   └───────┘",
+      "    ╱│   │╲ ",
+      "   ╱ │   │ ╲",
+    ],
+    happy: [
+      "   ┌───────┐",
+      "   │ ^   ^ │",
+      "   │   ▲   │",
+      "   │  ◡◡◡  │",
+      "   └───────┘",
+      "    ╱│   │╲ ",
+      "   ╱ │   │ ╲",
+    ],
+    hurt: [
+      "   ┌───────┐",
+      "   │ >   < │",
+      "   │   ▲   │",
+      "   │  ~~~  │",
+      "   └───────┘",
+      "    ╱│   │╲ ",
+      "   ╱ │   │ ╲",
+    ],
+    danger: [
+      "   ┌───────┐",
+      "   │ ×   × │",
+      "   │   ▲   │",
+      "   │  ∧∧∧  │",
+      "   └───────┘",
+      "    ╱│   │╲ ",
+      "   ╱ │   │ ╲",
+    ],
+    petri: [
+      "   ┌───────┐",
+      "   │ ░   ░ │",
+      "   │   ▲   │",
+      "   │  ░░░  │",
+      "   └░░░░░░░┘",
+      "    ╱░   ░╲ ",
+      "   ╱ ░   ░ ╲",
+    ],
+    combat: [
+      "   ┌───────┐",
+      "   │ ò   ó │",
+      "   │   ▲   │",
+      "   │  ───  │",
+      "   └───────┘",
+      "    ╱│ ⚔ │╲ ",
+      "   ╱ │   │ ╲",
+    ],
+  },
+  female: {
+    normal: [
+      "   ╭~ ~ ~ ~╮",
+      "   │ ·   · │",
+      "   │   ᐯ   │",
+      "   │  ───  │",
+      "   ╰───────╯",
+      "    ╱│   │╲ ",
+      "   ╱ │   │ ╲",
+    ],
+    happy: [
+      "   ╭~ ~ ~ ~╮",
+      "   │ ^   ^ │",
+      "   │   ᐯ   │",
+      "   │  ◡◡◡  │",
+      "   ╰───────╯",
+      "    ╱│   │╲ ",
+      "   ╱ │   │ ╲",
+    ],
+    hurt: [
+      "   ╭~ ~ ~ ~╮",
+      "   │ >   < │",
+      "   │   ᐯ   │",
+      "   │  ~~~  │",
+      "   ╰───────╯",
+      "    ╱│   │╲ ",
+      "   ╱ │   │ ╲",
+    ],
+    danger: [
+      "   ╭~ ~ ~ ~╮",
+      "   │ ×   × │",
+      "   │   ᐯ   │",
+      "   │  ∧∧∧  │",
+      "   ╰───────╯",
+      "    ╱│   │╲ ",
+      "   ╱ │   │ ╲",
+    ],
+    petri: [
+      "   ╭░ ░ ░ ░╮",
+      "   │ ░   ░ │",
+      "   │   ᐯ   │",
+      "   │  ░░░  │",
+      "   ╰░░░░░░░╯",
+      "    ╱░   ░╲ ",
+      "   ╱ ░   ░ ╲",
+    ],
+    combat: [
+      "   ╭~ ~ ~ ~╮",
+      "   │ ò   ó │",
+      "   │   ᐯ   │",
+      "   │  ───  │",
+      "   ╰───────╯",
+      "    ╱│ ⚔ │╲ ",
+      "   ╱ │   │ ╲",
+    ],
+  }
+};
+
+function getAvatarMood() {
+  if (state.mood === 'combat') return 'combat';
+  if (state.petri >= 60) return 'petri';
+  var hpPct = state.hp / state.maxHp;
+  if (hpPct <= 0.25) return 'danger';
+  if (hpPct <= 0.55) return 'hurt';
+  if (hpPct >= 0.95 && state.petri <= 10) return 'happy';
+  return 'normal';
+}
+
+function renderAvatar() {
+  var mood = getAvatarMood();
+  var art = AVATAR[state.sex] && AVATAR[state.sex][mood];
+  if (!art) art = AVATAR.male.normal;
+  $avatarBox.textContent = art.join('\n');
+  // Update mood CSS class
+  $avatarBox.className = 'avatar-box mood-' + mood;
+  $avatarName.textContent = state.name;
+}
+
+// ═══════════════════════════════════════════════════
 //  Render UI
 // ═══════════════════════════════════════════════════
 function renderStatus() {
@@ -1064,6 +1276,8 @@ function renderStatus() {
   $mstHp.textContent = 'HP ' + state.hp;
   $mstPetri.textContent = L('石化 ', 'Petri ') + state.petri + '%';
   $mstLoc.textContent = getRegion(state.region) || '';
+
+  renderAvatar();
 }
 
 // ═══════════════════════════════════════════════════
@@ -1419,6 +1633,7 @@ function regionStartNode() {
 //  Combat System
 // ═══════════════════════════════════════════════════
 function startCombat(enemy, onWin, onFlee) {
+  state.mood = 'combat';
   let enemyHp = enemy.hp;
   const eName = enemy.name;
 
@@ -1446,7 +1661,7 @@ ${enemy.desc || ''}`;
       { text: L('防守', 'Defend'), action: () => doDefend() },
     ];
     if (onFlee) {
-      choices.push({ text: L('逃跑', 'Flee'), action: () => onFlee() });
+      choices.push({ text: L('逃跑', 'Flee'), action: () => { state.mood = 'normal'; onFlee(); } });
     }
     renderScene(text, choices);
   }
@@ -1460,6 +1675,7 @@ ${enemy.desc || ''}`;
 
     if (enemyHp <= 0) {
       log += `<div class="combat-log">${L(eName + ' 被擊敗了！', eName + ' has been defeated!')}</div>`;
+      state.mood = 'normal';
       renderScene(log, [{ text: L('繼續', 'Continue'), action: () => onWin() }]);
       return;
     }
@@ -2206,10 +2422,21 @@ document.querySelectorAll('.stat-alloc-btn').forEach(function(btn) {
 
 updateAllocUI();
 
+// ── Sex selection ──
+var selectedSex = 'male';
+document.querySelectorAll('.sex-btn').forEach(function(btn) {
+  btn.addEventListener('click', function() {
+    selectedSex = btn.dataset.sex;
+    document.querySelectorAll('.sex-btn').forEach(function(b) { b.classList.remove('selected'); });
+    btn.classList.add('selected');
+  });
+});
+
 function startGame() {
   var nameInput = document.getElementById('name-input');
   var name = nameInput.value.trim() || L('無名旅者', 'Nameless Wanderer');
   state.name = name;
+  state.sex = selectedSex;
   state.str = allocStats.str;
   state.agi = allocStats.agi;
   state.wil = allocStats.wil;
