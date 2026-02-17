@@ -1,0 +1,986 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>石化深淵 — 文字冒險</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #0a0a10;
+    color: #c8c8d0;
+    font-family: "Noto Serif TC", "Source Han Serif TC", Georgia, serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ── Header ── */
+  header {
+    text-align: center;
+    padding: 18px 0 10px;
+    border-bottom: 1px solid #2a2a3a;
+  }
+  header h1 {
+    font-size: 1.8rem;
+    color: #d4a843;
+    letter-spacing: 6px;
+    text-shadow: 0 0 12px rgba(212,168,67,.35);
+  }
+  header .subtitle {
+    font-size: .85rem;
+    color: #6a6a7a;
+    margin-top: 4px;
+  }
+
+  /* ── Main Layout ── */
+  .game-container {
+    display: flex;
+    flex: 1;
+    max-width: 1200px;
+    width: 100%;
+    margin: 0 auto;
+    gap: 0;
+  }
+
+  /* ── Left: Story Panel ── */
+  .story-panel {
+    flex: 1;
+    padding: 28px 32px;
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid #1e1e2e;
+    min-height: 0;
+  }
+
+  .region-label {
+    font-size: .75rem;
+    color: #d4a843;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+    opacity: .8;
+  }
+
+  .story-text {
+    flex: 1;
+    overflow-y: auto;
+    font-size: 1.05rem;
+    line-height: 1.85;
+    padding-right: 8px;
+    white-space: pre-line;
+  }
+  .story-text::-webkit-scrollbar { width: 4px; }
+  .story-text::-webkit-scrollbar-thumb { background: #2a2a3a; border-radius: 2px; }
+
+  .story-text .combat-log {
+    color: #a06040;
+    font-size: .92rem;
+    margin: 6px 0;
+    padding-left: 12px;
+    border-left: 2px solid #5a3a2a;
+  }
+
+  .choices {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .choice-btn {
+    background: #12121e;
+    border: 1px solid #2a2a3a;
+    color: #c8c8d0;
+    padding: 12px 18px;
+    font-size: .98rem;
+    font-family: inherit;
+    text-align: left;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: all .2s;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .choice-btn:hover, .choice-btn:focus {
+    background: #1a1a2e;
+    border-color: #d4a843;
+    color: #e8e8f0;
+    outline: none;
+  }
+  .choice-btn .key-hint {
+    display: inline-block;
+    width: 26px; height: 26px;
+    line-height: 26px;
+    text-align: center;
+    background: #1e1e30;
+    border: 1px solid #3a3a50;
+    border-radius: 4px;
+    font-size: .8rem;
+    color: #d4a843;
+    flex-shrink: 0;
+  }
+
+  /* ── Right: Status Panel ── */
+  .status-panel {
+    width: 280px;
+    padding: 28px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    flex-shrink: 0;
+  }
+
+  .status-section h3 {
+    font-size: .8rem;
+    color: #d4a843;
+    letter-spacing: 3px;
+    margin-bottom: 10px;
+    border-bottom: 1px solid #1e1e2e;
+    padding-bottom: 4px;
+  }
+
+  .stat-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+    font-size: .9rem;
+  }
+  .stat-label { color: #7a7a8e; }
+  .stat-value { color: #e0e0ea; font-weight: bold; }
+  .stat-value.hp { color: #c0564b; }
+  .stat-value.petri { color: #7a7ac0; }
+
+  /* Bars */
+  .bar-container {
+    height: 6px;
+    background: #1a1a28;
+    border-radius: 3px;
+    margin-top: 3px;
+    margin-bottom: 8px;
+    overflow: hidden;
+  }
+  .bar-fill {
+    height: 100%;
+    border-radius: 3px;
+    transition: width .4s ease;
+  }
+  .bar-fill.hp-bar { background: linear-gradient(90deg, #8b2020, #c0564b); }
+  .bar-fill.petri-bar { background: linear-gradient(90deg, #4a4a8a, #7a7ac0); }
+
+  /* Inventory */
+  .inventory-list {
+    list-style: none;
+    font-size: .88rem;
+  }
+  .inventory-list li {
+    padding: 4px 0;
+    color: #9a9ab0;
+    border-bottom: 1px solid #141420;
+  }
+  .inventory-list li::before {
+    content: "◆ ";
+    color: #d4a843;
+    font-size: .7rem;
+  }
+  .inventory-empty {
+    color: #4a4a5a;
+    font-style: italic;
+    font-size: .85rem;
+  }
+
+  /* ── Death Overlay ── */
+  .death-overlay {
+    position: fixed; inset: 0;
+    background: rgba(5,5,10,.92);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .6s;
+  }
+  .death-overlay.active {
+    opacity: 1;
+    pointer-events: all;
+  }
+  .death-overlay h2 {
+    font-size: 2.4rem;
+    color: #7a7ac0;
+    letter-spacing: 8px;
+    margin-bottom: 12px;
+  }
+  .death-overlay p {
+    color: #6a6a80;
+    margin-bottom: 28px;
+    font-size: 1rem;
+  }
+  .death-overlay button {
+    background: none;
+    border: 1px solid #7a7ac0;
+    color: #9a9ad0;
+    padding: 12px 36px;
+    font-size: 1rem;
+    font-family: inherit;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: all .25s;
+  }
+  .death-overlay button:hover {
+    background: #1a1a30;
+    border-color: #d4a843;
+    color: #d4a843;
+  }
+
+  /* ── Notification ── */
+  .notification {
+    position: fixed;
+    top: 20px; left: 50%;
+    transform: translateX(-50%) translateY(-60px);
+    background: #1a1a2e;
+    border: 1px solid #d4a843;
+    color: #d4a843;
+    padding: 10px 24px;
+    border-radius: 4px;
+    font-size: .9rem;
+    opacity: 0;
+    transition: all .35s;
+    z-index: 200;
+    pointer-events: none;
+  }
+  .notification.show {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+  }
+
+  /* ── Responsive ── */
+  @media (max-width: 760px) {
+    .game-container { flex-direction: column; }
+    .status-panel { width: 100%; border-top: 1px solid #1e1e2e; }
+    .story-panel { border-right: none; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>石 化 深 淵</h1>
+  <div class="subtitle">—— 從祭獻之坑，向光攀升 ——</div>
+</header>
+
+<div class="game-container">
+  <div class="story-panel">
+    <div class="region-label" id="region-label"></div>
+    <div class="story-text" id="story-text"></div>
+    <div class="choices" id="choices"></div>
+  </div>
+  <div class="status-panel">
+    <div class="status-section">
+      <h3>生命</h3>
+      <div class="stat-row">
+        <span class="stat-label">HP</span>
+        <span class="stat-value hp" id="stat-hp">100 / 100</span>
+      </div>
+      <div class="bar-container"><div class="bar-fill hp-bar" id="bar-hp"></div></div>
+      <div class="stat-row">
+        <span class="stat-label">石化度</span>
+        <span class="stat-value petri" id="stat-petri">0%</span>
+      </div>
+      <div class="bar-container"><div class="bar-fill petri-bar" id="bar-petri"></div></div>
+    </div>
+    <div class="status-section">
+      <h3>屬性</h3>
+      <div class="stat-row"><span class="stat-label">力量</span><span class="stat-value" id="stat-str">5</span></div>
+      <div class="stat-row"><span class="stat-label">敏捷</span><span class="stat-value" id="stat-agi">5</span></div>
+      <div class="stat-row"><span class="stat-label">意志</span><span class="stat-value" id="stat-wil">5</span></div>
+    </div>
+    <div class="status-section">
+      <h3>物品欄</h3>
+      <ul class="inventory-list" id="inventory"></ul>
+    </div>
+    <div class="status-section">
+      <h3>位置</h3>
+      <div class="stat-row"><span class="stat-label" id="location-text">祭獻坑</span></div>
+    </div>
+  </div>
+</div>
+
+<div class="death-overlay" id="death-overlay">
+  <h2>石 化</h2>
+  <p id="death-msg">你的身體已完全化為冰冷的石頭……</p>
+  <button id="revive-btn">掙脫石殼，重新站起</button>
+</div>
+
+<div class="notification" id="notification"></div>
+
+<script>
+// ═══════════════════════════════════════════════════
+//  Game State
+// ═══════════════════════════════════════════════════
+const state = {
+  hp: 100, maxHp: 100,
+  petri: 0,          // 石化度 0-100
+  str: 5, agi: 5, wil: 5,
+  inventory: [],
+  region: 0,         // 0=祭獻坑, 1=石脈迴廊, 2=灰燼神殿, 3=裂隙天穹
+  node: 'start',
+  flags: {},
+  deathCount: 0,
+};
+
+const REGIONS = ['祭獻坑','石脈迴廊','灰燼神殿','裂隙天穹'];
+
+// ── DOM refs ──
+const $story   = document.getElementById('story-text');
+const $choices  = document.getElementById('choices');
+const $region   = document.getElementById('region-label');
+const $hp       = document.getElementById('stat-hp');
+const $barHp    = document.getElementById('bar-hp');
+const $petri    = document.getElementById('stat-petri');
+const $barPetri = document.getElementById('bar-petri');
+const $str      = document.getElementById('stat-str');
+const $agi      = document.getElementById('stat-agi');
+const $wil      = document.getElementById('stat-wil');
+const $inv      = document.getElementById('inventory');
+const $loc      = document.getElementById('location-text');
+const $deathOv  = document.getElementById('death-overlay');
+const $deathMsg = document.getElementById('death-msg');
+const $revive   = document.getElementById('revive-btn');
+const $notif    = document.getElementById('notification');
+
+// ═══════════════════════════════════════════════════
+//  Utility
+// ═══════════════════════════════════════════════════
+function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
+
+function rng(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
+
+function notify(msg) {
+  $notif.textContent = msg;
+  $notif.classList.add('show');
+  setTimeout(() => $notif.classList.remove('show'), 2000);
+}
+
+function hasItem(name) { return state.inventory.includes(name); }
+
+function addItem(name) {
+  if (!hasItem(name)) {
+    state.inventory.push(name);
+    notify('獲得物品：' + name);
+  }
+}
+
+function removeItem(name) {
+  const i = state.inventory.indexOf(name);
+  if (i >= 0) state.inventory.splice(i, 1);
+}
+
+function changeHp(delta) {
+  state.hp = clamp(state.hp + delta, 0, state.maxHp);
+  if (state.hp <= 0) die('你的生命力耗盡，倒在了冰冷的石地上……');
+}
+
+function changePetri(delta) {
+  state.petri = clamp(state.petri + delta, 0, 100);
+  if (state.petri >= 100) die('你的身體已完全化為冰冷的石頭……');
+}
+
+function changeStat(stat, delta) {
+  state[stat] = Math.max(1, state[stat] + delta);
+}
+
+// ═══════════════════════════════════════════════════
+//  Render UI
+// ═══════════════════════════════════════════════════
+function renderStatus() {
+  $hp.textContent = state.hp + ' / ' + state.maxHp;
+  $barHp.style.width = (state.hp / state.maxHp * 100) + '%';
+  $petri.textContent = state.petri + '%';
+  $barPetri.style.width = state.petri + '%';
+  $str.textContent = state.str;
+  $agi.textContent = state.agi;
+  $wil.textContent = state.wil;
+  $loc.textContent = REGIONS[state.region] || '';
+  $region.textContent = '第' + '一二三四'[state.region] + '層 — ' + REGIONS[state.region];
+
+  if (state.inventory.length === 0) {
+    $inv.innerHTML = '<li class="inventory-empty">空</li>';
+  } else {
+    $inv.innerHTML = state.inventory.map(it => '<li>' + it + '</li>').join('');
+  }
+}
+
+function renderScene(text, choices) {
+  $story.innerHTML = text;
+  $choices.innerHTML = '';
+  const keys = ['A','B','C','D'];
+  choices.forEach((c, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'choice-btn';
+    btn.innerHTML = '<span class="key-hint">' + keys[i] + '</span><span>' + c.text + '</span>';
+    btn.addEventListener('click', () => selectChoice(i));
+    $choices.appendChild(btn);
+  });
+  currentChoices = choices;
+  renderStatus();
+  $story.scrollTop = $story.scrollHeight;
+}
+
+// ═══════════════════════════════════════════════════
+//  Keyboard Shortcuts
+// ═══════════════════════════════════════════════════
+let currentChoices = [];
+
+document.addEventListener('keydown', (e) => {
+  if ($deathOv.classList.contains('active')) {
+    if (e.key === 'Enter' || e.key === ' ') revive();
+    return;
+  }
+  const map = { a: 0, b: 1, c: 2, d: 3, '1': 0, '2': 1, '3': 2, '4': 3 };
+  const idx = map[e.key.toLowerCase()];
+  if (idx !== undefined && idx < currentChoices.length) {
+    selectChoice(idx);
+  }
+});
+
+function selectChoice(idx) {
+  if (idx >= currentChoices.length) return;
+  const action = currentChoices[idx].action;
+  currentChoices = [];
+  action();
+}
+
+// ═══════════════════════════════════════════════════
+//  Death / Revive
+// ═══════════════════════════════════════════════════
+function die(msg) {
+  $deathMsg.textContent = msg || '你死了……';
+  $deathOv.classList.add('active');
+}
+
+function revive() {
+  state.deathCount++;
+  state.hp = Math.floor(state.maxHp * 0.6);
+  state.petri = Math.max(0, state.petri - 30);
+  $deathOv.classList.remove('active');
+  notify('你從石殼中掙脫，重新站起。（復活次數：' + state.deathCount + '）');
+  renderStatus();
+  // Return to current region start
+  loadNode(state.node.includes('combat') ? regionStartNode() : state.node);
+}
+
+$revive.addEventListener('click', revive);
+
+function regionStartNode() {
+  return ['r0_start','r1_start','r2_start','r3_start'][state.region] || 'r0_start';
+}
+
+// ═══════════════════════════════════════════════════
+//  Combat System
+// ═══════════════════════════════════════════════════
+function startCombat(enemy, onWin, onFlee) {
+  let enemyHp = enemy.hp;
+  const eName = enemy.name;
+
+  function combatRound() {
+    const text = `<b>【戰鬥】${eName}</b>
+敵人HP：${enemyHp} / ${enemy.hp}　｜　你的HP：${state.hp} / ${state.maxHp}
+
+${enemy.desc || ''}`;
+
+    const choices = [
+      { text: '攻擊', action: () => doAttack() },
+      { text: '閃避', action: () => doDodge() },
+      { text: '防守', action: () => doDefend() },
+    ];
+    if (onFlee) {
+      choices.push({ text: '逃跑', action: () => onFlee() });
+    }
+    renderScene(text, choices);
+  }
+
+  function doAttack() {
+    const dmg = rng(3, 6) + Math.floor(state.str * 1.2);
+    const enemyDmg = Math.max(0, rng(enemy.atkMin, enemy.atkMax) - Math.floor(state.agi * 0.3));
+    enemyHp -= dmg;
+
+    let log = `<div class="combat-log">你揮出攻擊，造成 ${dmg} 點傷害。</div>`;
+
+    if (enemyHp <= 0) {
+      log += `<div class="combat-log">${eName} 被擊敗了！</div>`;
+      renderScene(log, [{ text: '繼續', action: () => onWin() }]);
+      return;
+    }
+
+    changeHp(-enemyDmg);
+    if (enemy.petriDmg) changePetri(enemy.petriDmg);
+    log += `<div class="combat-log">${eName} 反擊，對你造成 ${enemyDmg} 點傷害。${enemy.petriDmg ? '石化度 +' + enemy.petriDmg + '%' : ''}</div>`;
+
+    if (state.hp <= 0) return; // die() already called
+
+    renderScene(log, [{ text: '繼續戰鬥', action: () => combatRound() }]);
+  }
+
+  function doDodge() {
+    const dodgeRoll = rng(1, 10) + state.agi;
+    let log;
+    if (dodgeRoll >= 10) {
+      log = `<div class="combat-log">你靈巧地閃開了攻擊！</div>`;
+    } else {
+      const enemyDmg = Math.max(1, rng(enemy.atkMin, enemy.atkMax) - state.agi);
+      changeHp(-enemyDmg);
+      if (enemy.petriDmg) changePetri(Math.floor(enemy.petriDmg / 2));
+      log = `<div class="combat-log">閃避失敗！受到 ${enemyDmg} 點傷害。</div>`;
+      if (state.hp <= 0) return;
+    }
+    renderScene(log, [{ text: '繼續戰鬥', action: () => combatRound() }]);
+  }
+
+  function doDefend() {
+    const block = Math.floor(state.str * 0.8) + rng(2, 5);
+    const enemyDmg = Math.max(0, rng(enemy.atkMin, enemy.atkMax) - block);
+    changeHp(-enemyDmg);
+    const petriReduce = state.wil >= 7 ? 2 : 0;
+    if (petriReduce) changePetri(-petriReduce);
+    let log = `<div class="combat-log">你舉起防禦，承受了 ${enemyDmg} 點傷害。${petriReduce ? '意志集中，石化度 -' + petriReduce + '%' : ''}</div>`;
+    if (state.hp <= 0) return;
+    renderScene(log, [{ text: '繼續戰鬥', action: () => combatRound() }]);
+  }
+
+  combatRound();
+}
+
+// ═══════════════════════════════════════════════════
+//  Node System
+// ═══════════════════════════════════════════════════
+const nodes = {};
+
+function registerNode(id, fn) { nodes[id] = fn; }
+
+function loadNode(id) {
+  state.node = id;
+  if (nodes[id]) {
+    nodes[id]();
+  } else {
+    renderScene('<i>（未實裝的節點：' + id + '）</i>', [
+      { text: '返回', action: () => loadNode(regionStartNode()) }
+    ]);
+  }
+}
+
+// ═══════════════════════════════════════════════════
+//  Region 0 — 祭獻坑
+// ═══════════════════════════════════════════════════
+
+registerNode('r0_start', () => {
+  state.region = 0;
+  renderScene(
+`你在黑暗中睜開眼睛。
+
+冰冷的石地貼著你的背脊，空氣中瀰漫著潮濕與石灰石的苦味。你的四肢僵硬——左手的指尖已經泛灰，隱隱有石化的紋路蔓延。
+
+你被扔進了<b>祭獻坑</b>。這裡是地下世界最深處的垃圾場，那些被石化詛咒侵蝕、不再有利用價值的人，都會被丟到這裡。
+
+頭頂上方，遙遠的裂縫透出一絲微光。
+
+你知道——你必須向上攀升。`,
+    [
+      { text: '檢查自己的身體', action: () => loadNode('r0_body') },
+      { text: '觀察周圍環境', action: () => loadNode('r0_look') },
+      { text: '直接尋找出路', action: () => loadNode('r0_path') },
+    ]
+  );
+});
+
+registerNode('r0_body', () => {
+  renderScene(
+`你低頭審視自己。
+
+衣衫襤褸，腳上沒有鞋。左手的石化紋路從指尖延伸到手腕——目前還不影響活動，但你隱約感覺到那股冰涼的麻痺正在緩慢擴散。
+
+你的身體還算結實，不像是長期囚禁的囚犯。也許，你是最近才被丟下來的。
+
+你的記憶一片模糊。唯一記得的，是墜落前那些穿著灰袍的祭司，和他們面無表情的臉。`,
+    [
+      { text: '嘗試活動關節，恢復身體機能', action: () => {
+        changeStat('agi', 1);
+        notify('敏捷 +1');
+        loadNode('r0_look');
+      }},
+      { text: '集中精神，抵抗石化的侵蝕', action: () => {
+        changeStat('wil', 1);
+        changePetri(-3);
+        notify('意志 +1，石化度 -3%');
+        loadNode('r0_look');
+      }},
+    ]
+  );
+});
+
+registerNode('r0_look', () => {
+  state.flags.lookedAround = true;
+  renderScene(
+`你環顧四周。
+
+祭獻坑是一個不規則的天然洞穴，大約十來步寬。地面散落著碎石和……那些是骨頭，還是完全石化的殘肢，你分不清楚。
+
+角落裡有一具<b>半石化的屍體</b>，手中似乎還握著什麼東西。
+
+北面的岩壁上有模糊的<b>攀爬痕跡</b>——有人嘗試過往上爬。
+
+南面有一條狹窄的<b>裂縫</b>，黑暗中似乎傳來微弱的水聲。`,
+    [
+      { text: '檢查半石化的屍體', action: () => loadNode('r0_corpse') },
+      { text: '查看攀爬痕跡', action: () => loadNode('r0_climb_check') },
+      { text: '探索裂縫', action: () => loadNode('r0_crack') },
+    ]
+  );
+});
+
+registerNode('r0_corpse', () => {
+  const alreadySearched = state.flags.corpseSearched;
+  if (alreadySearched) {
+    renderScene(
+`你已經搜過這具屍體了。石化的手指保持著握緊的姿態，再也無法鬆開。`,
+      [{ text: '返回', action: () => loadNode('r0_look') }]
+    );
+    return;
+  }
+  state.flags.corpseSearched = true;
+  addItem('碎石匕首');
+  renderScene(
+`你蹲在那具半石化的屍體旁。
+
+這個人已經死了很久。身體的右半部完全變成了灰色的石頭，左半部則已經腐朽。他的石化手中緊握著一把用石片磨成的粗糙匕首。
+
+你費了些力氣，才把匕首從石化的手指中撬出來。刀刃不算鋒利，但總比赤手空拳好。
+
+你注意到屍體的胸口刻著幾個歪歪斜斜的字：「別走南邊」。`,
+    [
+      { text: '記住警告，去查看攀爬痕跡', action: () => { state.flags.corpseWarning = true; loadNode('r0_climb_check'); } },
+      { text: '無視警告，探索南面裂縫', action: () => loadNode('r0_crack') },
+    ]
+  );
+});
+
+registerNode('r0_crack', () => {
+  renderScene(
+`你側身擠進南面的裂縫。
+
+通道越來越窄，空氣越來越潮濕。水聲漸漸清晰——前方似乎有一池地下水。
+
+突然，你的腳下一滑！${state.flags.corpseWarning ? '你想起屍體上的警告，心中一緊。' : ''}
+
+你勉強抓住岩壁穩住身體，但小腿浸入了冰冷的水中。一股刺骨的寒意從腳底竄上——那不是普通的水，水面泛著灰色的微光。
+
+<b>石化之水。</b>`,
+    [
+      { text: '立刻退回（考驗敏捷）', action: () => {
+        if (state.agi >= 6) {
+          notify('敏捷檢定成功！');
+          changePetri(3);
+          renderScene(
+`你反應迅速，一把抽回雙腳，跌跌撞撞地退出裂縫。
+
+小腿處的皮膚微微泛灰，石化侵入了一點點，但不算嚴重。
+
+不過，你在水邊看到了一塊發光的礦石，順手撿了起來。`,
+            [{ text: '返回坑底', action: () => { addItem('微光石'); loadNode('r0_look'); } }]
+          );
+        } else {
+          changePetri(10);
+          changeHp(-8);
+          renderScene(
+`你慌忙後退，但滑了一跤，整條小腿都泡進了石化之水。
+
+劇烈的疼痛和麻痺感從腿部蔓延。你拼命爬出裂縫，但皮膚上已經留下了大片灰色紋路。`,
+            [{ text: '返回坑底', action: () => loadNode('r0_look') }]
+          );
+        }
+      }},
+      { text: '嘗試用意志抵抗石化，採集水邊礦石', action: () => {
+        if (state.wil >= 6) {
+          changePetri(5);
+          addItem('微光石');
+          addItem('石化水瓶');
+          notify('意志檢定成功！');
+          renderScene(
+`你閉上眼睛，集中精神。意志力化為一股溫熱的力量，暫時壓制住石化的侵蝕。
+
+你快速採集了水邊的微光石，還用碎石片舀了一些石化之水——也許以後能派上用場。`,
+            [{ text: '返回坑底', action: () => loadNode('r0_look') }]
+          );
+        } else {
+          changePetri(12);
+          changeHp(-5);
+          renderScene(
+`你嘗試以精神力抵抗，但石化的力量太過強大。冰冷的感覺迅速爬上你的雙腿。
+
+你不得不放棄，連滾帶爬地退了出來。`,
+            [{ text: '返回坑底', action: () => loadNode('r0_look') }]
+          );
+        }
+      }},
+    ]
+  );
+});
+
+registerNode('r0_climb_check', () => {
+  renderScene(
+`你走到北面岩壁前。
+
+牆面上有模糊的抓痕和一些鑿出的凹陷，顯然有人嘗試過向上攀爬。大約三個人高的地方，有一個突出的岩棚——如果能爬上去，也許就能找到通往上層的路。
+
+但岩壁濕滑，而且你注意到牆上有奇怪的灰色苔蘚——接觸到可能會加速石化。`,
+    [
+      { text: '直接攀爬（考驗力量）', action: () => loadNode('r0_climb_str') },
+      { text: '尋找其他可以借力的東西', action: () => loadNode('r0_climb_alt') },
+      { text: '返回觀察', action: () => loadNode('r0_look') },
+    ]
+  );
+});
+
+registerNode('r0_climb_str', () => {
+  const strCheck = state.str + rng(1, 6);
+  if (strCheck >= 9) {
+    changePetri(3);
+    renderScene(
+`你深吸一口氣，找準落腳點，開始攀爬。
+
+岩壁比想像中更滑，你的手掌幾次差點鬆開。灰色苔蘚沾上了你的手臂，帶來一陣麻痺感，但你咬牙撐住。
+
+你的手指終於扣住了岩棚的邊緣——用盡全力，你把自己拉了上去。
+
+岩棚上方，一條蜿蜒的隧道延伸向黑暗深處。隱約能感覺到前方有一絲氣流。`,
+      [{ text: '進入隧道', action: () => loadNode('r0_tunnel') }]
+    );
+  } else {
+    changePetri(5);
+    changeHp(-10);
+    renderScene(
+`你奮力向上攀爬，但到了一半，腳下的岩石突然碎裂。
+
+你重重地摔回地面，背部傳來劇痛。更糟的是，摔落時你整隻手臂都蹭過了灰色苔蘚，石化感迅速蔓延。`,
+      [
+        { text: '休息一下再嘗試', action: () => { changeHp(5); loadNode('r0_climb_check'); } },
+        { text: '放棄攀爬，尋找其他路', action: () => loadNode('r0_climb_alt') },
+      ]
+    );
+  }
+});
+
+registerNode('r0_climb_alt', () => {
+  const hasMikouStone = hasItem('微光石');
+  renderScene(
+`你退後幾步，打量整個岩壁。
+
+在角落裡，你發現幾塊較大的碎石可以堆疊起來當作墊腳。而岩壁的裂縫中似乎卡著一根朽木——也許可以當作支撐。${hasMikouStone ? '\n\n你手中的微光石散發著淡淡的光芒，讓你能看得更清楚。你注意到岩壁上有一條隱蔽的路線，上面的苔蘚較少。' : ''}`,
+    [
+      { text: hasMikouStone ? '沿著隱蔽路線攀爬' : '堆石頭後攀爬', action: () => {
+        changePetri(hasMikouStone ? 1 : 4);
+        renderScene(
+hasMikouStone
+? `借助微光石的光照，你找到了一條苔蘚稀疏的路線。攀爬依然不容易，但你順利地避開了大部分石化苔蘚。
+
+幾分鐘後，你翻上了岩棚。微光石的光芒照亮了前方的隧道。`
+: `你花了一些時間堆好碎石，然後小心翼翼地攀爬。中途仍然碰到了一些灰色苔蘚，但比直接硬爬好多了。
+
+你成功爬上了岩棚。前方是一條黑暗的隧道。`,
+          [{ text: '進入隧道', action: () => loadNode('r0_tunnel') }]
+        );
+      }},
+      { text: '返回', action: () => loadNode('r0_look') },
+    ]
+  );
+});
+
+registerNode('r0_tunnel', () => {
+  renderScene(
+`隧道狹窄而曲折，你只能弓著身子前進。
+
+牆壁上偶爾閃爍著石化礦脈的灰色光芒。你不敢觸碰。
+
+走了一段路，隧道突然變寬。你面前出現了一個較大的空間——
+
+一隻<b>石蜥蜴</b>蹲伏在前方。
+
+它有一隻普通狗大小，全身覆蓋著灰色的石鱗。它歪著頭看著你，嘴裡發出低沉的嘶嘶聲。那雙眼睛閃著不自然的紫色光芒——那是石化凝視的前兆。`,
+    [
+      { text: '戰鬥', action: () => {
+        startCombat(
+          {
+            name: '石蜥蜴',
+            hp: 30,
+            atkMin: 4, atkMax: 9,
+            petriDmg: 3,
+            desc: '石蜥蜴的眼睛閃爍著紫光，每次攻擊都帶有石化效果。'
+          },
+          () => {
+            changeStat('str', 1);
+            notify('力量 +1');
+            loadNode('r0_after_lizard');
+          },
+          () => {
+            changePetri(5);
+            renderScene(
+`你轉身拔腿就跑。石蜥蜴追了一小段路，用石化凝視掃了你一眼，然後放棄了追擊。
+
+你的後背一陣發麻——石化度上升了。`,
+              [{ text: '退回岩棚', action: () => loadNode('r0_climb_check') }]
+            );
+          }
+        );
+      }},
+      { text: '嘗試悄悄繞過去（考驗敏捷）', action: () => {
+        if (state.agi >= 7) {
+          renderScene(
+`你壓低身體，沿著洞穴邊緣慢慢移動。石蜥蜴似乎注意到了什麼，抬起頭嗅了嗅空氣，但隨後又趴了下去。
+
+你屏住呼吸，從它身後悄悄溜了過去。`,
+            [{ text: '繼續前進', action: () => loadNode('r0_after_lizard') }]
+          );
+        } else {
+          changePetri(4);
+          changeHp(-5);
+          renderScene(
+`你嘗試潛行，但踩到了一塊碎石。石蜥蜴猛地轉頭，紫色的凝視直射向你！
+
+一股石化的力量衝擊你的身體，你的皮膚瞬間僵硬了幾秒。等你恢復知覺時，石蜥蜴已經擺出了攻擊姿態。`,
+            [
+              { text: '被迫戰鬥', action: () => {
+                startCombat(
+                  { name: '石蜥蜴', hp: 30, atkMin: 4, atkMax: 9, petriDmg: 3, desc: '石蜥蜴的眼睛閃爍著紫光。' },
+                  () => { changeStat('str', 1); notify('力量 +1'); loadNode('r0_after_lizard'); },
+                  null
+                );
+              }},
+            ]
+          );
+        }
+      }},
+      { text: hasItem('碎石匕首') ? '投擲碎石匕首（先發制人）' : '大聲威嚇', action: () => {
+        if (hasItem('碎石匕首')) {
+          removeItem('碎石匕首');
+          renderScene(
+`你抽出碎石匕首，瞄準石蜥蜴的眼睛擲出！
+
+匕首準確地擊中了目標——石蜥蜴發出一聲刺耳的慘叫，紫色的眼睛暗淡下來。它掙扎了幾下，最終倒在地上，變回了一塊普通的灰石。
+
+匕首斷裂了，但你已經不再需要它了。`,
+            [{ text: '繼續前進', action: () => { changeStat('str', 1); loadNode('r0_after_lizard'); } }]
+          );
+        } else {
+          renderScene(
+`你大喊一聲，試圖嚇退石蜥蜴。
+
+石蜥蜴歪了歪頭，然後……直接撲了過來。看來威嚇對它毫無效果。`,
+            [
+              { text: '戰鬥', action: () => {
+                startCombat(
+                  { name: '石蜥蜴', hp: 30, atkMin: 4, atkMax: 9, petriDmg: 3, desc: '石蜥蜴的眼睛閃爍著紫光。' },
+                  () => { changeStat('str', 1); notify('力量 +1'); loadNode('r0_after_lizard'); },
+                  () => { changePetri(5); loadNode('r0_climb_check'); }
+                );
+              }},
+            ]
+          );
+        }
+      }},
+    ]
+  );
+});
+
+registerNode('r0_after_lizard', () => {
+  renderScene(
+`石蜥蜴的巢穴後方，隧道繼續向上延伸。
+
+你注意到牆壁上的礦脈越來越密集，空氣中的石化氣息也越來越濃。但同時，前方的光線變得更亮了。
+
+再往前走了一段路，你聽到了迴盪的腳步聲和敲擊聲——不是天然的，是人為的。
+
+隧道的盡頭，一扇粗糙的石門半掩著。門上刻著一行已經模糊的古文字。你只能辨認出其中幾個：
+
+<b>「……石脈……迴廊……禁入……」</b>
+
+石門的另一邊，是下一個層級——<b>石脈迴廊</b>。
+
+那裡或許有其他倖存者，但也意味著更多危險。`,
+    [
+      { text: '推開石門，進入石脈迴廊', action: () => {
+        state.region = 1;
+        loadNode('r1_start');
+      }},
+      { text: '在門口稍作休息', action: () => {
+        changeHp(15);
+        changePetri(-2);
+        notify('HP +15，石化度 -2%');
+        renderScene(
+`你靠著石門坐下，閉上眼睛。
+
+在這個充滿石化威脅的地下世界，片刻的寧靜顯得格外珍貴。你的呼吸逐漸平穩，身上的傷痛也稍稍緩解。
+
+但你知道，不能停留太久。這裡的空氣本身就帶有微量的石化粒子。
+
+你站起身來，準備好面對下一段旅程。`,
+          [{ text: '推開石門，進入石脈迴廊', action: () => { state.region = 1; loadNode('r1_start'); } }]
+        );
+      }},
+    ]
+  );
+});
+
+// ═══════════════════════════════════════════════════
+//  Region 1 — 石脈迴廊（Placeholder for future）
+// ═══════════════════════════════════════════════════
+registerNode('r1_start', () => {
+  state.region = 1;
+  renderScene(
+`石門在你身後緩緩關閉。
+
+你踏入了<b>石脈迴廊</b>。
+
+這裡不再是天然洞穴——走廊由切割整齊的石磚砌成，牆壁上鑲嵌著發光的石化礦脈，散發出幽藍的冷光。整條走廊寬約兩步，高約三步，延伸向遠方。
+
+空氣中的石化氣息比坑底更濃，但至少能看清路。
+
+遠處傳來金屬碰撞的迴音。
+
+<i>（第二層 — 石脈迴廊的冒險將在後續更新中展開……）</i>`,
+    [
+      { text: '繼續探索（即將開放）', action: () => {
+        notify('此區域尚未開放');
+        loadNode('r1_start');
+      }},
+    ]
+  );
+});
+
+// ═══════════════════════════════════════════════════
+//  Region 0 — path shortcut
+// ═══════════════════════════════════════════════════
+registerNode('r0_path', () => {
+  renderScene(
+`你不想浪費時間在這個死亡之坑裡多待一秒。
+
+你快速掃視洞穴——北面岩壁上的攀爬痕跡最為明顯，那應該是唯一的出路。
+
+但在攀爬之前，也許應該先做些準備。這裡畢竟是個未知的環境，貿然行動可能會付出代價。`,
+    [
+      { text: '先仔細觀察環境再說', action: () => loadNode('r0_look') },
+      { text: '不管了，直接爬', action: () => loadNode('r0_climb_str') },
+    ]
+  );
+});
+
+// ═══════════════════════════════════════════════════
+//  Init
+// ═══════════════════════════════════════════════════
+loadNode('r0_start');
+</script>
+</body>
+</html>
