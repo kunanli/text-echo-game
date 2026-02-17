@@ -70,6 +70,7 @@
     line-height: 1.85;
     padding-right: 8px;
     white-space: pre-line;
+    cursor: pointer;
   }
   .story-text::-webkit-scrollbar { width: 4px; }
   .story-text::-webkit-scrollbar-thumb { background: #2a2a3a; border-radius: 2px; }
@@ -80,6 +81,37 @@
     margin: 6px 0;
     padding-left: 12px;
     border-left: 2px solid #5a3a2a;
+  }
+
+  /* ── ASCII Art ── */
+  .ascii-art {
+    font-family: "Courier New", Courier, monospace;
+    font-size: .72rem;
+    line-height: 1.15;
+    color: #5a6a5a;
+    white-space: pre;
+    margin: 12px 0;
+    text-align: center;
+    letter-spacing: 1px;
+    user-select: none;
+  }
+  .ascii-art.gold { color: #9a8040; }
+  .ascii-art.purple { color: #6a5a8a; }
+  .ascii-art.red { color: #8a4a3a; }
+  .ascii-art.blue { color: #4a5a7a; }
+
+  /* ── Typewriter cursor ── */
+  .tw-cursor {
+    display: inline-block;
+    width: 2px;
+    height: 1.1em;
+    background: #d4a843;
+    margin-left: 2px;
+    vertical-align: text-bottom;
+    animation: blink-cursor .7s step-end infinite;
+  }
+  @keyframes blink-cursor {
+    50% { opacity: 0; }
   }
 
   .choices {
@@ -311,6 +343,20 @@
 </div>
 
 <div class="death-overlay" id="death-overlay">
+  <pre class="ascii-art purple" style="font-size:.65rem; margin-bottom:16px;">
+    .     .       .  .   . .   .   . .    +  .
+      .     .  :     .    .. :. .___---------___.
+           .  .   .    .  :.:. _".^ .^ ^.  '.. :"-_. .
+        .  :       .  .  .:../:            . .^  :.:\.
+            .   . :: +. :.:/: .   .        .        .:\
+     .  :    .     . _ gy:| :                        . |
+      .. . .   . - +. :. :/: .                         :\
+      .      .     . .:.|:                    .         . |
+        .       . : :{. :                            . . |
+      .     . . . :  /. :            .                . .:\
+     .   .:!googl/. :                                 .  :\
+    :.!gooogle/  :                                     . |
+  </pre>
   <h2>石 化</h2>
   <p id="death-msg">你的身體已完全化為冰冷的石頭……</p>
   <button id="revive-btn">掙脫石殼，重新站起</button>
@@ -415,8 +461,101 @@ function renderStatus() {
   }
 }
 
+// ── Typewriter engine ──
+let twTimer = null;
+let twSkip = false;
+let twDone = false;
+let pendingChoices = [];
+
+function parseHtmlSegments(html) {
+  const segs = [];
+  let i = 0;
+  while (i < html.length) {
+    if (html[i] === '<') {
+      const end = html.indexOf('>', i);
+      if (end >= 0) {
+        segs.push({ type: 'tag', val: html.slice(i, end + 1) });
+        i = end + 1;
+      } else {
+        segs.push({ type: 'char', val: html[i] });
+        i++;
+      }
+    } else if (html[i] === '&') {
+      const semi = html.indexOf(';', i);
+      if (semi >= 0 && semi - i < 10) {
+        segs.push({ type: 'entity', val: html.slice(i, semi + 1) });
+        i = semi + 1;
+      } else {
+        segs.push({ type: 'char', val: html[i] });
+        i++;
+      }
+    } else {
+      segs.push({ type: 'char', val: html[i] });
+      i++;
+    }
+  }
+  return segs;
+}
+
+function typewrite(html, onDone) {
+  if (twTimer) { clearInterval(twTimer); twTimer = null; }
+  twDone = false;
+  twSkip = false;
+
+  const segs = parseHtmlSegments(html);
+  let idx = 0;
+  let buf = '';
+
+  // Speed: faster for ASCII art lines, normal for prose
+  const baseSpeed = 18;
+
+  function finish() {
+    if (twTimer) { clearInterval(twTimer); twTimer = null; }
+    $story.innerHTML = html;
+    twDone = true;
+    onDone();
+  }
+
+  twTimer = setInterval(() => {
+    if (twSkip) { finish(); return; }
+    if (idx >= segs.length) { finish(); return; }
+
+    // Batch: reveal multiple chars per tick for speed
+    let count = 0;
+    const batchSize = 2;
+    while (count < batchSize && idx < segs.length) {
+      const seg = segs[idx];
+      buf += seg.val;
+      idx++;
+      if (seg.type === 'char') count++;
+      // Tags and entities don't count toward batch
+    }
+
+    $story.innerHTML = buf + '<span class="tw-cursor"></span>';
+    $story.scrollTop = $story.scrollHeight;
+  }, baseSpeed);
+}
+
+function skipTypewriter() {
+  if (!twDone) {
+    twSkip = true;
+  }
+}
+
+$story.addEventListener('click', skipTypewriter);
+
 function renderScene(text, choices) {
-  $story.innerHTML = text;
+  $choices.innerHTML = '';
+  pendingChoices = choices;
+  currentChoices = [];
+  renderStatus();
+
+  typewrite(text, () => {
+    showChoices(choices);
+  });
+}
+
+function showChoices(choices) {
   $choices.innerHTML = '';
   const keys = ['A','B','C','D'];
   choices.forEach((c, i) => {
@@ -424,11 +563,16 @@ function renderScene(text, choices) {
     btn.className = 'choice-btn';
     btn.innerHTML = '<span class="key-hint">' + keys[i] + '</span><span>' + c.text + '</span>';
     btn.addEventListener('click', () => selectChoice(i));
+    btn.style.opacity = '0';
+    btn.style.transform = 'translateY(8px)';
     $choices.appendChild(btn);
+    setTimeout(() => {
+      btn.style.transition = 'opacity .3s, transform .3s';
+      btn.style.opacity = '1';
+      btn.style.transform = 'translateY(0)';
+    }, 60 * i);
   });
   currentChoices = choices;
-  renderStatus();
-  $story.scrollTop = $story.scrollHeight;
 }
 
 // ═══════════════════════════════════════════════════
@@ -439,6 +583,12 @@ let currentChoices = [];
 document.addEventListener('keydown', (e) => {
   if ($deathOv.classList.contains('active')) {
     if (e.key === 'Enter' || e.key === ' ') revive();
+    return;
+  }
+  // Skip typewriter with Space or Enter
+  if (!twDone && (e.key === ' ' || e.key === 'Enter')) {
+    e.preventDefault();
+    skipTypewriter();
     return;
   }
   const map = { a: 0, b: 1, c: 2, d: 3, '1': 0, '2': 1, '3': 2, '4': 3 };
@@ -488,9 +638,19 @@ function startCombat(enemy, onWin, onFlee) {
   const eName = enemy.name;
 
   function combatRound() {
-    const text = `<b>【戰鬥】${eName}</b>
-敵人HP：${enemyHp} / ${enemy.hp}　｜　你的HP：${state.hp} / ${state.maxHp}
+    const hpPct = Math.max(0, Math.floor(enemyHp / enemy.hp * 10));
+    const hpBar = '█'.repeat(hpPct) + '░'.repeat(10 - hpPct);
+    const myPct = Math.max(0, Math.floor(state.hp / state.maxHp * 10));
+    const myBar = '█'.repeat(myPct) + '░'.repeat(10 - myPct);
 
+    const text = `<pre class="ascii-art red">
+  ╔══════════════════════════════╗
+  ║     ⚔  戰  鬥  ⚔           ║
+  ╠══════════════════════════════╣
+  ║  ${eName.padEnd(6)}  [${hpBar}]  ${String(enemyHp).padStart(3)}  ║
+  ║  你      [${myBar}]  ${String(state.hp).padStart(3)}  ║
+  ╚══════════════════════════════╝
+</pre>
 ${enemy.desc || ''}`;
 
     const choices = [
@@ -580,7 +740,26 @@ function loadNode(id) {
 registerNode('r0_start', () => {
   state.region = 0;
   renderScene(
-`你在黑暗中睜開眼睛。
+`<pre class="ascii-art">
+        .         .            .        .
+    .        .          .                     .
+         ___===___         .        .
+        /  \\   /  \\    .                .
+   .   |    \\ /    |        .
+       |     V     |   .         .        .
+  .     \\   ___   /         .
+         \\_/   \\_/      .            .
+    .     |  |  |                         .
+          |  |  |    .        .      .
+   .      |__|__|          .
+     .   /       \\    .            .
+        /  ~   ~  \\        .             .
+  .    /  (  祭  )  \\           .
+      /   (  獻  )   \\   .          .
+     /    (  坑  )    \\       .
+    /______=======______\\          .
+</pre>
+你在黑暗中睜開眼睛。
 
 冰冷的石地貼著你的背脊，空氣中瀰漫著潮濕與石灰石的苦味。你的四肢僵硬——左手的指尖已經泛灰，隱隱有石化的紋路蔓延。
 
@@ -599,7 +778,18 @@ registerNode('r0_start', () => {
 
 registerNode('r0_body', () => {
   renderScene(
-`你低頭審視自己。
+`<pre class="ascii-art purple">
+      o
+     /|\\
+    / | \\
+   /  |  \\
+  ~~~~|    \\
+      |     |
+     / \\   /
+    /   \\ /
+   石化紋路蔓延中…
+</pre>
+你低頭審視自己。
 
 衣衫襤褸，腳上沒有鞋。左手的石化紋路從指尖延伸到手腕——目前還不影響活動，但你隱約感覺到那股冰涼的麻痺正在緩慢擴散。
 
@@ -625,7 +815,21 @@ registerNode('r0_body', () => {
 registerNode('r0_look', () => {
   state.flags.lookedAround = true;
   renderScene(
-`你環顧四周。
+`<pre class="ascii-art">
+  [北：攀爬痕跡]
+    |  /|  ^  ^
+    | / | /| /|
+    |/  |/ |/ |
+----+---+--+--+----
+   .  .  @@  . .
+  . ,  屍體  ,.
+ ~ite~  .  . ~ite~
+  你 ←  .  . → .
+----+---+--+--+----
+    |   ~~~    |
+    | [南：裂縫] |
+</pre>
+你環顧四周。
 
 祭獻坑是一個不規則的天然洞穴，大約十來步寬。地面散落著碎石和……那些是骨頭，還是完全石化的殘肢，你分不清楚。
 
@@ -654,13 +858,26 @@ registerNode('r0_corpse', () => {
   state.flags.corpseSearched = true;
   addItem('碎石匕首');
   renderScene(
-`你蹲在那具半石化的屍體旁。
+`<pre class="ascii-art">
+     _____
+    / R.I \\
+   | .P.   |
+   | _____ |
+   |/##   \\|     ___
+   |##  @@ |----/   \\
+   |#  /|| |   | 匕首 |
+   |# / || |    \\___/
+   |_/  ||_|
+  /石化  殘軀\\
+ /=============\\
+</pre>
+你蹲在那具半石化的屍體旁。
 
 這個人已經死了很久。身體的右半部完全變成了灰色的石頭，左半部則已經腐朽。他的石化手中緊握著一把用石片磨成的粗糙匕首。
 
 你費了些力氣，才把匕首從石化的手指中撬出來。刀刃不算鋒利，但總比赤手空拳好。
 
-你注意到屍體的胸口刻著幾個歪歪斜斜的字：「別走南邊」。`,
+你注意到屍體的胸口刻著幾個歪歪斜斜的字：<b>「別走南邊」</b>。`,
     [
       { text: '記住警告，去查看攀爬痕跡', action: () => { state.flags.corpseWarning = true; loadNode('r0_climb_check'); } },
       { text: '無視警告，探索南面裂縫', action: () => loadNode('r0_crack') },
@@ -670,7 +887,19 @@ registerNode('r0_corpse', () => {
 
 registerNode('r0_crack', () => {
   renderScene(
-`你側身擠進南面的裂縫。
+`<pre class="ascii-art blue">
+    |  |        |  |
+    |  |________|  |
+    | /~~~~~~~~~~\\ |
+    |/ ~~~ ~~ ~~~ \\|
+    | ~~~~~~~~~~~~ |
+    |~~ 石化之水 ~~|
+    |~~~~~~~~~~~~~~|
+    |######~~~~~~~~|
+    |####  ~~~~~~~~|
+    |##  腳  ~~~~~~|
+</pre>
+你側身擠進南面的裂縫。
 
 通道越來越窄，空氣越來越潮濕。水聲漸漸清晰——前方似乎有一池地下水。
 
@@ -732,7 +961,22 @@ registerNode('r0_crack', () => {
 
 registerNode('r0_climb_check', () => {
   renderScene(
-`你走到北面岩壁前。
+`<pre class="ascii-art">
+  ___________________________
+ |  ~~~~~~~~隧道~~~~~~~~  |
+ |_________======_________|
+           |    |
+      ┌────┘    └────┐岩棚
+      |              |
+    ~~|##  ^^  ##  ~~|~~
+   ~~ | # /||\\ # ~~ | ~~
+  ~~  |  / || \\  ~~ | 苔蘚
+ ~~   | /  ||  \\ ~  |
+~~    |/   ||   \\   |
+~~~~~~+~~~~||~~~~+~~~~~~
+      |    你    |
+</pre>
+你走到北面岩壁前。
 
 牆面上有模糊的抓痕和一些鑿出的凹陷，顯然有人嘗試過向上攀爬。大約三個人高的地方，有一個突出的岩棚——如果能爬上去，也許就能找到通往上層的路。
 
@@ -801,7 +1045,22 @@ hasMikouStone
 
 registerNode('r0_tunnel', () => {
   renderScene(
-`隧道狹窄而曲折，你只能弓著身子前進。
+`<pre class="ascii-art purple">
+         ___....----""""----....___
+    .-'""                         ""'-.
+   /   ___                     ___     \\
+  |  .'   '.   石 蜥 蜴   .'   '.   |
+  | /  ◉    \\  ～～嘶～～  /    ◉  \\ |
+  | |        |  .-------.  |        | |
+   \\ '.___.' /.'  /#####\\'. '.___.' /
+    '-.____.'\\ |  /#######\\ |/'.____.-'
+              \\| |#########| |
+               | |##石鱗###| |
+               |  \\#######/  |
+                \\  '.___.'  /
+         ~~~~~~~~\\________/~~~~~~~~
+</pre>
+隧道狹窄而曲折，你只能弓著身子前進。
 
 牆壁上偶爾閃爍著石化礦脈的灰色光芒。你不敢觸碰。
 
@@ -897,7 +1156,24 @@ registerNode('r0_tunnel', () => {
 
 registerNode('r0_after_lizard', () => {
   renderScene(
-`石蜥蜴的巢穴後方，隧道繼續向上延伸。
+`<pre class="ascii-art gold">
+     _______________________
+    |   |             |   |
+    |   |    石  脈    |   |
+    |   |             |   |
+    |   |    迴  廊    |   |
+    |   |             |   |
+    |   |    禁  入    |   |
+    |   |             |   |
+    |   |      ___    |   |
+    |   |     | | |   |   |
+    |   |     | | |   |   |
+    |___|_____|_|_|___|___|
+   /                       \\
+  /     ···  石  門  ···     \\
+ /___________________________\\
+</pre>
+石蜥蜴的巢穴後方，隧道繼續向上延伸。
 
 你注意到牆壁上的礦脈越來越密集，空氣中的石化氣息也越來越濃。但同時，前方的光線變得更亮了。
 
@@ -940,7 +1216,21 @@ registerNode('r0_after_lizard', () => {
 registerNode('r1_start', () => {
   state.region = 1;
   renderScene(
-`石門在你身後緩緩關閉。
+`<pre class="ascii-art blue">
+  ╔═══╦═══════════════════╦═══╗
+  ║///║                   ║///║
+  ║///║   石 脈 迴 廊     ║///║
+  ║///║                   ║///║
+  ║///╠═══════════════════╣///║
+  ║///║  .:*~*:.   .:*~*:.║///║
+  ║///║    礦脈       礦脈 ║///║
+  ║///║  .:*~*:.   .:*~*:.║///║
+  ║///║         ...        ║///║
+  ║///║        . 你 .      ║///║
+  ║///║         '''        ║///║
+  ╚═══╩═══════════════════╩═══╝
+</pre>
+石門在你身後緩緩關閉。
 
 你踏入了<b>石脈迴廊</b>。
 
