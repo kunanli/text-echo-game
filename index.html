@@ -341,6 +341,160 @@
     color: #d4a843;
   }
 
+  /* ── Title Screen ── */
+  .title-screen {
+    position: fixed; inset: 0;
+    background: #0a0a10;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 300;
+    overflow-y: auto;
+    transition: opacity .8s;
+  }
+  .title-screen.hidden {
+    opacity: 0;
+    pointer-events: none;
+  }
+  .title-ascii {
+    font-family: "Courier New", Courier, monospace;
+    font-size: .82rem;
+    line-height: 1.22;
+    color: #d4a843;
+    white-space: pre;
+    text-align: center;
+    user-select: none;
+    margin-bottom: 30px;
+    text-shadow: 0 0 14px rgba(212,168,67,.2);
+  }
+  .title-ascii .star {
+    color: #6a6a8a;
+    animation: twinkle 3s ease-in-out infinite;
+  }
+  @keyframes twinkle {
+    0%, 100% { opacity: .3; }
+    50% { opacity: 1; }
+  }
+  .title-form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 22px;
+    width: 340px;
+  }
+  .title-section {
+    width: 100%;
+  }
+  .title-label {
+    display: block;
+    font-size: .78rem;
+    color: #d4a843;
+    letter-spacing: 3px;
+    margin-bottom: 10px;
+    text-align: center;
+  }
+  .title-input {
+    width: 100%;
+    background: #12121e;
+    border: 1px solid #2a2a3a;
+    color: #e0e0ea;
+    font-family: inherit;
+    font-size: 1.1rem;
+    padding: 10px 14px;
+    border-radius: 4px;
+    text-align: center;
+    outline: none;
+    transition: border-color .2s;
+  }
+  .title-input:focus {
+    border-color: #d4a843;
+  }
+  .title-input::placeholder {
+    color: #4a4a5a;
+  }
+  .stat-alloc-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 5px 0;
+  }
+  .stat-alloc-name {
+    color: #9a9ab0;
+    font-size: .95rem;
+    width: 42px;
+  }
+  .stat-alloc-desc {
+    color: #4a4a5a;
+    font-size: .72rem;
+    width: 72px;
+  }
+  .stat-alloc-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .stat-alloc-btn {
+    background: #1a1a2e;
+    border: 1px solid #2a2a3a;
+    color: #d4a843;
+    width: 30px; height: 30px;
+    font-size: 1.1rem;
+    font-family: "Courier New", monospace;
+    cursor: pointer;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all .15s;
+    padding: 0;
+  }
+  .stat-alloc-btn:hover:not(:disabled) {
+    background: #2a2a40;
+    border-color: #d4a843;
+  }
+  .stat-alloc-btn:disabled {
+    opacity: .25;
+    cursor: default;
+  }
+  .stat-alloc-val {
+    color: #e0e0ea;
+    font-weight: bold;
+    font-size: 1.1rem;
+    width: 24px;
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+  }
+  .stat-alloc-remain {
+    text-align: center;
+    font-size: .82rem;
+    color: #5a5a6a;
+    margin-top: 6px;
+  }
+  .stat-alloc-remain span {
+    color: #d4a843;
+    font-weight: bold;
+  }
+  .start-btn {
+    background: none;
+    border: 1px solid #d4a843;
+    color: #d4a843;
+    padding: 14px 52px;
+    font-size: 1.1rem;
+    font-family: inherit;
+    cursor: pointer;
+    border-radius: 4px;
+    letter-spacing: 6px;
+    transition: all .25s;
+    margin-top: 6px;
+  }
+  .start-btn:hover {
+    background: #1a1a2e;
+    color: #e8d080;
+    border-color: #e8d080;
+    text-shadow: 0 0 8px rgba(232,208,128,.3);
+  }
+
   /* ── Notification ── */
   .notification {
     position: fixed;
@@ -387,10 +541,88 @@
     .explore-bar { font-size: .65rem; }
     .story-text { font-size: .95rem; line-height: 1.7; }
     .choice-btn { padding: 14px 14px; font-size: 1rem; }
+    .title-ascii { font-size: .52rem; line-height: 1.15; margin-bottom: 18px; }
+    .title-form { width: 90%; max-width: 340px; }
+    .start-btn { padding: 14px 36px; font-size: 1rem; letter-spacing: 4px; }
   }
 </style>
 </head>
 <body>
+
+<div class="title-screen" id="title-screen">
+  <pre class="title-ascii">
+          <span class="star">·  ✦  ·</span>                              <span class="star">·  ✦  ·</span>
+      <span class="star">˚</span>            <span class="star">·</span>                  <span class="star">·</span>            <span class="star">˚</span>
+
+       ╔═══════════════════════════════════════════╗
+       ║ ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ ║
+       ║ ░                                       ░ ║
+       ║ ░        石    化    深    淵           ░ ║
+       ║ ░                                       ░ ║
+       ║ ░     —— 從祭獻之坑，向光攀升 ——      ░ ║
+       ║ ░                                       ░ ║
+       ║ ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ ║
+       ╚═══════════════════════════════════════════╝
+
+                   \          |||          /
+                    \    *    |||    *    /
+                     \        |||        /
+                      \   ·   |||   ·   /
+                       \      |||      /
+                        \     |||     /
+                         \    |||    /
+                          \   |||   /
+                           \  |||  /
+                            \ ||| /
+                             \|||/
+                              \|/
+                           ____V____
+                          /  ░░░░░  \
+                         / ░░░░░░░░░ \
+                        / ░░ 深  淵 ░░ \
+                       /░░░░░░░░░░░░░░░░\
+  </pre>
+  <div class="title-form">
+    <div class="title-section">
+      <span class="title-label">角 色 命 名</span>
+      <input class="title-input" id="name-input" type="text" placeholder="輸入你的名字……" maxlength="12">
+    </div>
+    <div class="title-section">
+      <span class="title-label">能 力 分 配</span>
+      <div id="stat-alloc">
+        <div class="stat-alloc-row">
+          <span class="stat-alloc-name">力量</span>
+          <span class="stat-alloc-desc">攻擊·攀爬</span>
+          <div class="stat-alloc-controls">
+            <button class="stat-alloc-btn" data-stat="str" data-dir="-1">&minus;</button>
+            <span class="stat-alloc-val" id="alloc-str">3</span>
+            <button class="stat-alloc-btn" data-stat="str" data-dir="1">+</button>
+          </div>
+        </div>
+        <div class="stat-alloc-row">
+          <span class="stat-alloc-name">敏捷</span>
+          <span class="stat-alloc-desc">閃避·潛行</span>
+          <div class="stat-alloc-controls">
+            <button class="stat-alloc-btn" data-stat="agi" data-dir="-1">&minus;</button>
+            <span class="stat-alloc-val" id="alloc-agi">3</span>
+            <button class="stat-alloc-btn" data-stat="agi" data-dir="1">+</button>
+          </div>
+        </div>
+        <div class="stat-alloc-row">
+          <span class="stat-alloc-name">意志</span>
+          <span class="stat-alloc-desc">抗石化·精神</span>
+          <div class="stat-alloc-controls">
+            <button class="stat-alloc-btn" data-stat="wil" data-dir="-1">&minus;</button>
+            <span class="stat-alloc-val" id="alloc-wil">3</span>
+            <button class="stat-alloc-btn" data-stat="wil" data-dir="1">+</button>
+          </div>
+        </div>
+      </div>
+      <div class="stat-alloc-remain">剩餘點數：<span id="alloc-remain">6</span></div>
+    </div>
+    <button class="start-btn" id="start-btn">開 始 冒 險</button>
+  </div>
+</div>
 
 <header>
   <h1>石 化 深 淵</h1>
@@ -467,6 +699,7 @@
 //  Game State
 // ═══════════════════════════════════════════════════
 const state = {
+  name: '旅者',
   hp: 100, maxHp: 100,
   petri: 0,          // 石化度 0-100
   str: 5, agi: 5, wil: 5,
@@ -496,6 +729,7 @@ const $deathOv  = document.getElementById('death-overlay');
 const $deathMsg = document.getElementById('death-msg');
 const $revive   = document.getElementById('revive-btn');
 const $notif    = document.getElementById('notification');
+const $subtitle = document.querySelector('.subtitle');
 
 // ═══════════════════════════════════════════════════
 //  Utility
@@ -551,6 +785,7 @@ function renderStatus() {
   $wil.textContent = state.wil;
   $loc.textContent = REGIONS[state.region] || '';
   $region.textContent = '第' + '一二三四'[state.region] + '層 — ' + REGIONS[state.region];
+  $subtitle.textContent = state.name + ' —— 石化度 ' + state.petri + '%';
 
   if (state.inventory.length === 0) {
     $inv.innerHTML = '<li class="inventory-empty">空</li>';
@@ -797,6 +1032,9 @@ function showChoices(choices) {
 // ═══════════════════════════════════════════════════
 
 document.addEventListener('keydown', (e) => {
+  // Ignore keyboard shortcuts while title screen is active
+  var ts = document.getElementById('title-screen');
+  if (ts && !ts.classList.contains('hidden')) return;
   if ($deathOv.classList.contains('active')) {
     if (e.key === 'Enter' || e.key === ' ') revive();
     return;
@@ -1442,9 +1680,73 @@ registerNode('r0_path', () => {
 });
 
 // ═══════════════════════════════════════════════════
+//  Title Screen — Name & Stat Allocation
+// ═══════════════════════════════════════════════════
+const allocStats = { str: 3, agi: 3, wil: 3 };
+const ALLOC_BASE = 3;
+const ALLOC_MAX = 9;
+const ALLOC_POINTS = 6;
+
+function getAllocUsed() {
+  return (allocStats.str - ALLOC_BASE) + (allocStats.agi - ALLOC_BASE) + (allocStats.wil - ALLOC_BASE);
+}
+
+function updateAllocUI() {
+  document.getElementById('alloc-str').textContent = allocStats.str;
+  document.getElementById('alloc-agi').textContent = allocStats.agi;
+  document.getElementById('alloc-wil').textContent = allocStats.wil;
+  document.getElementById('alloc-remain').textContent = ALLOC_POINTS - getAllocUsed();
+
+  document.querySelectorAll('.stat-alloc-btn').forEach(function(btn) {
+    var stat = btn.dataset.stat;
+    var dir = parseInt(btn.dataset.dir);
+    if (dir === 1) {
+      btn.disabled = getAllocUsed() >= ALLOC_POINTS || allocStats[stat] >= ALLOC_MAX;
+    } else {
+      btn.disabled = allocStats[stat] <= ALLOC_BASE;
+    }
+  });
+}
+
+document.querySelectorAll('.stat-alloc-btn').forEach(function(btn) {
+  btn.addEventListener('click', function() {
+    var stat = btn.dataset.stat;
+    var dir = parseInt(btn.dataset.dir);
+    var newVal = allocStats[stat] + dir;
+    if (newVal < ALLOC_BASE || newVal > ALLOC_MAX) return;
+    if (dir === 1 && getAllocUsed() >= ALLOC_POINTS) return;
+    allocStats[stat] = newVal;
+    updateAllocUI();
+  });
+});
+
+updateAllocUI();
+
+function startGame() {
+  var nameInput = document.getElementById('name-input');
+  var name = nameInput.value.trim() || '無名旅者';
+  state.name = name;
+  state.str = allocStats.str;
+  state.agi = allocStats.agi;
+  state.wil = allocStats.wil;
+
+  var titleScreen = document.getElementById('title-screen');
+  titleScreen.classList.add('hidden');
+  setTimeout(function() { titleScreen.style.display = 'none'; }, 800);
+
+  renderStatus();
+  loadNode('r0_start');
+}
+
+document.getElementById('start-btn').addEventListener('click', startGame);
+document.getElementById('name-input').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') startGame();
+});
+
+// ═══════════════════════════════════════════════════
 //  Init
 // ═══════════════════════════════════════════════════
-loadNode('r0_start');
+// Game starts when player clicks "開始冒險" on the title screen
 </script>
 </body>
 </html>
