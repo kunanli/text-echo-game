@@ -128,36 +128,62 @@
   .log-tag.tag-system  { color: #6a6a8a; }
   .log-tag.tag-petri   { color: #7a7ac0; }
 
-  /* ── Explore indicator ── */
-  .explore-status {
+  /* ── Explore status bar ── */
+  .explore-bar {
     font-family: "Courier New", Courier, monospace;
-    font-size: .75rem;
-    color: #4a5a4a;
-    padding: 4px 0;
+    font-size: .72rem;
+    color: #3a4a3a;
+    padding: 6px 0 8px;
+    border-bottom: 1px solid #1a1a28;
+    margin-bottom: 8px;
     letter-spacing: 1px;
+    display: none;
+    align-items: center;
+    gap: 8px;
   }
-  .explore-status .spinner {
+  .explore-bar.active {
+    display: flex;
+  }
+  .explore-bar .eb-icon {
+    animation: pulse-icon 1.5s ease-in-out infinite;
+    font-size: .85rem;
+  }
+  @keyframes pulse-icon {
+    0%, 100% { opacity: .4; }
+    50% { opacity: 1; }
+  }
+  .explore-bar .eb-label {
+    color: #5a6a5a;
+  }
+  .explore-bar .eb-dots {
     display: inline-block;
-    animation: spin-dots 1.5s steps(3) infinite;
+    width: 18px;
+    text-align: left;
+    overflow: hidden;
   }
-  @keyframes spin-dots {
-    0%   { content: '.'; }
-    33%  { content: '..'; }
-    66%  { content: '...'; }
+  .explore-bar .eb-timer {
+    color: #4a5a6a;
+    margin-left: auto;
+    font-variant-numeric: tabular-nums;
+  }
+  .explore-bar.done {
+    animation: none;
+  }
+  .explore-bar.done .eb-icon {
+    animation: none;
+    opacity: .6;
+  }
+  .explore-bar.done .eb-label {
+    color: #6a6a4a;
   }
 
-  /* ── Typewriter cursor ── */
-  .tw-cursor {
-    display: inline-block;
-    width: 2px;
-    height: 1.1em;
-    background: #d4a843;
-    margin-left: 2px;
-    vertical-align: text-bottom;
-    animation: blink-cursor .7s step-end infinite;
-  }
-  @keyframes blink-cursor {
-    50% { opacity: 0; }
+  /* ── Log timestamp ── */
+  .log-ts {
+    font-family: "Courier New", Courier, monospace;
+    font-size: .7rem;
+    color: #3a3a4a;
+    margin-right: 4px;
+    font-variant-numeric: tabular-nums;
   }
 
   .choices {
@@ -357,6 +383,8 @@
       overflow-x: auto;
     }
     .log-line { font-size: .92rem; }
+    .log-ts { font-size: .62rem; }
+    .explore-bar { font-size: .65rem; }
     .story-text { font-size: .95rem; line-height: 1.7; }
     .choice-btn { padding: 14px 14px; font-size: 1rem; }
   }
@@ -372,6 +400,12 @@
 <div class="game-container">
   <div class="story-panel">
     <div class="region-label" id="region-label"></div>
+    <div class="explore-bar" id="explore-bar">
+      <span class="eb-icon">⏳</span>
+      <span class="eb-label" id="eb-label">自動探索中</span>
+      <span class="eb-dots" id="eb-dots"></span>
+      <span class="eb-timer" id="eb-timer">00:00</span>
+    </div>
     <div class="story-text" id="story-text"></div>
     <div class="choices" id="choices"></div>
   </div>
@@ -526,50 +560,166 @@ function renderStatus() {
 }
 
 // ═══════════════════════════════════════════════════
-//  Auto-explore log feed engine
+//  Auto-explore log feed engine (idle RPG style)
 // ═══════════════════════════════════════════════════
 var autoTimer = null;
+var autoClockTimer = null;
 var autoFast = false;
 var autoRunning = false;
+var autoElapsed = 0;    // elapsed milliseconds
 let currentChoices = [];
 
+// DOM refs for explore bar
+const $exploreBar   = document.getElementById('explore-bar');
+const $ebLabel      = document.getElementById('eb-label');
+const $ebDots       = document.getElementById('eb-dots');
+const $ebTimer      = document.getElementById('eb-timer');
+
+// ── Ambient / filler events ──
+const AMBIENT_POOL = [
+  { tag: '環境', tagColor: 'tag-system', text: '一陣冷風從遠處吹來……' },
+  { tag: '感知', tagColor: 'tag-sense', text: '遠處傳來微弱的水滴聲。' },
+  { tag: '環境', tagColor: 'tag-system', text: '空氣中的石化粒子在微光中閃爍。' },
+  { tag: '感知', tagColor: 'tag-sense', text: '你感覺到腳下的地面微微震動。' },
+  { tag: '環境', tagColor: 'tag-system', text: '某處傳來石塊碎裂的聲響。' },
+  { tag: '感知', tagColor: 'tag-sense', text: '一股潮濕的氣息撲面而來。' },
+  { tag: '環境', tagColor: 'tag-system', text: '牆壁上的礦脈閃爍了一下。' },
+  { tag: '石化', tagColor: 'tag-petri', text: '你的指尖隱隱發麻——石化在緩慢蔓延。' },
+  { tag: '感知', tagColor: 'tag-sense', text: '你聽到了自己的心跳聲。' },
+  { tag: '環境', tagColor: 'tag-system', text: '洞穴深處傳來不明的回聲。' },
+  { tag: '感知', tagColor: 'tag-sense', text: '你的影子在礦脈的冷光中微微搖晃。' },
+  { tag: '環境', tagColor: 'tag-system', text: '腳下的碎石發出細微的響聲。' },
+  { tag: '感知', tagColor: 'tag-sense', text: '空氣變得更加沉重了。' },
+  { tag: '環境', tagColor: 'tag-system', text: '你嗅到了一絲腐朽的氣味。' },
+];
+var lastAmbientIdx = -1;
+
+function pickAmbient() {
+  var pool = AMBIENT_POOL;
+  var idx;
+  do { idx = Math.floor(Math.random() * pool.length); } while (idx === lastAmbientIdx);
+  lastAmbientIdx = idx;
+  return Object.assign({}, pool[idx], { delay: rng(1800, 2800) });
+}
+
+// ── Format time ──
+function fmtTime(ms) {
+  var totalSec = Math.floor(ms / 1000);
+  var m = Math.floor(totalSec / 60);
+  var s = totalSec % 60;
+  return (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
+}
+
+// ── Dots animation ──
+var dotCount = 0;
+var dotTimer = null;
+function startDots() {
+  dotCount = 0;
+  if (dotTimer) clearInterval(dotTimer);
+  dotTimer = setInterval(function() {
+    dotCount = (dotCount + 1) % 4;
+    $ebDots.textContent = '.'.repeat(dotCount);
+  }, 500);
+}
+function stopDots() {
+  if (dotTimer) { clearInterval(dotTimer); dotTimer = null; }
+  $ebDots.textContent = '';
+}
+
+// ── Explore bar control ──
+function showExploreBar(label) {
+  $exploreBar.classList.add('active');
+  $exploreBar.classList.remove('done');
+  $ebLabel.textContent = label || '自動探索中';
+  $ebTimer.textContent = '00:00';
+  startDots();
+}
+function updateExploreTimer() {
+  $ebTimer.textContent = fmtTime(autoElapsed);
+}
+function finishExploreBar() {
+  stopDots();
+  $exploreBar.classList.add('done');
+  $ebLabel.textContent = '等待決策';
+  $ebTimer.textContent = fmtTime(autoElapsed);
+}
+function hideExploreBar() {
+  $exploreBar.classList.remove('active');
+  $exploreBar.classList.remove('done');
+  stopDots();
+}
+
+// ── Stop everything ──
 function stopAuto() {
   if (autoTimer) { clearTimeout(autoTimer); autoTimer = null; }
+  if (autoClockTimer) { clearInterval(autoClockTimer); autoClockTimer = null; }
   autoRunning = false;
 }
 
-// steps: array of { tag?, tagColor?, text?, html?, art?, delay?, effect? }
+// ── Main autoExplore function ──
+// steps: array of { tag?, tagColor?, text?, html?, art?, delay?, effect?, noAmbient? }
 // choices: array of { text, action }
-function autoExplore(steps, choices) {
+// opts: { label? }
+function autoExplore(steps, choices, opts) {
   stopAuto();
   autoFast = false;
   autoRunning = true;
+  autoElapsed = 0;
   $story.innerHTML = '';
   $choices.innerHTML = '';
   currentChoices = [];
   renderStatus();
 
+  var label = (opts && opts.label) || '自動探索中';
+  showExploreBar(label);
+
+  // Start the clock (ticks every 200ms for smooth display)
+  autoClockTimer = setInterval(function() {
+    autoElapsed += 200;
+    updateExploreTimer();
+  }, 200);
+
+  // Build the expanded step list (inject ambient between steps)
+  var expanded = [];
+  for (var i = 0; i < steps.length; i++) {
+    expanded.push(steps[i]);
+    // After non-art, non-last steps, maybe inject ambient (30% chance)
+    if (!steps[i].art && i < steps.length - 1 && !steps[i].noAmbient) {
+      if (Math.random() < 0.3) {
+        expanded.push(pickAmbient());
+      }
+    }
+  }
+
   var idx = 0;
 
   function showNext() {
-    if (idx >= steps.length) {
+    if (idx >= expanded.length) {
       autoRunning = false;
+      if (autoClockTimer) { clearInterval(autoClockTimer); autoClockTimer = null; }
+      finishExploreBar();
       showChoices(choices);
       return;
     }
 
-    var step = steps[idx];
+    var step = expanded[idx];
     idx++;
 
     // Build line element
     var line = document.createElement('div');
 
     if (step.art) {
-      // ASCII art: inject as raw HTML
       line.innerHTML = step.art;
     } else {
       line.className = 'log-line';
 
+      // Timestamp
+      var tsEl = document.createElement('span');
+      tsEl.className = 'log-ts';
+      tsEl.textContent = fmtTime(autoElapsed);
+      line.appendChild(tsEl);
+
+      // Tag
       if (step.tag) {
         var tagEl = document.createElement('span');
         tagEl.className = 'log-tag ' + (step.tagColor || 'tag-explore');
@@ -577,6 +727,7 @@ function autoExplore(steps, choices) {
         line.appendChild(tagEl);
       }
 
+      // Content
       if (step.html) {
         var span = document.createElement('span');
         span.innerHTML = step.html;
@@ -594,14 +745,14 @@ function autoExplore(steps, choices) {
     $story.appendChild(line);
     $story.scrollTop = $story.scrollHeight;
 
-    var delay = autoFast ? 120 : (step.delay != null ? step.delay : 1200);
+    var delay = autoFast ? 100 : (step.delay != null ? step.delay : 1200);
     autoTimer = setTimeout(showNext, delay);
   }
 
   showNext();
 }
 
-// Tap to fast-forward the auto-explore (not skip entirely)
+// Tap to fast-forward (not skip)
 function tapFastForward() {
   if (autoRunning) {
     autoFast = true;
@@ -613,6 +764,7 @@ $story.addEventListener('touchend', tapFastForward);
 // Legacy renderScene: for simple scenes (combat results etc)
 function renderScene(text, choices) {
   stopAuto();
+  hideExploreBar();
   $story.innerHTML = text;
   $choices.innerHTML = '';
   currentChoices = [];
@@ -804,6 +956,8 @@ function loadNode(id) {
 registerNode('r0_start', () => {
   state.region = 0;
   autoExplore([
+    { tag: '系統', tagColor: 'tag-system', text: '意識逐漸恢復……', delay: 2500 },
+    { tag: '系統', tagColor: 'tag-system', text: '正在載入感官……', delay: 2000 },
     { art: `<pre class="ascii-art">
         .         .            .        .
     .        .          .                     .
@@ -822,19 +976,23 @@ registerNode('r0_start', () => {
       /   (  獻  )   \\   .          .
      /    (  坑  )    \\       .
     /______=======______\\          .
-</pre>`, delay: 800 },
-    { tag: '意識', tagColor: 'tag-petri', text: '你在黑暗中睜開眼睛。', delay: 1800 },
-    { tag: '感知', tagColor: 'tag-sense', text: '冰冷的石地貼著你的背脊……空氣中瀰漫著潮濕與石灰石的苦味。', delay: 2200 },
-    { tag: '警告', tagColor: 'tag-warn', html: '你的四肢僵硬——左手的指尖已經泛灰，隱隱有<b>石化</b>的紋路蔓延。', delay: 2500 },
-    { tag: '情報', tagColor: 'tag-info', html: '你被扔進了<b>祭獻坑</b>——地下世界最深處的垃圾場。', delay: 2000 },
-    { tag: '情報', tagColor: 'tag-info', text: '被石化詛咒侵蝕、不再有利用價值的人，都會被丟到這裡。', delay: 2200 },
-    { tag: '探索', tagColor: 'tag-explore', text: '頭頂上方，遙遠的裂縫透出一絲微光。', delay: 2000 },
-    { tag: '決意', tagColor: 'tag-info', text: '你知道——你必須向上攀升。', delay: 1500 },
+</pre>`, delay: 1000 },
+    { tag: '意識', tagColor: 'tag-petri', text: '你在黑暗中睜開眼睛。', delay: 2500 },
+    { tag: '感知', tagColor: 'tag-sense', text: '……什麼都看不見。只有無盡的黑暗。', delay: 2800 },
+    { tag: '感知', tagColor: 'tag-sense', text: '冰冷的石地貼著你的背脊。', delay: 2500 },
+    { tag: '感知', tagColor: 'tag-sense', text: '空氣中瀰漫著潮濕與石灰石的苦味。', delay: 2200 },
+    { tag: '身體', tagColor: 'tag-petri', text: '你嘗試動一動手指……', delay: 3000 },
+    { tag: '警告', tagColor: 'tag-warn', html: '你的四肢僵硬——左手的指尖已經泛灰，隱隱有<b>石化</b>的紋路蔓延。', delay: 2800 },
+    { tag: '感知', tagColor: 'tag-sense', text: '頭頂上方，遙遠的裂縫透出一絲微光。', delay: 2500 },
+    { tag: '情報', tagColor: 'tag-info', html: '你被扔進了<b>祭獻坑</b>——地下世界最深處的垃圾場。', delay: 2800 },
+    { tag: '情報', tagColor: 'tag-info', text: '被石化詛咒侵蝕、不再有利用價值的人，都會被丟到這裡。', delay: 2500 },
+    { tag: '環境', tagColor: 'tag-system', text: '遠處傳來石塊掉落的聲音。', delay: 2200 },
+    { tag: '決意', tagColor: 'tag-info', text: '你知道——你必須向上攀升。', delay: 2000 },
   ], [
     { text: '檢查自己的身體', action: () => loadNode('r0_body') },
     { text: '觀察周圍環境', action: () => loadNode('r0_look') },
     { text: '直接尋找出路', action: () => loadNode('r0_path') },
-  ]);
+  ], { label: '正在甦醒' });
 });
 
 registerNode('r0_body', () => {
@@ -849,12 +1007,15 @@ registerNode('r0_body', () => {
      / \\   /
     /   \\ /
    石化紋路蔓延中…
-</pre>`, delay: 600 },
-    { tag: '行動', tagColor: 'tag-move', text: '你低頭審視自己。', delay: 1500 },
-    { tag: '感知', tagColor: 'tag-sense', text: '衣衫襤褸，腳上沒有鞋。', delay: 1500 },
-    { tag: '石化', tagColor: 'tag-petri', text: '左手的石化紋路從指尖延伸到手腕——那股冰涼的麻痺正在緩慢擴散。', delay: 2200 },
-    { tag: '感知', tagColor: 'tag-sense', text: '你的身體還算結實，也許是最近才被丟下來的。', delay: 2000 },
-    { tag: '記憶', tagColor: 'tag-system', text: '記憶一片模糊……唯一記得的，是墜落前那些穿著灰袍的祭司。', delay: 2000 },
+</pre>`, delay: 800 },
+    { tag: '行動', tagColor: 'tag-move', text: '你低頭審視自己。', delay: 2000 },
+    { tag: '感知', tagColor: 'tag-sense', text: '衣衫襤褸，腳上沒有鞋。', delay: 2200 },
+    { tag: '身體', tagColor: 'tag-sense', text: '你活動了一下手臂……關節僵硬但還能動。', delay: 2500 },
+    { tag: '石化', tagColor: 'tag-petri', text: '左手的石化紋路從指尖延伸到手腕。', delay: 2800 },
+    { tag: '石化', tagColor: 'tag-petri', text: '那股冰涼的麻痺感正在緩慢擴散……', delay: 2500 },
+    { tag: '感知', tagColor: 'tag-sense', text: '你的身體還算結實，也許是最近才被丟下來的。', delay: 2500 },
+    { tag: '記憶', tagColor: 'tag-system', text: '記憶一片模糊……', delay: 3000 },
+    { tag: '記憶', tagColor: 'tag-system', text: '唯一記得的，是墜落前那些穿著灰袍的祭司，和他們面無表情的臉。', delay: 2500 },
   ], [
     { text: '嘗試活動關節，恢復身體機能', action: () => {
       changeStat('agi', 1);
@@ -867,12 +1028,15 @@ registerNode('r0_body', () => {
       notify('意志 +1，石化度 -3%');
       loadNode('r0_look');
     }},
-  ]);
+  ], { label: '檢查身體' });
 });
 
 registerNode('r0_look', () => {
   state.flags.lookedAround = true;
   autoExplore([
+    { tag: '行動', tagColor: 'tag-move', text: '你緩緩站起身來。', delay: 2000 },
+    { tag: '探索', tagColor: 'tag-explore', text: '環顧四周……', delay: 2500 },
+    { tag: '感知', tagColor: 'tag-sense', text: '等待眼睛適應黑暗……', delay: 3000 },
     { art: `<pre class="ascii-art">
   [北：攀爬痕跡]
     |  /|  ^  ^
@@ -886,18 +1050,19 @@ registerNode('r0_look', () => {
 ----+---+--+--+----
     |   ~~~    |
     | [南：裂縫] |
-</pre>`, delay: 600 },
-    { tag: '探索', tagColor: 'tag-explore', text: '你環顧四周。', delay: 1500 },
-    { tag: '探索', tagColor: 'tag-explore', text: '祭獻坑是一個不規則的天然洞穴，大約十來步寬。', delay: 1800 },
-    { tag: '感知', tagColor: 'tag-sense', text: '地面散落著碎石和……那些是骨頭，還是石化殘肢，你分不清楚。', delay: 2200 },
-    { tag: '發現', tagColor: 'tag-item', html: '角落裡有一具<b>半石化的屍體</b>，手中似乎還握著什麼。', delay: 2000 },
-    { tag: '發現', tagColor: 'tag-item', html: '北面岩壁上有模糊的<b>攀爬痕跡</b>——有人嘗試過往上爬。', delay: 2000 },
-    { tag: '發現', tagColor: 'tag-item', html: '南面有一條狹窄的<b>裂縫</b>，黑暗中傳來微弱的水聲。', delay: 1800 },
+</pre>`, delay: 800 },
+    { tag: '探索', tagColor: 'tag-explore', text: '祭獻坑是一個不規則的天然洞穴，大約十來步寬。', delay: 2500 },
+    { tag: '感知', tagColor: 'tag-sense', text: '地面散落著碎石和……那些是骨頭，還是石化殘肢，你分不清楚。', delay: 2800 },
+    { tag: '探索', tagColor: 'tag-explore', text: '掃描東側……什麼都沒有，只有光滑的岩壁。', delay: 2500 },
+    { tag: '探索', tagColor: 'tag-explore', text: '掃描西側……幾個已經完全石化的人形，蜷縮在角落。', delay: 2800 },
+    { tag: '發現', tagColor: 'tag-item', html: '角落裡有一具<b>半石化的屍體</b>，手中似乎還握著什麼。', delay: 2500 },
+    { tag: '發現', tagColor: 'tag-item', html: '北面岩壁上有模糊的<b>攀爬痕跡</b>——有人嘗試過往上爬。', delay: 2500 },
+    { tag: '發現', tagColor: 'tag-item', html: '南面有一條狹窄的<b>裂縫</b>，黑暗中傳來微弱的水聲。', delay: 2200 },
   ], [
     { text: '檢查半石化的屍體', action: () => loadNode('r0_corpse') },
     { text: '查看攀爬痕跡', action: () => loadNode('r0_climb_check') },
     { text: '探索裂縫', action: () => loadNode('r0_crack') },
-  ]);
+  ], { label: '觀察環境' });
 });
 
 registerNode('r0_corpse', () => {
@@ -929,7 +1094,7 @@ registerNode('r0_corpse', () => {
   ], [
     { text: '記住警告，去查看攀爬痕跡', action: () => { state.flags.corpseWarning = true; loadNode('r0_climb_check'); } },
     { text: '無視警告，探索南面裂縫', action: () => loadNode('r0_crack') },
-  ]);
+  ], { label: '調查屍體' });
 });
 
 registerNode('r0_crack', () => {
@@ -995,7 +1160,7 @@ registerNode('r0_crack', () => {
         ], [{ text: '返回坑底', action: () => loadNode('r0_look') }]);
       }
     }},
-  ]);
+  ], { label: '探索裂縫' });
 });
 
 registerNode('r0_climb_check', () => {
@@ -1023,7 +1188,7 @@ registerNode('r0_climb_check', () => {
     { text: '直接攀爬（考驗力量）', action: () => loadNode('r0_climb_str') },
     { text: '尋找其他可以借力的東西', action: () => loadNode('r0_climb_alt') },
     { text: '返回觀察', action: () => loadNode('r0_look') },
-  ]);
+  ], { label: '查看岩壁' });
 });
 
 registerNode('r0_climb_str', () => {
@@ -1086,11 +1251,17 @@ registerNode('r0_climb_alt', () => {
 
 registerNode('r0_tunnel', () => {
   autoExplore([
-    { tag: '移動', tagColor: 'tag-move', text: '你進入了隧道。狹窄而曲折，只能弓著身子前進。', delay: 1800 },
-    { tag: '感知', tagColor: 'tag-sense', text: '牆壁上偶爾閃爍著石化礦脈的灰色光芒。', delay: 2000 },
-    { tag: '移動', tagColor: 'tag-move', text: '小心翼翼地前行……', delay: 2200 },
-    { tag: '移動', tagColor: 'tag-move', text: '繼續深入……隧道的氣流似乎在變化。', delay: 2500 },
-    { tag: '探索', tagColor: 'tag-explore', text: '走了一段路，隧道突然變寬。', delay: 1800 },
+    { tag: '移動', tagColor: 'tag-move', text: '你進入了隧道。狹窄而曲折，只能弓著身子前進。', delay: 2500 },
+    { tag: '感知', tagColor: 'tag-sense', text: '牆壁上偶爾閃爍著石化礦脈的灰色光芒。你不敢觸碰。', delay: 2800 },
+    { tag: '移動', tagColor: 'tag-move', text: '小心翼翼地前行……', delay: 3000 },
+    { tag: '感知', tagColor: 'tag-sense', text: '腳下的碎石發出細碎的聲響。', delay: 2500 },
+    { tag: '移動', tagColor: 'tag-move', text: '隧道開始向上傾斜。', delay: 2800 },
+    { tag: '感知', tagColor: 'tag-sense', text: '空氣的溫度微微下降了。', delay: 2500 },
+    { tag: '移動', tagColor: 'tag-move', text: '繼續深入……隧道的氣流似乎在變化。', delay: 3200 },
+    { tag: '環境', tagColor: 'tag-system', text: '某處傳來了低沉的嘶嘶聲……', delay: 2500 },
+    { tag: '警告', tagColor: 'tag-warn', text: '你停下腳步，屏住呼吸，仔細聆聽。', delay: 3000 },
+    { tag: '移動', tagColor: 'tag-move', text: '繼續向前……前方似乎有一個較大的空間。', delay: 2800 },
+    { tag: '探索', tagColor: 'tag-explore', text: '走了一段路，隧道突然變寬——', delay: 2000 },
     { art: `<pre class="ascii-art purple">
          ___....----""""----....___
     .-'""                         ""'-.
@@ -1106,8 +1277,8 @@ registerNode('r0_tunnel', () => {
                 \\  '.___.'  /
          ~~~~~~~~\\________/~~~~~~~~
 </pre>`, delay: 800 },
-    { tag: '遭遇', tagColor: 'tag-combat', html: '一隻<b>石蜥蜴</b>蹲伏在前方！', delay: 1500 },
-    { tag: '感知', tagColor: 'tag-sense', text: '全身覆蓋灰色石鱗，嘴裡發出低沉的嘶嘶聲。', delay: 2000 },
+    { tag: '遭遇', tagColor: 'tag-combat', html: '一隻<b>石蜥蜴</b>蹲伏在前方！', delay: 1500, noAmbient: true },
+    { tag: '感知', tagColor: 'tag-sense', text: '全身覆蓋灰色石鱗，嘴裡發出低沉的嘶嘶聲。', delay: 2000, noAmbient: true },
     { tag: '警告', tagColor: 'tag-warn', text: '那雙眼睛閃著不自然的紫色光芒——石化凝視的前兆。', delay: 2000 },
   ], [
     { text: '戰鬥', action: () => {
@@ -1167,17 +1338,21 @@ registerNode('r0_tunnel', () => {
         }}]);
       }
     }},
-  ]);
+  ], { label: '穿越隧道' });
 });
 
 registerNode('r0_after_lizard', () => {
   autoExplore([
-    { tag: '移動', tagColor: 'tag-move', text: '石蜥蜴的巢穴後方，隧道繼續向上延伸。', delay: 1800 },
-    { tag: '感知', tagColor: 'tag-sense', text: '牆壁上的礦脈越來越密集……石化氣息越來越濃。', delay: 2200 },
-    { tag: '移動', tagColor: 'tag-move', text: '繼續向前走……', delay: 2500 },
-    { tag: '感知', tagColor: 'tag-sense', text: '前方的光線變得更亮了。', delay: 1800 },
-    { tag: '移動', tagColor: 'tag-move', text: '再往前走了一段路……', delay: 2500 },
-    { tag: '感知', tagColor: 'tag-sense', text: '你聽到了迴盪的腳步聲和敲擊聲——不是天然的，是人為的。', delay: 2200 },
+    { tag: '移動', tagColor: 'tag-move', text: '石蜥蜴的巢穴後方，隧道繼續向上延伸。', delay: 2500 },
+    { tag: '感知', tagColor: 'tag-sense', text: '牆壁上的礦脈越來越密集。', delay: 2800 },
+    { tag: '移動', tagColor: 'tag-move', text: '繼續向前走……', delay: 3200 },
+    { tag: '石化', tagColor: 'tag-petri', text: '空氣中的石化氣息越來越濃。你的皮膚微微刺痛。', delay: 2800 },
+    { tag: '移動', tagColor: 'tag-move', text: '隧道在這裡分出了一條支路……你選擇繼續向上。', delay: 3000 },
+    { tag: '感知', tagColor: 'tag-sense', text: '前方的光線似乎變得更亮了。', delay: 2500 },
+    { tag: '移動', tagColor: 'tag-move', text: '加快腳步……', delay: 2800 },
+    { tag: '感知', tagColor: 'tag-sense', text: '腳下的地面從粗糙的岩石變成了平整的石板。', delay: 2500 },
+    { tag: '移動', tagColor: 'tag-move', text: '再往前走了一段路……', delay: 3000 },
+    { tag: '感知', tagColor: 'tag-sense', text: '你聽到了迴盪的腳步聲和敲擊聲——不是天然的，是人為的。', delay: 2800 },
     { art: `<pre class="ascii-art gold">
      _______________________
     |   |             |   |
@@ -1214,7 +1389,7 @@ registerNode('r0_after_lizard', () => {
         { tag: '行動', tagColor: 'tag-move', text: '你站起身來，準備好面對下一段旅程。', delay: 1800 },
       ], [{ text: '推開石門，進入石脈迴廊', action: () => { state.region = 1; loadNode('r1_start'); } }]);
     }},
-  ]);
+  ], { label: '向上攀升' });
 });
 
 // ═══════════════════════════════════════════════════
@@ -1249,7 +1424,7 @@ registerNode('r1_start', () => {
       notify('此區域尚未開放');
       loadNode('r1_start');
     }},
-  ]);
+  ], { label: '進入石脈迴廊' });
 });
 
 // ═══════════════════════════════════════════════════
@@ -1257,13 +1432,13 @@ registerNode('r1_start', () => {
 // ═══════════════════════════════════════════════════
 registerNode('r0_path', () => {
   autoExplore([
-    { tag: '決意', tagColor: 'tag-info', text: '你不想在這個死亡之坑裡多待一秒。', delay: 1500 },
-    { tag: '探索', tagColor: 'tag-explore', text: '快速掃視洞穴——北面岩壁上的攀爬痕跡最為明顯。', delay: 2000 },
-    { tag: '情報', tagColor: 'tag-info', text: '那應該是唯一的出路。但也許應該先做些準備。', delay: 2000 },
+    { tag: '決意', tagColor: 'tag-info', text: '你不想在這個死亡之坑裡多待一秒。', delay: 2000 },
+    { tag: '探索', tagColor: 'tag-explore', text: '快速掃視洞穴——北面岩壁上的攀爬痕跡最為明顯。', delay: 2500 },
+    { tag: '情報', tagColor: 'tag-info', text: '那應該是唯一的出路。但也許應該先做些準備。', delay: 2200 },
   ], [
     { text: '先仔細觀察環境再說', action: () => loadNode('r0_look') },
     { text: '不管了，直接爬', action: () => loadNode('r0_climb_str') },
-  ]);
+  ], { label: '尋找出路' });
 });
 
 // ═══════════════════════════════════════════════════
