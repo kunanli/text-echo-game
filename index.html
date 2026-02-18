@@ -2039,7 +2039,7 @@ function startPatrol() {
   state.mood = 'combat';
   renderStatus();
   appendDivider();
-  showExploreBar(L('自動巡邏中', 'Auto Patrolling'));
+  showExploreBar(L('警戒巡邏中', 'Patrolling'));
   autoClockTimer = setInterval(function() {
     autoElapsed += 200;
     updateExploreTimer();
@@ -2049,7 +2049,7 @@ function startPatrol() {
   currentChoices = [];
   var btn = document.createElement('button');
   btn.className = 'choice-btn';
-  btn.textContent = L('停止巡邏', 'Stop Patrol');
+  btn.textContent = L('停下腳步', 'Stop and rest');
   btn.addEventListener('click', stopPatrol);
   $choices.appendChild(btn);
   setTimeout(function() {
@@ -2364,7 +2364,7 @@ registerNode('r0_look', () => {
   ], (function() {
     var c = [];
     if (state.flags.corpseSearched) {
-      c.push({ text: '在坑底巡邏掛機', textEn: 'Auto-patrol the pit', action: () => loadNode('r0_patrol') });
+      c.push({ text: '在坑底四處警戒', textEn: 'Stay alert and patrol the pit', action: () => loadNode('r0_patrol') });
     } else {
       c.push({ text: '查看西側的屍體和石化人形', textEn: 'Examine the corpse and petrified figures', action: () => loadNode('r0_corpse') });
     }
@@ -2376,10 +2376,10 @@ registerNode('r0_look', () => {
 
 registerNode('r0_patrol', () => {
   autoExplore([
-    { tag: '行動', tagColor: 'tag-move', text: '你決定在祭獻坑周圍巡邏，搜索殘留的怪物。', textEn: 'You decide to patrol the Sacrificial Pit, hunting any remaining creatures.', delay: 2000 },
-    { tag: '感知', tagColor: 'tag-sense', text: '握緊武器，壓低身體，你開始沿著洞穴邊緣移動。', textEn: 'Gripping your weapon, crouching low, you begin moving along the cave walls.', delay: 2000 },
+    { tag: '判斷', tagColor: 'tag-move', text: '離開這裡之前，也許應該先清除周圍的威脅。', textEn: 'Before leaving, perhaps you should clear the threats lurking nearby.', delay: 2000 },
+    { tag: '感知', tagColor: 'tag-sense', text: '你握緊武器，壓低身體，沿著洞穴邊緣摸索前進。', textEn: 'You grip your weapon, crouch low, and creep along the cave walls.', delay: 2000 },
   ], [
-    { text: '開始自動巡邏', textEn: 'Start auto-patrol', action: () => startPatrol() },
+    { text: '深入警戒搜索', textEn: 'Begin patrol sweep', action: () => startPatrol() },
     { text: '返回', textEn: 'Return', action: () => loadNode('r0_look') },
   ], { label: L('準備巡邏', 'Preparing patrol') });
 });
