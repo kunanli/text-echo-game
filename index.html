@@ -416,13 +416,13 @@
   }
   .title-ascii {
     font-family: "Courier New", Courier, monospace;
-    font-size: .82rem;
-    line-height: 1.22;
+    font-size: .62rem;
+    line-height: 1.18;
     color: #d4a843;
     white-space: pre;
     text-align: center;
     user-select: none;
-    margin-bottom: 30px;
+    margin-bottom: 10px;
     text-shadow: 0 0 14px rgba(212,168,67,.2);
   }
   .title-ascii .star {
@@ -432,6 +432,26 @@
   @keyframes twinkle {
     0%, 100% { opacity: .3; }
     50% { opacity: 1; }
+  }
+  .title-zh {
+    color: #e8c860;
+    animation: title-glow 4s ease-in-out infinite;
+    text-shadow: 0 0 12px rgba(232,200,96,.5);
+    letter-spacing: 2px;
+  }
+  .title-en {
+    animation: title-shift 6s ease-in-out infinite;
+  }
+  @keyframes title-glow {
+    0%, 100% { color: #e8c860; text-shadow: 0 0 8px rgba(232,200,96,.3); }
+    33% { color: #c89830; text-shadow: 0 0 20px rgba(200,152,48,.6), 0 0 40px rgba(200,152,48,.2); }
+    66% { color: #a07828; text-shadow: 0 0 14px rgba(160,120,40,.5); }
+  }
+  @keyframes title-shift {
+    0%, 100% { color: #d4a843; text-shadow: 0 0 6px rgba(212,168,67,.2); }
+    25% { color: #8a8a9a; text-shadow: 0 0 16px rgba(138,138,154,.4); }
+    50% { color: #d4a843; text-shadow: 0 0 22px rgba(212,168,67,.5), 0 0 44px rgba(212,168,67,.15); }
+    75% { color: #9a9080; text-shadow: 0 0 12px rgba(154,144,128,.3); }
   }
   .title-form {
     display: flex;
@@ -628,6 +648,13 @@
     position: relative;
     pointer-events: all;
   }
+  .title-version {
+    color: #4a4a5a;
+    font-size: .75rem;
+    letter-spacing: 2px;
+    font-family: "Courier New", Courier, monospace;
+    margin-bottom: 8px;
+  }
   .click-prompt {
     color: #5a5a6a;
     font-size: .9rem;
@@ -821,36 +848,48 @@
   <!-- Phase 1: Splash -->
   <div class="title-phase active" id="phase-splash">
     <pre class="title-ascii">
-          <span class="star">·  ✦  ·</span>                              <span class="star">·  ✦  ·</span>
-      <span class="star">˚</span>            <span class="star">·</span>                  <span class="star">·</span>            <span class="star">˚</span>
+          <span class="star">·  ✦  ·</span>                                                          <span class="star">·  ✦  ·</span>
+      <span class="star">˚</span>            <span class="star">·</span>                                          <span class="star">·</span>            <span class="star">˚</span>
 
-       ╔═══════════════════════════════════════════╗
-       ║ ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ ║
-       ║ ░                                       ░ ║
-       ║ ░        石    化    深    淵           ░ ║
-       ║ ░      PETRIFICATION  ABYSS            ░ ║
-       ║ ░                                       ░ ║
-       ║ ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ ║
-       ╚═══════════════════════════════════════════╝
+   ╔═══════════════════════════════════════════════════════════════════════╗
+   ║ ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ ║
+   ║ ░                                                                 ░ ║
+   ║ ░              <span class="title-zh">石        化        深        淵</span>                   ░ ║
+   ║ ░                                                                 ░ ║
+   ║ ░   <span class="title-en">╔═╗ ╔═╗ ══╦══ ╔═══╗ ═╦═ ╔═══  ═╦═ ╔═══ ╔═══╗ ══╦══ ═╦═ ╔═══╗</span> ║
+   ║ ░   <span class="title-en">║ ║ ║     ║   ║   ║  ║  ║      ║  ║    ║   ║   ║    ║  ║   ║</span> ║
+   ║ ░   <span class="title-en">╠═╝ ╠══   ║   ╠═╦═╝  ║  ╠══    ║  ║    ╠═══╣   ║    ║  ║   ║</span> ║
+   ║ ░   <span class="title-en">║   ║     ║   ║ ╚╗   ║  ║      ║  ║    ║   ║   ║    ║  ║   ║</span> ║
+   ║ ░   <span class="title-en">╩   ╚═╝   ╩   ╩  ╚═ ═╩═ ╚═══ ═╩═ ╚═══ ╩   ╩   ╩   ═╩═ ╚═══╝</span> ║
+   ║ ░                                                                 ░ ║
+   ║ ░          <span class="title-en">╔═══╗ ╔══╗  ╗   ╔ ╔═══ ╔═══</span>                           ░ ║
+   ║ ░          <span class="title-en">║   ║ ║   ║ ╚╗ ╔╝ ║    ║</span>                              ░ ║
+   ║ ░          <span class="title-en">╠═══╣ ╠══╦╝  ╚╦╝  ╚══╗ ╚══╗</span>                           ░ ║
+   ║ ░          <span class="title-en">║   ║ ║  ╚╗   ║      ║    ║</span>                           ░ ║
+   ║ ░          <span class="title-en">╩   ╩ ╚═══╝   ╩   ═══╝ ═══╝</span>                           ░ ║
+   ║ ░                                                                 ░ ║
+   ║ ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ ║
+   ╚═══════════════════════════════════════════════════════════════════════╝
 
-                   \          |||          /
-                    \    *    |||    *    /
-                     \        |||        /
-                      \   ·   |||   ·   /
-                       \      |||      /
-                        \     |||     /
-                         \    |||    /
-                          \   |||   /
-                           \  |||  /
-                            \ ||| /
-                             \|||/
-                              \|/
-                           ____V____
-                          /  ░░░░░  \
-                         / ░░░░░░░░░ \
-                        / ░░ 深  淵 ░░ \
-                       /░░░░░░░░░░░░░░░░\
+                          \          |||          /
+                           \    *    |||    *    /
+                            \        |||        /
+                             \   ·   |||   ·   /
+                              \      |||      /
+                               \     |||     /
+                                \    |||    /
+                                 \   |||   /
+                                  \  |||  /
+                                   \ ||| /
+                                    \|||/
+                                     \|/
+                                  ____V____
+                                 /  ░░░░░  \
+                                / ░░░░░░░░░ \
+                               / ░░ 深  淵 ░░ \
+                              /░░░░░░░░░░░░░░░░\
     </pre>
+    <div class="title-version">v0.3</div>
     <div class="click-prompt">— 點擊開始 · Click to Start —</div>
   </div>
 
