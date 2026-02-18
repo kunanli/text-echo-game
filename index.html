@@ -579,12 +579,12 @@
     display: inline-block;
     text-align: left;
   }
-  .avatar-box.mood-happy, .maf-art.mood-happy   { color: #8aaa6a; }
-  .avatar-box.mood-normal, .maf-art.mood-normal { color: #8a8a9a; }
-  .avatar-box.mood-hurt, .maf-art.mood-hurt     { color: #b07040; }
-  .avatar-box.mood-danger, .maf-art.mood-danger { color: #c04040; }
-  .avatar-box.mood-petri, .maf-art.mood-petri   { color: #7a7ac0; }
-  .avatar-box.mood-combat, .maf-art.mood-combat { color: #a05030; }
+  .avatar-box.mood-happy  { color: #8aaa6a; }
+  .avatar-box.mood-normal { color: #8a8a9a; }
+  .avatar-box.mood-hurt   { color: #b07040; }
+  .avatar-box.mood-danger { color: #c04040; }
+  .avatar-box.mood-petri  { color: #7a7ac0; }
+  .avatar-box.mood-combat { color: #a05030; }
   #avatar-section {
     display: flex;
     flex-direction: column;
@@ -600,11 +600,6 @@
     border-bottom: 1px solid #1e1e2e;
     margin-bottom: 4px;
     width: 100%;
-  }
-
-  /* ── Mobile floating avatar (hidden on desktop) ── */
-  .mobile-avatar-float {
-    display: none;
   }
 
   .start-btn {
@@ -755,53 +750,44 @@
       transition: max-height .3s ease, padding .3s ease;
     }
     .status-panel.open {
-      max-height: 200px;
+      max-height: 340px;
       padding: 10px 14px;
       overflow-y: auto;
       flex-direction: row;
       flex-wrap: wrap;
-      gap: 6px 14px;
+      gap: 4px 10px;
     }
     #avatar-section {
-      display: none;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 6px;
+      width: 100%;
+      padding-bottom: 6px;
+      border-bottom: 1px solid #1e1e2e;
+      margin-bottom: 2px;
+    }
+    #avatar-section .avatar-box {
+      font-size: .36rem;
+      line-height: 1.05;
+      min-height: auto;
+      padding: 2px 0;
+    }
+    #avatar-section .avatar-name {
+      font-size: .65rem;
+      padding-bottom: 0;
+      border-bottom: none;
+      margin-bottom: 0;
+      margin-top: 0;
+      writing-mode: horizontal-tb;
     }
     .status-section {
-      min-width: 100px;
+      min-width: 90px;
       flex: 1;
     }
     .status-section h3 {
       font-size: .7rem;
       margin-bottom: 4px;
-    }
-    .mobile-avatar-float {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      float: right;
-      margin: 0 -4px 4px 8px;
-      z-index: 10;
-      background: rgba(10, 10, 20, 0.85);
-      border: 1px solid #1e1e2e;
-      border-radius: 6px;
-      padding: 5px 6px 3px;
-      pointer-events: none;
-    }
-    .maf-art {
-      font-family: "Courier New", Courier, monospace;
-      font-size: .38rem;
-      line-height: 1.1;
-      white-space: pre;
-      color: #8a8a9a;
-    }
-    .maf-art span {
-      display: inline-block;
-      text-align: left;
-    }
-    .maf-name {
-      font-size: .52rem;
-      color: #d4a843;
-      letter-spacing: 1px;
-      margin-top: 2px;
     }
     .mobile-status-toggle {
       display: flex;
@@ -965,10 +951,6 @@
 
 <div class="game-container">
   <div class="story-panel">
-    <div class="mobile-avatar-float" id="mobile-avatar-float">
-      <div class="maf-art" id="maf-art"></div>
-      <div class="maf-name" id="maf-name"></div>
-    </div>
     <div class="region-label" id="region-label"></div>
     <div class="explore-bar" id="explore-bar">
       <span class="eb-icon">⏳</span>
@@ -1139,8 +1121,6 @@ const $mstLoc   = document.getElementById('mst-loc');
 const $statusPanel  = document.querySelector('.status-panel');
 const $avatarBox    = document.getElementById('avatar-box');
 const $avatarName   = document.getElementById('avatar-name');
-const $mafArt       = document.getElementById('maf-art');
-const $mafName      = document.getElementById('maf-name');
 
 // ── Mobile status toggle ──
 $mobileToggle.addEventListener('click', function() {
@@ -1356,17 +1336,8 @@ function getAvatarMood() {
 // ── Idle animation (blink + hair wind) ──
 var _idleTmr = null, _idleR = null, _idleArt = '';
 
-function _allSpans() {
-  var arr = [];
-  var s1 = $avatarBox.querySelector('span');
-  var s2 = $mafArt.querySelector('span');
-  if (s1) arr.push(s1);
-  if (s2) arr.push(s2);
-  return arr;
-}
-function _setAll(txt) {
-  _allSpans().forEach(function(s) { s.textContent = txt; });
-}
+function _getSpan() { return $avatarBox.querySelector('span'); }
+function _setText(txt) { var s = _getSpan(); if (s) s.textContent = txt; }
 
 function startIdleAnim() {
   stopIdleAnim();
@@ -1383,18 +1354,17 @@ function _nextIdle() {
 }
 
 function _doBlink() {
-  var spans = _allSpans();
-  if (!spans.length) return _nextIdle();
+  if (!_getSpan()) return _nextIdle();
   var orig = _idleArt;
   var blinked = orig.replace(/[◆◇◠●×]/g, '─');
-  _setAll(blinked);
+  _setText(blinked);
   _idleR = setTimeout(function() {
-    _setAll(orig);
+    _setText(orig);
     if (Math.random() < 0.3) {
       _idleR = setTimeout(function() {
-        _setAll(blinked);
+        _setText(blinked);
         _idleR = setTimeout(function() {
-          _setAll(orig);
+          _setText(orig);
           _nextIdle();
         }, 100);
       }, 150);
@@ -1403,8 +1373,7 @@ function _doBlink() {
 }
 
 function _doHairWind() {
-  var spans = _allSpans();
-  if (!spans.length) return _nextIdle();
+  if (!_getSpan()) return _nextIdle();
   var orig = _idleArt;
   var lines = orig.split('\n');
   var isFemale = state.sex === 'female';
@@ -1424,11 +1393,11 @@ function _doHairWind() {
     return out.join('\n');
   }
 
-  _setAll(windFrame(0));
+  _setText(windFrame(0));
   _idleR = setTimeout(function() {
-    _setAll(windFrame(1));
+    _setText(windFrame(1));
     _idleR = setTimeout(function() {
-      _setAll(orig);
+      _setText(orig);
       _nextIdle();
     }, 220);
   }, 220);
@@ -1441,21 +1410,12 @@ function renderAvatar() {
   var text = art.join('\n');
   _idleArt = text;
 
-  // Desktop avatar
   var span = document.createElement('span');
   span.textContent = text;
   $avatarBox.innerHTML = '';
   $avatarBox.appendChild(span);
   $avatarBox.className = 'avatar-box mood-' + mood;
   $avatarName.textContent = state.name;
-
-  // Mobile floating avatar
-  var mSpan = document.createElement('span');
-  mSpan.textContent = text;
-  $mafArt.innerHTML = '';
-  $mafArt.appendChild(mSpan);
-  $mafArt.className = 'maf-art mood-' + mood;
-  $mafName.textContent = state.name;
 
   startIdleAnim();
 }
@@ -1774,14 +1734,24 @@ function autoExplore(steps, choices, opts) {
   showNext();
 }
 
-// Tap to fast-forward (not skip)
+// Tap to fast-forward (not skip) — scroll-aware for mobile
 function tapFastForward() {
   if (autoRunning) {
     autoFast = true;
   }
 }
-$story.addEventListener('click', tapFastForward);
-$story.addEventListener('touchend', tapFastForward);
+var _touchMoved = false;
+$story.addEventListener('touchstart', function() { _touchMoved = false; }, { passive: true });
+$story.addEventListener('touchmove', function() { _touchMoved = true; }, { passive: true });
+$story.addEventListener('touchend', function(e) {
+  if (!_touchMoved) tapFastForward();
+  _touchMoved = false;
+});
+$story.addEventListener('click', function(e) {
+  // Avoid double-fire on touch devices
+  if (e.sourceCapabilities && e.sourceCapabilities.firesTouchEvents) return;
+  tapFastForward();
+});
 
 // Legacy renderScene: for simple scenes (combat results etc)
 function renderScene(text, choices) {
@@ -2205,12 +2175,9 @@ registerNode('r0_look', () => {
     { tag: '發現', tagColor: 'tag-item', html: '北面岩壁上有模糊的<b>攀爬痕跡</b>——有人嘗試過往上爬。', htmlEn: 'The north wall bears faint <b>climbing marks</b> — someone tried to climb up.', delay: 2500 },
     { tag: '發現', tagColor: 'tag-item', html: '南面有一條狹窄的<b>裂縫</b>，黑暗中傳來微弱的水聲。', htmlEn: 'To the south, a narrow <b>crack</b> — faint sounds of water echo from within.', delay: 2200 },
   ], [
-    { text: '檢查半石化的屍體', textEn: 'Examine the half-petrified corpse', action: () => loadNode('r0_corpse') },
-    { text: '走向那些石化人形', textEn: 'Approach the petrified figures', action: () => loadNode('r0_statues') },
-    { text: '查看攀爬痕跡', textEn: 'Check the climbing marks', action: () => loadNode('r0_climb_check') },
-    { text: '探索裂縫', textEn: 'Explore the crack', action: () => loadNode('r0_crack') },
-    { text: '搜索東側岩壁的角落', textEn: 'Search the eastern wall corner', action: () => loadNode('r0_hidden') },
-    { text: '靠著岩壁休息一下', textEn: 'Lean against the wall and rest', action: () => loadNode('r0_rest') },
+    { text: '查看西側的屍體和石化人形', textEn: 'Examine the corpse and petrified figures to the west', action: () => loadNode('r0_corpse') },
+    { text: '查看北面攀爬痕跡', textEn: 'Check the climbing marks to the north', action: () => loadNode('r0_climb_check') },
+    { text: '探索南面裂縫', textEn: 'Explore the southern crack', action: () => loadNode('r0_crack') },
   ], { label: L('觀察環境', 'Observing area') });
 });
 
@@ -2218,7 +2185,11 @@ registerNode('r0_corpse', () => {
   if (state.flags.corpseSearched) {
     renderScene(L('你已經搜過這具屍體了。石化的手指保持著握緊的姿態，再也無法鬆開。',
       'You\'ve already searched this corpse. The petrified fingers remain clenched, never to open again.'),
-      [{ text: '返回', textEn: 'Return', action: () => loadNode('r0_look') }]);
+      [
+        { text: '搜索東側岩壁的角落', textEn: 'Search the eastern wall corner', action: () => loadNode('r0_hidden') },
+        { text: '靠著岩壁休息一下', textEn: 'Lean against the wall and rest', action: () => loadNode('r0_rest') },
+        { text: '返回', textEn: 'Return', action: () => loadNode('r0_look') },
+      ]);
     return;
   }
   state.flags.corpseSearched = true;
@@ -2273,7 +2244,8 @@ registerNode('r0_corpse', () => {
     { tag: '警告', tagColor: 'tag-warn', html: '屍體胸口刻著歪歪斜斜的字：<b>「別走南邊」</b>', htmlEn: 'Carved crookedly on the corpse\'s chest: <b>"DON\'T GO SOUTH"</b>', delay: 2000 },
   ], [
     { text: '記住警告，去查看攀爬痕跡', textEn: 'Heed the warning, check climbing marks', action: () => { state.flags.corpseWarning = true; loadNode('r0_climb_check'); } },
-    { text: '無視警告，探索南面裂縫', textEn: 'Ignore the warning, explore the southern crack', action: () => loadNode('r0_crack') },
+    { text: '走向旁邊的石化人形', textEn: 'Approach the petrified figures nearby', action: () => loadNode('r0_statues') },
+    { text: '返回', textEn: 'Return', action: () => loadNode('r0_look') },
   ], { label: L('調查屍體', 'Examining corpse') });
 });
 
