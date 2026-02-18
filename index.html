@@ -1308,6 +1308,77 @@ function getAvatarMood() {
   return 'normal';
 }
 
+// ── Idle animation (blink + hair wind) ──
+var _idleTmr = null, _idleR = null, _idleArt = '';
+
+function startIdleAnim() {
+  stopIdleAnim();
+  var s = $avatarBox.querySelector('span');
+  if (s) _idleArt = s.textContent;
+  _nextIdle();
+}
+function stopIdleAnim() {
+  clearTimeout(_idleTmr); clearTimeout(_idleR);
+  _idleTmr = _idleR = null;
+}
+function _nextIdle() {
+  _idleTmr = setTimeout(function() {
+    if (Math.random() < 0.55) _doBlink(); else _doHairWind();
+  }, 2500 + Math.random() * 3500);
+}
+function _getSpan() { return $avatarBox.querySelector('span'); }
+
+function _doBlink() {
+  var s = _getSpan();
+  if (!s) return _nextIdle();
+  var orig = _idleArt;
+  s.textContent = orig.replace(/[◆◇◠●×]/g, '─');
+  _idleR = setTimeout(function() {
+    s.textContent = orig;
+    if (Math.random() < 0.3) {
+      _idleR = setTimeout(function() {
+        s.textContent = orig.replace(/[◆◇◠●×]/g, '─');
+        _idleR = setTimeout(function() {
+          s.textContent = orig;
+          _nextIdle();
+        }, 100);
+      }, 150);
+    } else _nextIdle();
+  }, 130);
+}
+
+function _doHairWind() {
+  var s = _getSpan();
+  if (!s) return _nextIdle();
+  var orig = _idleArt;
+  var lines = orig.split('\n');
+  var isFemale = state.sex === 'female';
+  var hc = isFemale ? '·' : '_';
+  var wc = isFemale ? "'" : '~';
+
+  function windFrame(parity) {
+    var out = lines.slice();
+    for (var i = 1; i <= 2 && i < out.length; i++) {
+      var r = '', n = 0;
+      for (var j = 0; j < out[i].length; j++) {
+        if (out[i][j] === hc) { r += (n % 2 === parity) ? wc : hc; n++; }
+        else r += out[i][j];
+      }
+      out[i] = r;
+    }
+    return out.join('\n');
+  }
+
+  s.textContent = windFrame(0);
+  _idleR = setTimeout(function() {
+    s.textContent = windFrame(1);
+    _idleR = setTimeout(function() {
+      s.textContent = orig;
+      _nextIdle();
+    }, 220);
+  }, 220);
+}
+
 function renderAvatar() {
   var mood = getAvatarMood();
   var art = AVATAR[state.sex] && AVATAR[state.sex][mood];
@@ -1316,9 +1387,10 @@ function renderAvatar() {
   span.textContent = art.join('\n');
   $avatarBox.innerHTML = '';
   $avatarBox.appendChild(span);
-  // Update mood CSS class
   $avatarBox.className = 'avatar-box mood-' + mood;
   $avatarName.textContent = state.name;
+  _idleArt = art.join('\n');
+  startIdleAnim();
 }
 
 // ═══════════════════════════════════════════════════
