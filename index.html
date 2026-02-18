@@ -724,7 +724,6 @@
       overflow: hidden;
     }
     .story-panel {
-      position: relative;
       border-right: none;
       padding: 10px 14px;
       flex: 1;
@@ -777,9 +776,8 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      position: absolute;
-      top: 6px;
-      right: 6px;
+      float: right;
+      margin: 0 -4px 4px 8px;
       z-index: 10;
       background: rgba(10, 10, 20, 0.85);
       border: 1px solid #1e1e2e;
@@ -1475,10 +1473,8 @@ function renderStatus() {
   $loc.textContent = getRegion(state.region) || '';
   if (state.lang === 'en') {
     $region.textContent = 'Floor ' + (state.region + 1) + ' — ' + getRegion(state.region);
-    $subtitle.textContent = state.name + ' — Petri ' + state.petri + '%';
   } else {
     $region.textContent = '第' + '一二三四'[state.region] + '層 — ' + getRegion(state.region);
-    $subtitle.textContent = state.name + ' —— 石化度 ' + state.petri + '%';
   }
 
   if (state.inventory.length === 0) {
