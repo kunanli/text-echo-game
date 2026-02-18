@@ -2048,15 +2048,18 @@ registerNode('r0_look', () => {
 </pre>`, delay: 800 },
     { tag: '探索', tagColor: 'tag-explore', text: '祭獻坑是一個不規則的天然洞穴，大約十來步寬。', textEn: 'The Sacrificial Pit is an irregular natural cave, roughly ten paces wide.', delay: 2500 },
     { tag: '感知', tagColor: 'tag-sense', text: '地面散落著碎石和……那些是骨頭，還是石化殘肢，你分不清楚。', textEn: 'The ground is littered with rubble and... bones? Petrified limbs? Hard to tell.', delay: 2800 },
-    { tag: '探索', tagColor: 'tag-explore', text: '掃描東側……什麼都沒有，只有光滑的岩壁。', textEn: 'Scanning east... nothing but smooth rock wall.', delay: 2500 },
+    { tag: '探索', tagColor: 'tag-explore', text: '掃描東側……岩壁看似光滑，但角落處有些不自然的石塊堆疊。', textEn: 'Scanning east... the wall looks smooth, but there\'s an unnatural pile of rocks in the corner.', delay: 2500 },
     { tag: '探索', tagColor: 'tag-explore', text: '掃描西側……幾個已經完全石化的人形，蜷縮在角落。', textEn: 'Scanning west... several fully petrified figures, curled up in the corner.', delay: 2800 },
     { tag: '發現', tagColor: 'tag-item', html: '角落裡有一具<b>半石化的屍體</b>，手中似乎還握著什麼。', htmlEn: 'In the corner, a <b>half-petrified corpse</b> seems to be clutching something.', delay: 2500 },
     { tag: '發現', tagColor: 'tag-item', html: '北面岩壁上有模糊的<b>攀爬痕跡</b>——有人嘗試過往上爬。', htmlEn: 'The north wall bears faint <b>climbing marks</b> — someone tried to climb up.', delay: 2500 },
     { tag: '發現', tagColor: 'tag-item', html: '南面有一條狹窄的<b>裂縫</b>，黑暗中傳來微弱的水聲。', htmlEn: 'To the south, a narrow <b>crack</b> — faint sounds of water echo from within.', delay: 2200 },
   ], [
     { text: '檢查半石化的屍體', textEn: 'Examine the half-petrified corpse', action: () => loadNode('r0_corpse') },
+    { text: '走向那些石化人形', textEn: 'Approach the petrified figures', action: () => loadNode('r0_statues') },
     { text: '查看攀爬痕跡', textEn: 'Check the climbing marks', action: () => loadNode('r0_climb_check') },
     { text: '探索裂縫', textEn: 'Explore the crack', action: () => loadNode('r0_crack') },
+    { text: '搜索東側岩壁的角落', textEn: 'Search the eastern wall corner', action: () => loadNode('r0_hidden') },
+    { text: '靠著岩壁休息一下', textEn: 'Lean against the wall and rest', action: () => loadNode('r0_rest') },
   ], { label: L('觀察環境', 'Observing area') });
 });
 
@@ -2121,6 +2124,234 @@ registerNode('r0_corpse', () => {
     { text: '記住警告，去查看攀爬痕跡', textEn: 'Heed the warning, check climbing marks', action: () => { state.flags.corpseWarning = true; loadNode('r0_climb_check'); } },
     { text: '無視警告，探索南面裂縫', textEn: 'Ignore the warning, explore the southern crack', action: () => loadNode('r0_crack') },
   ], { label: L('調查屍體', 'Examining corpse') });
+});
+
+// ── Petrified figures (new exploration) ──
+registerNode('r0_statues', () => {
+  var steps = [
+    { art: `<pre class="ascii-art purple">
+      .    .         .         .    .
+         .                .
+     ╱▔▔╲   ╱▔▔╲              ╱▔▔╲
+    │ ·· │  │ ·· │   ╱▔▔╲    │ ·· │
+    │    │  │    │  │ ·· │   │    │
+    │ ░░ │  │░░░░│  │░░░░│   │░░░░│
+    │░░░░│  │░░░░│  │░░░░│   │░░░░│
+    ╱░░░░╲  ╱░░░░╲  ╱░░░░╲   ╱░░░░╲
+   ═══════ ═══════ ════════  ═══════
+     沉默的    石化    見證者們
+</pre>`, artEn: `<pre class="ascii-art purple">
+      .    .         .         .    .
+         .                .
+     ╱▔▔╲   ╱▔▔╲              ╱▔▔╲
+    │ ·· │  │ ·· │   ╱▔▔╲    │ ·· │
+    │    │  │    │  │ ·· │   │    │
+    │ ░░ │  │░░░░│  │░░░░│   │░░░░│
+    │░░░░│  │░░░░│  │░░░░│   │░░░░│
+    ╱░░░░╲  ╱░░░░╲  ╱░░░░╲   ╱░░░░╲
+   ═══════ ═══════ ════════  ═══════
+      The   Silent  Witnesses
+</pre>`, delay: 800 },
+    { tag: '移動', tagColor: 'tag-move', text: '你走向西側那些蜷縮在角落的石化人形。', textEn: 'You approach the petrified figures huddled in the western corner.', delay: 2000 },
+    { tag: '探索', tagColor: 'tag-explore', text: '他們至少有四個人。全身已經完全化為灰白色的石頭。', textEn: 'At least four of them. Their entire bodies have turned to grey-white stone.', delay: 2500 },
+    { tag: '感知', tagColor: 'tag-sense', text: '他們的表情被永遠凝固了——恐懼、絕望、痛苦……', textEn: 'Their expressions are frozen forever — fear, despair, agony...', delay: 2800 },
+    { tag: '探索', tagColor: 'tag-explore', text: '其中一個人形雙手緊緊抱住自己的頭，嘴巴大張彷彿在無聲地尖叫。', textEn: 'One figure clutches their head with both hands, mouth agape in a silent scream.', delay: 3000 },
+    { tag: '感知', tagColor: 'tag-sense', text: '另一個人伸出手，手指指向北面岩壁——彷彿死前還在指著某個方向。', textEn: 'Another reaches out, finger pointing toward the north wall — as if gesturing at something with their last breath.', delay: 2800 },
+    { tag: '探索', tagColor: 'tag-explore', text: '你蹲下來仔細查看……在一個人形的腳邊，地上刻著歪歪斜斜的文字。', textEn: 'You crouch down for a closer look... at one figure\'s feet, crooked words are scratched into the ground.', delay: 2500 },
+    { tag: '情報', tagColor: 'tag-info', html: '「<b>水能……延緩……石化……</b>」——後面的字跡已經模糊不清。', htmlEn: '"<b>Water can... slow... petrification...</b>" — the rest is illegible.', delay: 2500 },
+  ];
+  if (!state.flags.statuesSearched) {
+    steps.push({ tag: '發現', tagColor: 'tag-item', text: '在人形堆的縫隙中，你發現了一小塊布片包裹的東西。', textEn: 'In the gap between the figures, you find something wrapped in a scrap of cloth.', delay: 2000 });
+    steps.push({ tag: '物品', tagColor: 'tag-item', html: '打開一看——是一塊乾硬的<b>黑麵包</b>。雖然已經發霉，但勉強能吃。', htmlEn: 'Unwrapping it — a piece of hard <b>black bread</b>. Moldy, but barely edible.', delay: 2000, effect: () => { addItem(L('黑麵包', 'Black Bread')); state.flags.statuesSearched = true; } });
+  }
+  autoExplore(steps, [
+    { text: '在石像群中搜索更多線索', textEn: 'Search the statues for more clues', action: () => loadNode('r0_whisper') },
+    { text: '探索石像後方的空地', textEn: 'Explore the clearing behind the statues', action: () => loadNode('r0_ritual') },
+    { text: '返回中央', textEn: 'Return to center', action: () => loadNode('r0_look') },
+  ], { label: L('調查石像', 'Examining statues') });
+});
+
+// ── Mysterious whisper among statues ──
+registerNode('r0_whisper', () => {
+  autoExplore([
+    { tag: '行動', tagColor: 'tag-move', text: '你繼續在石像之間翻找。', textEn: 'You continue searching among the statues.', delay: 2000 },
+    { tag: '感知', tagColor: 'tag-sense', text: '突然——', textEn: 'Suddenly —', delay: 1500 },
+    { tag: '感知', tagColor: 'tag-sense', text: '你聽到了什麼。', textEn: 'You hear something.', delay: 2500 },
+    { tag: '感知', tagColor: 'tag-sense', text: '不是石塊掉落的聲音。不是水滴。', textEn: 'Not the sound of falling rocks. Not dripping water.', delay: 2500 },
+    { tag: '感知', tagColor: 'tag-sense', html: '是<b>呢喃聲</b>。', htmlEn: 'It\'s a <b>murmur</b>.', delay: 2000 },
+    { tag: '環境', tagColor: 'tag-system', text: '「……回……來……」', textEn: '"...come... back..."', delay: 3000 },
+    { tag: '感知', tagColor: 'tag-sense', text: '聲音像是從石像內部傳出來的——又像是從你自己的腦海中響起。', textEn: 'The voice seems to come from within the statues — or perhaps from inside your own mind.', delay: 3000 },
+    { tag: '石化', tagColor: 'tag-petri', text: '你的左手突然一陣劇痛，石化紋路閃爍了一下。', textEn: 'A sudden sharp pain in your left hand — the petrification patterns flicker.', delay: 2500 },
+    { tag: '環境', tagColor: 'tag-system', text: '「……別……掙扎……」', textEn: '"...don\'t... struggle..."', delay: 3000 },
+    { tag: '感知', tagColor: 'tag-sense', text: '然後，一切歸於寂靜。', textEn: 'Then, silence returns.', delay: 2500 },
+  ], [
+    { text: '集中精神對抗（考驗意志）', textEn: 'Focus your mind to resist (Willpower check)', action: () => {
+      if (state.wil >= 6) {
+        changePetri(-2);
+        notify(L('意志堅定！石化度 -2%', 'Will held firm! Petri -2%'));
+        autoExplore([
+          { tag: '意志', tagColor: 'tag-info', text: '你閉上眼睛，集中精神——那個聲音被你強行推了回去。', textEn: 'You close your eyes, focusing — you force the voice back.', delay: 2000 },
+          { tag: '意志', tagColor: 'tag-info', text: '你的意識變得更加清明。你不屬於這些石像。你還活著。', textEn: 'Your mind grows clearer. You are not one of these statues. You are alive.', delay: 2500 },
+          { tag: '記憶', tagColor: 'tag-system', html: '在精神集中的瞬間，一段模糊的記憶閃過——<b>你曾經是一名探險者</b>。', htmlEn: 'In that moment of focus, a hazy memory surfaces — <b>you were once an explorer</b>.', delay: 2800 },
+        ], [{ text: '返回', textEn: 'Return', action: () => loadNode('r0_look') }]);
+      } else {
+        changePetri(5);
+        changeHp(-3);
+        autoExplore([
+          { tag: '失敗', tagColor: 'tag-warn', text: '你試圖抵抗那個聲音，但它像潮水一樣湧入你的腦海——', textEn: 'You try to resist the voice, but it floods your mind like a tide —', delay: 2000 },
+          { tag: '石化', tagColor: 'tag-petri', text: '左手的石化紋路突然擴展到了手肘。劇痛令你跪倒在地。', textEn: 'The petrification on your left hand suddenly spreads to your elbow. Pain brings you to your knees.', delay: 2500 },
+          { tag: '警告', tagColor: 'tag-warn', text: '你掙扎著站起來，遠離了石像群。', textEn: 'You struggle to your feet and back away from the statues.', delay: 2000 },
+        ], [{ text: '返回', textEn: 'Return', action: () => loadNode('r0_look') }]);
+      }
+    }},
+    { text: '立刻後退遠離', textEn: 'Back away immediately', action: () => {
+      changePetri(2);
+      autoExplore([
+        { tag: '行動', tagColor: 'tag-move', text: '你本能地後退了幾步，遠離那些石像。', textEn: 'You instinctively step back, away from the statues.', delay: 1500 },
+        { tag: '石化', tagColor: 'tag-petri', text: '左手的痛楚慢慢消退了……但石化似乎又多了一點。', textEn: 'The pain in your left hand slowly fades... but the petrification seems to have advanced.', delay: 2200 },
+      ], [{ text: '返回', textEn: 'Return', action: () => loadNode('r0_look') }]);
+    }},
+  ], { label: L('聆聽呢喃', 'Listening to whispers') });
+});
+
+// ── Ritual site discovery ──
+registerNode('r0_ritual', () => {
+  autoExplore([
+    { art: `<pre class="ascii-art red">
+              .  ·  .  ·  .
+           .                 .
+         .    ╱╲       ╱╲    .
+        .    ╱  ╲     ╱  ╲    .
+       .    ╱    ╲   ╱    ╲    .
+      .    ╱  ⛤  ╲ ╱  ⛤  ╲    .
+     .    ╱________╳________╲    .
+      .  ╱    ⛤   ╱ ╲   ⛤  ╲  .
+       .╱________╱ ⛤ ╲________╲.
+        .       ╱_____╲       .
+         .    ·  祭壇  ·    .
+           .               .
+              .  ·  .  ·  .
+</pre>`, artEn: `<pre class="ascii-art red">
+              .  ·  .  ·  .
+           .                 .
+         .    ╱╲       ╱╲    .
+        .    ╱  ╲     ╱  ╲    .
+       .    ╱    ╲   ╱    ╲    .
+      .    ╱  ⛤  ╲ ╱  ⛤  ╲    .
+     .    ╱________╳________╲    .
+      .  ╱    ⛤   ╱ ╲   ⛤  ╲  .
+       .╱________╱ ⛤ ╲________╲.
+        .       ╱_____╲       .
+         .    ·  Altar  ·    .
+           .               .
+              .  ·  .  ·  .
+</pre>`, delay: 800 },
+    { tag: '探索', tagColor: 'tag-explore', text: '在石像群的後方，你發現了一片被刻意清理過的空地。', textEn: 'Behind the statues, you find a patch of deliberately cleared ground.', delay: 2000 },
+    { tag: '感知', tagColor: 'tag-sense', text: '地面上刻著複雜的幾何圖案——五芒星形的溝槽中殘留著暗紅色的痕跡。', textEn: 'Complex geometric patterns are carved into the ground — pentagram grooves stained with dark red residue.', delay: 2800 },
+    { tag: '情報', tagColor: 'tag-info', text: '這是一個祭壇。用來進行石化獻祭的祭壇。', textEn: 'This is an altar. Used for petrification sacrifices.', delay: 2500 },
+    { tag: '探索', tagColor: 'tag-explore', text: '五芒星的五個頂點各放著一塊石化結晶，暗淡但尚有微光。', textEn: 'At each of the five points sits a petrification crystal, dim but still faintly glowing.', delay: 2500 },
+    { tag: '情報', tagColor: 'tag-info', html: '中央有一塊石板，上面刻著古老的文字：<b>「以石化為養，以血肉為種，收穫永恆之驅殼。」</b>', htmlEn: 'A stone slab at the center bears ancient text: <b>"Nourished by petrification, seeded with flesh, to harvest an eternal vessel."</b>', delay: 3200 },
+    { tag: '記憶', tagColor: 'tag-system', text: '你的腦海中隱約浮現出灰袍祭司們圍著你吟誦的場景……', textEn: 'A faint vision surfaces — grey-robed priests chanting around you...', delay: 3000 },
+    { tag: '感知', tagColor: 'tag-sense', text: '空氣中瀰漫著不自然的寒意。離這裡越近，你的左手就越疼。', textEn: 'An unnatural chill pervades the air. The closer you get, the more your left hand aches.', delay: 2500 },
+  ], [
+    { text: '嘗試取走一塊石化結晶', textEn: 'Try to take a petrification crystal', action: () => {
+      if (!state.flags.tookCrystal) {
+        state.flags.tookCrystal = true;
+        changePetri(4);
+        addItem(L('石化結晶', 'Petri Crystal'));
+        autoExplore([
+          { tag: '行動', tagColor: 'tag-move', text: '你小心翼翼地伸手觸碰其中一塊結晶——', textEn: 'You carefully reach for one of the crystals —', delay: 1500 },
+          { tag: '石化', tagColor: 'tag-petri', text: '指尖觸碰的瞬間，一股冰冷的電流從手臂竄上肩膀！', textEn: 'The instant your fingers touch it, a freezing current shoots from your arm to your shoulder!', delay: 2000 },
+          { tag: '警告', tagColor: 'tag-warn', text: '你咬牙把結晶拔了出來。五芒星圖案的光芒黯淡了一些。', textEn: 'Gritting your teeth, you wrench the crystal free. The pentagram dims slightly.', delay: 2200 },
+          { tag: '情報', tagColor: 'tag-info', text: '也許這個東西以後能派上用場……或者它只會加速你的石化。', textEn: 'Perhaps this could be useful later... or it may only accelerate your petrification.', delay: 2200 },
+        ], [{ text: '離開祭壇', textEn: 'Leave the altar', action: () => loadNode('r0_look') }]);
+      } else {
+        renderScene(L('你已經取走了一塊結晶。剩下的你不敢再碰了。', 'You already took one crystal. You dare not touch the rest.'),
+          [{ text: '返回', textEn: 'Return', action: () => loadNode('r0_look') }]);
+      }
+    }},
+    { text: '用力踢散祭壇（考驗力量）', textEn: 'Kick the altar apart (Strength check)', action: () => {
+      if (state.str >= 6) {
+        changeStat('wil', 1);
+        notify(L('意志 +1', 'WIL +1'));
+        autoExplore([
+          { tag: '行動', tagColor: 'tag-move', text: '你怒火中燒——這就是毀掉你的東西。', textEn: 'Fury rises — this is what destroyed you.', delay: 1500 },
+          { tag: '行動', tagColor: 'tag-move', text: '你用盡全力踢向石板——石板裂成了兩半！', textEn: 'You kick the slab with all your might — it cracks in two!', delay: 2000 },
+          { tag: '環境', tagColor: 'tag-system', text: '五芒星圖案上的結晶同時碎裂，散發出一陣灰色煙霧。', textEn: 'The pentagram crystals shatter simultaneously, releasing grey smoke.', delay: 2500 },
+          { tag: '意志', tagColor: 'tag-info', text: '你感到一股奇異的解脫感。仇恨化為了力量。', textEn: 'A strange sense of release washes over you. Hatred becomes strength.', delay: 2500 },
+        ], [{ text: '返回', textEn: 'Return', action: () => loadNode('r0_look') }]);
+      } else {
+        changeHp(-5);
+        autoExplore([
+          { tag: '行動', tagColor: 'tag-move', text: '你用力踢向石板——', textEn: 'You kick the slab hard —', delay: 1500 },
+          { tag: '失敗', tagColor: 'tag-warn', text: '石板紋絲不動。你的腳趾傳來一陣劇痛。', textEn: 'The slab doesn\'t budge. Searing pain in your toes.', delay: 2000 },
+          { tag: '傷害', tagColor: 'tag-warn', text: '你一瘸一拐地退了回來。也許不該這麼衝動。', textEn: 'You limp away. Perhaps that was reckless.', delay: 2000 },
+        ], [{ text: '返回', textEn: 'Return', action: () => loadNode('r0_look') }]);
+      }
+    }},
+    { text: '不碰這個東西，離開', textEn: 'Don\'t touch it, leave', action: () => loadNode('r0_look') },
+  ], { label: L('調查祭壇', 'Examining altar') });
+});
+
+// ── Hidden cache behind rubble ──
+registerNode('r0_hidden', () => {
+  if (state.flags.hiddenFound) {
+    renderScene(L('你再次查看那個洞穴。裡面已經空了，只剩下灰塵和碎石。', 'You check the alcove again. Empty now, just dust and rubble.'),
+      [{ text: '返回', textEn: 'Return', action: () => loadNode('r0_look') }]);
+    return;
+  }
+  state.flags.hiddenFound = true;
+  var hasGlow = hasItem(L('微光石', 'Glowstone'));
+  var steps = [
+    { tag: '探索', tagColor: 'tag-explore', text: '在東側岩壁的角落，你注意到一處不自然的石塊堆疊。', textEn: 'In the eastern corner, you notice an unnatural pile of rocks.', delay: 2000 },
+    { tag: '行動', tagColor: 'tag-move', text: '你搬開了幾塊石頭——後面是一個狹小的凹洞。', textEn: 'You move some rocks aside — revealing a small alcove behind.', delay: 2200 },
+  ];
+  if (hasGlow) {
+    steps.push({ tag: '物品', tagColor: 'tag-item', text: '微光石的光照進了凹洞。你清楚看到了裡面的東西。', textEn: 'The Glowstone illuminates the alcove. You see clearly what\'s inside.', delay: 2000 });
+  } else {
+    steps.push({ tag: '感知', tagColor: 'tag-sense', text: '你伸手摸索——黑暗中碰到了幾樣東西。', textEn: 'You reach in and feel around in the dark — your fingers find several objects.', delay: 2000 });
+  }
+  steps.push(
+    { tag: '發現', tagColor: 'tag-item', html: '一小包乾燥的<b>草藥</b>，包在皮革裡。', htmlEn: 'A small bundle of dried <b>herbs</b>, wrapped in leather.', delay: 1800, effect: () => addItem(L('乾燥草藥', 'Dried Herbs')) },
+    { tag: '發現', tagColor: 'tag-item', text: '一段粗糙的繩索，大約兩個人高的長度。', textEn: 'A length of crude rope, about two body-lengths long.', delay: 1800, effect: () => addItem(L('粗繩', 'Rope')) },
+    { tag: '情報', tagColor: 'tag-info', text: '有人曾經在這裡藏了求生物資。看來你不是第一個試圖逃出去的人。', textEn: 'Someone stashed survival supplies here. You\'re not the first to try escaping.', delay: 2500 },
+    { tag: '感知', tagColor: 'tag-sense', text: '但那個人……最終成功了嗎？', textEn: 'But did that person... ever make it out?', delay: 2500 }
+  );
+  autoExplore(steps, [
+    { text: '使用草藥治療傷口', textEn: 'Use herbs to treat wounds', action: () => {
+      if (hasItem(L('乾燥草藥', 'Dried Herbs'))) {
+        removeItem(L('乾燥草藥', 'Dried Herbs'));
+        changeHp(12);
+        changePetri(-2);
+        notify(L('HP +12，石化度 -2%', 'HP +12, Petri -2%'));
+      }
+      loadNode('r0_look');
+    }},
+    { text: '先收好，也許之後更需要', textEn: 'Save them for later', action: () => loadNode('r0_look') },
+  ], { label: L('搜索暗室', 'Searching alcove') });
+});
+
+// ── Rest and memory flashback ──
+registerNode('r0_rest', () => {
+  autoExplore([
+    { tag: '行動', tagColor: 'tag-move', text: '你靠著岩壁坐了下來，讓自己喘口氣。', textEn: 'You lean against the wall and sit down, catching your breath.', delay: 2000 },
+    { tag: '感知', tagColor: 'tag-sense', text: '黑暗中，你的呼吸聲格外清晰。', textEn: 'In the darkness, your breathing sounds unnervingly loud.', delay: 2500 },
+    { tag: '環境', tagColor: 'tag-system', text: '……', textEn: '...', delay: 3000 },
+    { tag: '記憶', tagColor: 'tag-system', text: '你閉上眼睛——碎片般的記憶開始浮現。', textEn: 'You close your eyes — fragmented memories surface.', delay: 3000 },
+    { tag: '記憶', tagColor: 'tag-system', text: '……一座城市。高聳的石塔。街道上的人們來來往往。', textEn: '...A city. Towering stone spires. People bustling through the streets.', delay: 3000 },
+    { tag: '記憶', tagColor: 'tag-system', text: '……一間小酒館。溫暖的壁爐。有人對你笑著說了什麼。', textEn: '...A small tavern. A warm hearth. Someone smiling, saying something to you.', delay: 3000 },
+    { tag: '記憶', tagColor: 'tag-system', text: '……然後是灰袍。很多灰袍。你被按在冰冷的祭壇上。', textEn: '...Then grey robes. Many grey robes. You\'re pressed against a cold altar.', delay: 3000 },
+    { tag: '記憶', tagColor: 'tag-system', text: '……他們的吟唱聲越來越大。你的身體開始僵硬。', textEn: '...Their chanting grows louder. Your body begins to stiffen.', delay: 3000 },
+    { tag: '記憶', tagColor: 'tag-system', text: '……墜落。無盡的墜落。', textEn: '...Falling. Endless falling.', delay: 3000 },
+    { tag: '感知', tagColor: 'tag-sense', text: '你猛地睜開眼睛。冷汗浸透了後背。', textEn: 'Your eyes snap open. Cold sweat soaks your back.', delay: 2500 },
+    { tag: '恢復', tagColor: 'tag-explore', text: '雖然記憶令人不安，但短暫的休息讓你的身體恢復了一些。', textEn: 'The memories are unsettling, but the brief rest has restored some strength.', delay: 2200 },
+  ], [
+    { text: '站起來繼續探索', textEn: 'Stand up and continue', action: () => {
+      changeHp(8);
+      notify(L('HP +8', 'HP +8'));
+      loadNode('r0_look');
+    }},
+  ], { label: L('休息', 'Resting') });
 });
 
 registerNode('r0_crack', () => {
