@@ -1546,14 +1546,14 @@ const AMBIENT_POOL = [
   { tag: '感知', tagColor: 'tag-sense', text: '你感覺到腳下的地面微微震動。', textEn: 'You feel the ground trembling beneath your feet.' },
   { tag: '環境', tagColor: 'tag-system', text: '某處傳來石塊碎裂的聲響。', textEn: 'The sound of crumbling stone echoes nearby.' },
   { tag: '感知', tagColor: 'tag-sense', text: '一股潮濕的氣息撲面而來。', textEn: 'A wave of damp air washes over you.' },
-  { tag: '環境', tagColor: 'tag-system', text: '牆壁上的礦脈閃爍了一下。', textEn: 'The ore veins on the wall flicker briefly.' },
   { tag: '石化', tagColor: 'tag-petri', text: '你的指尖隱隱發麻——石化在緩慢蔓延。', textEn: 'Your fingertips tingle — petrification slowly spreads.' },
   { tag: '感知', tagColor: 'tag-sense', text: '你聽到了自己的心跳聲。', textEn: 'You hear your own heartbeat.' },
   { tag: '環境', tagColor: 'tag-system', text: '洞穴深處傳來不明的回聲。', textEn: 'Unknown echoes reverberate from deep within the cave.' },
   { tag: '感知', tagColor: 'tag-sense', text: '你的影子在礦脈的冷光中微微搖晃。', textEn: 'Your shadow sways in the cold glow of ore veins.' },
-  { tag: '環境', tagColor: 'tag-system', text: '腳下的碎石發出細微的響聲。', textEn: 'Gravel crunches softly underfoot.' },
   { tag: '感知', tagColor: 'tag-sense', text: '空氣變得更加沉重了。', textEn: 'The air grows heavier.' },
   { tag: '環境', tagColor: 'tag-system', text: '你嗅到了一絲腐朽的氣味。', textEn: 'You catch a faint scent of decay.' },
+  { tag: '感知', tagColor: 'tag-sense', text: '頭頂傳來碎屑掉落的細響，像是有什麼在上方移動。', textEn: 'Debris trickles from above — something stirs overhead.' },
+  { tag: '環境', tagColor: 'tag-system', text: '岩壁上一道裂縫正緩緩滲出灰色液體。', textEn: 'A crack in the wall seeps with grey liquid.' },
 ];
 var lastAmbientIdx = -1;
 
@@ -2043,22 +2043,55 @@ function loadNode(id) {
 //  Patrol / Idle Grind System
 // ═══════════════════════════════════════════════════
 var R0_MONSTERS = [
-  { name: '石化蝙蝠', nameEn: 'Petrified Bat', hp: 12, atkMin: 2, atkMax: 5, petriDmg: 1, xp: 5 },
-  { name: '灰蘑菇怪', nameEn: 'Grey Mushroom', hp: 8, atkMin: 1, atkMax: 4, petriDmg: 0, xp: 3 },
-  { name: '石蜥蜴幼體', nameEn: 'Baby Stone Lizard', hp: 18, atkMin: 3, atkMax: 7, petriDmg: 2, xp: 8 },
-  { name: '石化鼠群', nameEn: 'Petrified Rat Swarm', hp: 15, atkMin: 2, atkMax: 6, petriDmg: 1, xp: 6 },
+  { name: '石化蝙蝠', nameEn: 'Petrified Bat', hp: 12, atkMin: 2, atkMax: 5, petriDmg: 1, xp: 5,
+    art: [
+      '        ╱╲    ╱╲',
+      '       ╱  ╲╭╮╱  ╲',
+      '      ╱  ╱ ◉◉ ╲  ╲',
+      '     ╱  ╱  ╰╯  ╲  ╲',
+      '    ╱__╱  ╱╲╱╲  ╲__╲',
+      '          ╰──╯',
+    ]
+  },
+  { name: '灰蘑菇怪', nameEn: 'Grey Mushroom', hp: 8, atkMin: 1, atkMax: 4, petriDmg: 0, xp: 3,
+    art: [
+      '        ╭━━━━━╮',
+      '      ╭╯ ◎  ◎ ╰╮',
+      '    ╭╯  ╭────╮  ╰╮',
+      '    ╰━━━┥    ┝━━━╯',
+      '        │ ╱╲ │',
+      '       ╱╱  ╲╲',
+    ]
+  },
+  { name: '石蜥蜴幼體', nameEn: 'Baby Stone Lizard', hp: 18, atkMin: 3, atkMax: 7, petriDmg: 2, xp: 8,
+    art: [
+      '             ╱╲',
+      '    ╱╲╱╲╱╲╱╱  ╲',
+      '   ╱        ◆  ╲╶╮',
+      '  ╱╱╲  ╱╲  ╰──╯  │',
+      '    ╲╱╱  ╲╱  ╭╮╭╮╯',
+      '             ╯╰╯╰',
+    ]
+  },
+  { name: '石化鼠群', nameEn: 'Petrified Rat Swarm', hp: 15, atkMin: 2, atkMax: 6, petriDmg: 1, xp: 6,
+    art: [
+      '    ╭╮   ╭╮   ╭╮',
+      '   (°>  (°>  (°>',
+      '   ╱╱╲  ╱╱╲  ╱╱╲',
+      '  ╱╱  ╲╱╱  ╲╱╱  ╲',
+      '  ~╯   ~╯   ~╯',
+    ]
+  },
 ];
 var PATROL_TEXTS = [
   { text: '你沿著洞穴邊緣緩慢移動，警惕地觀察四周。', textEn: 'You move slowly along the cave wall, watching your surroundings.' },
-  { text: '腳下的碎石發出細碎的聲響。', textEn: 'Gravel crunches softly underfoot.' },
-  { text: '遠處傳來模糊的聲響……', textEn: 'A faint noise echoes from the distance...' },
   { text: '你穿過一片石化結晶密集的區域。', textEn: 'You pass through an area dense with petrification crystals.' },
-  { text: '空氣中瀰漫著潮濕的石化氣息。', textEn: 'The air is thick with the damp scent of petrification.' },
   { text: '你小心翼翼地避開地面上的石化水坑。', textEn: 'You carefully step around puddles of petrification water.' },
-  { text: '牆壁上的石化礦脈閃爍著微弱的灰光。', textEn: 'Petrification veins on the walls flicker with faint grey light.' },
   { text: '你停下腳步，仔細聆聽……', textEn: 'You pause and listen carefully...' },
-  { text: '一陣冷風從裂縫中吹來，帶著石頭的味道。', textEn: 'A cold breeze blows from a crack, carrying the smell of stone.' },
   { text: '你踢開一堆碎骨，繼續前進。', textEn: 'You kick aside a pile of bone fragments and press on.' },
+  { text: '你蹲下身子，檢查地上的抓痕——是新的。', textEn: 'You crouch to inspect scratches on the ground — fresh ones.' },
+  { text: '你繞過一具完全石化的蟲殼，不敢觸碰。', textEn: 'You skirt a fully petrified insect husk, not daring to touch it.' },
+  { text: '你靠著岩壁調整呼吸，準備繼續前進。', textEn: 'You lean on the wall to steady your breath, then press on.' },
 ];
 
 var patrolActive = false;
@@ -2957,15 +2990,10 @@ registerNode('r0_tunnel', () => {
   autoExplore([
     { tag: '移動', tagColor: 'tag-move', text: '你進入了隧道。狹窄而曲折，只能弓著身子前進。', textEn: 'You enter the tunnel. Narrow and winding, forcing you to crouch.', delay: 2500 },
     { tag: '感知', tagColor: 'tag-sense', text: '牆壁上偶爾閃爍著石化礦脈的灰色光芒。你不敢觸碰。', textEn: 'Petrification ore veins flicker on the walls. You dare not touch them.', delay: 2800 },
-    { tag: '移動', tagColor: 'tag-move', text: '小心翼翼地前行……', textEn: 'Moving cautiously...', delay: 3000 },
-    { tag: '感知', tagColor: 'tag-sense', text: '腳下的碎石發出細碎的聲響。', textEn: 'Gravel crunches softly underfoot.', delay: 2500 },
-    { tag: '移動', tagColor: 'tag-move', text: '隧道開始向上傾斜。', textEn: 'The tunnel begins to slope upward.', delay: 2800 },
-    { tag: '感知', tagColor: 'tag-sense', text: '空氣的溫度微微下降了。', textEn: 'The air temperature drops slightly.', delay: 2500 },
-    { tag: '移動', tagColor: 'tag-move', text: '繼續深入……隧道的氣流似乎在變化。', textEn: 'Pressing on... the airflow seems to shift.', delay: 3200 },
+    { tag: '移動', tagColor: 'tag-move', text: '隧道開始向上傾斜，氣流隨之改變。', textEn: 'The tunnel begins to slope upward, the airflow shifting.', delay: 2800 },
     { tag: '環境', tagColor: 'tag-system', text: '某處傳來了低沉的嘶嘶聲……', textEn: 'A low hissing sound from somewhere...', delay: 2500 },
     { tag: '警告', tagColor: 'tag-warn', text: '你停下腳步，屏住呼吸，仔細聆聽。', textEn: 'You freeze, hold your breath, and listen.', delay: 3000 },
-    { tag: '移動', tagColor: 'tag-move', text: '繼續向前……前方似乎有一個較大的空間。', textEn: 'Moving forward... a larger chamber seems to lie ahead.', delay: 2800 },
-    { tag: '探索', tagColor: 'tag-explore', text: '走了一段路，隧道突然變寬——', textEn: 'After a stretch, the tunnel suddenly widens —', delay: 2000 },
+    { tag: '探索', tagColor: 'tag-explore', text: '隧道突然變寬——前方有一個較大的空間。', textEn: 'The tunnel suddenly widens — a larger chamber ahead.', delay: 2000 },
     { art: `<pre class="ascii-art purple">
               ___....────""""""""────....___
          .-'"                               "'-.
@@ -3074,14 +3102,9 @@ registerNode('r0_tunnel', () => {
 registerNode('r0_after_lizard', () => {
   autoExplore([
     { tag: '移動', tagColor: 'tag-move', text: '石蜥蜴的巢穴後方，隧道繼續向上延伸。', textEn: 'Beyond the lizard\'s lair, the tunnel continues upward.', delay: 2500 },
-    { tag: '感知', tagColor: 'tag-sense', text: '牆壁上的礦脈越來越密集。', textEn: 'Ore veins on the walls grow denser.', delay: 2800 },
-    { tag: '移動', tagColor: 'tag-move', text: '繼續向前走……', textEn: 'Pressing forward...', delay: 3200 },
-    { tag: '石化', tagColor: 'tag-petri', text: '空氣中的石化氣息越來越濃。你的皮膚微微刺痛。', textEn: 'Petrification grows stronger in the air. Your skin prickles.', delay: 2800 },
+    { tag: '石化', tagColor: 'tag-petri', text: '牆壁上的礦脈越來越密集，空氣中石化氣息刺痛皮膚。', textEn: 'Ore veins grow denser on the walls, petrification in the air stinging your skin.', delay: 2800 },
     { tag: '移動', tagColor: 'tag-move', text: '隧道在這裡分出了一條支路……你選擇繼續向上。', textEn: 'The tunnel forks here... you choose to keep going up.', delay: 3000 },
-    { tag: '感知', tagColor: 'tag-sense', text: '前方的光線似乎變得更亮了。', textEn: 'The light ahead seems to grow brighter.', delay: 2500 },
-    { tag: '移動', tagColor: 'tag-move', text: '加快腳步……', textEn: 'Picking up the pace...', delay: 2800 },
-    { tag: '感知', tagColor: 'tag-sense', text: '腳下的地面從粗糙的岩石變成了平整的石板。', textEn: 'The ground shifts from rough rock to smooth flagstone.', delay: 2500 },
-    { tag: '移動', tagColor: 'tag-move', text: '再往前走了一段路……', textEn: 'Walking a bit further...', delay: 3000 },
+    { tag: '感知', tagColor: 'tag-sense', text: '腳下的地面從粗糙的岩石變成了平整的石板。前方的光線似乎更亮了。', textEn: 'The ground shifts from rough rock to smooth flagstone. The light ahead grows brighter.', delay: 2800 },
     { tag: '感知', tagColor: 'tag-sense', text: '你聽到了迴盪的腳步聲和敲擊聲——不是天然的，是人為的。', textEn: 'You hear echoing footsteps and hammering — not natural, but man-made.', delay: 2800 },
     { art: `<pre class="ascii-art gold">
         ╔═══════════════════════════════╗
