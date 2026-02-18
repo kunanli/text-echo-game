@@ -590,17 +590,6 @@
     flex-direction: column;
     align-items: center;
   }
-  .avatar-name {
-    font-size: .72rem;
-    color: #d4a843;
-    letter-spacing: 2px;
-    text-align: center;
-    margin-top: 4px;
-    padding-bottom: 10px;
-    border-bottom: 1px solid #1e1e2e;
-    margin-bottom: 4px;
-    width: 100%;
-  }
 
   .start-btn {
     background: none;
@@ -759,27 +748,14 @@
     }
     #avatar-section {
       display: flex;
-      flex-direction: row;
       align-items: center;
-      gap: 6px;
-      width: 100%;
-      padding-bottom: 6px;
-      border-bottom: 1px solid #1e1e2e;
-      margin-bottom: 2px;
+      justify-content: center;
     }
     #avatar-section .avatar-box {
       font-size: .36rem;
       line-height: 1.05;
       min-height: auto;
       padding: 2px 0;
-    }
-    #avatar-section .avatar-name {
-      font-size: .65rem;
-      padding-bottom: 0;
-      border-bottom: none;
-      margin-bottom: 0;
-      margin-top: 0;
-      writing-mode: horizontal-tb;
     }
     .status-section {
       min-width: 90px;
@@ -946,7 +922,7 @@
 
 <header>
   <h1 id="header-title">石 化 深 淵</h1>
-  <div class="subtitle">—— 從祭獻之坑，向光攀升 ——</div>
+  <div class="subtitle" id="player-name"></div>
 </header>
 
 <div class="game-container">
@@ -964,7 +940,6 @@
   <div class="status-panel">
     <div class="status-section" id="avatar-section">
       <div class="avatar-box mood-normal" id="avatar-box"></div>
-      <div class="avatar-name" id="avatar-name"></div>
     </div>
     <div class="status-section">
       <h3 id="label-life">生命</h3>
@@ -1113,14 +1088,13 @@ const $deathOv  = document.getElementById('death-overlay');
 const $deathMsg = document.getElementById('death-msg');
 const $revive   = document.getElementById('revive-btn');
 const $notif    = document.getElementById('notification');
-const $subtitle = document.querySelector('.subtitle');
+const $playerName = document.getElementById('player-name');
 const $mobileToggle = document.getElementById('mobile-status-toggle');
 const $mstHp    = document.getElementById('mst-hp');
 const $mstPetri = document.getElementById('mst-petri');
 const $mstLoc   = document.getElementById('mst-loc');
 const $statusPanel  = document.querySelector('.status-panel');
 const $avatarBox    = document.getElementById('avatar-box');
-const $avatarName   = document.getElementById('avatar-name');
 
 // ── Mobile status toggle ──
 $mobileToggle.addEventListener('click', function() {
@@ -1415,7 +1389,7 @@ function renderAvatar() {
   $avatarBox.innerHTML = '';
   $avatarBox.appendChild(span);
   $avatarBox.className = 'avatar-box mood-' + mood;
-  $avatarName.textContent = state.name;
+  $playerName.textContent = state.name;
 
   startIdleAnim();
 }
