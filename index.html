@@ -579,12 +579,12 @@
     display: inline-block;
     text-align: left;
   }
-  .avatar-box.mood-happy  { color: #8aaa6a; }
-  .avatar-box.mood-normal { color: #8a8a9a; }
-  .avatar-box.mood-hurt   { color: #b07040; }
-  .avatar-box.mood-danger { color: #c04040; }
-  .avatar-box.mood-petri  { color: #7a7ac0; }
-  .avatar-box.mood-combat { color: #a05030; }
+  .avatar-box.mood-happy, .maf-art.mood-happy   { color: #8aaa6a; }
+  .avatar-box.mood-normal, .maf-art.mood-normal { color: #8a8a9a; }
+  .avatar-box.mood-hurt, .maf-art.mood-hurt     { color: #b07040; }
+  .avatar-box.mood-danger, .maf-art.mood-danger { color: #c04040; }
+  .avatar-box.mood-petri, .maf-art.mood-petri   { color: #7a7ac0; }
+  .avatar-box.mood-combat, .maf-art.mood-combat { color: #a05030; }
   #avatar-section {
     display: flex;
     flex-direction: column;
@@ -600,6 +600,11 @@
     border-bottom: 1px solid #1e1e2e;
     margin-bottom: 4px;
     width: 100%;
+  }
+
+  /* ── Mobile floating avatar (hidden on desktop) ── */
+  .mobile-avatar-float {
+    display: none;
   }
 
   .start-btn {
@@ -719,6 +724,7 @@
       overflow: hidden;
     }
     .story-panel {
+      position: relative;
       border-right: none;
       padding: 10px 14px;
       flex: 1;
@@ -756,6 +762,9 @@
       flex-wrap: wrap;
       gap: 6px 14px;
     }
+    #avatar-section {
+      display: none;
+    }
     .status-section {
       min-width: 100px;
       flex: 1;
@@ -763,6 +772,37 @@
     .status-section h3 {
       font-size: .7rem;
       margin-bottom: 4px;
+    }
+    .mobile-avatar-float {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      z-index: 10;
+      background: rgba(10, 10, 20, 0.85);
+      border: 1px solid #1e1e2e;
+      border-radius: 6px;
+      padding: 5px 6px 3px;
+      pointer-events: none;
+    }
+    .maf-art {
+      font-family: "Courier New", Courier, monospace;
+      font-size: .38rem;
+      line-height: 1.1;
+      white-space: pre;
+      color: #8a8a9a;
+    }
+    .maf-art span {
+      display: inline-block;
+      text-align: left;
+    }
+    .maf-name {
+      font-size: .52rem;
+      color: #d4a843;
+      letter-spacing: 1px;
+      margin-top: 2px;
     }
     .mobile-status-toggle {
       display: flex;
@@ -926,6 +966,10 @@
 
 <div class="game-container">
   <div class="story-panel">
+    <div class="mobile-avatar-float" id="mobile-avatar-float">
+      <div class="maf-art" id="maf-art"></div>
+      <div class="maf-name" id="maf-name"></div>
+    </div>
     <div class="region-label" id="region-label"></div>
     <div class="explore-bar" id="explore-bar">
       <span class="eb-icon">⏳</span>
@@ -1096,6 +1140,8 @@ const $mstLoc   = document.getElementById('mst-loc');
 const $statusPanel  = document.querySelector('.status-panel');
 const $avatarBox    = document.getElementById('avatar-box');
 const $avatarName   = document.getElementById('avatar-name');
+const $mafArt       = document.getElementById('maf-art');
+const $mafName      = document.getElementById('maf-name');
 
 // ── Mobile status toggle ──
 $mobileToggle.addEventListener('click', function() {
@@ -1311,10 +1357,20 @@ function getAvatarMood() {
 // ── Idle animation (blink + hair wind) ──
 var _idleTmr = null, _idleR = null, _idleArt = '';
 
+function _allSpans() {
+  var arr = [];
+  var s1 = $avatarBox.querySelector('span');
+  var s2 = $mafArt.querySelector('span');
+  if (s1) arr.push(s1);
+  if (s2) arr.push(s2);
+  return arr;
+}
+function _setAll(txt) {
+  _allSpans().forEach(function(s) { s.textContent = txt; });
+}
+
 function startIdleAnim() {
   stopIdleAnim();
-  var s = $avatarBox.querySelector('span');
-  if (s) _idleArt = s.textContent;
   _nextIdle();
 }
 function stopIdleAnim() {
@@ -1326,20 +1382,20 @@ function _nextIdle() {
     if (Math.random() < 0.55) _doBlink(); else _doHairWind();
   }, 2500 + Math.random() * 3500);
 }
-function _getSpan() { return $avatarBox.querySelector('span'); }
 
 function _doBlink() {
-  var s = _getSpan();
-  if (!s) return _nextIdle();
+  var spans = _allSpans();
+  if (!spans.length) return _nextIdle();
   var orig = _idleArt;
-  s.textContent = orig.replace(/[◆◇◠●×]/g, '─');
+  var blinked = orig.replace(/[◆◇◠●×]/g, '─');
+  _setAll(blinked);
   _idleR = setTimeout(function() {
-    s.textContent = orig;
+    _setAll(orig);
     if (Math.random() < 0.3) {
       _idleR = setTimeout(function() {
-        s.textContent = orig.replace(/[◆◇◠●×]/g, '─');
+        _setAll(blinked);
         _idleR = setTimeout(function() {
-          s.textContent = orig;
+          _setAll(orig);
           _nextIdle();
         }, 100);
       }, 150);
@@ -1348,8 +1404,8 @@ function _doBlink() {
 }
 
 function _doHairWind() {
-  var s = _getSpan();
-  if (!s) return _nextIdle();
+  var spans = _allSpans();
+  if (!spans.length) return _nextIdle();
   var orig = _idleArt;
   var lines = orig.split('\n');
   var isFemale = state.sex === 'female';
@@ -1369,11 +1425,11 @@ function _doHairWind() {
     return out.join('\n');
   }
 
-  s.textContent = windFrame(0);
+  _setAll(windFrame(0));
   _idleR = setTimeout(function() {
-    s.textContent = windFrame(1);
+    _setAll(windFrame(1));
     _idleR = setTimeout(function() {
-      s.textContent = orig;
+      _setAll(orig);
       _nextIdle();
     }, 220);
   }, 220);
@@ -1383,13 +1439,25 @@ function renderAvatar() {
   var mood = getAvatarMood();
   var art = AVATAR[state.sex] && AVATAR[state.sex][mood];
   if (!art) art = AVATAR.male.normal;
+  var text = art.join('\n');
+  _idleArt = text;
+
+  // Desktop avatar
   var span = document.createElement('span');
-  span.textContent = art.join('\n');
+  span.textContent = text;
   $avatarBox.innerHTML = '';
   $avatarBox.appendChild(span);
   $avatarBox.className = 'avatar-box mood-' + mood;
   $avatarName.textContent = state.name;
-  _idleArt = art.join('\n');
+
+  // Mobile floating avatar
+  var mSpan = document.createElement('span');
+  mSpan.textContent = text;
+  $mafArt.innerHTML = '';
+  $mafArt.appendChild(mSpan);
+  $mafArt.className = 'maf-art mood-' + mood;
+  $mafName.textContent = state.name;
+
   startIdleAnim();
 }
 
