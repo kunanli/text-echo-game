@@ -181,7 +181,7 @@ function stopIdleAnim() {
 function _nextIdle() {
   _idleTmr = setTimeout(function() {
     if (Math.random() < 0.55) _doBlink(); else _doHairWind();
-  }, 2500 + Math.random() * 3500);
+  }, 1200 + Math.random() * 2000);
 }
 
 function _doBlink() {
@@ -191,16 +191,16 @@ function _doBlink() {
   _setText(blinked);
   _idleR = setTimeout(function() {
     _setText(orig);
-    if (Math.random() < 0.3) {
+    if (Math.random() < 0.4) {
       _idleR = setTimeout(function() {
         _setText(blinked);
         _idleR = setTimeout(function() {
           _setText(orig);
           _nextIdle();
-        }, 100);
-      }, 150);
+        }, 80);
+      }, 120);
     } else _nextIdle();
-  }, 130);
+  }, 110);
 }
 
 function _doHairWind() {
@@ -230,8 +230,8 @@ function _doHairWind() {
     _idleR = setTimeout(function() {
       _setText(orig);
       _nextIdle();
-    }, 220);
-  }, 220);
+    }, 180);
+  }, 180);
 }
 
 function renderAvatar() {
