@@ -125,3 +125,75 @@ document.getElementById('start-btn').addEventListener('click', startGame);
 document.getElementById('name-input').addEventListener('keydown', function(e) {
   if (e.key === 'Enter') startGame();
 });
+
+// ── Save Code UI ──
+(function() {
+  var $overlay = document.getElementById('save-overlay');
+  var $textarea = document.getElementById('save-textarea');
+  var $msg = document.getElementById('save-msg');
+  var $title = document.getElementById('save-dialog-title');
+  var $hint = document.getElementById('save-hint');
+  var $copyBtn = document.getElementById('save-copy-btn');
+  var $importBtn = document.getElementById('save-import-btn');
+  var $closeBtn = document.getElementById('save-close-btn');
+  var $openBtn = document.getElementById('save-code-btn');
+
+  function openSaveDialog() {
+    var en = state.lang === 'en';
+    $title.textContent = en ? 'SAVE CODE' : '存 檔 碼';
+    $hint.textContent = en ? 'Copy this code to save progress, or paste a code to load:' : '複製此代碼以保存進度，或貼上代碼來讀取：';
+    $copyBtn.textContent = en ? 'Copy' : '複製';
+    $importBtn.textContent = en ? 'Load' : '讀取';
+    $closeBtn.textContent = en ? 'Close' : '關閉';
+    $textarea.value = exportSaveCode();
+    $msg.textContent = '';
+    $overlay.classList.add('active');
+    setTimeout(function() { $textarea.select(); }, 100);
+  }
+
+  $openBtn.addEventListener('click', openSaveDialog);
+
+  $closeBtn.addEventListener('click', function() {
+    $overlay.classList.remove('active');
+  });
+
+  $overlay.addEventListener('click', function(e) {
+    if (e.target === $overlay) $overlay.classList.remove('active');
+  });
+
+  $copyBtn.addEventListener('click', function() {
+    $textarea.select();
+    try {
+      navigator.clipboard.writeText($textarea.value).then(function() {
+        $msg.style.color = '#5a5';
+        $msg.textContent = state.lang === 'en' ? 'Copied!' : '已複製！';
+      });
+    } catch (e) {
+      document.execCommand('copy');
+      $msg.style.color = '#5a5';
+      $msg.textContent = state.lang === 'en' ? 'Copied!' : '已複製！';
+    }
+  });
+
+  $importBtn.addEventListener('click', function() {
+    var code = $textarea.value.trim();
+    if (!code) {
+      $msg.style.color = '#a55';
+      $msg.textContent = state.lang === 'en' ? 'Please paste a save code.' : '請貼上存檔碼。';
+      return;
+    }
+    if (importSaveCode(code)) {
+      applyLang();
+      renderStatus();
+      $msg.style.color = '#5a5';
+      $msg.textContent = state.lang === 'en' ? 'Loaded! Resuming...' : '讀取成功！恢復中……';
+      setTimeout(function() {
+        $overlay.classList.remove('active');
+        loadNode(state.node);
+      }, 800);
+    } else {
+      $msg.style.color = '#a55';
+      $msg.textContent = state.lang === 'en' ? 'Invalid save code.' : '無效的存檔碼。';
+    }
+  });
+})();

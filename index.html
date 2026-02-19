@@ -184,6 +184,24 @@
       <h3 id="label-loc">位置</h3>
       <div class="stat-row"><span class="stat-label" id="location-text">祭獻坑</span></div>
     </div>
+    <div class="status-section save-section">
+      <button class="save-btn" id="save-code-btn">存檔碼</button>
+    </div>
+  </div>
+
+  <!-- Save code overlay -->
+  <div class="save-overlay" id="save-overlay">
+    <div class="save-dialog">
+      <h3 id="save-dialog-title">存 檔 碼</h3>
+      <p class="save-hint" id="save-hint">複製此代碼以保存進度，或貼上代碼來讀取：</p>
+      <textarea class="save-textarea" id="save-textarea" rows="3" spellcheck="false"></textarea>
+      <div class="save-buttons">
+        <button class="save-action-btn" id="save-copy-btn">複製</button>
+        <button class="save-action-btn" id="save-import-btn">讀取</button>
+        <button class="save-action-btn save-close-btn" id="save-close-btn">關閉</button>
+      </div>
+      <p class="save-msg" id="save-msg"></p>
+    </div>
   </div>
   <div class="mobile-status-toggle" id="mobile-status-toggle">
     <div class="mst-stats">

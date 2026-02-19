@@ -66,6 +66,8 @@ function applyLang() {
   // Death overlay
   document.getElementById('death-title').textContent = en ? 'PETRIFIED' : '石 化';
   document.getElementById('revive-btn').textContent = en ? 'Break free and rise again' : '掙脫石殼，重新站起';
+  // Save code button
+  document.getElementById('save-code-btn').textContent = en ? 'Save Code' : '存檔碼';
 }
 
 // ── DOM refs ──

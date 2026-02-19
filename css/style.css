@@ -843,3 +843,91 @@
     .title-form { width: 90%; max-width: 340px; }
     .start-btn { padding: 14px 36px; font-size: 1rem; letter-spacing: 4px; }
   }
+
+  /* ══ Save Code UI ══ */
+  .save-section { text-align: center; padding: 8px 0; }
+  .save-btn {
+    background: #1a1a2e;
+    color: #8a8a9a;
+    border: 1px solid #2a2a3a;
+    border-radius: 6px;
+    padding: 8px 20px;
+    font-family: inherit;
+    font-size: .85rem;
+    cursor: pointer;
+    letter-spacing: 2px;
+    transition: all .2s;
+    width: 100%;
+  }
+  .save-btn:hover { background: #222238; color: #d4a843; border-color: #d4a843; }
+
+  .save-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.75);
+    z-index: 500;
+    justify-content: center;
+    align-items: center;
+  }
+  .save-overlay.active { display: flex; }
+
+  .save-dialog {
+    background: #12121e;
+    border: 1px solid #2a2a3a;
+    border-radius: 10px;
+    padding: 24px;
+    width: 90%;
+    max-width: 420px;
+    text-align: center;
+  }
+  .save-dialog h3 {
+    color: #d4a843;
+    font-size: 1.1rem;
+    letter-spacing: 4px;
+    margin-bottom: 10px;
+  }
+  .save-hint {
+    color: #6a6a7a;
+    font-size: .8rem;
+    margin-bottom: 12px;
+  }
+  .save-textarea {
+    width: 100%;
+    background: #0a0a14;
+    color: #c8c8d0;
+    border: 1px solid #2a2a3a;
+    border-radius: 6px;
+    padding: 10px;
+    font-family: "Courier New", monospace;
+    font-size: .82rem;
+    resize: none;
+    word-break: break-all;
+  }
+  .save-textarea:focus { outline: none; border-color: #d4a843; }
+  .save-buttons {
+    display: flex;
+    gap: 8px;
+    margin-top: 14px;
+    justify-content: center;
+  }
+  .save-action-btn {
+    background: #1a1a2e;
+    color: #c8c8d0;
+    border: 1px solid #2a2a3a;
+    border-radius: 6px;
+    padding: 8px 18px;
+    font-family: inherit;
+    font-size: .85rem;
+    cursor: pointer;
+    transition: all .2s;
+  }
+  .save-action-btn:hover { background: #222238; border-color: #d4a843; color: #d4a843; }
+  .save-close-btn { color: #6a6a7a; }
+  .save-close-btn:hover { color: #c8c8d0; }
+  .save-msg {
+    margin-top: 10px;
+    font-size: .8rem;
+    color: #5a5;
+    min-height: 1.2em;
+  }
