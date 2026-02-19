@@ -52,9 +52,9 @@ function applyLang() {
   // Header (ASCII art frame)
   var $hdr = document.getElementById('header-ascii');
   if (en) {
-    $hdr.textContent = '╔═══════════════════════════════╗\n║  PETRIFICATION          ABYSS  ║\n╚═══════════════════════════════╝';
+    $hdr.textContent = '╔══════════════════════════════════════════════════════════════╗\n║  ░░  P E T R I F I C A T I O N  ░░  A B Y S S               ║\n╚══════════════════════════════════════════════════════════════╝';
   } else {
-    $hdr.textContent = '╔═══════════════════════════════╗\n║   石  化  深  淵   PETRIABYSS ║\n╚═══════════════════════════════╝';
+    $hdr.textContent = '╔══════════════════════════════════════════════════════════════╗\n║  ░░  石  化  深  淵  ░░  P E T R I F I C A T I O N  ABYSS  ║\n╚══════════════════════════════════════════════════════════════╝';
   }
   // Status panel
   document.getElementById('label-life').textContent = en ? 'LIFE' : '生命';

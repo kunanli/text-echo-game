@@ -20,17 +20,12 @@
   }
   .header-ascii {
     font-family: "Courier New", Courier, monospace;
-    font-size: .55rem;
-    line-height: 1.15;
+    font-size: .75rem;
+    line-height: 1.2;
     color: #d4a843;
-    letter-spacing: 1px;
-    text-shadow: 0 0 12px rgba(212,168,67,.35);
+    letter-spacing: 2px;
+    text-shadow: 0 0 14px rgba(212,168,67,.4);
     margin: 0;
-  }
-  header .subtitle {
-    font-size: .85rem;
-    color: #6a6a7a;
-    margin-top: 4px;
   }
 
   /* ── Main Layout ── */
@@ -631,6 +626,16 @@
     flex-direction: column;
     align-items: center;
   }
+  .player-name-tag {
+    font-size: .85rem;
+    color: #c8b870;
+    letter-spacing: 3px;
+    text-align: center;
+    border-bottom: 1px solid #2a2a3a;
+    padding-bottom: 6px;
+    margin-bottom: 4px;
+    width: 100%;
+  }
 
   .start-btn {
     background: none;
@@ -844,7 +849,7 @@
     .mobile-status-toggle.open .mst-arrow {
       transform: rotate(180deg);
     }
-    .header-ascii { font-size: .4rem; letter-spacing: 0; }
+    .header-ascii { font-size: .5rem; letter-spacing: 1px; }
     header { padding: 6px 0 4px; }
     .ascii-art {
       font-size: .72rem;
