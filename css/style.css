@@ -14,14 +14,14 @@
   /* ── Header ── */
   header {
     text-align: center;
-    padding: 10px 0 6px;
+    padding: 14px 0 10px;
     border-bottom: 1px solid #2a2a3a;
     flex-shrink: 0;
   }
   .header-ascii {
     font-family: "Courier New", Courier, monospace;
-    font-size: .75rem;
-    line-height: 1.2;
+    font-size: .85rem;
+    line-height: 1.25;
     color: #d4a843;
     letter-spacing: 2px;
     text-shadow: 0 0 14px rgba(212,168,67,.4);
@@ -849,7 +849,7 @@
     .mobile-status-toggle.open .mst-arrow {
       transform: rotate(180deg);
     }
-    .header-ascii { font-size: .5rem; letter-spacing: 1px; }
+    .header-ascii { font-size: .45rem; letter-spacing: 0; }
     header { padding: 6px 0 4px; }
     .ascii-art {
       font-size: .72rem;
