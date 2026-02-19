@@ -40,7 +40,51 @@ var R0_MONSTERS = [
     ]
   },
 ];
-var PATROL_TEXTS = [
+
+var R1_MONSTERS = [
+  { name: '礦脈蠕蟲', nameEn: 'Ore Vein Worm', hp: 22, atkMin: 4, atkMax: 8, petriDmg: 2, xp: 10,
+    art: [
+      '    ╭━━━╮',
+      '   ╱ ◎◎ ╲━━╮',
+      '  │ ╰──╯ ░░╲',
+      '   ╲░░░░░░░░│',
+      '    ╰━╮░░╭━╯',
+      '      ╰━━╯',
+    ]
+  },
+  { name: '鐵甲石蟲', nameEn: 'Ironclad Stonebug', hp: 28, atkMin: 5, atkMax: 9, petriDmg: 2, xp: 12,
+    art: [
+      '     ╭══════╮',
+      '    ╱ ◆ ══ ◆ ╲',
+      '   │══════════│',
+      '   │ ▓▓▓▓▓▓▓▓ │',
+      '   │══════════│',
+      '    ╲╱╲╱╲╱╲╱╲╱',
+    ]
+  },
+  { name: '石化礦工亡魂', nameEn: 'Petrified Miner Ghost', hp: 20, atkMin: 3, atkMax: 10, petriDmg: 3, xp: 14,
+    art: [
+      '      ╱▔▔▔╲',
+      '     │ ● ● │',
+      '     │  ▽  │',
+      '    ╱░░░░░░░╲',
+      '   │ ░░⛏░░░ │',
+      '    ·  · ·  ·',
+    ]
+  },
+  { name: '結晶蝎', nameEn: 'Crystal Scorpion', hp: 25, atkMin: 6, atkMax: 11, petriDmg: 3, xp: 15,
+    art: [
+      '        ╭╮',
+      '       ╱◆ ╲╮',
+      '    ╱━╱    ╲━╲',
+      '   ╱ ╱ ◉  ◉ ╲ ╲',
+      '  ╱━╱╲╱╲╱╲╱╲╱━╲',
+      '  ╲╱  ╱╲  ╱╲  ╲╱',
+    ]
+  },
+];
+
+var R0_PATROL_TEXTS = [
   { text: '你沿著洞穴邊緣緩慢移動，警惕地觀察四周。', textEn: 'You move slowly along the cave wall, watching your surroundings.' },
   { text: '你穿過一片石化結晶密集的區域。', textEn: 'You pass through an area dense with petrification crystals.' },
   { text: '你小心翼翼地避開地面上的石化水坑。', textEn: 'You carefully step around puddles of petrification water.' },
@@ -50,6 +94,23 @@ var PATROL_TEXTS = [
   { text: '你繞過一具完全石化的蟲殼，不敢觸碰。', textEn: 'You skirt a fully petrified insect husk, not daring to touch it.' },
   { text: '你靠著岩壁調整呼吸，準備繼續前進。', textEn: 'You lean on the wall to steady your breath, then press on.' },
 ];
+
+var R1_PATROL_TEXTS = [
+  { text: '你沿著鐵軌前進，鏽蝕的金屬在腳下吱嘎作響。', textEn: 'You follow the rails, rusted metal creaking underfoot.' },
+  { text: '礦脈的幽藍冷光映照出你警惕的身影。', textEn: 'The cold blue glow of ore veins casts your wary silhouette.' },
+  { text: '你經過一處坍塌的支撐柱，小心地繞了過去。', textEn: 'You pass a collapsed support pillar, carefully skirting it.' },
+  { text: '牆壁上的結晶發出微弱的脈動聲，像是心跳。', textEn: 'Crystals on the wall pulse faintly, like a heartbeat.' },
+  { text: '你聽到遠處傳來鐵器碰撞的聲音——也許是風。', textEn: 'Clanging iron echoes from afar — perhaps just the wind.' },
+  { text: '地面上散落著生鏽的採礦工具。', textEn: 'Rusted mining tools litter the ground.' },
+  { text: '你踩過一片碎裂的石化礦石，發出清脆的聲響。', textEn: 'You step on shattered petri-ore, a crisp crunch echoing.' },
+  { text: '一陣冰冷的氣流從走廊深處吹來，夾帶著石化粒子。', textEn: 'A freezing draft from deep in the corridor carries petri-particles.' },
+];
+
+// Region-aware helpers
+var PATROL_TEXTS = R0_PATROL_TEXTS; // kept for backwards compat
+function getPatrolMonsters() { return state.region >= 1 ? R1_MONSTERS : R0_MONSTERS; }
+function getPatrolTexts() { return state.region >= 1 ? R1_PATROL_TEXTS : R0_PATROL_TEXTS; }
+function getPatrolReturnNode() { return state.region >= 1 ? 'r1_look' : 'r0_look'; }
 
 var patrolActive = false;
 var patrolTimers = [];
@@ -112,13 +173,14 @@ function stopPatrol() {
   if (autoClockTimer) { clearInterval(autoClockTimer); autoClockTimer = null; }
   finishExploreBar();
   renderStatus();
-  loadNode('r0_look');
+  loadNode(getPatrolReturnNode());
 }
 
 function runPatrolCycle() {
   if (!patrolActive) return;
 
-  var monster = R0_MONSTERS[rng(0, R0_MONSTERS.length - 1)];
+  var monsters = getPatrolMonsters();
+  var monster = monsters[rng(0, monsters.length - 1)];
   var mName = L(monster.name, monster.nameEn);
 
   // Pre-simulate combat
@@ -145,11 +207,12 @@ function runPatrolCycle() {
   var queue = [];
 
   // 2-3 patrol exploration lines
+  var patrolPool = getPatrolTexts();
   var n = rng(2, 3), used = [];
   for (var i = 0; i < n; i++) {
-    var idx; do { idx = rng(0, PATROL_TEXTS.length - 1); } while (used.indexOf(idx) !== -1);
+    var idx; do { idx = rng(0, patrolPool.length - 1); } while (used.indexOf(idx) !== -1);
     used.push(idx);
-    var p = PATROL_TEXTS[idx];
+    var p = patrolPool[idx];
     queue.push({ tag: L('巡邏','Patrol'), color: 'tag-move', text: L(p.text, p.textEn), delay: rng(1500, 2300) });
   }
 

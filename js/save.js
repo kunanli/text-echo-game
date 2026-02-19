@@ -66,24 +66,180 @@ function deleteSave() {
   localStorage.removeItem(SAVE_KEY);
 }
 
-// ── Share code (base64 encoded state) ──
+// ── Seed-based share code (compact) ──
+// Encodes state into a short alphanumeric string (~30-50 chars)
+
+var SEED_NODES = [
+  'r0_start','r0_body','r0_look','r0_patrol','r0_corpse','r0_statues',
+  'r0_whisper','r0_ritual','r0_hidden','r0_rest','r0_crack',
+  'r0_climb_check','r0_climb_str','r0_climb_alt','r0_tunnel',
+  'r0_after_lizard','r0_path',
+  'r1_start','r1_look','r1_forge','r1_furnace','r1_forge_search',
+  'r1_crystal','r1_crystal_items','r1_guard_check','r1_guard_fight',
+  'r1_guard_weak','r1_guard_sneak','r1_deep','r1_quarters','r1_rest',
+  'r1_gate','r1_gate_open','r1_patrol',
+];
+
+var SEED_ITEMS_ZH = [
+  '碎石匕首','黑麵包','微光石','石化水瓶','乾燥草藥','粗繩','石化結晶',
+  '鍛造鐵錘','迴廊地圖','純淨石化結晶','灰石盾','守衛核心石',
+  '抗石化護符','礦工烈酒','皮甲碎片',
+];
+var SEED_ITEMS_EN = [
+  'Stone Dagger','Black Bread','Glowstone','Petri-Water Flask','Dried Herbs','Rope','Petri Crystal',
+  'Forged Hammer','Corridor Map','Pure Petri Crystal','Greystone Shield','Guardian Core Stone',
+  'Anti-Petri Amulet','Miner\'s Spirits','Leather Scrap',
+];
+
+var SEED_FLAGS = [
+  'lookedAround','corpseSearched','corpseWarning','statuesSearched',
+  'tookCrystal','hiddenFound',
+  'r1Looked','r1ForgeVisited','r1ForgeSearched','r1ForgeFullSearch',
+  'r1GuardHint','r1GuardDefeated','r1CrystalItemsTaken','r1QuartersSearched',
+];
+
+var B36 = '0123456789abcdefghijklmnopqrstuvwxyz';
+
+function toB36(num, len) {
+  var s = '';
+  num = Math.max(0, Math.floor(num));
+  for (var i = 0; i < len; i++) {
+    s = B36[num % 36] + s;
+    num = Math.floor(num / 36);
+  }
+  return s;
+}
+
+function fromB36(str) {
+  var n = 0;
+  for (var i = 0; i < str.length; i++) {
+    n = n * 36 + B36.indexOf(str[i].toLowerCase());
+  }
+  return n;
+}
+
 function exportSaveCode() {
-  var data = {
-    n: state.name, s: state.sex,
-    h: state.hp, mh: state.maxHp, p: state.petri,
-    str: state.str, agi: state.agi, wil: state.wil,
-    xp: state.xp, lv: state.level, xn: state.xpToNext,
-    inv: state.inventory, r: state.region, nd: state.node,
-    f: state.flags, dc: state.deathCount, l: state.lang,
-  };
   try {
-    return btoa(unescape(encodeURIComponent(JSON.stringify(data))));
+    var parts = [];
+    // Header
+    parts.push('PA1');
+    // Sex + lang (1 char each)
+    parts.push(state.sex === 'female' ? '1' : '0');
+    parts.push(state.lang === 'en' ? '1' : '0');
+    // Stats: hp(3), maxHp(3), petri(2), str(2), agi(2), wil(2)
+    parts.push(toB36(state.hp, 3));
+    parts.push(toB36(state.maxHp, 3));
+    parts.push(toB36(state.petri, 2));
+    parts.push(toB36(state.str, 2));
+    parts.push(toB36(state.agi, 2));
+    parts.push(toB36(state.wil, 2));
+    // XP(3), level(2), region(1), deathCount(2)
+    parts.push(toB36(state.xp, 3));
+    parts.push(toB36(state.level, 2));
+    parts.push(toB36(state.region, 1));
+    parts.push(toB36(state.deathCount, 2));
+    // Node index (2 chars)
+    var nodeIdx = SEED_NODES.indexOf(state.node);
+    if (nodeIdx < 0) nodeIdx = 0;
+    parts.push(toB36(nodeIdx, 2));
+    // Inventory bitmask (base36, up to ~15 items = need ceil(15/5)=3 chars using 36^n)
+    var invBits = 0;
+    var itemList = state.lang === 'en' ? SEED_ITEMS_EN : SEED_ITEMS_ZH;
+    for (var i = 0; i < SEED_ITEMS_ZH.length; i++) {
+      if (state.inventory.indexOf(SEED_ITEMS_ZH[i]) !== -1 || state.inventory.indexOf(SEED_ITEMS_EN[i]) !== -1) {
+        invBits |= (1 << i);
+      }
+    }
+    parts.push(toB36(invBits, 3));
+    // Flags bitmask
+    var flagBits = 0;
+    for (var i = 0; i < SEED_FLAGS.length; i++) {
+      if (state.flags[SEED_FLAGS[i]]) flagBits |= (1 << i);
+    }
+    parts.push(toB36(flagBits, 3));
+    // Name (URI-encode then base36 length prefix + raw)
+    var nameEnc = encodeURIComponent(state.name);
+    parts.push(toB36(nameEnc.length, 2) + nameEnc);
+    // Checksum (simple sum of all preceding chars mod 36)
+    var all = parts.join('');
+    var cksum = 0;
+    for (var i = 0; i < all.length; i++) cksum = (cksum + all.charCodeAt(i)) % 36;
+    parts.push(B36[cksum]);
+
+    return parts.join('');
   } catch (e) { return ''; }
 }
 
 function importSaveCode(code) {
   try {
-    var json = decodeURIComponent(escape(atob(code.trim())));
+    code = code.trim();
+    // Try new seed format first
+    if (code.indexOf('PA1') === 0) {
+      return importSeed(code);
+    }
+    // Fallback: try legacy base64 format
+    return importLegacy(code);
+  } catch (e) {
+    return false;
+  }
+}
+
+function importSeed(code) {
+  try {
+    if (code.substring(0, 3) !== 'PA1') return false;
+    var p = 3; // cursor position
+    // Sex + lang
+    state.sex = code[p++] === '1' ? 'female' : 'male';
+    state.lang = code[p++] === '1' ? 'en' : 'zh';
+    // Stats
+    state.hp = fromB36(code.substring(p, p + 3)); p += 3;
+    state.maxHp = fromB36(code.substring(p, p + 3)); p += 3;
+    state.petri = fromB36(code.substring(p, p + 2)); p += 2;
+    state.str = fromB36(code.substring(p, p + 2)); p += 2;
+    state.agi = fromB36(code.substring(p, p + 2)); p += 2;
+    state.wil = fromB36(code.substring(p, p + 2)); p += 2;
+    // XP, level, region, deathCount
+    state.xp = fromB36(code.substring(p, p + 3)); p += 3;
+    state.level = fromB36(code.substring(p, p + 2)); p += 2;
+    state.region = fromB36(code.substring(p, p + 1)); p += 1;
+    state.deathCount = fromB36(code.substring(p, p + 2)); p += 2;
+    state.xpToNext = xpForLevel(state.level);
+    // Node
+    var nodeIdx = fromB36(code.substring(p, p + 2)); p += 2;
+    state.node = SEED_NODES[nodeIdx] || 'r0_start';
+    // Inventory
+    var invBits = fromB36(code.substring(p, p + 3)); p += 3;
+    state.inventory = [];
+    var itemList = state.lang === 'en' ? SEED_ITEMS_EN : SEED_ITEMS_ZH;
+    for (var i = 0; i < itemList.length; i++) {
+      if (invBits & (1 << i)) state.inventory.push(itemList[i]);
+    }
+    // Flags
+    var flagBits = fromB36(code.substring(p, p + 3)); p += 3;
+    state.flags = {};
+    for (var i = 0; i < SEED_FLAGS.length; i++) {
+      if (flagBits & (1 << i)) state.flags[SEED_FLAGS[i]] = true;
+    }
+    // Name
+    var nameLen = fromB36(code.substring(p, p + 2)); p += 2;
+    var nameEnc = code.substring(p, p + nameLen); p += nameLen;
+    state.name = decodeURIComponent(nameEnc) || '旅者';
+    // Checksum
+    var all = code.substring(0, p);
+    var cksum = 0;
+    for (var i = 0; i < all.length; i++) cksum = (cksum + all.charCodeAt(i)) % 36;
+    if (code[p] !== B36[cksum]) return false;
+    state.mood = 'normal';
+    saveGame();
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+
+function importLegacy(code) {
+  try {
+    var json = decodeURIComponent(escape(atob(code)));
     var d = JSON.parse(json);
     state.name = d.n || '旅者';
     state.sex = d.s || 'male';
@@ -102,6 +258,7 @@ function importSaveCode(code) {
     state.flags = d.f || {};
     state.deathCount = d.dc || 0;
     state.lang = d.l || 'zh';
+    state.mood = 'normal';
     saveGame();
     return true;
   } catch (e) {
