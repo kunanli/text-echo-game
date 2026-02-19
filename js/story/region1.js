@@ -61,10 +61,10 @@ registerNode('r1_start', () => {
 });
 
 registerNode('r1_look', () => {
+  var firstVisit = !state.flags.r1Looked;
   state.flags.r1Looked = true;
-  autoExplore([
-    { tag: '探索', tagColor: 'tag-explore', text: '你仔細觀察石脈迴廊的構造。', textEn: 'You study the structure of the Vein Corridor.', delay: 2000 },
-    { art: `<pre class="ascii-art blue">
+
+  var mapArt = { art: `<pre class="ascii-art blue">
            北：鍛 造 間
               │
   ┌───────────┼───────────┐
@@ -109,13 +109,22 @@ registerNode('r1_look', () => {
   └───────────┼───────────┘
               │
            S: Gate (Return)
-</pre>`, delay: 800 },
+</pre>`, delay: 800 };
+
+  var steps = firstVisit ? [
+    { tag: '探索', tagColor: 'tag-explore', text: '你仔細觀察石脈迴廊的構造。', textEn: 'You study the structure of the Vein Corridor.', delay: 2000 },
+    mapArt,
     { tag: '探索', tagColor: 'tag-explore', text: '迴廊是一個十字形結構，中央有生鏽的鐵軌延伸向各個方向。', textEn: 'The corridor forms a cross shape, with rusted rails stretching in every direction.', delay: 2500 },
     { tag: '感知', tagColor: 'tag-sense', text: '中央停著一輛破舊的礦車，車身覆蓋著灰色的石化結晶。', textEn: 'A broken-down mine cart sits at the center, encrusted with grey petrification crystals.', delay: 2500 },
     { tag: '發現', tagColor: 'tag-item', html: '北面通道盡頭似乎有<b>火光</b>閃爍——那裡可能是鍛造間。', htmlEn: '<b>Firelight</b> flickers at the end of the northern passage — possibly a forge room.', delay: 2200 },
     { tag: '探索', tagColor: 'tag-explore', text: '東面走廊的盡頭有一具巨大的石化殘骸——像是某種守衛。', textEn: 'At the east end, a massive petrified husk — some kind of guardian.', delay: 2200 },
     { tag: '探索', tagColor: 'tag-explore', text: '西面的牆壁上結晶特別密集，空氣中充斥著刺鼻的石化氣息。', textEn: 'The western walls are thick with crystals, the air heavy with petrification.', delay: 2200 },
-  ], (function() {
+  ] : [
+    { tag: '行動', tagColor: 'tag-move', text: '你回到了石脈迴廊中央，環顧四周。', textEn: 'You return to the center of the Vein Corridor and survey the area.', delay: 1500 },
+    mapArt,
+  ];
+
+  autoExplore(steps, (function() {
     var c = [];
     c.push({ text: '探索北面鍛造間', textEn: 'Explore the forge room to the north', action: () => loadNode('r1_forge') });
     c.push({ text: '查看東面的守衛殘骸', textEn: 'Examine the guardian remains to the east', action: () => loadNode('r1_guard_check') });

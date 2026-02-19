@@ -151,12 +151,10 @@ registerNode('r0_body', () => {
 });
 
 registerNode('r0_look', () => {
+  var firstVisit = !state.flags.lookedAround;
   state.flags.lookedAround = true;
-  autoExplore([
-    { tag: '行動', tagColor: 'tag-move', text: '你緩緩站起身來。', textEn: 'You slowly rise to your feet.', delay: 2000 },
-    { tag: '探索', tagColor: 'tag-explore', text: '環顧四周……', textEn: 'Looking around...', delay: 2500 },
-    { tag: '感知', tagColor: 'tag-sense', text: '等待眼睛適應黑暗……', textEn: 'Waiting for your eyes to adjust to the darkness...', delay: 3000 },
-    { art: `<pre class="ascii-art">
+
+  var mapArt = { art: `<pre class="ascii-art">
           ┌──── 北：攀爬痕跡 ────┐
           │  /│  ^  ^   ^  ^    │
           │ / │ /│ /│  /│ /│    │
@@ -200,7 +198,13 @@ registerNode('r0_look', () => {
           │   │~ Water ~│   │
           │   │~~~~~~~~│   │
           └──── S: Crack ────┘
-</pre>`, delay: 800 },
+</pre>`, delay: 800 };
+
+  var steps = firstVisit ? [
+    { tag: '行動', tagColor: 'tag-move', text: '你緩緩站起身來。', textEn: 'You slowly rise to your feet.', delay: 2000 },
+    { tag: '探索', tagColor: 'tag-explore', text: '環顧四周……', textEn: 'Looking around...', delay: 2500 },
+    { tag: '感知', tagColor: 'tag-sense', text: '等待眼睛適應黑暗……', textEn: 'Waiting for your eyes to adjust to the darkness...', delay: 3000 },
+    mapArt,
     { tag: '探索', tagColor: 'tag-explore', text: '祭獻坑是一個不規則的天然洞穴，大約十來步寬。', textEn: 'The Sacrificial Pit is an irregular natural cave, roughly ten paces wide.', delay: 2500 },
     { tag: '感知', tagColor: 'tag-sense', text: '地面散落著碎石和……那些是骨頭，還是石化殘肢，你分不清楚。', textEn: 'The ground is littered with rubble and... bones? Petrified limbs? Hard to tell.', delay: 2800 },
     { tag: '探索', tagColor: 'tag-explore', text: '掃描東側……岩壁看似光滑，但角落處有些不自然的石塊堆疊。', textEn: 'Scanning east... the wall looks smooth, but there\'s an unnatural pile of rocks in the corner.', delay: 2500 },
@@ -208,7 +212,12 @@ registerNode('r0_look', () => {
     { tag: '發現', tagColor: 'tag-item', html: '角落裡有一具<b>半石化的屍體</b>，手中似乎還握著什麼。', htmlEn: 'In the corner, a <b>half-petrified corpse</b> seems to be clutching something.', delay: 2500 },
     { tag: '發現', tagColor: 'tag-item', html: '北面岩壁上有模糊的<b>攀爬痕跡</b>——有人嘗試過往上爬。', htmlEn: 'The north wall bears faint <b>climbing marks</b> — someone tried to climb up.', delay: 2500 },
     { tag: '發現', tagColor: 'tag-item', html: '南面有一條狹窄的<b>裂縫</b>，黑暗中傳來微弱的水聲。', htmlEn: 'To the south, a narrow <b>crack</b> — faint sounds of water echo from within.', delay: 2200 },
-  ], (function() {
+  ] : [
+    { tag: '行動', tagColor: 'tag-move', text: '你回到了祭獻坑中央，環顧四周。', textEn: 'You return to the center of the Sacrificial Pit and look around.', delay: 1500 },
+    mapArt,
+  ];
+
+  autoExplore(steps, (function() {
     var c = [];
     if (state.flags.corpseSearched) {
       c.push({ text: '在坑底四處警戒', textEn: 'Stay alert and patrol the pit', action: () => loadNode('r0_patrol') });
