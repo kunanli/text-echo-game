@@ -49,8 +49,13 @@ function applyLang() {
   document.getElementById('alloc-wil-desc').textContent = en ? 'Anti-Petri·Mind' : '抗石化·精神';
   document.getElementById('alloc-remain-label').textContent = en ? 'Points left: ' : '剩餘點數：';
   document.getElementById('start-btn').textContent = en ? 'BEGIN ADVENTURE' : '開 始 冒 險';
-  // Header
-  document.getElementById('header-title').textContent = en ? 'PETRIFICATION ABYSS' : '石 化 深 淵';
+  // Header (ASCII art frame)
+  var $hdr = document.getElementById('header-ascii');
+  if (en) {
+    $hdr.textContent = '╔═══════════════════════════════╗\n║  PETRIFICATION          ABYSS  ║\n╚═══════════════════════════════╝';
+  } else {
+    $hdr.textContent = '╔═══════════════════════════════╗\n║   石  化  深  淵   PETRIABYSS ║\n╚═══════════════════════════════╝';
+  }
   // Status panel
   document.getElementById('label-life').textContent = en ? 'LIFE' : '生命';
   document.getElementById('label-hp').textContent = 'HP';

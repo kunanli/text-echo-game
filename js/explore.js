@@ -55,16 +55,22 @@ function fmtTime(ms) {
     : pad(m) + ':' + pad(s);
 }
 
-// ── Dots animation ──
+// ── ASCII spinner & dots animation ──
 var dotCount = 0;
 var dotTimer = null;
+var spinnerFrames = ['/', '-', '\\', '|'];
+var spinnerIdx = 0;
+var $ebIcon = document.getElementById('eb-icon');
 function startDots() {
   dotCount = 0;
+  spinnerIdx = 0;
   if (dotTimer) clearInterval(dotTimer);
   dotTimer = setInterval(function() {
     dotCount = (dotCount + 1) % 4;
+    spinnerIdx = (spinnerIdx + 1) % 4;
     $ebDots.textContent = '.'.repeat(dotCount);
-  }, 500);
+    $ebIcon.textContent = '[' + spinnerFrames[spinnerIdx] + ']';
+  }, 250);
 }
 function stopDots() {
   if (dotTimer) { clearInterval(dotTimer); dotTimer = null; }
@@ -76,17 +82,18 @@ function showExploreBar(label) {
   $exploreBar.classList.add('active');
   $exploreBar.classList.remove('done');
   $ebLabel.textContent = label || L('自動探索中', 'Auto-exploring');
-  $ebTimer.textContent = fmtTime(autoElapsed);
+  $ebTimer.textContent = '[' + fmtTime(autoElapsed) + ']';
   startDots();
 }
 function updateExploreTimer() {
-  $ebTimer.textContent = fmtTime(autoElapsed);
+  $ebTimer.textContent = '[' + fmtTime(autoElapsed) + ']';
 }
 function finishExploreBar() {
   stopDots();
   $exploreBar.classList.add('done');
+  $ebIcon.textContent = '[=]';
   $ebLabel.textContent = L('等待決策', 'Awaiting decision');
-  $ebTimer.textContent = fmtTime(autoElapsed);
+  $ebTimer.textContent = '[' + fmtTime(autoElapsed) + ']';
 }
 function hideExploreBar() {
   $exploreBar.classList.remove('active');
@@ -122,7 +129,7 @@ function showPending() {
   removePending();
   $pendingEl = document.createElement('div');
   $pendingEl.className = 'pending-indicator';
-  $pendingEl.innerHTML = '<span class="dot">●</span><span class="dot">●</span><span class="dot">●</span>';
+  $pendingEl.innerHTML = '<span class="dot">░</span><span class="dot">░</span><span class="dot">▒</span><span class="dot">░</span><span class="dot">░</span>';
   $story.appendChild($pendingEl);
   $story.scrollTop = $story.scrollHeight;
 }
