@@ -849,8 +849,8 @@
     .mobile-status-toggle.open .mst-arrow {
       transform: rotate(180deg);
     }
-    .header-ascii { font-size: .45rem; letter-spacing: 0; }
-    header { padding: 6px 0 4px; }
+    header { padding: 4px 0 3px; overflow: hidden; }
+    .header-ascii { font-size: min(.65rem, 1.7vw); letter-spacing: 0; line-height: 1.15; }
     .ascii-art {
       font-size: .72rem;
       letter-spacing: 0;
