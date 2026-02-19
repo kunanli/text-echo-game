@@ -28,6 +28,18 @@
     margin: 0;
   }
 
+  /* ── Mobile header (hidden on desktop) ── */
+  .header-mobile { display: none; }
+
+  @keyframes hm-glow {
+    0%, 100% { text-shadow: 0 0 6px rgba(212,168,67,.25); }
+    50%      { text-shadow: 0 0 18px rgba(212,168,67,.6), 0 0 36px rgba(212,168,67,.15); }
+  }
+  @keyframes hm-fadein {
+    from { opacity: 0; transform: translateY(-6px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
   /* ── Main Layout ── */
   .game-container {
     display: flex;
@@ -849,8 +861,30 @@
     .mobile-status-toggle.open .mst-arrow {
       transform: rotate(180deg);
     }
-    header { padding: 4px 0 3px; overflow: hidden; }
-    .header-ascii { font-size: min(.65rem, 1.7vw); letter-spacing: 0; line-height: 1.15; }
+    header { padding: 6px 0 4px; overflow: hidden; }
+    .header-ascii { display: none; }
+    .header-mobile {
+      display: flex !important;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+      animation: hm-fadein .8s ease-out both;
+    }
+    .hm-title {
+      font-family: "Courier New", Courier, monospace;
+      font-size: .82rem;
+      color: #d4a843;
+      letter-spacing: 2px;
+      animation: hm-glow 4s ease-in-out infinite;
+    }
+    .hm-player {
+      font-size: .7rem;
+      color: #8a7a50;
+      letter-spacing: 2px;
+      min-height: 1em;
+    }
+    .hm-player:not(:empty)::before { content: '\23DC  '; }
+    .hm-player:not(:empty)::after  { content: ' \23DD'; }
     .ascii-art {
       font-size: .72rem;
       letter-spacing: 0;

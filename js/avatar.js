@@ -247,6 +247,7 @@ function renderAvatar() {
   $avatarBox.appendChild(span);
   $avatarBox.className = 'avatar-box mood-' + mood;
   $playerName.textContent = state.name;
+  $hmPlayer.textContent = state.name;
 
   startIdleAnim();
 }

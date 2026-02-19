@@ -49,6 +49,8 @@ function applyLang() {
   document.getElementById('alloc-wil-desc').textContent = en ? 'Anti-Petri·Mind' : '抗石化·精神';
   document.getElementById('alloc-remain-label').textContent = en ? 'Points left: ' : '剩餘點數：';
   document.getElementById('start-btn').textContent = en ? 'BEGIN ADVENTURE' : '開 始 冒 險';
+  // Mobile header title
+  $hmTitle.textContent = en ? '┄┄ PETRIFICATION ABYSS ┄┄' : '┄┄ 石化深淵 · PETRIABYSS ┄┄';
   // Header (ASCII art frame)
   var $hdr = document.getElementById('header-ascii');
   if (en) {
@@ -97,6 +99,8 @@ const $deathMsg = document.getElementById('death-msg');
 const $revive   = document.getElementById('revive-btn');
 const $notif    = document.getElementById('notification');
 const $playerName = document.getElementById('player-name');
+const $hmPlayer = document.getElementById('hm-player');
+const $hmTitle  = document.getElementById('hm-title');
 const $mobileToggle = document.getElementById('mobile-status-toggle');
 const $mstHp    = document.getElementById('mst-hp');
 const $mstPetri = document.getElementById('mst-petri');
