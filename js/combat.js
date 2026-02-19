@@ -15,7 +15,7 @@ function startCombat(enemy, onWin, onFlee) {
     const text = `<pre class="ascii-art red">
   ╔════════════════════════════════════════╗
   ║                                        ║
-  ║          ⚔   ${combatTitle}   ⚔              ║
+  ║          >>  ${combatTitle}  <<              ║
   ║                                        ║
   ╠════════════════════════════════════════╣
   ║                                        ║

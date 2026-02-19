@@ -68,7 +68,7 @@ var R1_MONSTERS = [
       '     │ ● ● │',
       '     │  ▽  │',
       '    ╱░░░░░░░╲',
-      '   │ ░░⛏░░░ │',
+      '   │ ░░╋░░░ │',
       '    ·  · ·  ·',
     ]
   },
@@ -140,6 +140,14 @@ function patrolAppend(tag, tagColor, content, isHtml) {
   $story.scrollTop = $story.scrollHeight;
 }
 
+function patrolAppendArt(artLines, className) {
+  var pre = document.createElement('pre');
+  pre.className = 'ascii-art ' + (className || '');
+  pre.textContent = artLines.join('\n');
+  $story.appendChild(pre);
+  $story.scrollTop = $story.scrollHeight;
+}
+
 function startPatrol() {
   stopAuto();
   clearPatrolTimers();
@@ -176,6 +184,35 @@ function stopPatrol() {
   loadNode(getPatrolReturnNode());
 }
 
+// ── Suspense texts before encounter ──
+var SUSPENSE_TEXTS = [
+  { zh: '你停下了腳步——有什麼在靠近……', en: 'You freeze — something draws near...' },
+  { zh: '前方傳來異樣的聲響……你握緊了武器。', en: 'Strange sounds ahead... You tighten your grip.' },
+  { zh: '空氣突然變得凝重，你屏住了呼吸。', en: 'The air grows heavy. You hold your breath.' },
+  { zh: '腳下的碎石突然震動——有東西來了。', en: 'Gravel trembles underfoot — something approaches.' },
+  { zh: '一股殺意從暗處襲來，你本能地戒備。', en: 'Killing intent washes over you. You brace instinctively.' },
+];
+
+// ── Attack / counter verb pools for vivid combat text ──
+var ATK_VERBS = [
+  { zh: '你揮出一擊——', en: 'You swing — ' },
+  { zh: '你猛力出手——', en: 'You strike hard — ' },
+  { zh: '你找到破綻突刺——', en: 'You find an opening — ' },
+  { zh: '你衝上前攻擊——', en: 'You rush in — ' },
+  { zh: '你側身劈砍——', en: 'You slash from the side — ' },
+];
+var COUNTER_VERBS = [
+  { zh: '反擊了！', en: 'strikes back!' },
+  { zh: '猛撲而來！', en: 'lunges at you!' },
+  { zh: '揮爪回擊！', en: 'claws back!' },
+  { zh: '狠狠撞來！', en: 'charges at you!' },
+];
+var DEFEAT_VERBS = [
+  { zh: '——致命一擊！擊敗了', en: ' — a killing blow! ' },
+  { zh: '——貫穿要害！擊倒了', en: ' — a critical strike! ' },
+  { zh: '——最後一擊命中！擊敗了', en: ' — the final blow lands! ' },
+];
+
 function runPatrolCycle() {
   if (!patrolActive) return;
 
@@ -194,12 +231,21 @@ function runPatrolCycle() {
     mHp -= pAtk;
     totalDmg += mAtk;
     totalPetri += monster.petriDmg;
+
+    var av = ATK_VERBS[rng(0, ATK_VERBS.length - 1)];
+    var cv = COUNTER_VERBS[rng(0, COUNTER_VERBS.length - 1)];
+
     if (mHp <= 0) {
-      combatLog.push(L('第' + rounds + '回合：造成 ' + pAtk + ' 傷害——擊敗了' + monster.name + '！',
-                        'Rd ' + rounds + ': deal ' + pAtk + ' — ' + monster.nameEn + ' defeated!'));
+      var dv = DEFEAT_VERBS[rng(0, DEFEAT_VERBS.length - 1)];
+      combatLog.push(L(
+        av.zh + '造成 ' + pAtk + ' 傷害' + dv.zh + monster.name + '！',
+        av.en + pAtk + ' dmg' + dv.en + monster.nameEn + ' defeated!'
+      ));
     } else {
-      combatLog.push(L('第' + rounds + '回合：造成 ' + pAtk + ' 傷害，受到 ' + mAtk + ' 傷害',
-                        'Rd ' + rounds + ': deal ' + pAtk + ', take ' + mAtk + ' dmg'));
+      combatLog.push(L(
+        av.zh + '造成 ' + pAtk + ' 傷害。' + monster.name + cv.zh + ' 受到 ' + mAtk + ' 傷害。',
+        av.en + pAtk + ' dmg. ' + monster.nameEn + ' ' + cv.en + ' Take ' + mAtk + ' dmg.'
+      ));
     }
   }
 
@@ -216,14 +262,25 @@ function runPatrolCycle() {
     queue.push({ tag: L('巡邏','Patrol'), color: 'tag-move', text: L(p.text, p.textEn), delay: rng(1500, 2300) });
   }
 
-  // Encounter
-  queue.push({ tag: L('遭遇','Encounter'), color: 'tag-combat',
-    html: L('發現了<b>' + monster.name + '</b>！', 'Encountered <b>' + monster.nameEn + '</b>!'),
-    delay: 1200 });
+  // Suspense line — tension build-up before encounter
+  var suspense = SUSPENSE_TEXTS[rng(0, SUSPENSE_TEXTS.length - 1)];
+  queue.push({ tag: L('感知','Sense'), color: 'tag-sense',
+    text: L(suspense.zh, suspense.en), delay: 2200, pending: true });
 
-  // Combat rounds
+  // Monster ASCII art
+  queue.push({ art: monster.art, artClass: 'monster-art', delay: 1800, pending: true });
+
+  // Encounter announcement
+  queue.push({ tag: L('遭遇','Encounter'), color: 'tag-combat',
+    html: L('一隻<b>' + monster.name + '</b>出現了！進入戰鬥！',
+            'A <b>' + monster.nameEn + '</b> appears! Entering combat!'),
+    delay: 1800 });
+
+  // Combat rounds (with dramatic pacing)
   for (var i = 0; i < combatLog.length; i++) {
-    queue.push({ tag: L('戰鬥','Battle'), color: 'tag-combat', text: combatLog[i], delay: rng(700, 1000) });
+    var isLast = (i === combatLog.length - 1);
+    queue.push({ tag: L('戰鬥','Battle'), color: 'tag-combat', text: combatLog[i],
+      delay: isLast ? rng(2000, 2800) : rng(1500, 2200), pending: true });
   }
 
   // Result + apply effects
@@ -231,7 +288,8 @@ function runPatrolCycle() {
   queue.push({ tag: L('結果','Result'), color: 'tag-item',
     text: L('勝利！ HP -' + totalDmg + '  石化 +' + totalPetri + '%  經驗 +' + mXp,
             'Victory! HP -' + totalDmg + '  Petri +' + totalPetri + '%  XP +' + mXp),
-    delay: 1800,
+    delay: 2000,
+    pending: true,
     effect: function() {
       changeHp(-totalDmg);
       changePetri(totalPetri);
@@ -242,9 +300,9 @@ function runPatrolCycle() {
 
   // Continue text
   queue.push({ tag: L('巡邏','Patrol'), color: 'tag-move',
-    text: L('繼續巡邏……', 'Continuing patrol...'), delay: 2000 });
+    text: L('繼續巡邏……', 'Continuing patrol...'), delay: 2200 });
 
-  // Process queue sequentially
+  // Process queue sequentially with pending indicators for tension
   var qi = 0;
   function processNext() {
     if (!patrolActive) return;
@@ -253,11 +311,31 @@ function runPatrolCycle() {
       return;
     }
     var step = queue[qi++];
-    if (step.effect) step.effect();
-    if (!patrolActive) return; // effect may have triggered death
-    if (step.html) patrolAppend(step.tag, step.color, step.html, true);
-    else patrolAppend(step.tag, step.color, step.text, false);
-    patrolTimers.push(setTimeout(processNext, step.delay));
+
+    function renderAndContinue() {
+      if (!patrolActive) return;
+      if (step.effect) step.effect();
+      if (!patrolActive) return; // effect may have triggered death
+      if (step.art) {
+        patrolAppendArt(step.art, step.artClass || '');
+      } else if (step.html) {
+        patrolAppend(step.tag, step.color, step.html, true);
+      } else {
+        patrolAppend(step.tag, step.color, step.text, false);
+      }
+      patrolTimers.push(setTimeout(processNext, step.delay));
+    }
+
+    // Show pending indicator before dramatic moments
+    if (step.pending) {
+      showPending();
+      patrolTimers.push(setTimeout(function() {
+        removePending();
+        renderAndContinue();
+      }, 650));
+    } else {
+      renderAndContinue();
+    }
   }
   processNext();
 }
