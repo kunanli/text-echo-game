@@ -28,9 +28,10 @@ function renderStatus() {
   }
 
   // Mobile mini status bar
+  $mstName.textContent = state.name;
+  $mstLv.textContent = 'Lv.' + state.level;
   $mstHp.textContent = 'HP ' + state.hp;
   $mstPetri.textContent = L('石化 ', 'Petri ') + state.petri + '%';
-  $mstLoc.textContent = 'Lv.' + state.level + ' ' + (getRegion(state.region) || '');
 
   renderAvatar();
 }

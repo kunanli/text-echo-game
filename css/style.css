@@ -612,14 +612,14 @@
   /* ── ASCII avatar in status panel ── */
   .avatar-box {
     font-family: "Courier New", Courier, monospace;
-    font-size: .58rem;
-    line-height: 1.15;
+    font-size: .62rem;
+    line-height: 1.18;
     color: #8a8a9a;
     white-space: pre;
     text-align: center;
     padding: 6px 0 4px;
     user-select: none;
-    min-height: 95px;
+    min-height: 72px;
     transition: color .4s;
     overflow: hidden;
   }
@@ -843,6 +843,8 @@
       color: #7a7a8e;
       font-family: "Courier New", Courier, monospace;
     }
+    .mobile-status-toggle .mst-name { color: #c8b870; font-weight: bold; }
+    .mobile-status-toggle .mst-lv { color: #50c850; }
     .mobile-status-toggle .mst-hp { color: #c0564b; }
     .mobile-status-toggle .mst-petri { color: #7a7ac0; }
     .mobile-status-toggle .mst-arrow {
@@ -870,14 +872,6 @@
       letter-spacing: 2px;
       animation: hm-glow 4s ease-in-out infinite;
     }
-    .hm-player {
-      font-size: .7rem;
-      color: #8a7a50;
-      letter-spacing: 2px;
-      min-height: 1em;
-    }
-    .hm-player:not(:empty)::before { content: '\23DC  '; }
-    .hm-player:not(:empty)::after  { content: ' \23DD'; }
     .ascii-art {
       font-size: .72rem;
       letter-spacing: 0;
