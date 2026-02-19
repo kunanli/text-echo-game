@@ -358,10 +358,17 @@ registerNode('r0_whisper', () => {
     { tag: '環境', tagColor: 'tag-system', text: '「……別……掙扎……」', textEn: '"...don\'t... struggle..."', delay: 3000 },
     { tag: '感知', tagColor: 'tag-sense', text: '然後，一切歸於寂靜。', textEn: 'Then, silence returns.', delay: 2500 },
   ], [
-    { text: '集中精神對抗（考驗意志）', textEn: 'Focus your mind to resist (Willpower check)', action: () => {
-      if (state.wil >= 6) {
+    { label: checkLabel('集中精神對抗', 'Focus your mind to resist', 'wil', 7), action: () => {
+      var r = statCheck('wil', 7);
+      if (r === 'crit') {
+        changePetri(-5);
+        autoExplore([
+          { tag: '大成功', tagColor: 'tag-info', text: '你閉上眼睛——精神力如同烈焰般爆發，呢喃聲瞬間被粉碎！', textEn: 'You close your eyes — your willpower erupts like fire, shattering the murmur instantly!', delay: 2000 },
+          { tag: '意志', tagColor: 'tag-info', text: '不僅如此，石化的侵蝕竟然大幅消退了。', textEn: 'Moreover, the petrification recedes significantly.', delay: 2500 },
+          { tag: '記憶', tagColor: 'tag-system', html: '一段清晰的記憶浮現——<b>你曾經是一名探險者</b>，而且你並不孤單。', htmlEn: 'A vivid memory surfaces — <b>you were once an explorer</b>, and you were not alone.', delay: 2800 },
+        ], [{ text: '返回', textEn: 'Return', action: () => loadNode('r0_look') }]);
+      } else if (r === 'pass') {
         changePetri(-2);
-        notify(L('意志堅定！石化度 -2%', 'Will held firm! Petri -2%'));
         autoExplore([
           { tag: '意志', tagColor: 'tag-info', text: '你閉上眼睛，集中精神——那個聲音被你強行推了回去。', textEn: 'You close your eyes, focusing — you force the voice back.', delay: 2000 },
           { tag: '意志', tagColor: 'tag-info', text: '你的意識變得更加清明。你不屬於這些石像。你還活著。', textEn: 'Your mind grows clearer. You are not one of these statues. You are alive.', delay: 2500 },
@@ -443,10 +450,17 @@ registerNode('r0_ritual', () => {
           [{ text: '返回', textEn: 'Return', action: () => loadNode('r0_look') }]);
       }
     }},
-    { text: '用力踢散祭壇（考驗力量）', textEn: 'Kick the altar apart (Strength check)', action: () => {
-      if (state.str >= 6) {
+    { label: checkLabel('用力踢散祭壇', 'Kick the altar apart', 'str', 7), action: () => {
+      var r = statCheck('str', 7);
+      if (r === 'crit') {
+        changeStat('wil', 2);
+        autoExplore([
+          { tag: '大成功', tagColor: 'tag-move', text: '你怒火中燒——一腳將石板踢得粉碎！', textEn: 'Fury erupts — you shatter the slab to dust with a single kick!', delay: 1500 },
+          { tag: '環境', tagColor: 'tag-system', text: '五芒星圖案爆裂開來，灰色煙霧被你的氣勢壓散。', textEn: 'The pentagram explodes, grey smoke scattered by your sheer force.', delay: 2500 },
+          { tag: '意志', tagColor: 'tag-info', text: '強烈的解脫感湧上心頭——你的意志大幅增強。', textEn: 'A powerful sense of liberation surges through you — your will strengthens greatly.', delay: 2500 },
+        ], [{ text: '返回', textEn: 'Return', action: () => loadNode('r0_look') }]);
+      } else if (r === 'pass') {
         changeStat('wil', 1);
-        notify(L('意志 +1', 'WIL +1'));
         autoExplore([
           { tag: '行動', tagColor: 'tag-move', text: '你怒火中燒——這就是毀掉你的東西。', textEn: 'Fury rises — this is what destroyed you.', delay: 1500 },
           { tag: '行動', tagColor: 'tag-move', text: '你用盡全力踢向石板——石板裂成了兩半！', textEn: 'You kick the slab with all your might — it cracks in two!', delay: 2000 },
@@ -581,9 +595,15 @@ registerNode('r0_crack', () => {
     { tag: '警告', tagColor: 'tag-warn', text: '你勉強抓住岩壁穩住身體，但小腿浸入了冰冷的水中。', textEn: 'You barely grab the wall to steady yourself, but your calves plunge into the icy water.', delay: 2200 },
     { tag: '石化', tagColor: 'tag-petri', html: '水面泛著灰色的微光——<b>石化之水。</b>', htmlEn: 'The water glows with a grey shimmer — <b>Petrification Water.</b>', delay: 1800 },
   ], [
-    { text: '立刻退回（考驗敏捷）', textEn: 'Retreat immediately (Agility check)', action: () => {
-      if (state.agi >= 6) {
-        notify(L('敏捷檢定成功！', 'Agility check passed!'));
+    { label: checkLabel('立刻退回', 'Retreat immediately', 'agi', 7), action: () => {
+      var r = statCheck('agi', 7);
+      if (r === 'crit') {
+        changePetri(0);
+        autoExplore([
+          { tag: '大成功', tagColor: 'tag-explore', text: '你以驚人的反射速度抽回雙腳——完美閃避！', textEn: 'With incredible reflexes you pull your feet out — perfect dodge!', delay: 1200 },
+          { tag: '探索', tagColor: 'tag-explore', text: '不僅毫髮無傷，你還從水邊撈到了一塊發光的礦石。', textEn: 'Not only unscathed, you also snatch a glowing mineral from the water\'s edge.', delay: 1800 },
+        ], [{ text: '返回坑底', textEn: 'Return to the pit', action: () => { addItem(L('微光石', 'Glowstone')); loadNode('r0_look'); } }]);
+      } else if (r === 'pass') {
         changePetri(3);
         autoExplore([
           { tag: '行動', tagColor: 'tag-explore', text: '你反應迅速，一把抽回雙腳！', textEn: 'Quick reflexes! You yank your feet back!', delay: 1200 },
@@ -600,10 +620,17 @@ registerNode('r0_crack', () => {
         ], [{ text: '返回坑底', textEn: 'Return to the pit', action: () => loadNode('r0_look') }]);
       }
     }},
-    { text: '嘗試用意志抵抗石化，採集水邊礦石', textEn: 'Resist petrification with willpower, gather minerals', action: () => {
-      if (state.wil >= 6) {
+    { label: checkLabel('用意志抵抗石化，採集水邊礦石', 'Resist petrification, gather minerals', 'wil', 8), action: () => {
+      var r = statCheck('wil', 8);
+      if (r === 'crit') {
+        changePetri(2);
+        autoExplore([
+          { tag: '大成功', tagColor: 'tag-petri', text: '你閉上眼睛——精神力完美壓制了石化之水的侵蝕！', textEn: 'You close your eyes — your willpower perfectly suppresses the petrification water!', delay: 1500 },
+          { tag: '成功', tagColor: 'tag-explore', text: '你從容不迫地採集了水邊的所有有用資源。', textEn: 'You calmly gather all useful resources by the water.', delay: 2000 },
+          { tag: '物品', tagColor: 'tag-item', html: '採集了<b>微光石</b>、<b>石化水瓶</b>和一小塊<b>石化結晶</b>。', htmlEn: 'Gathered <b>Glowstone</b>, <b>Petri-Water Flask</b>, and a small <b>Petri Crystal</b>.', delay: 1500, effect: () => { addItem(L('微光石', 'Glowstone')); addItem(L('石化水瓶', 'Petri-Water Flask')); addItem(L('石化結晶', 'Petri Crystal')); } },
+        ], [{ text: '返回坑底', textEn: 'Return to the pit', action: () => loadNode('r0_look') }]);
+      } else if (r === 'pass') {
         changePetri(5);
-        notify(L('意志檢定成功！', 'Willpower check passed!'));
         autoExplore([
           { tag: '意志', tagColor: 'tag-petri', text: '你閉上眼睛，集中精神……', textEn: 'You close your eyes, focusing your mind...', delay: 1500 },
           { tag: '成功', tagColor: 'tag-explore', text: '意志力化為溫熱的力量，暫時壓制住石化侵蝕。', textEn: 'Your willpower becomes a warm force, suppressing the petrification.', delay: 2000 },
@@ -676,15 +703,22 @@ registerNode('r0_climb_check', () => {
     { tag: '探索', tagColor: 'tag-explore', text: '大約三個人高處有一個突出的岩棚。', textEn: 'About three body-lengths up, a protruding ledge.', delay: 1800 },
     { tag: '警告', tagColor: 'tag-warn', text: '岩壁濕滑，牆上有奇怪的灰色苔蘚——接觸可能加速石化。', textEn: 'The wall is slick, covered in strange grey moss — contact may accelerate petrification.', delay: 2200 },
   ], [
-    { text: '直接攀爬（考驗力量）', textEn: 'Climb directly (Strength check)', action: () => loadNode('r0_climb_str') },
+    { label: checkLabel('直接攀爬', 'Climb directly', 'str', 9), action: () => loadNode('r0_climb_str') },
     { text: '尋找其他可以借力的東西', textEn: 'Look for alternative handholds', action: () => loadNode('r0_climb_alt') },
     { text: '返回觀察', textEn: 'Go back', action: () => loadNode('r0_look') },
   ], { label: L('查看岩壁', 'Checking wall') });
 });
 
 registerNode('r0_climb_str', () => {
-  const strCheck = state.str + rng(1, 6);
-  if (strCheck >= 9) {
+  var r = statCheck('str', 9);
+  if (r === 'crit') {
+    changePetri(1);
+    autoExplore([
+      { tag: '大成功', tagColor: 'tag-move', text: '你深吸一口氣——手腳如同猿猴般靈活！', textEn: 'You take a deep breath — climbing with ape-like agility!', delay: 1500 },
+      { tag: '行動', tagColor: 'tag-move', text: '完美避開所有灰色苔蘚，一口氣攀上了岩棚！', textEn: 'You avoid every patch of grey moss and reach the ledge in one go!', delay: 2000 },
+      { tag: '探索', tagColor: 'tag-explore', text: '岩棚上方，一條蜿蜒的隧道延伸向黑暗深處。', textEn: 'Above the ledge, a winding tunnel stretches into the darkness.', delay: 1800 },
+    ], [{ text: '進入隧道', textEn: 'Enter the tunnel', action: () => loadNode('r0_tunnel') }]);
+  } else if (r === 'pass') {
     changePetri(3);
     autoExplore([
       { tag: '行動', tagColor: 'tag-move', text: '你深吸一口氣，找準落腳點，開始攀爬。', textEn: 'You take a deep breath, find your footholds, and begin climbing.', delay: 1500 },
@@ -810,8 +844,14 @@ registerNode('r0_tunnel', () => {
         }
       );
     }},
-    { text: '嘗試悄悄繞過去（考驗敏捷）', textEn: 'Sneak past it (Agility check)', action: () => {
-      if (state.agi >= 7) {
+    { label: checkLabel('嘗試悄悄繞過去', 'Sneak past it', 'agi', 8), action: () => {
+      var r = statCheck('agi', 8);
+      if (r === 'crit') {
+        autoExplore([
+          { tag: '大成功', tagColor: 'tag-move', text: '你如同幽靈般無聲移動——石蜥蜴毫無察覺！', textEn: 'You move like a ghost — the lizard notices nothing!', delay: 2000 },
+          { tag: '探索', tagColor: 'tag-explore', text: '你甚至在它身旁摸到了一件有用的東西。', textEn: 'You even find something useful beside it.', delay: 2000 },
+        ], [{ text: '繼續前進', textEn: 'Continue forward', action: () => { addItem(L('蜥蜴鱗片', 'Lizard Scale')); loadNode('r0_after_lizard'); } }]);
+      } else if (r === 'pass') {
         autoExplore([
           { tag: '潛行', tagColor: 'tag-move', text: '你壓低身體，沿著洞穴邊緣慢慢移動……', textEn: 'You crouch low, inching along the cave wall...', delay: 2000 },
           { tag: '感知', tagColor: 'tag-sense', text: '石蜥蜴抬起頭嗅了嗅空氣……隨後又趴了下去。', textEn: 'The lizard lifts its head to sniff the air... then settles back down.', delay: 2500 },

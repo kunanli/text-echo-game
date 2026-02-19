@@ -62,7 +62,7 @@ function showChoices(choices) {
   choices.forEach(function(c, i) {
     var btn = document.createElement('button');
     btn.className = 'choice-btn';
-    var choiceLabel = (state.lang === 'en' && c.textEn) ? c.textEn : c.text;
+    var choiceLabel = c.label ? c.label : ((state.lang === 'en' && c.textEn) ? c.textEn : c.text);
     btn.innerHTML = '<span class="key-hint">' + keys[i] + '</span><span>' + choiceLabel + '</span>';
     btn.addEventListener('click', function() { selectChoice(i); });
     btn.style.opacity = '0';

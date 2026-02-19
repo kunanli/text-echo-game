@@ -68,6 +68,10 @@ function applyLang() {
   document.getElementById('revive-btn').textContent = en ? 'Break free and rise again' : '掙脫石殼，重新站起';
   // Save code button
   document.getElementById('save-code-btn').textContent = en ? 'Save Code' : '存檔碼';
+  // Level-up dialog (static labels)
+  document.getElementById('levelup-str-desc').textContent = en ? 'Attack · Climb' : '攻擊·攀爬';
+  document.getElementById('levelup-agi-desc').textContent = en ? 'Dodge · Stealth' : '閃避·潛行';
+  document.getElementById('levelup-wil-desc').textContent = en ? 'Anti-Petri · Mind' : '抗石化·精神';
 }
 
 // ── DOM refs ──

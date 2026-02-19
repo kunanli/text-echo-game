@@ -931,3 +931,43 @@
     color: #5a5;
     min-height: 1.2em;
   }
+
+  /* ══ Level-Up UI ══ */
+  .levelup-dialog { max-width: 360px; }
+  .levelup-choices {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 14px;
+  }
+  .levelup-btn {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: #1a1a2e;
+    color: #c8c8d0;
+    border: 1px solid #2a2a3a;
+    border-radius: 8px;
+    padding: 14px 16px;
+    font-family: inherit;
+    font-size: .9rem;
+    cursor: pointer;
+    transition: all .2s;
+    text-align: left;
+  }
+  .levelup-btn:hover { background: #222238; border-color: #d4a843; }
+  .levelup-stat-name {
+    color: #d4a843;
+    font-weight: bold;
+    min-width: 40px;
+  }
+  .levelup-stat-val {
+    color: #6a6a7a;
+    font-size: .8rem;
+    min-width: 60px;
+  }
+  .levelup-stat-desc {
+    color: #5a5a6a;
+    font-size: .75rem;
+    margin-left: auto;
+  }
