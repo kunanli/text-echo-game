@@ -46,6 +46,27 @@
     font-size: .55rem;
   }
 
+  /* ── Audio Toggle ── */
+  .audio-toggle {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: 1px solid #2a2a3a;
+    color: #5a5a6a;
+    font-family: inherit;
+    font-size: .7rem;
+    padding: 2px 8px;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: color .3s, border-color .3s;
+    letter-spacing: 1px;
+  }
+  .audio-toggle:hover { color: #8a8aa0; border-color: #3a3a5a; }
+  .audio-toggle.on { color: #d4a843; border-color: #6a5a30; }
+  .header-bar { position: relative; }
+
   @keyframes hm-glow {
     0%, 100% { text-shadow: 0 0 6px rgba(212,168,67,.25); }
     50%      { text-shadow: 0 0 18px rgba(212,168,67,.6), 0 0 36px rgba(212,168,67,.15); }

@@ -37,6 +37,8 @@ document.getElementById('phase-splash').addEventListener('click', function(e) {
         var titleScreen = document.getElementById('title-screen');
         titleScreen.classList.add('hidden');
         setTimeout(function() { titleScreen.style.display = 'none'; }, 800);
+        ambientAudio.start();
+        updateAudioBtn();
         renderStatus();
         loadNode(state.node);
       }
@@ -116,6 +118,9 @@ function startGame() {
   var titleScreen = document.getElementById('title-screen');
   titleScreen.classList.add('hidden');
   setTimeout(function() { titleScreen.style.display = 'none'; }, 800);
+
+  ambientAudio.start();
+  updateAudioBtn();
 
   renderStatus();
   loadNode('r0_start');
@@ -197,3 +202,25 @@ document.getElementById('name-input').addEventListener('keydown', function(e) {
     }
   });
 })();
+
+// ── Audio Toggle ──
+var $audioBtn = document.getElementById('audio-toggle');
+
+function updateAudioBtn() {
+  if (ambientAudio.isRunning()) {
+    $audioBtn.textContent = '\u266A ON';
+    $audioBtn.classList.add('on');
+  } else {
+    $audioBtn.textContent = '\u266A OFF';
+    $audioBtn.classList.remove('on');
+  }
+}
+
+$audioBtn.addEventListener('click', function() {
+  if (ambientAudio.isRunning()) {
+    ambientAudio.stop();
+  } else {
+    ambientAudio.start();
+  }
+  updateAudioBtn();
+});
