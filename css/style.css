@@ -623,14 +623,14 @@
   /* ── ASCII avatar in status panel ── */
   .avatar-box {
     font-family: "Courier New", Courier, monospace;
-    font-size: .58rem;
-    line-height: 1.15;
+    font-size: .65rem;
+    line-height: 1.2;
     color: #8a8a9a;
     white-space: pre;
     text-align: center;
     padding: 8px 4px 6px;
     user-select: none;
-    min-height: 100px;
+    min-height: 80px;
     transition: color .4s;
     overflow: hidden;
     background: #0c0c16;
@@ -833,8 +833,8 @@
       justify-content: center;
     }
     #avatar-section .avatar-box {
-      font-size: .34rem;
-      line-height: 1.02;
+      font-size: .38rem;
+      line-height: 1.05;
       min-height: auto;
       padding: 3px 2px;
       border-width: 1px;
