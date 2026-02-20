@@ -1,51 +1,87 @@
 // ══ Combat System ══
+// 4 actions: Attack, Observe, Commune, Flee
+//   Attack  — STR-based damage, enemy counter-attacks
+//   Observe — AGI check, success grants 2x dmg buff next attack
+//   Commune — WIL check, build empathy to spare enemy (bonus XP, less petri)
+//   Flee    — escape (if allowed)
+
 function startCombat(enemy, onWin, onFlee) {
   state.mood = 'combat';
   let enemyHp = enemy.hp;
   const eName = enemy.name;
+  let observed = false;   // next attack deals 2x
+  let empathy = 0;        // commune progress (need 3 to spare)
+  const empathyGoal = enemy.empathyGoal || 3;
+
+  // Commune text pool per-enemy, with fallback
+  var communeTexts = enemy.commune || [
+    { zh: '你試著向它傳達善意……它似乎猶豫了一瞬。', en: 'You reach out with goodwill... it hesitates for a moment.' },
+    { zh: '你凝視著它的眼睛，感受到深處殘存的意識。', en: 'You gaze into its eyes, sensing a flicker of awareness within.' },
+    { zh: '它的攻擊放緩了，像是在回憶什麼遙遠的東西。', en: 'Its attacks slow, as if remembering something distant.' },
+  ];
+  var communeFail = enemy.communeFail || [
+    { zh: '但它完全無法理解，石化能量反噬了你。', en: 'But it cannot comprehend. Petrification energy lashes back.' },
+    { zh: '你的意識碰觸到一片虛無，石化的寒意侵入。', en: 'Your mind touches void. A chill of stone creeps in.' },
+  ];
 
   function combatRound() {
-    const hpPct = Math.max(0, Math.floor(enemyHp / enemy.hp * 10));
-    const hpBar = '█'.repeat(hpPct) + '░'.repeat(10 - hpPct);
-    const myPct = Math.max(0, Math.floor(state.hp / state.maxHp * 10));
-    const myBar = '█'.repeat(myPct) + '░'.repeat(10 - myPct);
+    var hpPct = Math.max(0, Math.floor(enemyHp / enemy.hp * 10));
+    var hpBar = '\u2588'.repeat(hpPct) + '\u2591'.repeat(10 - hpPct);
+    var myPct = Math.max(0, Math.floor(state.hp / state.maxHp * 10));
+    var myBar = '\u2588'.repeat(myPct) + '\u2591'.repeat(10 - myPct);
 
     var combatTitle = L('戰  鬥', 'COMBAT');
     var youLabel = L('你', 'You').padEnd(6);
-    const text = `<pre class="ascii-art red">
-  ╔════════════════════════════════════════╗
-  ║                                        ║
-  ║          >>  ${combatTitle}  <<              ║
-  ║                                        ║
-  ╠════════════════════════════════════════╣
-  ║                                        ║
-  ║   ${eName.padEnd(8)}  [${hpBar}]   ${String(enemyHp).padStart(3)}   ║
-  ║                                        ║
-  ║   ${youLabel.padEnd(8)}[${myBar}]   ${String(state.hp).padStart(3)}   ║
-  ║                                        ║
-  ╚════════════════════════════════════════╝
-</pre>
-${enemy.desc || ''}`;
 
-    const choices = [
-      { text: L('攻擊', 'Attack'), action: () => doAttack() },
-      { text: L('閃避', 'Dodge'), action: () => doDodge() },
-      { text: L('防守', 'Defend'), action: () => doDefend() },
+    // Status indicators
+    var statusLine = '';
+    if (observed) statusLine += ' <span class="cl-observe">' + L('[觀察中·下次2x]', '[OBSERVED·2x next]') + '</span>';
+    if (empathy > 0) statusLine += ' <span class="cl-empathy">' + L('[共鳴 ' + empathy + '/' + empathyGoal + ']', '[Empathy ' + empathy + '/' + empathyGoal + ']') + '</span>';
+
+    var text = '<pre class="ascii-art red">'
+      + '\n  \u2554\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2557'
+      + '\n  \u2551                                        \u2551'
+      + '\n  \u2551          >>  ' + combatTitle + '  <<              \u2551'
+      + '\n  \u2551                                        \u2551'
+      + '\n  \u2560\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2563'
+      + '\n  \u2551                                        \u2551'
+      + '\n  \u2551   ' + eName.padEnd(8) + '  [' + hpBar + ']   ' + String(enemyHp).padStart(3) + '   \u2551'
+      + '\n  \u2551                                        \u2551'
+      + '\n  \u2551   ' + youLabel.padEnd(8) + '[' + myBar + ']   ' + String(state.hp).padStart(3) + '   \u2551'
+      + '\n  \u2551                                        \u2551'
+      + '\n  \u255a\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u255d'
+      + '\n</pre>'
+      + (statusLine ? '<div class="combat-status">' + statusLine + '</div>' : '')
+      + (enemy.desc || '');
+
+    // Build choices
+    var atkLabel = L('攻擊', 'Attack');
+    if (observed) atkLabel += L(' (2x)', ' (2x)');
+    var choices = [
+      { text: atkLabel, action: function() { doAttack(); } },
+      { text: L('觀察 [敏捷]', 'Observe [AGI]'), action: function() { doObserve(); } },
+      { text: L('感應 [意志]', 'Commune [WIL]'), action: function() { doCommune(); } },
     ];
     if (onFlee) {
-      choices.push({ text: L('逃跑', 'Flee'), action: () => { state.mood = 'normal'; onFlee(); } });
+      choices.push({ text: L('逃跑', 'Flee'), action: function() { state.mood = 'normal'; onFlee(); } });
     }
     renderScene(text, choices);
   }
 
+  // ── Attack ──
   function doAttack() {
-    const dmg = rng(3, 6) + Math.floor(state.str * 1.2);
-    const enemyDmg = Math.max(0, rng(enemy.atkMin, enemy.atkMax) - Math.floor(state.agi * 0.3));
+    var baseDmg = rng(3, 6) + Math.floor(state.str * 1.2);
+    var dmg = observed ? baseDmg * 2 : baseDmg;
+    var wasObserved = observed;
+    observed = false;
+    var enemyDmg = Math.max(0, rng(enemy.atkMin, enemy.atkMax) - Math.floor(state.agi * 0.3));
     enemyHp -= dmg;
 
-    let log = '<div class="combat-log combat-log-player">'
+    var log = '<div class="combat-log combat-log-player">'
       + '<span class="cl-tag cl-you">' + L('【你】', '[YOU]') + '</span> '
-      + L('揮出攻擊，造成 ' + dmg + ' 點傷害。', 'Attack! Dealt ' + dmg + ' damage.')
+      + L('揮出攻擊，造成 ' + dmg + ' 點傷害', 'Attack! Dealt ' + dmg + ' damage')
+      + (wasObserved ? ' <span class="cl-observe">' + L('（觀察加成！）', '(Observed bonus!)') + '</span>' : '')
+      + L('。', '.')
       + '</div>';
 
     if (enemyHp <= 0) {
@@ -54,7 +90,9 @@ ${enemy.desc || ''}`;
         + L('被擊敗了！', 'has been defeated!')
         + '</div>';
       state.mood = 'normal';
-      renderScene(log, [{ text: L('繼續', 'Continue'), action: () => onWin() }]);
+      var xpGain = enemy.xp || 5;
+      gainXp(xpGain);
+      renderScene(log, [{ text: L('繼續', 'Continue'), action: function() { onWin(); } }]);
       return;
     }
 
@@ -67,60 +105,109 @@ ${enemy.desc || ''}`;
       + '</div>';
 
     if (state.hp <= 0) return;
-
-    renderScene(log, [{ text: L('繼續戰鬥', 'Continue fighting'), action: () => combatRound() }]);
+    renderScene(log, [{ text: L('繼續戰鬥', 'Continue fighting'), action: function() { combatRound(); } }]);
   }
 
-  function doDodge() {
-    const dodgeRoll = rng(1, 10) + state.agi;
-    let log;
-    if (dodgeRoll >= 10) {
+  // ── Observe ──
+  function doObserve() {
+    var roll = rng(1, 6) + state.agi;
+    var dc = 7;
+    var log;
+
+    if (roll >= dc) {
+      observed = true;
       log = '<div class="combat-log combat-log-player">'
         + '<span class="cl-tag cl-you">' + L('【你】', '[YOU]') + '</span> '
-        + L('靈巧地閃開了攻擊！', 'Nimbly dodged the attack!')
+        + L('仔細觀察了 ' + eName + ' 的動作模式，發現了破綻！', 'Carefully studied ' + eName + '\'s patterns — found an opening!')
+        + ' <span class="cl-observe">' + L('下次攻擊 2 倍傷害', 'Next attack deals 2x damage') + '</span>'
         + '</div>'
         + '<div class="combat-log combat-log-enemy">'
         + '<span class="cl-tag cl-enemy">' + L('【' + eName + '】', '[' + eName + ']') + '</span> '
-        + L('攻擊落空。', 'Attack missed.')
+        + L('趁你觀察的間隙發起攻擊——但你及時閃開了。', 'Lunges at you during observation — but you dodge in time.')
         + '</div>';
     } else {
-      const enemyDmg = Math.max(1, rng(enemy.atkMin, enemy.atkMax) - state.agi);
+      var enemyDmg = Math.max(1, rng(enemy.atkMin, enemy.atkMax));
       changeHp(-enemyDmg);
-      var petriAmt = enemy.petriDmg ? Math.floor(enemy.petriDmg / 2) : 0;
-      if (petriAmt) changePetri(petriAmt);
       log = '<div class="combat-log combat-log-player">'
         + '<span class="cl-tag cl-you">' + L('【你】', '[YOU]') + '</span> '
-        + L('閃避失敗！', 'Dodge failed!')
+        + L('嘗試觀察，但沒能看出端倪……', 'Tried to observe, but couldn\'t find an opening...')
         + '</div>'
         + '<div class="combat-log combat-log-enemy">'
         + '<span class="cl-tag cl-enemy">' + L('【' + eName + '】', '[' + eName + ']') + '</span> '
-        + L('命中！造成 ' + enemyDmg + ' 點傷害。', 'Hit! ' + enemyDmg + ' damage.')
-        + (petriAmt ? ' <span class="cl-petri">' + L('石化 +' + petriAmt + '%', 'Petri +' + petriAmt + '%') + '</span>' : '')
+        + L('趁隙攻擊！造成 ' + enemyDmg + ' 點傷害。', 'Seizes the opening! ' + enemyDmg + ' damage.')
         + '</div>';
       if (state.hp <= 0) return;
     }
-    renderScene(log, [{ text: L('繼續戰鬥', 'Continue fighting'), action: () => combatRound() }]);
+    renderScene(log, [{ text: L('繼續戰鬥', 'Continue fighting'), action: function() { combatRound(); } }]);
   }
 
-  function doDefend() {
-    const block = Math.floor(state.str * 0.8) + rng(2, 5);
-    const enemyDmg = Math.max(0, rng(enemy.atkMin, enemy.atkMax) - block);
-    changeHp(-enemyDmg);
-    const petriReduce = state.wil >= 7 ? 2 : 0;
-    if (petriReduce) changePetri(-petriReduce);
+  // ── Commune ──
+  function doCommune() {
+    var roll = rng(1, 6) + state.wil;
+    var dc = 8;
+    var log;
 
-    let log = '<div class="combat-log combat-log-player">'
-      + '<span class="cl-tag cl-you">' + L('【你】', '[YOU]') + '</span> '
-      + L('舉起防禦，', 'Raised guard, ')
-      + (petriReduce ? L('意志集中！石化 -' + petriReduce + '%', 'Focus! Petri -' + petriReduce + '%') : L('嚴陣以待。', 'standing firm.'))
-      + '</div>'
-      + '<div class="combat-log combat-log-enemy">'
-      + '<span class="cl-tag cl-enemy">' + L('【' + eName + '】', '[' + eName + ']') + '</span> '
-      + L('攻擊被擋下，僅造成 ' + enemyDmg + ' 點傷害。', 'Attack blocked! Only ' + enemyDmg + ' damage.')
-      + '</div>';
+    if (roll >= dc) {
+      empathy++;
+      var txt = communeTexts[Math.min(empathy - 1, communeTexts.length - 1)];
+      log = '<div class="combat-log combat-log-commune">'
+        + '<span class="cl-tag cl-commune">' + L('【感應】', '[COMMUNE]') + '</span> '
+        + L(txt.zh, txt.en)
+        + ' <span class="cl-empathy">' + L('共鳴 ' + empathy + '/' + empathyGoal, 'Empathy ' + empathy + '/' + empathyGoal) + '</span>'
+        + '</div>';
+
+      if (empathy >= empathyGoal) {
+        // Spare the enemy — peaceful resolution
+        var spareText = enemy.spareText
+          || { zh: eName + ' 的眼中閃過一絲清明，它緩緩後退，消失在陰影中……', en: eName + '\'s eyes flicker with clarity. It slowly backs away into the shadows...' };
+        log += '<div class="combat-log combat-log-commune">'
+          + '<span class="cl-tag cl-commune">' + L('【共鳴】', '[RESONANCE]') + '</span> '
+          + L(spareText.zh, spareText.en)
+          + '</div>';
+        state.mood = 'normal';
+        // Bonus: more XP, petri reduction
+        var xpGain = Math.floor((enemy.xp || 5) * 1.5);
+        gainXp(xpGain);
+        var petriHeal = Math.min(state.petri, 3);
+        if (petriHeal > 0) changePetri(-petriHeal);
+        log += '<div class="combat-log combat-log-commune">'
+          + '<span class="cl-empathy">' + L('和平解決！經驗 +' + xpGain + (petriHeal ? '  石化 -' + petriHeal + '%' : ''), 'Peaceful resolution! EXP +' + xpGain + (petriHeal ? '  Petri -' + petriHeal + '%' : '')) + '</span>'
+          + '</div>';
+        renderScene(log, [{ text: L('繼續', 'Continue'), action: function() { onWin(); } }]);
+        return;
+      }
+    } else {
+      var txt = communeFail[rng(0, communeFail.length - 1)];
+      var petriPenalty = Math.max(1, Math.floor((enemy.petriDmg || 1) * 1.5));
+      changePetri(petriPenalty);
+      log = '<div class="combat-log combat-log-commune">'
+        + '<span class="cl-tag cl-commune">' + L('【感應】', '[COMMUNE]') + '</span> '
+        + L(txt.zh, txt.en)
+        + ' <span class="cl-petri">' + L('石化 +' + petriPenalty + '%', 'Petri +' + petriPenalty + '%') + '</span>'
+        + '</div>';
+    }
+
+    // Enemy still attacks (lighter if empathy > 0)
+    var atkReduction = empathy > 0 ? Math.floor(empathy * 1.5) : 0;
+    var enemyDmg = Math.max(0, rng(enemy.atkMin, enemy.atkMax) - atkReduction);
+    if (enemyDmg > 0) {
+      changeHp(-enemyDmg);
+      log += '<div class="combat-log combat-log-enemy">'
+        + '<span class="cl-tag cl-enemy">' + L('【' + eName + '】', '[' + eName + ']') + '</span> '
+        + (empathy > 0
+          ? L('猶豫地攻擊，造成 ' + enemyDmg + ' 點傷害。', 'Hesitantly attacks, dealing ' + enemyDmg + ' damage.')
+          : L('攻擊！造成 ' + enemyDmg + ' 點傷害。', 'Attacks! ' + enemyDmg + ' damage.'))
+        + '</div>';
+    } else if (empathy > 0) {
+      log += '<div class="combat-log combat-log-enemy">'
+        + '<span class="cl-tag cl-enemy">' + L('【' + eName + '】', '[' + eName + ']') + '</span> '
+        + L('停下了攻擊的動作，似乎在掙扎……', 'Stops its attack, as if struggling within...')
+        + '</div>';
+    }
 
     if (state.hp <= 0) return;
-    renderScene(log, [{ text: L('繼續戰鬥', 'Continue fighting'), action: () => combatRound() }]);
+    if (state.petri >= 100) return;
+    renderScene(log, [{ text: L('繼續戰鬥', 'Continue fighting'), action: function() { combatRound(); } }]);
   }
 
   combatRound();

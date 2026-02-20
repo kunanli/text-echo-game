@@ -7,7 +7,7 @@ const state = {
   str: 5, agi: 5, wil: 5,
   xp: 0, level: 1, xpToNext: 20,
   inventory: [],
-  region: 0,         // 0=祭獻坑, 1=石脈迴廊, 2=灰燼神殿, 3=裂隙天穹
+  region: 0,         // 0=祭獻坑, 1=石脈迴廊, 2=大採石場, 3=河城渡口
   node: 'start',
   flags: {},
   deathCount: 0,
@@ -28,8 +28,8 @@ const TAG_EN = {
   '意志':'WILL','傷害':'DMG',
 };
 
-const REGIONS_ZH = ['祭獻坑','石脈迴廊','灰燼神殿','裂隙天穹'];
-const REGIONS_EN = ['Sacrificial Pit','Vein Corridor','Ash Sanctum','Rift Canopy'];
+const REGIONS_ZH = ['祭獻坑','石脈迴廊','大採石場','河城渡口'];
+const REGIONS_EN = ['Sacrificial Pit','Vein Corridor','Great Quarry','River City Ferry'];
 function getRegion(i) { return state.lang === 'en' ? REGIONS_EN[i] : REGIONS_ZH[i]; }
 
 function applyLang() {

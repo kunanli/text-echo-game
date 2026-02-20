@@ -54,7 +54,8 @@ registerNode('r1_start', () => {
     { tag: '感知', tagColor: 'tag-sense', text: '牆壁上鑲嵌著發光的石化礦脈，散發出幽藍冷光。', textEn: 'Glowing petrification ore veins are embedded in the walls, casting cold blue light.', delay: 2000 },
     { tag: '石化', tagColor: 'tag-petri', text: '空氣中的石化氣息比坑底更濃。', textEn: 'The petrification in the air is denser than in the pit below.', delay: 1800 },
     { tag: '感知', tagColor: 'tag-sense', text: '遠處傳來金屬碰撞的迴音。', textEn: 'The echo of clanging metal resonates in the distance.', delay: 2200 },
-    { tag: '情報', tagColor: 'tag-info', text: '這裡曾經是一座礦坑——用來開採石化礦脈的地下設施。', textEn: 'This was once a mine — an underground facility for extracting petrification ore.', delay: 2500 },
+    { tag: '情報', tagColor: 'tag-info', text: '這裡曾經是一座礦坑——地表文明崩潰後，人類在地下開採石化礦脈的設施。', textEn: 'This was once a mine — after the surface collapsed, humans extracted petrification ore underground.', delay: 2500 },
+    { tag: '情報', tagColor: 'tag-info', text: '正是這些礦工挖穿了古老的封印，釋放出石化瘟疫……', textEn: 'It was these miners who breached the ancient seal, unleashing the Stone Plague...', delay: 2800 },
   ], [
     { text: '觀察迴廊', textEn: 'Survey the corridor', action: () => loadNode('r1_look') },
   ], { label: L('進入石脈迴廊', 'Entering Vein Corridor') });
@@ -229,7 +230,7 @@ registerNode('r1_forge_search', () => {
     { tag: '探索', tagColor: 'tag-explore', text: '你仔細翻找鍛造間的各個角落。', textEn: 'You carefully search every corner of the forge.', delay: 2000 },
     { tag: '發現', tagColor: 'tag-item', text: '礦石堆底下藏著一本被灰塵覆蓋的手札。', textEn: 'Beneath the ore pile, a dust-covered journal.', delay: 2200 },
     { tag: '情報', tagColor: 'tag-info', html: '手札上寫道：<b>「守衛的核心在胸口——只有鈍器才能擊碎它。」</b>', htmlEn: 'The journal reads: <b>"The guardian\'s core is in its chest — only blunt weapons can shatter it."</b>', delay: 3000, effect: () => { state.flags.r1GuardHint = true; } },
-    { tag: '情報', tagColor: 'tag-info', text: '後面還寫著：「東面的守衛已經石化了……但它仍在巡邏。」', textEn: 'It continues: "The eastern guardian has petrified... but it still patrols."', delay: 2800 },
+    { tag: '情報', tagColor: 'tag-info', text: '後面還寫著：「東面的守衛已經石化了……但它仍在巡邏。瘟疫驅動著它，就像驅動那些石礦工一樣。」', textEn: 'It continues: "The eastern guardian has petrified... but it still patrols. The plague drives it, just as it drives the Stone Miners."', delay: 3200 },
     { tag: '發現', tagColor: 'tag-item', html: '手札的夾頁中掉出了一張<b>迴廊地圖</b>。', htmlEn: 'A <b>Corridor Map</b> slips out from the journal\'s pages.', delay: 2000, effect: () => addItem(L('迴廊地圖', 'Corridor Map')) },
     { tag: '情報', tagColor: 'tag-info', text: '地圖上標註了一條通往更深處的路線——需要穿過守衛所在的區域。', textEn: 'The map marks a route deeper — through the guardian\'s area.', delay: 2500 },
   ], [
@@ -507,9 +508,9 @@ registerNode('r1_quarters', () => {
   └──────────────────────────────────────┘
 </pre>`, delay: 800 },
     { tag: '探索', tagColor: 'tag-explore', text: '這是礦工們的宿舍。八張床位排列整齊。', textEn: 'The miners\' quarters. Eight bunks in neat rows.', delay: 2000 },
-    { tag: '感知', tagColor: 'tag-sense', text: '其中四張床上……還躺著人。不——是完全石化的礦工。', textEn: 'Four of the bunks still have occupants. No — fully petrified miners.', delay: 2500 },
-    { tag: '石化', tagColor: 'tag-petri', text: '他們被石化的姿態栩栩如生——有的在睡夢中，有的在掙扎。', textEn: 'Their petrified poses are lifelike — some sleeping, some struggling.', delay: 2800 },
-    { tag: '情報', tagColor: 'tag-info', text: '石化發生在他們毫無防備的時候。', textEn: 'The petrification struck when they were defenseless.', delay: 2200 },
+    { tag: '感知', tagColor: 'tag-sense', text: '其中四張床上……還躺著人。不——是「石礦工」。完全石化的軀體。', textEn: 'Four of the bunks still have occupants. No — "Stone Miners." Fully petrified husks.', delay: 2500 },
+    { tag: '石化', tagColor: 'tag-petri', text: '他們的姿態栩栩如生——有的在睡夢中，有的在掙扎。肉體鈣化、記憶侵蝕。', textEn: 'Their poses are lifelike — some sleeping, some struggling. Flesh calcified, memories eroded.', delay: 2800 },
+    { tag: '情報', tagColor: 'tag-info', text: '石化瘟疫在他們毫無防備時發作。感染者成為石礦工——被蜂巢思維驅動，永遠困在挖掘的動作中。', textEn: 'The Stone Plague struck when they were defenseless. The infected become Stone Miners — driven by a hive mind, forever trapped in the motion of digging.', delay: 3200 },
   ];
   if (!state.flags.r1QuartersSearched) {
     steps.push({ tag: '探索', tagColor: 'tag-explore', text: '你檢查儲物櫃——大部分已經鏽蝕打不開了。', textEn: 'You check the lockers — most are rusted shut.', delay: 2000 });
@@ -537,12 +538,12 @@ registerNode('r1_rest', () => {
     { tag: '行動', tagColor: 'tag-move', text: '你找了一張沒有石化礦工的床鋪，小心翼翼地躺了下來。', textEn: 'You find an empty bunk and carefully lie down.', delay: 2000 },
     { tag: '感知', tagColor: 'tag-sense', text: '床墊硬邦邦的，但比起石頭地面已經好太多了。', textEn: 'The mattress is stiff, but far better than the stone floor.', delay: 2500 },
     { tag: '環境', tagColor: 'tag-system', text: '……', textEn: '...', delay: 3000 },
-    { tag: '記憶', tagColor: 'tag-system', text: '你做了一個夢。夢裡，你在一座地下城市的街道上行走。', textEn: 'You dream. Walking through the streets of an underground city.', delay: 3000 },
-    { tag: '記憶', tagColor: 'tag-system', text: '街道兩旁是發光的礦脈——和這裡一模一樣，但更加繁華。', textEn: 'Glowing veins line the streets — just like here, but thriving.', delay: 3000 },
-    { tag: '記憶', tagColor: 'tag-system', text: '人們穿梭其間，工匠、商人、士兵……石化還沒有蔓延。', textEn: 'People bustle about — artisans, merchants, soldiers... before the petrification spread.', delay: 3000 },
-    { tag: '記憶', tagColor: 'tag-system', html: '有人叫住了你：<b>「喂！你也是新來的探礦者嗎？」</b>', htmlEn: 'Someone calls out: <b>"Hey! Are you one of the new prospectors?"</b>', delay: 3000 },
-    { tag: '感知', tagColor: 'tag-sense', text: '你猛地醒來。石化礦工無聲地注視著你。', textEn: 'You jolt awake. Petrified miners stare silently.', delay: 2500 },
-    { tag: '恢復', tagColor: 'tag-explore', text: '身體恢復了不少，但那個夢……那是你的記憶嗎？', textEn: 'Your body has recovered well, but that dream... was it a memory?', delay: 2500 },
+    { tag: '記憶', tagColor: 'tag-system', text: '你做了一個夢。夢裡，你站在一個廣闊的地下洞穴中，頭頂是發光的礦脈。', textEn: 'You dream. Standing in a vast underground cavern, glowing ore veins overhead.', delay: 3000 },
+    { tag: '記憶', tagColor: 'tag-system', text: '人們在四周忙碌著——這是地表崩潰後建立的避難所，一座地底城市。', textEn: 'People bustle around — a shelter built after the surface collapsed, an underground city.', delay: 3000 },
+    { tag: '記憶', tagColor: 'tag-system', text: '礦工們推著礦車進入深處，開採那些發光的石頭。他們還不知道自己在挖掘什麼。', textEn: 'Miners push carts into the depths, extracting glowing stones. They don\'t yet know what they\'re unearthing.', delay: 3200 },
+    { tag: '記憶', tagColor: 'tag-system', html: '一個老婦人拉住你的手：<b>「孩子，別去礦坑那邊。那裡的空氣不對勁。」</b>', htmlEn: 'An old woman grabs your hand: <b>"Child, don\'t go near the mines. Something\'s wrong with the air there."</b>', delay: 3000 },
+    { tag: '感知', tagColor: 'tag-sense', text: '你猛地醒來。石礦工們無聲地注視著你——永遠凝固在挖掘的姿態中。', textEn: 'You jolt awake. Stone Miners stare silently — frozen forever in the posture of digging.', delay: 2500 },
+    { tag: '恢復', tagColor: 'tag-explore', text: '身體恢復了不少，但那個夢……那是你的記憶，還是這些礦工的？', textEn: 'Your body has recovered well, but that dream... was it your memory, or theirs?', delay: 2500 },
   ], [
     { text: '站起來繼續前進', textEn: 'Get up and move on', action: () => {
       changeHp(15);
@@ -563,7 +564,7 @@ registerNode('r1_gate', () => {
   ░    ╔═══════════════════════════════╗    ░
   ░    ║▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓║    ░
   ░    ║▓                             ▓║    ░
-  ░    ║▓    灰   燼   神   殿       ▓║    ░
+  ░    ║▓    大   採   石   場       ▓║    ░
   ░    ║▓                             ▓║    ░
   ░    ║▓    ─ ─ ─ ─ ─ ─ ─ ─ ─     ▓║    ░
   ░    ║▓                             ▓║    ░
@@ -583,7 +584,7 @@ registerNode('r1_gate', () => {
   ░    ╔═══════════════════════════════╗    ░
   ░    ║▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓║    ░
   ░    ║▓                             ▓║    ░
-  ░    ║▓    A S H    S A N C T U M   ▓║    ░
+  ░    ║▓    G R E A T  Q U A R R Y   ▓║    ░
   ░    ║▓                             ▓║    ░
   ░    ║▓    ─ ─ ─ ─ ─ ─ ─ ─ ─     ▓║    ░
   ░    ║▓                             ▓║    ░
@@ -600,7 +601,7 @@ registerNode('r1_gate', () => {
 </pre>`, delay: 800 },
     { tag: '探索', tagColor: 'tag-explore', text: '鐵軌的盡頭是一扇巨大的金屬門。', textEn: 'The rails end at a massive metal door.', delay: 2000 },
     { tag: '感知', tagColor: 'tag-sense', text: '門上刻著精細的紋飾——和祭獻坑的石門完全不同，這是人工精密鑄造的。', textEn: 'Intricate engravings cover the door — unlike the pit\'s crude stone gate, this was precision-cast.', delay: 2800 },
-    { tag: '情報', tagColor: 'tag-info', html: '門上的文字：<b>「灰燼神殿——唯有持核者方可進入」</b>', htmlEn: 'Inscription: <b>"Ash Sanctum — Only the core-bearer may enter"</b>', delay: 2500 },
+    { tag: '情報', tagColor: 'tag-info', html: '門上的文字：<b>「大採石場——唯有持核者方可進入」</b>', htmlEn: 'Inscription: <b>"Great Quarry — Only the core-bearer may enter"</b>', delay: 2500 },
     { tag: '探索', tagColor: 'tag-explore', text: '門的中央有一個菱形凹槽——和守衛核心石的形狀一模一樣。', textEn: 'A diamond-shaped slot at the center — the exact shape of the Guardian Core Stone.', delay: 2200 },
   ], (function() {
     var c = [];
@@ -623,10 +624,10 @@ registerNode('r1_gate_open', () => {
     { tag: '環境', tagColor: 'tag-system', text: '核心石亮起耀眼的光芒——門上的紋飾依次點亮。', textEn: 'The core blazes with light — engravings ignite one by one.', delay: 2200 },
     { tag: '環境', tagColor: 'tag-system', text: '沉重的金屬碰撞聲迴盪在走廊中——', textEn: 'Heavy metallic clangs echo through the corridor —', delay: 2000 },
     { tag: '環境', tagColor: 'tag-system', text: '大門開始緩緩打開。', textEn: 'The great door slowly opens.', delay: 2000 },
-    { tag: '感知', tagColor: 'tag-sense', text: '門後是一條向上的階梯，熱浪撲面而來。', textEn: 'Beyond the door, stairs ascend. A wave of heat washes over you.', delay: 2500 },
-    { tag: '感知', tagColor: 'tag-sense', text: '空氣中混雜著灰燼的味道——和某種……香料的氣息？', textEn: 'The air carries the scent of ash — and something... incense?', delay: 2500 },
-    { tag: '情報', tagColor: 'tag-info', html: '前方是第三層——<b>灰燼神殿</b>。', htmlEn: 'Ahead lies the third floor — the <b>Ash Sanctum</b>.', delay: 2000 },
-    { tag: '系統', tagColor: 'tag-system', html: '<i>（第三層 — 灰燼神殿的冒險將在後續更新中展開……）</i>', htmlEn: '<i>(Floor 3 — Ash Sanctum adventures coming in a future update...)</i>', delay: 1500 },
+    { tag: '感知', tagColor: 'tag-sense', text: '門後是一條向上的階梯，乾燥的風撲面而來。', textEn: 'Beyond the door, stairs ascend. A dry wind washes over you.', delay: 2500 },
+    { tag: '感知', tagColor: 'tag-sense', text: '空氣中混雜著碎石和鏽鐵的味道——前方似乎是一個巨大的開闊空間。', textEn: 'The air carries the scent of crushed stone and rusted iron — a vast open space lies ahead.', delay: 2500 },
+    { tag: '情報', tagColor: 'tag-info', html: '前方是第三層——<b>大採石場</b>。戰場遺跡與石化戰爭機械沉睡其中。', htmlEn: 'Ahead lies the third floor — the <b>Great Quarry</b>. Battlefield ruins and petrified war machines slumber within.', delay: 2500 },
+    { tag: '系統', tagColor: 'tag-system', html: '<i>（第三層 — 大採石場的冒險將在後續更新中展開……）</i>', htmlEn: '<i>(Floor 3 — Great Quarry adventures coming in a future update...)</i>', delay: 1500 },
   ], [
     { text: '在門口休息，準備下一段旅程', textEn: 'Rest at the gate, prepare for the next journey', action: () => {
       changeHp(20);

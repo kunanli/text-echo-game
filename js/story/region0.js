@@ -72,9 +72,10 @@ registerNode('r0_start', () => {
     { tag: '警告', tagColor: 'tag-warn', html: '你的四肢僵硬——左手的指尖已經泛灰，隱隱有<b>石化</b>的紋路蔓延。', htmlEn: 'Your limbs are stiff — the fingertips of your left hand have turned grey, with <b>petrification</b> patterns spreading.', delay: 2800 },
     { tag: '感知', tagColor: 'tag-sense', text: '頭頂上方，遙遠的裂縫透出一絲微光。', textEn: 'Far above, a faint gleam seeps through a distant crack.', delay: 2500 },
     { tag: '情報', tagColor: 'tag-info', html: '你被扔進了<b>祭獻坑</b>——地下世界最深處的垃圾場。', htmlEn: 'You were thrown into the <b>Sacrificial Pit</b> — the deepest dumping ground of the underworld.', delay: 2800 },
-    { tag: '情報', tagColor: 'tag-info', text: '被石化詛咒侵蝕、不再有利用價值的人，都會被丟到這裡。', textEn: 'Those consumed by the petrification curse, no longer of use, are cast down here.', delay: 2500 },
-    { tag: '環境', tagColor: 'tag-system', text: '遠處傳來石塊掉落的聲音。', textEn: 'The sound of falling stones echoes in the distance.', delay: 2200 },
-    { tag: '決意', tagColor: 'tag-info', text: '你知道——你必須向上攀升。', textEn: 'You know — you must climb upward.', delay: 2000 },
+    { tag: '情報', tagColor: 'tag-info', text: '被石化瘟疫感染、不再有利用價值的人，都會被丟到這裡。', textEn: 'Those consumed by the Stone Plague, no longer of use, are cast down here.', delay: 2500 },
+    { tag: '情報', tagColor: 'tag-info', text: '自從礦工們挖穿了地底的封印，這場瘟疫就再也沒有停過。', textEn: 'Ever since the miners breached the seal deep underground, the plague has never stopped.', delay: 2800 },
+    { tag: '環境', tagColor: 'tag-system', text: '遠處傳來石塊掉落的聲音。不——是挖掘聲。某些東西仍在無休止地鑿穿岩壁。', textEn: 'The sound of falling stones echoes in the distance. No — digging. Something still tunnels endlessly through rock.', delay: 2800 },
+    { tag: '決意', tagColor: 'tag-info', text: '你知道——你必須向上攀升。大上升。', textEn: 'You know — you must climb upward. The Great Ascent.', delay: 2000 },
   ], [
     { text: '檢查自己的身體', textEn: 'Examine your body', action: () => loadNode('r0_body') },
     { text: '觀察周圍環境', textEn: 'Survey your surroundings', action: () => loadNode('r0_look') },
@@ -134,7 +135,8 @@ registerNode('r0_body', () => {
     { tag: '石化', tagColor: 'tag-petri', text: '那股冰涼的麻痺感正在緩慢擴散……', textEn: 'That cold, numbing sensation is slowly expanding...', delay: 2500 },
     { tag: '感知', tagColor: 'tag-sense', text: '你的身體還算結實，也許是最近才被丟下來的。', textEn: 'Your body is still sturdy — you were probably thrown down recently.', delay: 2500 },
     { tag: '記憶', tagColor: 'tag-system', text: '記憶一片模糊……', textEn: 'Memories are hazy...', delay: 3000 },
-    { tag: '記憶', tagColor: 'tag-system', text: '唯一記得的，是墜落前那些穿著灰袍的祭司，和他們面無表情的臉。', textEn: 'The only memory — grey-robed priests before the fall, their expressionless faces.', delay: 2500 },
+    { tag: '記憶', tagColor: 'tag-system', text: '唯一記得的，是墜落前那些穿著灰袍的長老，和他們面無表情的臉。', textEn: 'The only memory — grey-robed elders before the fall, their expressionless faces.', delay: 2500 },
+    { tag: '記憶', tagColor: 'tag-system', text: '「爐灶少女」……這個詞從腦海深處浮起，像刀一樣刺痛。', textEn: '"Hearth-Maiden"... the word surfaces from deep within, sharp as a blade.', delay: 2800 },
   ], [
     { text: '嘗試活動關節，恢復身體機能', textEn: 'Stretch your joints to restore mobility', action: () => {
       changeStat('agi', 1);
@@ -336,11 +338,11 @@ registerNode('r0_statues', () => {
 </pre>`, delay: 800 },
     { tag: '移動', tagColor: 'tag-move', text: '你走向西側那些蜷縮在角落的石化人形。', textEn: 'You approach the petrified figures huddled in the western corner.', delay: 2000 },
     { tag: '探索', tagColor: 'tag-explore', text: '他們至少有四個人。全身已經完全化為灰白色的石頭。', textEn: 'At least four of them. Their entire bodies have turned to grey-white stone.', delay: 2500 },
-    { tag: '感知', tagColor: 'tag-sense', text: '他們的表情被永遠凝固了——恐懼、絕望、痛苦……', textEn: 'Their expressions are frozen forever — fear, despair, agony...', delay: 2800 },
+    { tag: '感知', tagColor: 'tag-sense', text: '他們的表情被永遠凝固了——恐懼、絕望、痛苦……石化瘟疫取代了他們的生命。', textEn: 'Their expressions are frozen forever — fear, despair, agony... The Stone Plague replaced their lives.', delay: 2800 },
     { tag: '探索', tagColor: 'tag-explore', text: '其中一個人形雙手緊緊抱住自己的頭，嘴巴大張彷彿在無聲地尖叫。', textEn: 'One figure clutches their head with both hands, mouth agape in a silent scream.', delay: 3000 },
     { tag: '感知', tagColor: 'tag-sense', text: '另一個人伸出手，手指指向北面岩壁——彷彿死前還在指著某個方向。', textEn: 'Another reaches out, finger pointing toward the north wall — as if gesturing at something with their last breath.', delay: 2800 },
     { tag: '探索', tagColor: 'tag-explore', text: '你蹲下來仔細查看……在一個人形的腳邊，地上刻著歪歪斜斜的文字。', textEn: 'You crouch down for a closer look... at one figure\'s feet, crooked words are scratched into the ground.', delay: 2500 },
-    { tag: '情報', tagColor: 'tag-info', html: '「<b>水能……延緩……石化……</b>」——後面的字跡已經模糊不清。', htmlEn: '"<b>Water can... slow... petrification...</b>" — the rest is illegible.', delay: 2500 },
+    { tag: '情報', tagColor: 'tag-info', html: '「<b>水能……延緩……石瘟……</b>」——後面的字跡已經模糊不清。', htmlEn: '"<b>Water can... slow... the Plague...</b>" — the rest is illegible.', delay: 2500 },
   ];
   if (!state.flags.statuesSearched) {
     steps.push({ tag: '發現', tagColor: 'tag-item', text: '在人形堆的縫隙中，你發現了一小塊布片包裹的東西。', textEn: 'In the gap between the figures, you find something wrapped in a scrap of cloth.', delay: 2000 });
@@ -374,14 +376,14 @@ registerNode('r0_whisper', () => {
         autoExplore([
           { tag: '大成功', tagColor: 'tag-info', text: '你閉上眼睛——精神力如同烈焰般爆發，呢喃聲瞬間被粉碎！', textEn: 'You close your eyes — your willpower erupts like fire, shattering the murmur instantly!', delay: 2000 },
           { tag: '意志', tagColor: 'tag-info', text: '不僅如此，石化的侵蝕竟然大幅消退了。', textEn: 'Moreover, the petrification recedes significantly.', delay: 2500 },
-          { tag: '記憶', tagColor: 'tag-system', html: '一段清晰的記憶浮現——<b>你曾經是一名探險者</b>，而且你並不孤單。', htmlEn: 'A vivid memory surfaces — <b>you were once an explorer</b>, and you were not alone.', delay: 2800 },
+          { tag: '記憶', tagColor: 'tag-system', html: '一段清晰的記憶浮現——<b>你來自一座被石化瘟疫緩慢吞噬的小鎮</b>，而你是少數對瘟疫有抗性的人之一。', htmlEn: 'A vivid memory surfaces — <b>you came from a town slowly consumed by the Stone Plague</b>, and you were one of the few with resistance.', delay: 3200 },
         ], [{ text: '返回', textEn: 'Return', action: () => loadNode('r0_look') }]);
       } else if (r === 'pass') {
         changePetri(-2);
         autoExplore([
           { tag: '意志', tagColor: 'tag-info', text: '你閉上眼睛，集中精神——那個聲音被你強行推了回去。', textEn: 'You close your eyes, focusing — you force the voice back.', delay: 2000 },
           { tag: '意志', tagColor: 'tag-info', text: '你的意識變得更加清明。你不屬於這些石像。你還活著。', textEn: 'Your mind grows clearer. You are not one of these statues. You are alive.', delay: 2500 },
-          { tag: '記憶', tagColor: 'tag-system', html: '在精神集中的瞬間，一段模糊的記憶閃過——<b>你曾經是一名探險者</b>。', htmlEn: 'In that moment of focus, a hazy memory surfaces — <b>you were once an explorer</b>.', delay: 2800 },
+          { tag: '記憶', tagColor: 'tag-system', html: '在精神集中的瞬間，一段模糊的記憶閃過——<b>你的身體對石化瘟疫有抗性</b>，但並非完全免疫。', htmlEn: 'In that moment of focus, a hazy memory surfaces — <b>your body has resistance to the Stone Plague</b>, but not full immunity.', delay: 2800 },
         ], [{ text: '返回', textEn: 'Return', action: () => loadNode('r0_look') }]);
       } else {
         changePetri(5);
@@ -437,10 +439,10 @@ registerNode('r0_ritual', () => {
 </pre>`, delay: 800 },
     { tag: '探索', tagColor: 'tag-explore', text: '在石像群的後方，你發現了一片被刻意清理過的空地。', textEn: 'Behind the statues, you find a patch of deliberately cleared ground.', delay: 2000 },
     { tag: '感知', tagColor: 'tag-sense', text: '地面上刻著複雜的幾何圖案——五芒星形的溝槽中殘留著暗紅色的痕跡。', textEn: 'Complex geometric patterns are carved into the ground — pentagram grooves stained with dark red residue.', delay: 2800 },
-    { tag: '情報', tagColor: 'tag-info', text: '這是一個祭壇。用來進行石化獻祭的祭壇。', textEn: 'This is an altar. Used for petrification sacrifices.', delay: 2500 },
+    { tag: '情報', tagColor: 'tag-info', text: '這是一個祭壇。長老們用來進行「爐灶少女」獻祭的祭壇。', textEn: 'This is an altar. Used by the elders for the "Hearth-Maiden" sacrifice.', delay: 2500 },
     { tag: '探索', tagColor: 'tag-explore', text: '五芒星的五個頂點各放著一塊石化結晶，暗淡但尚有微光。', textEn: 'At each of the five points sits a petrification crystal, dim but still faintly glowing.', delay: 2500 },
-    { tag: '情報', tagColor: 'tag-info', html: '中央有一塊石板，上面刻著古老的文字：<b>「以石化為養，以血肉為種，收穫永恆之驅殼。」</b>', htmlEn: 'A stone slab at the center bears ancient text: <b>"Nourished by petrification, seeded with flesh, to harvest an eternal vessel."</b>', delay: 3200 },
-    { tag: '記憶', tagColor: 'tag-system', text: '你的腦海中隱約浮現出灰袍祭司們圍著你吟誦的場景……', textEn: 'A faint vision surfaces — grey-robed priests chanting around you...', delay: 3000 },
+    { tag: '情報', tagColor: 'tag-info', html: '中央有一塊石板，上面刻著古老的文字：<b>「以石化為養，以血肉為種——獻爐灶之女，平息石瘟之怒。」</b>', htmlEn: 'A stone slab at the center bears ancient text: <b>"Nourished by petrification, seeded with flesh — offer the Hearth-Maiden to quell the Stone Plague\'s wrath."</b>', delay: 3200 },
+    { tag: '記憶', tagColor: 'tag-system', text: '你的腦海中隱約浮現出灰袍長老們圍著你吟誦的場景……他們試圖以你為祭品平息瘟疫。', textEn: 'A faint vision surfaces — grey-robed elders chanting around you... They tried to sacrifice you to appease the plague.', delay: 3500 },
     { tag: '感知', tagColor: 'tag-sense', text: '空氣中瀰漫著不自然的寒意。離這裡越近，你的左手就越疼。', textEn: 'An unnatural chill pervades the air. The closer you get, the more your left hand aches.', delay: 2500 },
   ], [
     { text: '嘗試取走一塊石化結晶', textEn: 'Try to take a petrification crystal', action: () => {
@@ -534,10 +536,11 @@ registerNode('r0_rest', () => {
     { tag: '感知', tagColor: 'tag-sense', text: '黑暗中，你的呼吸聲格外清晰。', textEn: 'In the darkness, your breathing sounds unnervingly loud.', delay: 2500 },
     { tag: '環境', tagColor: 'tag-system', text: '……', textEn: '...', delay: 3000 },
     { tag: '記憶', tagColor: 'tag-system', text: '你閉上眼睛——碎片般的記憶開始浮現。', textEn: 'You close your eyes — fragmented memories surface.', delay: 3000 },
-    { tag: '記憶', tagColor: 'tag-system', text: '……一座城市。高聳的石塔。街道上的人們來來往往。', textEn: '...A city. Towering stone spires. People bustling through the streets.', delay: 3000 },
-    { tag: '記憶', tagColor: 'tag-system', text: '……一間小酒館。溫暖的壁爐。有人對你笑著說了什麼。', textEn: '...A small tavern. A warm hearth. Someone smiling, saying something to you.', delay: 3000 },
-    { tag: '記憶', tagColor: 'tag-system', text: '……然後是灰袍。很多灰袍。你被按在冰冷的祭壇上。', textEn: '...Then grey robes. Many grey robes. You\'re pressed against a cold altar.', delay: 3000 },
-    { tag: '記憶', tagColor: 'tag-system', text: '……他們的吟唱聲越來越大。你的身體開始僵硬。', textEn: '...Their chanting grows louder. Your body begins to stiffen.', delay: 3000 },
+    { tag: '記憶', tagColor: 'tag-system', text: '……一座小鎮。地下的小鎮。自從地表崩潰後，人們就住在這裡。', textEn: '...A small town. Underground. People have lived here since the surface collapsed.', delay: 3000 },
+    { tag: '記憶', tagColor: 'tag-system', text: '……街道先開始淹水。井水變苦了。牆壁上長出了灰色的紋路。', textEn: '...The streets flooded first. Well water turned bitter. Grey patterns grew on the walls.', delay: 3000 },
+    { tag: '記憶', tagColor: 'tag-system', text: '……鄰居的臉龐不再會動。他們沒有消失——只是停止了移動。', textEn: '...Neighbors\' faces stopped moving. They didn\'t vanish — they just... stopped.', delay: 3000 },
+    { tag: '記憶', tagColor: 'tag-system', text: '……然後是灰袍。長老們。「爐灶少女」的祭祀。你被綁在熱泉的底部。', textEn: '...Then grey robes. The elders. The "Hearth-Maiden" ritual. You were bound at the bottom of a hot spring.', delay: 3500 },
+    { tag: '記憶', tagColor: 'tag-system', text: '……他們的吟唱聲越來越大。滾燙的水淹沒了你。你的身體開始僵硬。', textEn: '...Their chanting grew louder. Scalding water engulfed you. Your body began to stiffen.', delay: 3000 },
     { tag: '記憶', tagColor: 'tag-system', text: '……墜落。無盡的墜落。', textEn: '...Falling. Endless falling.', delay: 3000 },
     { tag: '感知', tagColor: 'tag-sense', text: '你猛地睜開眼睛。冷汗浸透了後背。', textEn: 'Your eyes snap open. Cold sweat soaks your back.', delay: 2500 },
     { tag: '恢復', tagColor: 'tag-explore', text: '雖然記憶令人不安，但短暫的休息讓你的身體恢復了一些。', textEn: 'The memories are unsettling, but the brief rest has restored some strength.', delay: 2200 },

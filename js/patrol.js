@@ -8,9 +8,16 @@ var R0_MONSTERS = [
       '     ╱  ╱  ╰╯  ╲  ╲',
       '    ╱__╱  ╱╲╱╲  ╲__╲',
       '          ╰──╯',
-    ]
+    ],
+    commune: [
+      { zh: '你發出輕柔的聲音……蝙蝠的翅膀微微停頓。', en: 'You make a soft sound... the bat\'s wings pause briefly.' },
+      { zh: '它歪著頭看你，石化的眼中似乎有一絲困惑。', en: 'It tilts its head at you, a hint of confusion in its stone eyes.' },
+      { zh: '蝙蝠收起翅膀，不再攻擊，靜靜地懸掛在空中。', en: 'The bat folds its wings, hanging still in the air.' },
+    ],
+    spareText: { zh: '石化蝙蝠發出一聲細小的嗚咽，拍著翅膀飛向洞穴深處。', en: 'The bat lets out a tiny whimper and flutters away into the cave.' },
   },
   { name: '灰蘑菇怪', nameEn: 'Grey Mushroom', hp: 8, atkMin: 1, atkMax: 4, petriDmg: 0, xp: 3,
+    empathyGoal: 2,
     art: [
       '        ╭━━━━━╮',
       '      ╭╯ ◎  ◎ ╰╮',
@@ -18,7 +25,12 @@ var R0_MONSTERS = [
       '    ╰━━━┥    ┝━━━╯',
       '        │ ╱╲ │',
       '       ╱╱  ╲╲',
-    ]
+    ],
+    commune: [
+      { zh: '你蹲下身……蘑菇怪的孢子散發出溫和的光芒。', en: 'You crouch down... the mushroom\'s spores glow warmly.' },
+      { zh: '它搖了搖傘蓋，似乎在跟你打招呼。', en: 'It wobbles its cap, as if greeting you.' },
+    ],
+    spareText: { zh: '灰蘑菇怪滿意地縮回地面，留下一小撮發光的孢子。', en: 'The mushroom happily sinks back into the ground, leaving glowing spores.' },
   },
   { name: '石蜥蜴幼體', nameEn: 'Baby Stone Lizard', hp: 18, atkMin: 3, atkMax: 7, petriDmg: 2, xp: 8,
     art: [
@@ -28,16 +40,30 @@ var R0_MONSTERS = [
       '  ╱╱╲  ╱╲  ╰──╯  │',
       '    ╲╱╱  ╲╱  ╭╮╭╮╯',
       '             ╯╰╯╰',
-    ]
+    ],
+    commune: [
+      { zh: '你伸出手……幼蜥蜴警惕地後退，但沒有逃走。', en: 'You extend your hand... the baby lizard backs away but doesn\'t flee.' },
+      { zh: '它的尾巴輕輕拍打地面，像是幼獸在試探你。', en: 'Its tail taps the ground lightly, like a young creature testing you.' },
+      { zh: '石蜥蜴幼體蹭了蹭你的手指，粗糙的鱗片帶著微溫。', en: 'The baby lizard nuzzles your fingers, its rough scales faintly warm.' },
+    ],
+    spareText: { zh: '石蜥蜴幼體發出輕快的叫聲，蹦跳著跑向石縫。也許它的母親還在某處等著。', en: 'The baby lizard chirps and bounces away toward a crevice. Perhaps its mother waits somewhere.' },
   },
   { name: '石化鼠群', nameEn: 'Petrified Rat Swarm', hp: 15, atkMin: 2, atkMax: 6, petriDmg: 1, xp: 6,
+    empathyGoal: 4,
     art: [
       '    ╭╮   ╭╮   ╭╮',
       '   (°>  (°>  (°>',
       '   ╱╱╲  ╱╱╲  ╱╱╲',
       '  ╱╱  ╲╱╱  ╲╱╱  ╲',
       '  ~╯   ~╯   ~╯',
-    ]
+    ],
+    commune: [
+      { zh: '你靜靜地蹲下……幾隻老鼠停止了啃咬。', en: 'You crouch quietly... a few rats stop gnawing.' },
+      { zh: '牠們圍繞著你轉圈，似乎在嗅探你的氣息。', en: 'They circle around you, seeming to sniff your scent.' },
+      { zh: '一隻老鼠站起身，石化的眼睛裡映出你的倒影。', en: 'One rat stands up, your reflection glinting in its stone eyes.' },
+      { zh: '鼠群漸漸安靜下來，牠們不再把你當作威脅。', en: 'The swarm calms down, no longer seeing you as a threat.' },
+    ],
+    spareText: { zh: '鼠群一哄而散，消失在石縫中。臨走前，一隻老鼠叼來了什麼東西放在你腳邊。', en: 'The rats scatter into crevices. Before leaving, one drops something at your feet.' },
   },
 ];
 
@@ -50,9 +76,16 @@ var R1_MONSTERS = [
       '   ╲░░░░░░░░│',
       '    ╰━╮░░╭━╯',
       '      ╰━━╯',
-    ]
+    ],
+    commune: [
+      { zh: '你觸碰洞壁……蠕蟲停止鑽動，身體的振動傳入你掌中。', en: 'You touch the wall... the worm stops burrowing, its vibrations running through your palm.' },
+      { zh: '它的身軀緩緩環繞在你周圍，卻沒有收緊。', en: 'Its body slowly coils around you, but doesn\'t tighten.' },
+      { zh: '蠕蟲貼著石壁安靜下來，彷彿回到了某種古老的本能。', en: 'The worm settles against the wall, as if returning to some ancient instinct.' },
+    ],
+    spareText: { zh: '礦脈蠕蟲鑽入石壁，留下一條閃著礦光的隧道。', en: 'The worm burrows into the wall, leaving a tunnel that glints with ore.' },
   },
   { name: '鐵甲石蟲', nameEn: 'Ironclad Stonebug', hp: 28, atkMin: 5, atkMax: 9, petriDmg: 2, xp: 12,
+    empathyGoal: 4,
     art: [
       '     ╭══════╮',
       '    ╱ ◆ ══ ◆ ╲',
@@ -60,9 +93,17 @@ var R1_MONSTERS = [
       '   │ ▓▓▓▓▓▓▓▓ │',
       '   │══════════│',
       '    ╲╱╲╱╲╱╲╱╲╱',
-    ]
+    ],
+    commune: [
+      { zh: '你敲了敲它的甲殼……一陣沉悶的迴響。', en: 'You tap its shell... a hollow echo resonates.' },
+      { zh: '石蟲縮起身體，但甲殼縫隙間傳來微弱的呼吸聲。', en: 'The bug curls up, but faint breathing sounds come from between its plates.' },
+      { zh: '你感覺到甲殼下有一顆溫熱的心。它只是害怕。', en: 'You sense a warm heart beneath the shell. It\'s just afraid.' },
+      { zh: '鐵甲石蟲的甲殼微微張開，露出柔軟的腹部——它信任你了。', en: 'The stonebug\'s shell opens slightly, showing its soft belly — it trusts you.' },
+    ],
+    spareText: { zh: '鐵甲石蟲翻了個身，像一顆圓石般滾向暗處，發出咔嗒咔嗒的聲音。', en: 'The stonebug rolls away like a boulder, its plates clicking softly.' },
   },
   { name: '石化礦工亡魂', nameEn: 'Petrified Miner Ghost', hp: 20, atkMin: 3, atkMax: 10, petriDmg: 3, xp: 14,
+    empathyGoal: 2,
     art: [
       '      ╱▔▔▔╲',
       '     │ ● ● │',
@@ -70,9 +111,15 @@ var R1_MONSTERS = [
       '    ╱░░░░░░░╲',
       '   │ ░░╋░░░ │',
       '    ·  · ·  ·',
-    ]
+    ],
+    commune: [
+      { zh: '「……家人……還在等我嗎？」你聽見了微弱的呢喃。', en: '"...family... are they still waiting?" You hear a faint murmur.' },
+      { zh: '亡魂的輪廓逐漸清晰——那是一位年邁的礦工，眼中含著淚光。', en: 'The ghost\'s form clarifies — an elderly miner, tears in its eyes.' },
+    ],
+    spareText: { zh: '礦工亡魂向你深深鞠了一躬：「謝謝你……記得我就好。」它的身影化為光點消散。', en: 'The miner\'s ghost bows deeply: "Thank you... just remember me." Its form dissolves into light.' },
   },
   { name: '結晶蝎', nameEn: 'Crystal Scorpion', hp: 25, atkMin: 6, atkMax: 11, petriDmg: 3, xp: 15,
+    empathyGoal: 4,
     art: [
       '        ╭╮',
       '       ╱◆ ╲╮',
@@ -80,7 +127,14 @@ var R1_MONSTERS = [
       '   ╱ ╱ ◉  ◉ ╲ ╲',
       '  ╱━╱╲╱╲╱╲╱╲╱━╲',
       '  ╲╱  ╱╲  ╱╲  ╲╱',
-    ]
+    ],
+    commune: [
+      { zh: '你小心地靠近……結晶蝎舉起尾刺，但遲遲沒有攻擊。', en: 'You approach carefully... the scorpion raises its stinger but doesn\'t strike.' },
+      { zh: '你注意到它的巢穴裡有小小的結晶卵——它在保護後代。', en: 'You notice tiny crystal eggs in its nest — it\'s protecting its young.' },
+      { zh: '你緩緩後退，表示不會碰觸那些卵。蝎子放下了尾刺。', en: 'You slowly back away from the eggs. The scorpion lowers its stinger.' },
+      { zh: '結晶蝎用螯小心翼翼地碰了碰你的手——一個和平的碰觸。', en: 'The scorpion gently touches your hand with its claw — a peaceful gesture.' },
+    ],
+    spareText: { zh: '結晶蝎回到巢穴，用身體護住那些結晶卵。在牠轉身的瞬間，你看見甲殼上刻著古老的符文。', en: 'The scorpion returns to its nest, shielding the crystal eggs. As it turns, you see ancient runes etched on its shell.' },
   },
 ];
 

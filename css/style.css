@@ -146,6 +146,22 @@
   .cl-enemy { color: #e07050; }
   .cl-petri { color: #8a7acc; font-size: .85rem; }
 
+  /* Commune / Observe combat styles */
+  .story-text .combat-log-commune {
+    color: #9a8ac8;
+    border-left-color: #5a4a8a;
+  }
+  .cl-commune { color: #b09ae0; }
+  .cl-observe { color: #60b8d0; font-size: .85rem; }
+  .cl-empathy { color: #c0a0f0; font-size: .85rem; font-weight: bold; }
+  .combat-status {
+    font-family: "Courier New", Courier, monospace;
+    font-size: .78rem;
+    text-align: center;
+    padding: 2px 0 6px;
+    letter-spacing: 1px;
+  }
+
   /* ── ASCII Art ── */
   .ascii-art {
     font-family: "Courier New", Courier, monospace;
