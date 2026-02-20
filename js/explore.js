@@ -6,7 +6,9 @@
 var autoTimer = null;
 var autoClockTimer = null;
 var autoFast = false;
+var autoSkipAll = false;  // long-press: dump all remaining text instantly
 var autoRunning = false;
+var _autoResume = null;  // callback to resume loop after long-press interrupt
 var autoElapsed = 0;    // cumulative game-time in milliseconds (never resets)
 
 // Mobile pacing: slower text on small screens
@@ -152,6 +154,7 @@ function removePending() {
 function autoExplore(steps, choices, opts) {
   stopAuto();
   autoFast = false;
+  autoSkipAll = false;
   autoRunning = true;
   appendDivider();
   $choices.innerHTML = '';
@@ -194,6 +197,13 @@ function autoExplore(steps, choices, opts) {
     var step = expanded[idx];
     idx++;
 
+    // Long-press: dump all remaining text instantly (no pending, no typewriter)
+    if (autoSkipAll) {
+      renderStepInstant(step);
+      showNext();
+      return;
+    }
+
     // If user tapped, skip pending but still show step normally
     if (autoFast) {
       autoFast = false;   // reset — only skip THIS step's pending
@@ -204,10 +214,45 @@ function autoExplore(steps, choices, opts) {
     // Show pending indicator, then render the actual step after a short pause
     showPending();
     var pendingDelay = (step.art ? 400 : 600) * PACE;
+    _autoResume = function() { removePending(); renderStepInstant(step); showNext(); };
     autoTimer = setTimeout(function() {
       removePending();
       renderStep(step);
     }, pendingDelay);
+  }
+
+  // Instant render (for long-press skip-all) — no typewriter, no delays
+  function renderStepInstant(step) {
+    var line = document.createElement('div');
+    var artContent = (state.lang === 'en' && step.artEn) ? step.artEn : step.art;
+
+    if (artContent) {
+      line.innerHTML = artContent;
+      if (step.effect) { try { step.effect(); renderStatus(); } catch(e) {} }
+      $story.appendChild(line);
+    } else {
+      line.className = 'log-line';
+      var tsEl = document.createElement('span');
+      tsEl.className = 'log-ts';
+      tsEl.textContent = fmtTime(autoElapsed);
+      line.appendChild(tsEl);
+      if (step.tag) {
+        var tagEl = document.createElement('span');
+        tagEl.className = 'log-tag ' + (step.tagColor || 'tag-explore');
+        var tagText = (state.lang === 'en' && TAG_EN[step.tag]) ? TAG_EN[step.tag] : step.tag;
+        tagEl.textContent = '[' + tagText + ']';
+        line.appendChild(tagEl);
+      }
+      var htmlContent = (state.lang === 'en' && step.htmlEn) ? step.htmlEn : step.html;
+      var textContent = (state.lang === 'en' && step.textEn) ? step.textEn : step.text;
+      var contentSpan = document.createElement('span');
+      if (htmlContent) { contentSpan.innerHTML = htmlContent; }
+      else { contentSpan.textContent = textContent || ''; }
+      line.appendChild(contentSpan);
+      if (step.effect) { try { step.effect(); renderStatus(); } catch(e) {} }
+      $story.appendChild(line);
+    }
+    $story.scrollTop = $story.scrollHeight;
   }
 
   function renderStep(step) {
@@ -223,6 +268,7 @@ function autoExplore(steps, choices, opts) {
       if (step.effect) { try { step.effect(); renderStatus(); } catch(e) {} }
       $story.appendChild(line);
       $story.scrollTop = $story.scrollHeight;
+      _autoResume = function() { showNext(); };
       autoTimer = setTimeout(showNext, stepDelay);
     } else {
       line.className = 'log-line';
@@ -263,11 +309,19 @@ function autoExplore(steps, choices, opts) {
       var ci = 0;
       var typeSpeed = Math.round(35 * PACE);
       function typeChar() {
+        if (autoSkipAll) {
+          // Long-press — finish instantly, no delay before next
+          if (isHtml) { contentSpan.innerHTML = fullHtml; } else { contentSpan.textContent = fullText; }
+          $story.scrollTop = $story.scrollHeight;
+          showNext();
+          return;
+        }
         if (autoFast) {
           // User tapped — finish THIS line's typewriter instantly, then wait normal delay
           autoFast = false;
           if (isHtml) { contentSpan.innerHTML = fullHtml; } else { contentSpan.textContent = fullText; }
           $story.scrollTop = $story.scrollHeight;
+          _autoResume = function() { showNext(); };
           autoTimer = setTimeout(showNext, stepDelay);
           return;
         }
@@ -275,11 +329,18 @@ function autoExplore(steps, choices, opts) {
           contentSpan.textContent += chars[ci];
           ci++;
           $story.scrollTop = $story.scrollHeight;
+          // Resume = finish this line's text instantly, then continue
+          _autoResume = function() {
+            if (isHtml) { contentSpan.innerHTML = fullHtml; } else { contentSpan.textContent = fullText; }
+            $story.scrollTop = $story.scrollHeight;
+            showNext();
+          };
           autoTimer = setTimeout(typeChar, typeSpeed);
         } else {
           // Typing done — swap to full html if needed (to restore <b> tags etc)
           if (isHtml) { contentSpan.innerHTML = fullHtml; }
           $story.scrollTop = $story.scrollHeight;
+          _autoResume = function() { showNext(); };
           autoTimer = setTimeout(showNext, stepDelay);
         }
       }
@@ -290,21 +351,53 @@ function autoExplore(steps, choices, opts) {
   showNext();
 }
 
-// Tap to fast-forward (not skip) — scroll-aware for mobile
-function tapFastForward() {
+// ── Tap / long-press controls ──
+// Tap (short press): skip one line's typewriter/pending
+// Long press (≥500ms): dump ALL remaining text instantly
+var _touchMoved = false;
+var _longPressTimer = null;
+var _didLongPress = false;
+var LONG_PRESS_MS = 500;
+
+function tapOneLine() {
   if (autoRunning) {
     autoFast = true;
   }
 }
-var _touchMoved = false;
-$story.addEventListener('touchstart', function() { _touchMoved = false; }, { passive: true });
-$story.addEventListener('touchmove', function() { _touchMoved = true; }, { passive: true });
-$story.addEventListener('touchend', function(e) {
-  if (!_touchMoved) tapFastForward();
+
+function longPressSkipAll() {
+  if (autoRunning) {
+    autoSkipAll = true;
+    // Cancel current timer and resume immediately — showNext will see autoSkipAll
+    if (autoTimer) { clearTimeout(autoTimer); autoTimer = null; }
+    removePending();
+    if (_autoResume) { var fn = _autoResume; _autoResume = null; fn(); }
+  }
+}
+
+$story.addEventListener('touchstart', function() {
   _touchMoved = false;
+  _didLongPress = false;
+  _longPressTimer = setTimeout(function() {
+    _didLongPress = true;
+    longPressSkipAll();
+  }, LONG_PRESS_MS);
+}, { passive: true });
+
+$story.addEventListener('touchmove', function() {
+  _touchMoved = true;
+  if (_longPressTimer) { clearTimeout(_longPressTimer); _longPressTimer = null; }
+}, { passive: true });
+
+$story.addEventListener('touchend', function(e) {
+  if (_longPressTimer) { clearTimeout(_longPressTimer); _longPressTimer = null; }
+  if (!_touchMoved && !_didLongPress) tapOneLine();
+  _touchMoved = false;
+  _didLongPress = false;
 });
+
+// Desktop click = single tap (skip one line)
 $story.addEventListener('click', function(e) {
-  // Avoid double-fire on touch devices
   if (e.sourceCapabilities && e.sourceCapabilities.firesTouchEvents) return;
-  tapFastForward();
+  tapOneLine();
 });
