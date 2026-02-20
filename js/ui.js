@@ -59,7 +59,7 @@ function renderScene(text, choices) {
 
 function showChoices(choices) {
   $choices.innerHTML = '';
-  var keys = ['A','B','C','D'];
+  var keys = ['A','B','C','D','E'];
   choices.forEach(function(c, i) {
     var btn = document.createElement('button');
     btn.className = 'choice-btn';
@@ -98,7 +98,7 @@ document.addEventListener('keydown', (e) => {
     autoFast = true;
     return;
   }
-  const map = { a: 0, b: 1, c: 2, d: 3, '1': 0, '2': 1, '3': 2, '4': 3 };
+  const map = { a: 0, b: 1, c: 2, d: 3, e: 4, '1': 0, '2': 1, '3': 2, '4': 3, '5': 4 };
   const idx = map[e.key.toLowerCase()];
   if (idx !== undefined && idx < currentChoices.length) {
     selectChoice(idx);
