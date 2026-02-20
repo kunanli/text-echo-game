@@ -14,30 +14,41 @@
   /* ── Header ── */
   header {
     text-align: center;
-    padding: 14px 0 10px;
-    border-bottom: 1px solid #2a2a3a;
+    padding: 10px 0 8px;
+    border-bottom: 1px solid #1e1e2e;
     flex-shrink: 0;
+    background: linear-gradient(180deg, #0c0c14 0%, #0a0a10 100%);
   }
-  .header-ascii {
-    font-family: "Courier New", Courier, monospace;
-    font-size: .85rem;
-    line-height: 1.25;
+  .header-bar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+  }
+  .header-title {
+    font-size: 1rem;
     color: #d4a843;
-    letter-spacing: 2px;
-    text-shadow: 0 0 14px rgba(212,168,67,.4);
-    margin: 0;
+    letter-spacing: 4px;
+    text-shadow: 0 0 12px rgba(212,168,67,.3);
   }
-
-  /* ── Mobile header (hidden on desktop) ── */
-  .header-mobile { display: none; }
+  .header-subtitle {
+    font-family: "Courier New", Courier, monospace;
+    font-size: .75rem;
+    color: #6a6a7a;
+    letter-spacing: 3px;
+  }
+  .header-sep {
+    color: #3a3a4a;
+    font-size: .8rem;
+  }
+  .header-deco {
+    color: #3a3a4a;
+    font-size: .55rem;
+  }
 
   @keyframes hm-glow {
     0%, 100% { text-shadow: 0 0 6px rgba(212,168,67,.25); }
     50%      { text-shadow: 0 0 18px rgba(212,168,67,.6), 0 0 36px rgba(212,168,67,.15); }
-  }
-  @keyframes hm-fadein {
-    from { opacity: 0; transform: translateY(-6px); }
-    to   { opacity: 1; transform: translateY(0); }
   }
 
   /* ── Main Layout ── */
@@ -612,27 +623,39 @@
   /* ── ASCII avatar in status panel ── */
   .avatar-box {
     font-family: "Courier New", Courier, monospace;
-    font-size: .62rem;
-    line-height: 1.18;
+    font-size: .58rem;
+    line-height: 1.15;
     color: #8a8a9a;
     white-space: pre;
     text-align: center;
-    padding: 6px 0 4px;
+    padding: 8px 4px 6px;
     user-select: none;
-    min-height: 72px;
+    min-height: 100px;
     transition: color .4s;
     overflow: hidden;
+    background: #0c0c16;
+    border: 1px solid #1a1a2a;
+    border-radius: 6px;
+    position: relative;
+  }
+  .avatar-box::before {
+    content: '';
+    position: absolute;
+    inset: 2px;
+    border: 1px solid #14141e;
+    border-radius: 4px;
+    pointer-events: none;
   }
   .avatar-box span {
     display: inline-block;
     text-align: left;
   }
-  .avatar-box.mood-happy  { color: #8aaa6a; }
+  .avatar-box.mood-happy  { color: #8aaa6a; border-color: #2a3a2a; }
   .avatar-box.mood-normal { color: #8a8a9a; }
-  .avatar-box.mood-hurt   { color: #b07040; }
-  .avatar-box.mood-danger { color: #c04040; }
-  .avatar-box.mood-petri  { color: #7a7ac0; }
-  .avatar-box.mood-combat { color: #a05030; }
+  .avatar-box.mood-hurt   { color: #b07040; border-color: #3a2a1a; }
+  .avatar-box.mood-danger { color: #c04040; border-color: #3a1a1a; }
+  .avatar-box.mood-petri  { color: #7a7ac0; border-color: #2a2a3a; }
+  .avatar-box.mood-combat { color: #c08030; border-color: #3a2a1a; }
   #avatar-section {
     display: flex;
     flex-direction: column;
@@ -810,10 +833,14 @@
       justify-content: center;
     }
     #avatar-section .avatar-box {
-      font-size: .36rem;
-      line-height: 1.05;
+      font-size: .34rem;
+      line-height: 1.02;
       min-height: auto;
-      padding: 2px 0;
+      padding: 3px 2px;
+      border-width: 1px;
+    }
+    #avatar-section .avatar-box::before {
+      display: none;
     }
     .status-section {
       min-width: 90px;
@@ -857,21 +884,9 @@
       transform: rotate(180deg);
     }
     header { padding: 6px 0 4px; overflow: hidden; }
-    .header-ascii { display: none; }
-    .header-mobile {
-      display: flex !important;
-      flex-direction: column;
-      align-items: center;
-      gap: 2px;
-      animation: hm-fadein .8s ease-out both;
-    }
-    .hm-title {
-      font-family: "Courier New", Courier, monospace;
-      font-size: .82rem;
-      color: #d4a843;
-      letter-spacing: 2px;
-      animation: hm-glow 4s ease-in-out infinite;
-    }
+    .header-subtitle { display: none; }
+    .header-sep { display: none; }
+    .header-title { font-size: .88rem; letter-spacing: 2px; }
     .ascii-art {
       font-size: .72rem;
       letter-spacing: 0;
