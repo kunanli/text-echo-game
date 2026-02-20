@@ -43,10 +43,16 @@ ${enemy.desc || ''}`;
     const enemyDmg = Math.max(0, rng(enemy.atkMin, enemy.atkMax) - Math.floor(state.agi * 0.3));
     enemyHp -= dmg;
 
-    let log = `<div class="combat-log">${L('你揮出攻擊，造成 ' + dmg + ' 點傷害。', 'You attack, dealing ' + dmg + ' damage.')}</div>`;
+    let log = '<div class="combat-log combat-log-player">'
+      + '<span class="cl-tag cl-you">' + L('【你】', '[YOU]') + '</span> '
+      + L('揮出攻擊，造成 ' + dmg + ' 點傷害。', 'Attack! Dealt ' + dmg + ' damage.')
+      + '</div>';
 
     if (enemyHp <= 0) {
-      log += `<div class="combat-log">${L(eName + ' 被擊敗了！', eName + ' has been defeated!')}</div>`;
+      log += '<div class="combat-log combat-log-enemy">'
+        + '<span class="cl-tag cl-enemy">' + L('【' + eName + '】', '[' + eName + ']') + '</span> '
+        + L('被擊敗了！', 'has been defeated!')
+        + '</div>';
       state.mood = 'normal';
       renderScene(log, [{ text: L('繼續', 'Continue'), action: () => onWin() }]);
       return;
@@ -54,7 +60,11 @@ ${enemy.desc || ''}`;
 
     changeHp(-enemyDmg);
     if (enemy.petriDmg) changePetri(enemy.petriDmg);
-    log += `<div class="combat-log">${L(eName + ' 反擊，對你造成 ' + enemyDmg + ' 點傷害。', eName + ' strikes back, dealing ' + enemyDmg + ' damage.')}${enemy.petriDmg ? L(' 石化度 +' + enemy.petriDmg + '%', ' Petri +' + enemy.petriDmg + '%') : ''}</div>`;
+    log += '<div class="combat-log combat-log-enemy">'
+      + '<span class="cl-tag cl-enemy">' + L('【' + eName + '】', '[' + eName + ']') + '</span> '
+      + L('反擊，造成 ' + enemyDmg + ' 點傷害。', 'Strikes back! ' + enemyDmg + ' damage.')
+      + (enemy.petriDmg ? ' <span class="cl-petri">' + L('石化 +' + enemy.petriDmg + '%', 'Petri +' + enemy.petriDmg + '%') + '</span>' : '')
+      + '</div>';
 
     if (state.hp <= 0) return;
 
@@ -65,12 +75,28 @@ ${enemy.desc || ''}`;
     const dodgeRoll = rng(1, 10) + state.agi;
     let log;
     if (dodgeRoll >= 10) {
-      log = `<div class="combat-log">${L('你靈巧地閃開了攻擊！', 'You nimbly dodge the attack!')}</div>`;
+      log = '<div class="combat-log combat-log-player">'
+        + '<span class="cl-tag cl-you">' + L('【你】', '[YOU]') + '</span> '
+        + L('靈巧地閃開了攻擊！', 'Nimbly dodged the attack!')
+        + '</div>'
+        + '<div class="combat-log combat-log-enemy">'
+        + '<span class="cl-tag cl-enemy">' + L('【' + eName + '】', '[' + eName + ']') + '</span> '
+        + L('攻擊落空。', 'Attack missed.')
+        + '</div>';
     } else {
       const enemyDmg = Math.max(1, rng(enemy.atkMin, enemy.atkMax) - state.agi);
       changeHp(-enemyDmg);
-      if (enemy.petriDmg) changePetri(Math.floor(enemy.petriDmg / 2));
-      log = `<div class="combat-log">${L('閃避失敗！受到 ' + enemyDmg + ' 點傷害。', 'Dodge failed! Took ' + enemyDmg + ' damage.')}</div>`;
+      var petriAmt = enemy.petriDmg ? Math.floor(enemy.petriDmg / 2) : 0;
+      if (petriAmt) changePetri(petriAmt);
+      log = '<div class="combat-log combat-log-player">'
+        + '<span class="cl-tag cl-you">' + L('【你】', '[YOU]') + '</span> '
+        + L('閃避失敗！', 'Dodge failed!')
+        + '</div>'
+        + '<div class="combat-log combat-log-enemy">'
+        + '<span class="cl-tag cl-enemy">' + L('【' + eName + '】', '[' + eName + ']') + '</span> '
+        + L('命中！造成 ' + enemyDmg + ' 點傷害。', 'Hit! ' + enemyDmg + ' damage.')
+        + (petriAmt ? ' <span class="cl-petri">' + L('石化 +' + petriAmt + '%', 'Petri +' + petriAmt + '%') + '</span>' : '')
+        + '</div>';
       if (state.hp <= 0) return;
     }
     renderScene(log, [{ text: L('繼續戰鬥', 'Continue fighting'), action: () => combatRound() }]);
@@ -82,7 +108,17 @@ ${enemy.desc || ''}`;
     changeHp(-enemyDmg);
     const petriReduce = state.wil >= 7 ? 2 : 0;
     if (petriReduce) changePetri(-petriReduce);
-    let log = `<div class="combat-log">${L('你舉起防禦，承受了 ' + enemyDmg + ' 點傷害。', 'You raise your guard, taking ' + enemyDmg + ' damage.')}${petriReduce ? L(' 意志集中，石化度 -' + petriReduce + '%', ' Focus! Petri -' + petriReduce + '%') : ''}</div>`;
+
+    let log = '<div class="combat-log combat-log-player">'
+      + '<span class="cl-tag cl-you">' + L('【你】', '[YOU]') + '</span> '
+      + L('舉起防禦，', 'Raised guard, ')
+      + (petriReduce ? L('意志集中！石化 -' + petriReduce + '%', 'Focus! Petri -' + petriReduce + '%') : L('嚴陣以待。', 'standing firm.'))
+      + '</div>'
+      + '<div class="combat-log combat-log-enemy">'
+      + '<span class="cl-tag cl-enemy">' + L('【' + eName + '】', '[' + eName + ']') + '</span> '
+      + L('攻擊被擋下，僅造成 ' + enemyDmg + ' 點傷害。', 'Attack blocked! Only ' + enemyDmg + ' damage.')
+      + '</div>';
+
     if (state.hp <= 0) return;
     renderScene(log, [{ text: L('繼續戰鬥', 'Continue fighting'), action: () => combatRound() }]);
   }

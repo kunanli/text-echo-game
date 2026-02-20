@@ -122,12 +122,29 @@
   }
 
   .story-text .combat-log {
-    color: #a06040;
     font-size: .92rem;
-    margin: 6px 0;
+    margin: 4px 0;
+    padding: 4px 10px;
     padding-left: 12px;
-    border-left: 2px solid #5a3a2a;
+    border-left: 2px solid #3a3a3a;
+    line-height: 1.6;
   }
+  .story-text .combat-log-player {
+    color: #6aaa8a;
+    border-left-color: #3a6a4a;
+  }
+  .story-text .combat-log-enemy {
+    color: #c07050;
+    border-left-color: #6a3a2a;
+  }
+  .cl-tag {
+    font-weight: bold;
+    font-size: .82rem;
+    margin-right: 2px;
+  }
+  .cl-you { color: #60c090; }
+  .cl-enemy { color: #e07050; }
+  .cl-petri { color: #8a7acc; font-size: .85rem; }
 
   /* ── ASCII Art ── */
   .ascii-art {
