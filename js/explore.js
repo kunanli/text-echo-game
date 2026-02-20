@@ -8,6 +8,14 @@ var autoClockTimer = null;
 var autoFast = false;
 var autoRunning = false;
 var autoElapsed = 0;    // cumulative game-time in milliseconds (never resets)
+
+// Mobile pacing: slower text on small screens
+var isMobile = window.innerWidth <= 760;
+var PACE = isMobile ? 1.4 : 1.0;   // delay multiplier
+window.addEventListener('resize', function() {
+  isMobile = window.innerWidth <= 760;
+  PACE = isMobile ? 1.4 : 1.0;
+});
 let currentChoices = [];
 
 // DOM refs for explore bar
@@ -186,15 +194,16 @@ function autoExplore(steps, choices, opts) {
     var step = expanded[idx];
     idx++;
 
-    // In fast mode, skip pending indicator
+    // If user tapped, skip pending but still show step normally
     if (autoFast) {
+      autoFast = false;   // reset — only skip THIS step's pending
       renderStep(step);
       return;
     }
 
     // Show pending indicator, then render the actual step after a short pause
     showPending();
-    var pendingDelay = step.art ? 400 : 600;
+    var pendingDelay = (step.art ? 400 : 600) * PACE;
     autoTimer = setTimeout(function() {
       removePending();
       renderStep(step);
@@ -206,14 +215,15 @@ function autoExplore(steps, choices, opts) {
     var line = document.createElement('div');
 
     var artContent = (state.lang === 'en' && step.artEn) ? step.artEn : step.art;
+    var stepDelay = Math.round((step.delay != null ? step.delay : 1200) * PACE);
+
     if (artContent) {
       line.innerHTML = artContent;
       // Run side effect
       if (step.effect) { try { step.effect(); renderStatus(); } catch(e) {} }
       $story.appendChild(line);
       $story.scrollTop = $story.scrollHeight;
-      var delay = autoFast ? 100 : (step.delay != null ? step.delay : 1200);
-      autoTimer = setTimeout(showNext, delay);
+      autoTimer = setTimeout(showNext, stepDelay);
     } else {
       line.className = 'log-line';
 
@@ -248,41 +258,32 @@ function autoExplore(steps, choices, opts) {
       var fullHtml = htmlContent || '';
       var isHtml = !!htmlContent;
 
-      // Fast mode: show all at once
-      if (autoFast) {
-        if (isHtml) { contentSpan.innerHTML = fullHtml; } else { contentSpan.textContent = fullText; }
-        $story.scrollTop = $story.scrollHeight;
-        var delay = autoFast ? 100 : (step.delay != null ? step.delay : 1200);
-        autoTimer = setTimeout(showNext, delay);
-      } else {
-        // Typewriter: for html content, extract plain text to type, then swap to html at end
-        var chars = isHtml ? fullHtml.replace(/<[^>]*>/g, '') : fullText;
-        var ci = 0;
-        var typeSpeed = 35;
-        function typeChar() {
-          if (autoFast) {
-            // User tapped fast-forward during typing
-            if (isHtml) { contentSpan.innerHTML = fullHtml; } else { contentSpan.textContent = fullText; }
-            $story.scrollTop = $story.scrollHeight;
-            var delay2 = 100;
-            autoTimer = setTimeout(showNext, delay2);
-            return;
-          }
-          if (ci < chars.length) {
-            contentSpan.textContent += chars[ci];
-            ci++;
-            $story.scrollTop = $story.scrollHeight;
-            autoTimer = setTimeout(typeChar, typeSpeed);
-          } else {
-            // Typing done — swap to full html if needed (to restore <b> tags etc)
-            if (isHtml) { contentSpan.innerHTML = fullHtml; }
-            $story.scrollTop = $story.scrollHeight;
-            var delay3 = step.delay != null ? step.delay : 1200;
-            autoTimer = setTimeout(showNext, delay3);
-          }
+      // Typewriter: for html content, extract plain text to type, then swap to html at end
+      var chars = isHtml ? fullHtml.replace(/<[^>]*>/g, '') : fullText;
+      var ci = 0;
+      var typeSpeed = Math.round(35 * PACE);
+      function typeChar() {
+        if (autoFast) {
+          // User tapped — finish THIS line's typewriter instantly, then wait normal delay
+          autoFast = false;
+          if (isHtml) { contentSpan.innerHTML = fullHtml; } else { contentSpan.textContent = fullText; }
+          $story.scrollTop = $story.scrollHeight;
+          autoTimer = setTimeout(showNext, stepDelay);
+          return;
         }
-        typeChar();
+        if (ci < chars.length) {
+          contentSpan.textContent += chars[ci];
+          ci++;
+          $story.scrollTop = $story.scrollHeight;
+          autoTimer = setTimeout(typeChar, typeSpeed);
+        } else {
+          // Typing done — swap to full html if needed (to restore <b> tags etc)
+          if (isHtml) { contentSpan.innerHTML = fullHtml; }
+          $story.scrollTop = $story.scrollHeight;
+          autoTimer = setTimeout(showNext, stepDelay);
+        }
       }
+      typeChar();
     }
   }
 
