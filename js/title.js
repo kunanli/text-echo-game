@@ -19,6 +19,10 @@ function showPhase(id) {
 })();
 
 document.getElementById('phase-splash').addEventListener('click', function(e) {
+  // Warm up AudioContext on first touch — mobile browsers require this
+  // to happen inside a user gesture, so the splash tap is the earliest moment.
+  ambientAudio.warmup();
+
   // If clicked the continue button, load save directly
   if (e.target.id === 'continue-btn' || e.target.closest('#continue-btn')) {
     return; // handled by its own listener
@@ -32,13 +36,14 @@ document.getElementById('phase-splash').addEventListener('click', function(e) {
   if (continueBtn) {
     continueBtn.addEventListener('click', function(e) {
       e.stopPropagation();
+      ambientAudio.warmup();   // ensure AudioContext is alive for this gesture
       if (loadSave()) {
         applyLang();
         var titleScreen = document.getElementById('title-screen');
         titleScreen.classList.add('hidden');
         setTimeout(function() { titleScreen.style.display = 'none'; }, 800);
         ambientAudio.start();
-        updateAudioBtn();
+        setTimeout(updateAudioBtn, 200);
         renderStatus();
         loadNode(state.node);
       }
@@ -120,7 +125,7 @@ function startGame() {
   setTimeout(function() { titleScreen.style.display = 'none'; }, 800);
 
   ambientAudio.start();
-  updateAudioBtn();
+  setTimeout(updateAudioBtn, 200);
 
   renderStatus();
   loadNode('r0_start');
@@ -219,8 +224,11 @@ function updateAudioBtn() {
 $audioBtn.addEventListener('click', function() {
   if (ambientAudio.isRunning()) {
     ambientAudio.stop();
+    updateAudioBtn();
   } else {
     ambientAudio.start();
+    // start() may be async (waiting for AudioContext.resume on mobile),
+    // so update the button after a short delay to reflect the actual state.
+    setTimeout(updateAudioBtn, 200);
   }
-  updateAudioBtn();
 });

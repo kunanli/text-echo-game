@@ -180,14 +180,8 @@ var ambientAudio = (function() {
   }
 
   // ── Public API ──
-  function start() {
-    if (running) return;
-    init();
-    if (!ctx) return;
-
-    // Resume AudioContext (needed after user gesture)
-    if (ctx.state === 'suspended') ctx.resume();
-
+  function beginPlayback() {
+    if (running) return;  // guard against double-start
     running = true;
 
     // Fade in master volume
@@ -198,6 +192,23 @@ var ambientAudio = (function() {
     scheduleDrip();
     scheduleGust();
     scheduleTone();
+  }
+
+  function start() {
+    if (running) return;
+    init();
+    if (!ctx) return;
+
+    // Mobile browsers require AudioContext.resume() inside a user gesture.
+    // resume() returns a Promise — we must wait for it before creating nodes,
+    // otherwise nodes are silently dropped on iOS Safari / Android Chrome.
+    if (ctx.state === 'suspended') {
+      ctx.resume().then(function() {
+        beginPlayback();
+      });
+    } else {
+      beginPlayback();
+    }
   }
 
   function stop() {
@@ -216,6 +227,14 @@ var ambientAudio = (function() {
     }
   }
 
+  // Pre-create AudioContext on the very first user touch/click.
+  // Mobile browsers only allow AudioContext creation inside gesture handlers,
+  // so calling this early makes subsequent start() calls reliable.
+  function warmup() {
+    init();
+    if (ctx && ctx.state === 'suspended') ctx.resume();
+  }
+
   function setVolume(v) {
     volume = Math.max(0, Math.min(1, v));
     if (masterGain && ctx && running) {
@@ -229,6 +248,7 @@ var ambientAudio = (function() {
   return {
     start: start,
     stop: stop,
+    warmup: warmup,
     setVolume: setVolume,
     getVolume: getVolume,
     isRunning: isRunning
