@@ -291,15 +291,19 @@ function runPatrolCycle() {
 
     if (mHp <= 0) {
       var dv = DEFEAT_VERBS[rng(0, DEFEAT_VERBS.length - 1)];
-      combatLog.push(L(
+      combatLog.push({ who: 'player', text: L(
         av.zh + '造成 ' + pAtk + ' 傷害' + dv.zh + monster.name + '！',
         av.en + pAtk + ' dmg' + dv.en + monster.nameEn + ' defeated!'
-      ));
+      )});
     } else {
-      combatLog.push(L(
-        av.zh + '造成 ' + pAtk + ' 傷害。' + monster.name + cv.zh + ' 受到 ' + mAtk + ' 傷害。',
-        av.en + pAtk + ' dmg. ' + monster.nameEn + ' ' + cv.en + ' Take ' + mAtk + ' dmg.'
-      ));
+      combatLog.push({ who: 'player', text: L(
+        av.zh + '造成 ' + pAtk + ' 傷害。',
+        av.en + pAtk + ' dmg.'
+      )});
+      combatLog.push({ who: 'enemy', text: L(
+        monster.name + cv.zh + ' 受到 ' + mAtk + ' 傷害。',
+        monster.nameEn + ' ' + cv.en + ' Take ' + mAtk + ' dmg.'
+      )});
     }
   }
 
@@ -330,11 +334,15 @@ function runPatrolCycle() {
             'A <b>' + monster.nameEn + '</b> appears! Entering combat!'),
     delay: 1800 });
 
-  // Combat rounds (with dramatic pacing)
+  // Combat rounds (with dramatic pacing — player and enemy on separate lines)
   for (var i = 0; i < combatLog.length; i++) {
+    var entry = combatLog[i];
     var isLast = (i === combatLog.length - 1);
-    queue.push({ tag: L('戰鬥','Battle'), color: 'tag-combat', text: combatLog[i],
-      delay: isLast ? rng(2000, 2800) : rng(1500, 2200), pending: true });
+    var tag = entry.who === 'enemy' ? L('反擊','Counter') : L('戰鬥','Battle');
+    var color = entry.who === 'enemy' ? 'tag-warn' : 'tag-combat';
+    var d = entry.who === 'enemy' ? rng(1200, 1800) : (isLast ? rng(2000, 2800) : rng(1500, 2200));
+    queue.push({ tag: tag, color: color, text: entry.text,
+      delay: d, pending: entry.who === 'player' });
   }
 
   // Result + apply effects
