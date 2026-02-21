@@ -1,13 +1,11 @@
 // ══ Procedural Ambient Audio Engine ══
 // Generates cave ambience using Web Audio API — no external files needed.
-// Layers: low drone, cave drafts, resonant hum.
+// Layer: low cave drone (filtered brown noise).
 
 var ambientAudio = (function() {
   var ctx = null;
   var masterGain = null;
   var running = false;
-  var gustTimer = null;
-  var toneTimer = null;
   var volume = 0.35;  // default volume
 
   function init() {
@@ -55,94 +53,6 @@ var ambientAudio = (function() {
     droneNode.start();
   }
 
-  // ── Layer 2: Cave draft (short low-frequency air bursts) ──
-  function playGust() {
-    if (!running || !ctx) return;
-    var now = ctx.currentTime;
-    // Short burst: 0.4–1.2s (tunnel draft, not ocean wave)
-    var dur = 0.4 + Math.random() * 0.8;
-
-    var bufSize = Math.ceil(ctx.sampleRate * (dur + 0.2));
-    var buf = ctx.createBuffer(1, bufSize, ctx.sampleRate);
-    var data = buf.getChannelData(0);
-    // Brown noise for deeper texture
-    var last = 0;
-    for (var i = 0; i < bufSize; i++) {
-      var white = Math.random() * 2 - 1;
-      last = (last + (0.04 * white)) / 1.04;
-      data[i] = last * 3.0;
-    }
-    var src = ctx.createBufferSource();
-    src.buffer = buf;
-
-    // Low bandpass: 60–150 Hz, narrow band — rumble through rock
-    var bp = ctx.createBiquadFilter();
-    bp.type = 'bandpass';
-    bp.frequency.value = 60 + Math.random() * 90;
-    bp.Q.value = 2.0;
-
-    var g = ctx.createGain();
-    // Quick attack, quick decay — sudden draft feeling
-    g.gain.setValueAtTime(0, now);
-    g.gain.linearRampToValueAtTime(0.05 + Math.random() * 0.03, now + dur * 0.15);
-    g.gain.linearRampToValueAtTime(0, now + dur);
-
-    src.connect(bp);
-    bp.connect(g);
-    g.connect(masterGain);
-    src.start(now);
-    src.stop(now + dur + 0.1);
-
-    scheduleGust();
-  }
-
-  function scheduleGust() {
-    var delay = 10000 + Math.random() * 20000; // 10-30 seconds between drafts
-    gustTimer = setTimeout(playGust, delay);
-  }
-
-  // ── Layer 4: Resonant cave tones (eerie harmonics) ──
-  function playTone() {
-    if (!running || !ctx) return;
-    var now = ctx.currentTime;
-    var dur = 2 + Math.random() * 3;
-
-    // Pick from a pentatonic-ish set for an eerie feel
-    var notes = [55, 65.4, 73.4, 82.4, 98, 110, 130.8];
-    var freq = notes[Math.floor(Math.random() * notes.length)];
-
-    var osc = ctx.createOscillator();
-    osc.type = 'triangle';
-    osc.frequency.value = freq;
-
-    var g = ctx.createGain();
-    g.gain.setValueAtTime(0, now);
-    g.gain.linearRampToValueAtTime(0.04 + Math.random() * 0.03, now + dur * 0.3);
-    g.gain.linearRampToValueAtTime(0, now + dur);
-
-    // Subtle reverb-like effect via delay
-    var delay = ctx.createDelay();
-    delay.delayTime.value = 0.15 + Math.random() * 0.2;
-    var feedback = ctx.createGain();
-    feedback.gain.value = 0.3;
-
-    osc.connect(g);
-    g.connect(masterGain);
-    g.connect(delay);
-    delay.connect(feedback);
-    feedback.connect(delay);
-    feedback.connect(masterGain);
-
-    osc.start(now);
-    osc.stop(now + dur + 1);
-
-    scheduleTone();
-  }
-
-  function scheduleTone() {
-    var delay = 12000 + Math.random() * 20000; // 12-32 seconds between tones
-    toneTimer = setTimeout(playTone, delay);
-  }
 
   // ── Public API ──
   function beginPlayback() {
@@ -154,8 +64,6 @@ var ambientAudio = (function() {
     masterGain.gain.linearRampToValueAtTime(volume, ctx.currentTime + 2);
 
     startDrone();
-    scheduleGust();
-    scheduleTone();
   }
 
   function start() {
@@ -178,9 +86,6 @@ var ambientAudio = (function() {
   function stop() {
     if (!running) return;
     running = false;
-    if (gustTimer) { clearTimeout(gustTimer); gustTimer = null; }
-    if (toneTimer) { clearTimeout(toneTimer); toneTimer = null; }
-
     if (masterGain && ctx) {
       masterGain.gain.linearRampToValueAtTime(0, ctx.currentTime + 1);
     }

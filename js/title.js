@@ -144,6 +144,7 @@ document.getElementById('name-input').addEventListener('keydown', function(e) {
   var $title = document.getElementById('save-dialog-title');
   var $hint = document.getElementById('save-hint');
   var $copyBtn = document.getElementById('save-copy-btn');
+  var $pasteBtn = document.getElementById('save-paste-btn');
   var $importBtn = document.getElementById('save-import-btn');
   var $closeBtn = document.getElementById('save-close-btn');
   var $openBtn = document.getElementById('save-code-btn');
@@ -153,6 +154,7 @@ document.getElementById('name-input').addEventListener('keydown', function(e) {
     $title.textContent = en ? 'SAVE CODE' : '存 檔 碼';
     $hint.textContent = en ? 'Copy this code to save progress, or paste a code to load:' : '複製此代碼以保存進度，或貼上代碼來讀取：';
     $copyBtn.textContent = en ? 'Copy' : '複製';
+    $pasteBtn.textContent = en ? 'Paste' : '貼上';
     $importBtn.textContent = en ? 'Load' : '讀取';
     $closeBtn.textContent = en ? 'Close' : '關閉';
     $textarea.value = exportSaveCode();
@@ -182,6 +184,23 @@ document.getElementById('name-input').addEventListener('keydown', function(e) {
       document.execCommand('copy');
       $msg.style.color = '#5a5';
       $msg.textContent = state.lang === 'en' ? 'Copied!' : '已複製！';
+    }
+  });
+
+  $pasteBtn.addEventListener('click', function() {
+    try {
+      navigator.clipboard.readText().then(function(text) {
+        $textarea.value = text;
+        $textarea.select();
+        $msg.style.color = '#5a5';
+        $msg.textContent = state.lang === 'en' ? 'Pasted! Press Load to apply.' : '已貼上！按讀取來載入。';
+      }).catch(function() {
+        $msg.style.color = '#a55';
+        $msg.textContent = state.lang === 'en' ? 'Paste failed. Please paste manually (Ctrl+V).' : '貼上失敗，請手動貼上（Ctrl+V）。';
+      });
+    } catch (e) {
+      $msg.style.color = '#a55';
+      $msg.textContent = state.lang === 'en' ? 'Paste not supported. Please paste manually (Ctrl+V).' : '不支援自動貼上，請手動貼上（Ctrl+V）。';
     }
   });
 
