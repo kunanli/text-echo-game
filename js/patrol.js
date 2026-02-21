@@ -368,8 +368,11 @@ function runPatrolCycle() {
 
     function renderAndContinue() {
       if (!patrolActive) return;
-      if (step.effect) step.effect();
-      if (!patrolActive) return; // effect may have triggered death
+      if (step.effect) {
+        try { step.effect(); } catch(e) {}
+      }
+      // Check if player died (die() sets patrolActive = false via stopPatrol or directly)
+      if (!patrolActive || state.hp <= 0 || state.petri >= 100) return;
       if (step.art) {
         patrolAppendArt(step.art, step.artClass || '');
       } else if (step.html) {

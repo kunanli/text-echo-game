@@ -3,8 +3,12 @@
 // ─── Death / Revive ───
 function die(msg) {
   // Stop patrol if active
-  if (patrolActive) { patrolActive = false; clearPatrolTimers(); }
+  patrolActive = false;
+  clearPatrolTimers();
   stopAuto();
+  state.mood = 'normal';
+  $choices.innerHTML = '';
+  currentChoices = [];
   $deathMsg.textContent = msg || L('你死了……', 'You died...');
   $deathOv.classList.add('active');
 }
@@ -16,8 +20,12 @@ function revive() {
   $deathOv.classList.remove('active');
   notify(L('你從石殼中掙脫，重新站起。（復活次數：' + state.deathCount + '）', 'You break free from the stone shell. (Deaths: ' + state.deathCount + ')'));
   renderStatus();
-  // Return to current region start
-  loadNode(state.node.includes('combat') ? regionStartNode() : state.node);
+  // Return to a safe node — avoid reloading combat/patrol/unknown nodes
+  var safeNode = state.node;
+  if (!safeNode || !nodes[safeNode] || safeNode.includes('combat') || safeNode.includes('guard_fight') || safeNode.includes('patrol')) {
+    safeNode = regionStartNode();
+  }
+  loadNode(safeNode);
 }
 
 $revive.addEventListener('click', revive);

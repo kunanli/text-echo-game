@@ -6,7 +6,6 @@ var ambientAudio = (function() {
   var ctx = null;
   var masterGain = null;
   var running = false;
-  var dripTimer = null;
   var gustTimer = null;
   var toneTimer = null;
   var volume = 0.35;  // default volume
@@ -56,49 +55,7 @@ var ambientAudio = (function() {
     droneNode.start();
   }
 
-  // ── Layer 2: Water drips ──
-  function playDrip() {
-    if (!running || !ctx) return;
-    var osc = ctx.createOscillator();
-    var g = ctx.createGain();
-    var f = ctx.createBiquadFilter();
-
-    // Random pitch for variety
-    var freq = 1800 + Math.random() * 2400;
-    osc.type = 'sine';
-    osc.frequency.value = freq;
-
-    // Sharp attack, quick decay
-    var now = ctx.currentTime;
-    g.gain.setValueAtTime(0, now);
-    g.gain.linearRampToValueAtTime(0.15 + Math.random() * 0.1, now + 0.003);
-    g.gain.exponentialRampToValueAtTime(0.001, now + 0.08 + Math.random() * 0.12);
-
-    // Bandpass for natural water sound
-    f.type = 'bandpass';
-    f.frequency.value = freq;
-    f.Q.value = 5;
-
-    osc.connect(f);
-    f.connect(g);
-    g.connect(masterGain);
-    osc.start(now);
-    osc.stop(now + 0.3);
-
-    // Sometimes play a second "splash" echo
-    if (Math.random() < 0.3) {
-      setTimeout(function() { if (running) playDrip(); }, 60 + Math.random() * 120);
-    }
-
-    scheduleDrip();
-  }
-
-  function scheduleDrip() {
-    var delay = 2000 + Math.random() * 6000; // 2-8 seconds between drips
-    dripTimer = setTimeout(playDrip, delay);
-  }
-
-  // ── Layer 3: Wind gusts (filtered noise bursts) ──
+  // ── Layer 2: Wind gusts (filtered noise bursts) ──
   function playGust() {
     if (!running || !ctx) return;
     var bufSize = ctx.sampleRate * 3;
@@ -189,7 +146,6 @@ var ambientAudio = (function() {
     masterGain.gain.linearRampToValueAtTime(volume, ctx.currentTime + 2);
 
     startDrone();
-    scheduleDrip();
     scheduleGust();
     scheduleTone();
   }
@@ -214,7 +170,6 @@ var ambientAudio = (function() {
   function stop() {
     if (!running) return;
     running = false;
-    if (dripTimer) { clearTimeout(dripTimer); dripTimer = null; }
     if (gustTimer) { clearTimeout(gustTimer); gustTimer = null; }
     if (toneTimer) { clearTimeout(toneTimer); toneTimer = null; }
 

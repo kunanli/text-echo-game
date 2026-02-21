@@ -91,12 +91,20 @@ function showLevelUpChoice() {
 
 function changeHp(delta) {
   state.hp = clamp(state.hp + delta, 0, state.maxHp);
-  if (state.hp <= 0) die(L('你的生命力耗盡，倒在了冰冷的石地上……', 'Your life force fades... You collapse on the cold stone floor...'));
+  if (state.hp <= 0) {
+    die(L('你的生命力耗盡，倒在了冰冷的石地上……', 'Your life force fades... You collapse on the cold stone floor...'));
+    return true; // dead
+  }
+  return false;
 }
 
 function changePetri(delta) {
   state.petri = clamp(state.petri + delta, 0, 100);
-  if (state.petri >= 100) die(L('你的身體已完全化為冰冷的石頭……', 'Your body has completely turned to cold stone...'));
+  if (state.petri >= 100) {
+    die(L('你的身體已完全化為冰冷的石頭……', 'Your body has completely turned to cold stone...'));
+    return true; // dead
+  }
+  return false;
 }
 
 function changeStat(stat, delta) {
