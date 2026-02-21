@@ -360,7 +360,15 @@ var _didLongPress = false;
 var LONG_PRESS_MS = 500;
 
 function tapOneLine() {
-  if (autoRunning) {
+  if (!autoRunning) return;
+  // Cancel current timer, finish current step, advance to next immediately
+  if (autoTimer) { clearTimeout(autoTimer); autoTimer = null; }
+  removePending();
+  if (_autoResume) {
+    var fn = _autoResume;
+    _autoResume = null;
+    fn();
+  } else {
     autoFast = true;
   }
 }
@@ -397,7 +405,28 @@ $story.addEventListener('touchend', function(e) {
 });
 
 // Desktop click = single tap (skip one line)
-$story.addEventListener('click', function(e) {
+// Desktop long-press (mousedown ≥500ms) = skip all
+var _mouseLP = null;
+var _didMouseLP = false;
+
+$story.addEventListener('mousedown', function(e) {
+  // Ignore touch-originated mouse events
   if (e.sourceCapabilities && e.sourceCapabilities.firesTouchEvents) return;
-  tapOneLine();
+  if (e.button !== 0) return;
+  _didMouseLP = false;
+  _mouseLP = setTimeout(function() {
+    _didMouseLP = true;
+    longPressSkipAll();
+  }, LONG_PRESS_MS);
+});
+
+$story.addEventListener('mouseup', function(e) {
+  if (e.sourceCapabilities && e.sourceCapabilities.firesTouchEvents) return;
+  if (_mouseLP) { clearTimeout(_mouseLP); _mouseLP = null; }
+  if (!_didMouseLP) tapOneLine();
+  _didMouseLP = false;
+});
+
+$story.addEventListener('mouseleave', function() {
+  if (_mouseLP) { clearTimeout(_mouseLP); _mouseLP = null; }
 });

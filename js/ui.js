@@ -84,6 +84,10 @@ function showChoices(choices) {
 //  Keyboard Shortcuts
 // ═══════════════════════════════════════════════════
 
+// ── Keyboard: hold Space/Enter ≥500ms = skip all text ──
+var _keyLP = null;
+var _keyLPKey = null;
+
 document.addEventListener('keydown', (e) => {
   // Ignore keyboard shortcuts while title screen is active
   var ts = document.getElementById('title-screen');
@@ -95,13 +99,30 @@ document.addEventListener('keydown', (e) => {
   // Fast-forward auto-explore with Space or Enter
   if (autoRunning && (e.key === ' ' || e.key === 'Enter')) {
     e.preventDefault();
-    autoFast = true;
+    if (!e.repeat) {
+      // First press — single skip + start long-press timer
+      autoFast = true;
+      _keyLPKey = e.key;
+      if (_keyLP) clearTimeout(_keyLP);
+      _keyLP = setTimeout(function() {
+        _keyLP = null;
+        longPressSkipAll();
+      }, 500);
+    }
     return;
   }
   const map = { a: 0, b: 1, c: 2, d: 3, e: 4, '1': 0, '2': 1, '3': 2, '4': 3, '5': 4 };
   const idx = map[e.key.toLowerCase()];
   if (idx !== undefined && idx < currentChoices.length) {
     selectChoice(idx);
+  }
+});
+
+document.addEventListener('keyup', (e) => {
+  if (_keyLP && (e.key === _keyLPKey)) {
+    clearTimeout(_keyLP);
+    _keyLP = null;
+    _keyLPKey = null;
   }
 });
 
