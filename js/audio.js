@@ -1,6 +1,6 @@
 // ══ Procedural Ambient Audio Engine ══
 // Generates cave ambience using Web Audio API — no external files needed.
-// Layers: low drone, water drips, wind gusts, resonant hum.
+// Layers: low drone, cave drafts, resonant hum.
 
 var ambientAudio = (function() {
   var ctx = null;
@@ -55,28 +55,36 @@ var ambientAudio = (function() {
     droneNode.start();
   }
 
-  // ── Layer 2: Wind gusts (filtered noise bursts) ──
+  // ── Layer 2: Cave draft (short low-frequency air bursts) ──
   function playGust() {
     if (!running || !ctx) return;
-    var bufSize = ctx.sampleRate * 3;
+    var now = ctx.currentTime;
+    // Short burst: 0.4–1.2s (tunnel draft, not ocean wave)
+    var dur = 0.4 + Math.random() * 0.8;
+
+    var bufSize = Math.ceil(ctx.sampleRate * (dur + 0.2));
     var buf = ctx.createBuffer(1, bufSize, ctx.sampleRate);
     var data = buf.getChannelData(0);
+    // Brown noise for deeper texture
+    var last = 0;
     for (var i = 0; i < bufSize; i++) {
-      data[i] = Math.random() * 2 - 1;
+      var white = Math.random() * 2 - 1;
+      last = (last + (0.04 * white)) / 1.04;
+      data[i] = last * 3.0;
     }
     var src = ctx.createBufferSource();
     src.buffer = buf;
 
+    // Low bandpass: 60–150 Hz, narrow band — rumble through rock
     var bp = ctx.createBiquadFilter();
     bp.type = 'bandpass';
-    bp.frequency.value = 200 + Math.random() * 300;
-    bp.Q.value = 0.5;
+    bp.frequency.value = 60 + Math.random() * 90;
+    bp.Q.value = 2.0;
 
     var g = ctx.createGain();
-    var now = ctx.currentTime;
-    var dur = 1.5 + Math.random() * 2.5;
+    // Quick attack, quick decay — sudden draft feeling
     g.gain.setValueAtTime(0, now);
-    g.gain.linearRampToValueAtTime(0.08 + Math.random() * 0.06, now + dur * 0.4);
+    g.gain.linearRampToValueAtTime(0.05 + Math.random() * 0.03, now + dur * 0.15);
     g.gain.linearRampToValueAtTime(0, now + dur);
 
     src.connect(bp);
@@ -89,7 +97,7 @@ var ambientAudio = (function() {
   }
 
   function scheduleGust() {
-    var delay = 8000 + Math.random() * 15000; // 8-23 seconds between gusts
+    var delay = 10000 + Math.random() * 20000; // 10-30 seconds between drafts
     gustTimer = setTimeout(playGust, delay);
   }
 
