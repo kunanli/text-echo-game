@@ -544,13 +544,27 @@ registerNode('r0_rest', () => {
     { tag: '記憶', tagColor: 'tag-system', text: '……墜落。無盡的墜落。', textEn: '...Falling. Endless falling.', delay: 3000 },
     { tag: '感知', tagColor: 'tag-sense', text: '你猛地睜開眼睛。冷汗浸透了後背。', textEn: 'Your eyes snap open. Cold sweat soaks your back.', delay: 2500 },
     { tag: '恢復', tagColor: 'tag-explore', text: '雖然記憶令人不安，但短暫的休息讓你的身體恢復了一些。', textEn: 'The memories are unsettling, but the brief rest has restored some strength.', delay: 2200 },
-  ], [
-    { text: '站起來繼續探索', textEn: 'Stand up and continue', action: () => {
+  ], (function() {
+    var c = [];
+    if (hasItem(L('黑麵包', 'Black Bread'))) {
+      c.push({ text: '吃黑麵包後再休息', textEn: 'Eat black bread before resting', action: () => {
+        removeItem(L('黑麵包', 'Black Bread'));
+        changeHp(18);
+        changePetri(-5);
+        autoExplore([
+          { tag: '物品', tagColor: 'tag-item', text: '你掰開乾硬的黑麵包。發霉的味道讓人皺眉，但飢餓感蓋過了一切。', textEn: 'You break the stale black bread. The moldy smell makes you wince, but hunger wins.', delay: 2000 },
+          { tag: '恢復', tagColor: 'tag-explore', text: '填飽了肚子，身體的恢復速度明顯加快。石化的刺痛感也消退了不少。', textEn: 'With your stomach full, recovery speeds up noticeably. The petrification sting fades.', delay: 2500 },
+          { tag: '情報', tagColor: 'tag-info', text: '石像腳下的文字是對的——進食確實能抑制石化侵蝕。', textEn: 'The writing at the statue\'s feet was right — eating does suppress petrification.', delay: 2200 },
+        ], [{ text: '繼續探索', textEn: 'Continue exploring', action: () => loadNode('r0_look') }]);
+      }});
+    }
+    c.push({ text: '站起來繼續探索', textEn: 'Stand up and continue', action: () => {
       changeHp(8);
       notify(L('HP +8', 'HP +8'));
       loadNode('r0_look');
-    }},
-  ], { label: L('休息', 'Resting') });
+    }});
+    return c;
+  })(), { label: L('休息', 'Resting') });
 });
 
 registerNode('r0_crack', () => {
