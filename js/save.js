@@ -36,9 +36,9 @@ function loadSave() {
     var data = JSON.parse(json);
     state.name = data.name || '旅者';
     state.sex = data.sex || 'male';
-    state.hp = data.hp != null ? data.hp : 100;
     state.maxHp = data.maxHp || 100;
-    state.petri = data.petri || 0;
+    state.hp = clamp(data.hp != null ? data.hp : 100, 0, state.maxHp);
+    state.petri = clamp(data.petri || 0, 0, 99);
     state.str = data.str || 5;
     state.agi = data.agi || 5;
     state.wil = data.wil || 5;
@@ -192,9 +192,10 @@ function importSeed(code) {
     state.sex = code[p++] === '1' ? 'female' : 'male';
     state.lang = code[p++] === '1' ? 'en' : 'zh';
     // Stats
-    state.hp = fromB36(code.substring(p, p + 3)); p += 3;
-    state.maxHp = fromB36(code.substring(p, p + 3)); p += 3;
-    state.petri = fromB36(code.substring(p, p + 2)); p += 2;
+    var rawHp = fromB36(code.substring(p, p + 3)); p += 3;
+    state.maxHp = fromB36(code.substring(p, p + 3)) || 100; p += 3;
+    state.hp = clamp(rawHp, 0, state.maxHp);
+    state.petri = clamp(fromB36(code.substring(p, p + 2)), 0, 99); p += 2;
     state.str = fromB36(code.substring(p, p + 2)); p += 2;
     state.agi = fromB36(code.substring(p, p + 2)); p += 2;
     state.wil = fromB36(code.substring(p, p + 2)); p += 2;

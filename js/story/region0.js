@@ -884,8 +884,9 @@ registerNode('r0_tunnel', () => {
           { tag: '成功', tagColor: 'tag-explore', text: '你屏住呼吸，從它身後悄悄溜了過去！', textEn: 'Holding your breath, you slip past it silently!', delay: 1800 },
         ], [{ text: '繼續前進', textEn: 'Continue forward', action: () => loadNode('r0_after_lizard') }]);
       } else {
-        changePetri(4);
-        changeHp(-5);
+        var dead = changePetri(4);
+        if (!dead) dead = changeHp(-5);
+        if (dead) return;
         autoExplore([
           { tag: '潛行', tagColor: 'tag-move', text: '你嘗試潛行……踩到了一塊碎石！', textEn: 'You try to sneak... and step on a loose rock!', delay: 1500 },
           { tag: '遭遇', tagColor: 'tag-combat', text: '石蜥蜴猛地轉頭，紫色凝視直射向你！', textEn: 'The lizard snaps its head around — purple gaze locks onto you!', delay: 1500 },

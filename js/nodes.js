@@ -20,9 +20,13 @@ function revive() {
   $deathOv.classList.remove('active');
   notify(L('你從石殼中掙脫，重新站起。（復活次數：' + state.deathCount + '）', 'You break free from the stone shell. (Deaths: ' + state.deathCount + ')'));
   renderStatus();
-  // Return to a safe node — avoid reloading combat/patrol/unknown nodes
+  // Return to a safe node — avoid reloading combat/patrol/tunnel nodes
+  // (tunnel nodes replay long auto-explore sequences with combat encounters)
+  var REVIVE_SAFE = { 'r0_tunnel': 'r0_climb_check', 'r1_guard_fight': 'r1_look', 'r1_guard_check': 'r1_look' };
   var safeNode = state.node;
-  if (!safeNode || !nodes[safeNode] || safeNode.includes('combat') || safeNode.includes('guard_fight') || safeNode.includes('patrol')) {
+  if (REVIVE_SAFE[safeNode]) {
+    safeNode = REVIVE_SAFE[safeNode];
+  } else if (!safeNode || !nodes[safeNode] || safeNode.includes('combat') || safeNode.includes('guard_fight') || safeNode.includes('patrol') || safeNode.includes('tunnel')) {
     safeNode = regionStartNode();
   }
   loadNode(safeNode);

@@ -25,9 +25,9 @@ function startCombat(enemy, onWin, onFlee) {
   ];
 
   function combatRound() {
-    var hpPct = Math.max(0, Math.floor(enemyHp / enemy.hp * 10));
+    var hpPct = clamp(Math.floor(enemyHp / enemy.hp * 10), 0, 10);
     var hpBar = '\u2588'.repeat(hpPct) + '\u2591'.repeat(10 - hpPct);
-    var myPct = Math.max(0, Math.floor(state.hp / state.maxHp * 10));
+    var myPct = clamp(Math.floor(state.hp / state.maxHp * 10), 0, 10);
     var myBar = '\u2588'.repeat(myPct) + '\u2591'.repeat(10 - myPct);
 
     var combatTitle = L('戰  鬥', 'COMBAT');
@@ -96,15 +96,15 @@ function startCombat(enemy, onWin, onFlee) {
       return;
     }
 
-    changeHp(-enemyDmg);
-    if (enemy.petriDmg) changePetri(enemy.petriDmg);
+    var dead = changeHp(-enemyDmg);
+    if (!dead && enemy.petriDmg) dead = changePetri(enemy.petriDmg);
     log += '<div class="combat-log combat-log-enemy">'
       + '<span class="cl-tag cl-enemy">' + L('【' + eName + '】', '[' + eName + ']') + '</span> '
       + L('反擊，造成 ' + enemyDmg + ' 點傷害。', 'Strikes back! ' + enemyDmg + ' damage.')
       + (enemy.petriDmg ? ' <span class="cl-petri">' + L('石化 +' + enemy.petriDmg + '%', 'Petri +' + enemy.petriDmg + '%') + '</span>' : '')
       + '</div>';
 
-    if (state.hp <= 0) return;
+    if (dead) return;
     renderScene(log, [{ text: L('繼續戰鬥', 'Continue fighting'), action: function() { combatRound(); } }]);
   }
 
