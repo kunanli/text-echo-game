@@ -78,17 +78,25 @@ var SEED_NODES = [
   'r1_crystal','r1_crystal_items','r1_guard_check','r1_guard_fight',
   'r1_guard_weak','r1_guard_sneak','r1_deep','r1_quarters','r1_rest',
   'r1_gate','r1_gate_open','r1_patrol',
+  'r2_start','r2_look','r2_quarry_floor','r2_crystal_harvest','r2_crystal_deep',
+  'r2_machine','r2_machine_activate','r2_bridge','r2_bridge_fix','r2_bridge_swing',
+  'r2_bridge_jump','r2_camp','r2_camp_chief','r2_camp_smith','r2_camp_medic',
+  'r2_rest','r2_boss_prep','r2_boss','r2_gate','r2_patrol',
 ];
 
 var SEED_ITEMS_ZH = [
   '碎石匕首','黑麵包','微光石','石化水瓶','乾燥草藥','粗繩','石化結晶',
   '鍛造鐵錘','迴廊地圖','純淨石化結晶','灰石盾','守衛核心石',
   '抗石化護符','礦工烈酒','皮甲碎片',
+  '強化鶴嘴鋤','抗石化藥膏','高純度石化結晶','工程師筆記',
+  '機甲控制鍵','精鍛戰鋤','濃縮淨化液',
 ];
 var SEED_ITEMS_EN = [
   'Stone Dagger','Black Bread','Glowstone','Petri-Water Flask','Dried Herbs','Rope','Petri Crystal',
   'Forged Hammer','Corridor Map','Pure Petri Crystal','Greystone Shield','Guardian Core Stone',
   'Anti-Petri Amulet','Miner\'s Spirits','Leather Scrap',
+  'Reinforced Pickaxe','Anti-Petri Salve','High-Purity Petri Crystal','Engineer\'s Notebook',
+  'Mech Control Key','Masterwork War Pick','Concentrated Purifier',
 ];
 
 var SEED_FLAGS = [
@@ -96,6 +104,10 @@ var SEED_FLAGS = [
   'tookCrystal','hiddenFound',
   'r1Looked','r1ForgeVisited','r1ForgeSearched','r1ForgeFullSearch',
   'r1GuardHint','r1GuardDefeated','r1CrystalItemsTaken','r1QuartersSearched',
+  'r2Looked','r2FloorSearched','r2CrystalHarvested','r2CrystalStatueSearched',
+  'r2MachineInspected','r2MachineCore','r2BridgeFixed','r2CampVisited',
+  'r2ChiefTalked','r2PickaxeUpgraded','r2ArmorUpgraded',
+  'r2MedicHealed','r2MedicElixir','r2BossDefeated',
 ];
 
 var B36 = '0123456789abcdefghijklmnopqrstuvwxyz';

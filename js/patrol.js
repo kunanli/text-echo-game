@@ -160,11 +160,98 @@ var R1_PATROL_TEXTS = [
   { text: '一陣冰冷的氣流從走廊深處吹來，夾帶著石化粒子。', textEn: 'A freezing draft from deep in the corridor carries petri-particles.' },
 ];
 
+var R2_MONSTERS = [
+  { name: '石化巨蟻', nameEn: 'Petrified Giant Ant', hp: 30, atkMin: 6, atkMax: 12, petriDmg: 3, xp: 16,
+    art: [
+      '      ╭━━╮',
+      '     ╱ ◆◆ ╲',
+      '    │ ╰──╯ │━╮',
+      '    ╰─╮  ╭─╯░░╲',
+      '   ╱╲ ╰━━╯ ░░░░│',
+      '  ╱╱ ╲░░░░░░░╱╱',
+      '  ~~  ~~~~~~~~',
+    ],
+    commune: [
+      { zh: '你蹲下身——巨蟻的觸角停止了擺動，朝你的方向傾斜。', en: 'You crouch — the giant ant\'s antennae stop swaying and tilt toward you.' },
+      { zh: '它用前足輕輕碰了碰你的手——像是在試探。', en: 'It gently taps your hand with its foreleg — as if testing.' },
+      { zh: '巨蟻的複眼中映出你的倒影。它不再把你當作敵人。', en: 'Your reflection gleams in its compound eyes. It no longer sees you as an enemy.' },
+    ],
+    spareText: { zh: '石化巨蟻轉身朝巢穴走去，走了幾步又回頭看了你一眼——然後消失在石壁的裂縫中。', en: 'The giant ant turns toward its nest, glances back at you once, then vanishes into a crack in the rock.' },
+  },
+  { name: '碎岩傀儡', nameEn: 'Rubble Golem', hp: 40, atkMin: 8, atkMax: 13, petriDmg: 3, xp: 18,
+    empathyGoal: 4,
+    art: [
+      '     ╔═══╗',
+      '     ║◇ ◇║',
+      '     ╚═╤═╝',
+      '    ╔══╧══╗',
+      '    ║▓▓▓▓▓║',
+      '    ╠═╤═╤═╣',
+      '    ╱╱ │ ╲╲',
+    ],
+    commune: [
+      { zh: '你伸出手……傀儡停下了揮拳的動作，歪著頭看你。', en: 'You extend your hand... the golem pauses mid-swing, tilting its head.' },
+      { zh: '它的身體裡傳出嗡嗡的振動——像是某種古老的語言。', en: 'A hum vibrates from within — like some ancient language.' },
+      { zh: '你的手掌貼上它粗糙的表面——溫暖從石頭裡傳來。', en: 'Your palm touches its rough surface — warmth radiates from within.' },
+      { zh: '傀儡緩緩跪下，胸口的石塊分開——露出了一顆發光的核心。它在向你展示它的心。', en: 'The golem slowly kneels, chest stones parting — revealing a glowing core. It shows you its heart.' },
+    ],
+    spareText: { zh: '碎岩傀儡站起身，用石臂輕輕拍了拍你的肩膀——然後一塊塊散開，回歸為採石場的碎石。', en: 'The golem rises, gently pats your shoulder with a stone arm — then crumbles piece by piece, returning to quarry rubble.' },
+  },
+  { name: '鏽蝕機甲殘骸', nameEn: 'Rusted Mech Wraith', hp: 35, atkMin: 7, atkMax: 15, petriDmg: 4, xp: 20,
+    empathyGoal: 3,
+    art: [
+      '     ╔══╗',
+      '    ╱ ●● ╲',
+      '    ╚═╤══╝',
+      '   ░░╱║╲░░',
+      '  ░░╱ ║ ╲░░',
+      '     ╱ ╲',
+      '    ╱╱ ╲╲',
+    ],
+    commune: [
+      { zh: '「……操縱者……已經……不在了……」破碎的音頻從殘骸中傳出。', en: '"...pilot...is...gone..." Broken audio emits from the wraith.' },
+      { zh: '殘骸中的警示燈閃爍——像是在哭泣。它不想戰鬥，只是在執行最後的命令。', en: 'Warning lights flicker within — like weeping. It doesn\'t want to fight, merely follows its final orders.' },
+      { zh: '你輕聲說了聲「解除命令」——殘骸的攻擊停止了。它聽到了。', en: 'You whisper "cancel orders" — the wraith\'s attacks cease. It heard you.' },
+    ],
+    spareText: { zh: '機甲殘骸的眼部亮了最後一下：「……任務完成。」然後永遠沉寂了下去。地上留下了一枚鏽蝕的徽章。', en: 'The wraith\'s eyes flash one last time: "...mission complete." Then silence forever. A rusted badge remains on the ground.' },
+  },
+  { name: '深層石化蟒', nameEn: 'Deep Stone Serpent', hp: 38, atkMin: 9, atkMax: 16, petriDmg: 5, xp: 22,
+    empathyGoal: 4,
+    art: [
+      '    ╭━━━╮',
+      '   ╱ ◉◉ ╲━━╮',
+      '  │ ╰──╯ ░░│━╮',
+      '   ╲░░░░░░░│ ░╲',
+      '    ╰━╮░░╭━╯░░│',
+      '      ╰━━╯░░░╱',
+      '         ╰━━╯',
+    ],
+    commune: [
+      { zh: '你靜靜站在原地……石化蟒慢慢環繞在你四周。', en: 'You stand still... the serpent slowly coils around you.' },
+      { zh: '它的舌頭輕輕舔過你的手臂上的石化紋路——像是在品嚐某種記憶。', en: 'Its tongue flicks over the petrification on your arm — as if tasting a memory.' },
+      { zh: '石化蟒收起了攻擊姿態，蟠踞在地上看著你。它的眼中有著某種古老的智慧。', en: 'The serpent relaxes its attack posture, coiling on the ground to watch you. Ancient wisdom glimmers in its eyes.' },
+      { zh: '它抬起頭，朝洞穴深處看了一眼——像是在告訴你什麼。然後緩緩離去。', en: 'It raises its head, glancing into the cave depths — as if telling you something. Then slowly departs.' },
+    ],
+    spareText: { zh: '深層石化蟒朝你點了點頭——是的，它點了頭。然後潛入了地底的裂縫中，留下一道金色的蛻皮。', en: 'The stone serpent nods at you — yes, it nods. Then dives into a ground fissure, leaving a golden shed skin.' },
+  },
+];
+
+var R2_PATROL_TEXTS = [
+  { text: '你穿越巨大的採石台之間，腳步聲在空曠中迴盪。', textEn: 'You weave between massive quarry platforms, footsteps echoing in the vastness.' },
+  { text: '頭頂的結晶礦脈閃爍著不祥的暗金色光芒。', textEn: 'Crystal veins overhead pulse with ominous dark golden light.' },
+  { text: '一塊碎石從岩柱上掉落，發出沉悶的碰撞聲。', textEn: 'A chunk of rock falls from a pillar, landing with a dull thud.' },
+  { text: '你經過一輛翻覆的巨型礦車。鐵輪已經被石化粒子腐蝕殆盡。', textEn: 'You pass an overturned giant mining cart. Its iron wheels are corroded by petri-particles.' },
+  { text: '遠處傳來機械殘骸自行崩塌的聲響。', textEn: 'The distant sound of mechanical wreckage collapsing on its own.' },
+  { text: '你沿著一條乾涸的水渠前進，渠壁上佈滿了石化紋路。', textEn: 'You follow a dried-up canal, its walls covered in petrification patterns.' },
+  { text: '一陣熱風從地底深處湧來，空氣中夾雜著金屬燒灼的氣味。', textEn: 'A hot gust surges from the depths, carrying the smell of scorched metal.' },
+  { text: '你踩到了什麼軟的東西——是一塊被石化到一半的菌毯。', textEn: 'You step on something soft — a mat of fungus, half petrified.' },
+];
+
 // Region-aware helpers
 var PATROL_TEXTS = R0_PATROL_TEXTS; // kept for backwards compat
-function getPatrolMonsters() { return state.region >= 1 ? R1_MONSTERS : R0_MONSTERS; }
-function getPatrolTexts() { return state.region >= 1 ? R1_PATROL_TEXTS : R0_PATROL_TEXTS; }
-function getPatrolReturnNode() { return state.region >= 1 ? 'r1_look' : 'r0_look'; }
+function getPatrolMonsters() { return state.region >= 2 ? R2_MONSTERS : state.region >= 1 ? R1_MONSTERS : R0_MONSTERS; }
+function getPatrolTexts() { return state.region >= 2 ? R2_PATROL_TEXTS : state.region >= 1 ? R1_PATROL_TEXTS : R0_PATROL_TEXTS; }
+function getPatrolReturnNode() { return state.region >= 2 ? 'r2_look' : state.region >= 1 ? 'r1_look' : 'r0_look'; }
 
 var patrolActive = false;
 var patrolTimers = [];

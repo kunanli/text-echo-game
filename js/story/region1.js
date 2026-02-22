@@ -1336,9 +1336,9 @@ registerNode('r1_gate_open', () => {
     { tag: '感知', tagColor: 'tag-sense', text: '門後是一條向上的階梯，乾燥的風撲面而來。', textEn: 'Beyond the door, stairs ascend. A dry wind washes over you.', delay: 2500 },
     { tag: '感知', tagColor: 'tag-sense', text: '空氣中混雜著碎石和鏽鐵的味道——前方似乎是一個巨大的開闊空間。', textEn: 'The air carries the scent of crushed stone and rusted iron — a vast open space lies ahead.', delay: 2500 },
     { tag: '情報', tagColor: 'tag-info', html: '前方是第三層——<b>大採石場</b>。戰場遺跡與石化戰爭機械沉睡其中。', htmlEn: 'Ahead lies the third floor — the <b>Great Quarry</b>. Battlefield ruins and petrified war machines slumber within.', delay: 2500 },
-    { tag: '系統', tagColor: 'tag-system', html: '<i>（第三層 — 大採石場的冒險將在後續更新中展開……）</i>', htmlEn: '<i>(Floor 3 — Great Quarry adventures coming in a future update...)</i>', delay: 1500 },
   ], [
-    { text: '在門口休息，準備下一段旅程', textEn: 'Rest at the gate, prepare for the next journey', action: () => {
+    { text: '踏入大採石場', textEn: 'Enter the Great Quarry', action: () => loadNode('r2_start') },
+    { text: '先休息一下', textEn: 'Rest first', action: () => {
       changeHp(20);
       changePetri(-5);
       notify(L('HP +20，石化度 -5%', 'HP +20, Petri -5%'));
