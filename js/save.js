@@ -82,6 +82,8 @@ var SEED_NODES = [
   'r2_machine','r2_machine_activate','r2_bridge','r2_bridge_fix','r2_bridge_swing',
   'r2_bridge_jump','r2_camp','r2_camp_chief','r2_camp_smith','r2_camp_medic',
   'r2_rest','r2_boss_prep','r2_boss','r2_gate','r2_patrol',
+  'r2_ying_talk','r2_ying_seal','r2_ying_night','r2_ying_promise',
+  'r2_crane','r2_zhou_trace',
 ];
 
 var SEED_ITEMS_ZH = [
@@ -90,6 +92,7 @@ var SEED_ITEMS_ZH = [
   '抗石化護符','礦工烈酒','皮甲碎片',
   '強化鶴嘴鋤','抗石化藥膏','高純度石化結晶','工程師筆記',
   '機甲控制鍵','精鍛戰鋤','濃縮淨化液',
+  '螢的護身符','石化抑制劑',
 ];
 var SEED_ITEMS_EN = [
   'Stone Dagger','Black Bread','Glowstone','Petri-Water Flask','Dried Herbs','Rope','Petri Crystal',
@@ -97,6 +100,7 @@ var SEED_ITEMS_EN = [
   'Anti-Petri Amulet','Miner\'s Spirits','Leather Scrap',
   'Reinforced Pickaxe','Anti-Petri Salve','High-Purity Petri Crystal','Engineer\'s Notebook',
   'Mech Control Key','Masterwork War Pick','Concentrated Purifier',
+  'Ying\'s Charm','Petri Suppressant',
 ];
 
 var SEED_FLAGS = [
@@ -108,6 +112,9 @@ var SEED_FLAGS = [
   'r2MachineInspected','r2MachineCore','r2BridgeFixed','r2CampVisited',
   'r2ChiefTalked','r2PickaxeUpgraded','r2ArmorUpgraded',
   'r2MedicHealed','r2MedicElixir','r2BossDefeated',
+  'r2YingArrived','r2YingLore3','r2YingLore4','r2YingSketch','r2YingNight',
+  'r2YingPromise','r2YingEngineer',
+  'r2CraneMet','r2CraneLore','r2CraneTrade','r2ZhouTrace',
 ];
 
 var B36 = '0123456789abcdefghijklmnopqrstuvwxyz';

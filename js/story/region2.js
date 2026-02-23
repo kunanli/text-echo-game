@@ -55,7 +55,9 @@ registerNode('r2_start', () => {
     { tag: '情報', tagColor: 'tag-info', text: '這裡曾是地底文明最大的採石場——也是石化戰爭的主戰場。', textEn: 'This was the underground civilization\'s largest quarry — and the main battlefield of the Petrification War.', delay: 2500 },
     { tag: '情報', tagColor: 'tag-info', text: '當石化瘟疫失控時，人類動用了戰爭機械試圖封鎖礦坑。但最終，機械也被石化了。', textEn: 'When the plague spiraled out of control, humans deployed war machines to seal the mines. In the end, the machines were petrified too.', delay: 3000 },
     { tag: '感知', tagColor: 'tag-sense', text: '遠處……似乎有火光在閃爍。這個深度，還有人活著？', textEn: 'In the distance... a flickering firelight. People, alive at this depth?', delay: 2500 },
-  ], [
+  ].concat(state.flags.r1YingCompanion ? [
+    { tag: '記憶', tagColor: 'tag-system', text: '你想起了螢——你們約好在採石場會合。希望' + (state.sex === 'male' ? '她' : '他') + '能平安到達這裡。', textEn: 'You think of Ying — you agreed to meet at the quarry. You hope ' + (state.sex === 'male' ? 'she' : 'he') + ' made it here safely.', delay: 2500 },
+  ] : []), [
     { text: '觀察採石場', textEn: 'Survey the quarry', action: () => loadNode('r2_look') },
   ], { label: L('進入大採石場', 'Entering Great Quarry') });
 });
@@ -110,6 +112,19 @@ registerNode('r2_look', () => {
     steps.push({ tag: '感知', tagColor: 'tag-sense', text: '左邊是大片的採石台和結晶密林。右邊是一座斷裂的石橋，橋對面似乎有營火的光芒。', textEn: 'To the left: quarry platforms and crystal thickets. To the right: a broken stone bridge, with firelight beyond.', delay: 2800 });
     steps.push({ tag: '感知', tagColor: 'tag-sense', text: '正前方的遠端，一座巨大的石化戰爭機械矗立在那裡，彷彿沉睡的巨人。', textEn: 'Straight ahead, a colossal petrified war machine stands like a sleeping giant.', delay: 2500 });
     steps.push({ tag: '情報', tagColor: 'tag-info', text: '北面的岩壁上有一條通道口——那是通往上層的上升通道，但似乎被什麼東西封鎖了。', textEn: 'On the north wall, a passage opening — the ascent shaft to the upper level, but something blocks it.', delay: 2500 });
+    // ── Ying arrives ──
+    if (state.flags.r1YingCompanion && !state.flags.r2YingArrived) {
+      state.flags.r2YingArrived = true;
+      var isMale = state.sex === 'male';
+      var yP = isMale ? L('她', 'she') : L('他', 'he');
+      steps.push({ tag: '遭遇', tagColor: 'tag-explore', text: '「——等等我！」', textEn: '"— Wait for me!"', delay: 2200 });
+      steps.push({ tag: '感知', tagColor: 'tag-sense', text: '身後傳來急促的腳步聲和喘息。你轉過身——', textEn: 'Hurried footsteps and panting from behind. You turn —', delay: 2000 });
+      steps.push({ tag: '遭遇', tagColor: 'tag-explore', html: '<b>螢</b>從入口的階梯上跑來，滿臉灰塵，衣角還沾著礦石碎屑。' + yP + '手裡緊抱著那本手冊。', htmlEn: '<b>Ying</b> rushes up the entrance stairs, face dusty, clothes flecked with mineral debris. ' + (isMale ? 'She' : 'He') + ' clutches that notebook tight.', delay: 2800 });
+      steps.push({ tag: '感知', tagColor: 'tag-sense', text: '「哈……哈……我從側隧道繞上來的。差點被一隻石化蟒吃了。」螢彎著腰喘氣，但眼睛裡帶著笑意。', textEn: '"Ha... ha... I came up through a side tunnel. Nearly got eaten by a petrified python." Ying doubles over panting, but ' + (isMale ? 'her' : 'his') + ' eyes are smiling.', delay: 3200 });
+      steps.push({ tag: '感知', tagColor: 'tag-sense', text: yP + '直起身，四下張望，然後深吸一口氣——', textEn: (isMale ? 'She' : 'He') + ' straightens up, looks around, takes a deep breath —', delay: 2200 });
+      steps.push({ tag: '情報', tagColor: 'tag-info', html: '「……<b>大採石場。</b>」螢的眼神變了，變得專注而狂熱。「我找了兩年的地方。封印石室就在這底下某處。」', htmlEn: '"...<b>The Great Quarry.</b>" Ying\'s gaze shifts — focused, fervent. "The place I\'ve searched for two years. The Seal Chamber is somewhere beneath this."', delay: 3500 });
+      steps.push({ tag: '感知', tagColor: 'tag-sense', text: yP + '轉頭看著你，嘴角微揚：「還好你走得不算太快。」', textEn: (isMale ? 'She' : 'He') + ' turns to you, lips curving: "Good thing you didn\'t walk too fast."', delay: 2500 });
+    }
   } else {
     steps.push(mapArt);
     steps.push({ tag: '探索', tagColor: 'tag-explore', text: '你回到了採石場的瞭望台。暗金色的光芒依舊照亮著這片荒蕪的地下工場。', textEn: 'You return to the quarry overlook. Dark golden light still illuminates this desolate underground works.', delay: 2000 });
@@ -129,6 +144,9 @@ registerNode('r2_look', () => {
     }
     if (state.flags.r2MachineCore) {
       c.push({ text: '前往上升通道', textEn: 'Go to the ascent shaft', action: () => loadNode('r2_gate') });
+    }
+    if (state.flags.r2YingArrived) {
+      c.push({ text: '找螢', textEn: 'Find Ying', action: () => loadNode('r2_ying_talk') });
     }
     c.push({ text: '巡邏採石場', textEn: 'Patrol the quarry', action: () => loadNode('r2_patrol') });
     c.push({ text: '返回石脈迴廊', textEn: 'Return to Vein Corridor', action: () => loadNode('r1_deep') });
@@ -193,6 +211,9 @@ registerNode('r2_quarry_floor', () => {
       }});
     }
     c.push({ text: '搜索結晶密林深處', textEn: 'Search deep in the crystal thicket', action: () => loadNode('r2_crystal_deep') });
+    if (state.flags.r1SurvivorMet && !state.flags.r2ZhouTrace) {
+      c.push({ text: '岩壁上好像有字……', textEn: 'There seems to be writing on the rock wall...', action: () => loadNode('r2_zhou_trace') });
+    }
     c.push({ text: '返回瞭望台', textEn: 'Return to overlook', action: () => loadNode('r2_look') });
     return c;
   })(), { label: L('搜索採石台', 'Searching quarry platform') });
@@ -485,6 +506,12 @@ registerNode('r2_camp', () => {
     c.push({ text: '和鐵霜說話', textEn: 'Talk to Iron Frost', action: () => loadNode('r2_camp_chief') });
     c.push({ text: '找鐵匠', textEn: 'Visit the blacksmith', action: () => loadNode('r2_camp_smith') });
     c.push({ text: '找醫師', textEn: 'Visit the medic', action: () => loadNode('r2_camp_medic') });
+    if (state.flags.r2YingArrived) {
+      c.push({ text: '和螢坐坐', textEn: 'Sit with Ying', action: () => loadNode('r2_ying_talk') });
+    }
+    if (state.flags.r1WandererMet) {
+      c.push({ text: state.flags.r2CraneMet ? '找灰鶴' : '角落裡有個熟悉的身影……', textEn: state.flags.r2CraneMet ? 'Find Grey Crane' : 'A familiar figure in the corner...', action: () => loadNode('r2_crane') });
+    }
     c.push({ text: '在營地休息', textEn: 'Rest at the camp', action: () => loadNode('r2_rest') });
     c.push({ text: '過橋返回', textEn: 'Cross back', action: () => loadNode('r2_look') });
     return c;
@@ -619,6 +646,15 @@ registerNode('r2_rest', () => {
         ]);
       }});
     }
+    if (hasItem(L('石化抑制劑', 'Petri Suppressant'))) {
+      c.push({ text: '服用石化抑制劑', textEn: 'Take the Petri Suppressant', action: () => {
+        removeItem(L('石化抑制劑', 'Petri Suppressant'));
+        changePetri(-15);
+        changeHp(10);
+        notify(L('石化度 -15%，HP +10', 'Petri -15%, HP +10'));
+        loadNode('r2_camp');
+      }});
+    }
     c.push({ text: '站起來繼續', textEn: 'Get up and continue', action: () => {
       changeHp(20);
       changePetri(-5);
@@ -631,13 +667,25 @@ registerNode('r2_rest', () => {
 
 // ── Boss Prep + Boss Fight ──
 registerNode('r2_boss_prep', () => {
+  var yingSteps = [];
+  if (state.flags.r2YingArrived) {
+    var isMale = state.sex === 'male';
+    var yP = isMale ? L('她', 'she') : L('他', 'he');
+    var yPC = isMale ? 'She' : 'He';
+    if (state.flags.r2YingPromise) {
+      yingSteps.push({ tag: '感知', tagColor: 'tag-sense', text: '螢站在營地入口，目光追隨著你。' + yP + '輕輕摸了摸自己空蕩蕩的領口——護身符已經在你身上了。', textEn: 'Ying stands at the camp entrance, eyes following you. ' + yPC + ' touches ' + (isMale ? 'her' : 'his') + ' bare collar — the charm is with you now.', delay: 2800 });
+      yingSteps.push({ tag: '感知', tagColor: 'tag-sense', text: yP + '沒有說話，只是朝你用力地點了一下頭。那個動作裡包含了太多說不出口的話。', textEn: yPC + ' says nothing, just nods firmly. That single gesture holds everything words cannot.', delay: 2800 });
+    } else {
+      yingSteps.push({ tag: '感知', tagColor: 'tag-sense', text: '螢在人群後面看著你出發。' + yP + '的嘴唇動了動，但最終什麼都沒說。', textEn: 'Ying watches from the back as you set out. ' + yPC + ' lips move, but no words come.', delay: 2500 });
+    }
+  }
   autoExplore([
     { tag: '情報', tagColor: 'tag-info', text: '鐵霜站了起來，用石化的左手握緊了石錘。', textEn: 'Iron Frost rises, gripping her stone hammer with her petrified left hand.', delay: 2000 },
     { tag: '情報', tagColor: 'tag-info', text: '「好。我帶兩個最好的戰士跟你一起去。其他人留下守營地。」', textEn: '"Good. I\'ll take two of our best fighters with you. The rest guard the camp."', delay: 2500 },
     { tag: '情報', tagColor: 'tag-info', text: '「記住——那頭巨獸是半人半機甲的存在。普通攻擊對它的外殼效果很差。」', textEn: '"Remember — that colossus is half-human, half-mech. Normal attacks barely scratch its shell."', delay: 2800 },
     { tag: '情報', tagColor: 'tag-info', html: '「你有機甲控制鍵——<b>在戰鬥中找到它胸口的核心接口，插入控制鍵就能讓它短路。</b>」', htmlEn: '"You have the mech control key — <b>find the core port on its chest during battle. Insert the key to short-circuit it.</b>"', delay: 3000 },
     { tag: '情報', tagColor: 'tag-info', text: '「但在那之前，你得先打穿它的護甲……準備好了嗎？」', textEn: '"But first you need to break through its armor... Are you ready?"', delay: 2500 },
-  ], [
+  ].concat(yingSteps), [
     { text: '出發！', textEn: 'Let\'s go!', action: () => loadNode('r2_boss') },
     { text: '再準備一下', textEn: 'I need more preparation', action: () => loadNode('r2_camp') },
   ], { label: L('作戰準備', 'Battle preparations') });
@@ -755,6 +803,300 @@ registerNode('r2_gate', () => {
       return c;
     })(), { label: L('上升通道', 'Ascent shaft') });
   }
+});
+
+// ═══════════════════════════════════════════════════
+//  NPC Continuation — 螢 (Ying) in Region 2
+// ═══════════════════════════════════════════════════
+
+registerNode('r2_ying_talk', () => {
+  var isMale = state.sex === 'male';
+  var yP = isMale ? L('她', 'she') : L('他', 'he');
+  var yPC = isMale ? 'She' : 'He';
+  var yPo = isMale ? 'her' : 'his';
+
+  var steps = [];
+  steps.push({ tag: '移動', tagColor: 'tag-move', text: '你在瞭望台的邊緣找到了螢。' + yP + '正蹲在地上，用炭筆在手冊上飛速地畫著什麼。', textEn: 'You find Ying at the edge of the overlook. ' + yPC + '\'s crouching, charcoal pencil flying across the notebook.', delay: 2200 });
+
+  if (!state.flags.r2YingLore3) {
+    steps.push({ tag: '感知', tagColor: 'tag-sense', text: '你湊近一看——' + yP + '在畫採石場的地形圖，標註著各種符號。', textEn: 'You look closer — ' + yPC + '\'s drawing a topographic map of the quarry, marked with symbols.', delay: 2500 });
+    steps.push({ tag: '情報', tagColor: 'tag-info', text: '「你來得正好。」螢頭也不抬地說。「我一直在對照筆記裡的舊地圖——有些東西對上了。」', textEn: '"Perfect timing." Ying speaks without looking up. "I\'ve been comparing the old maps in my notes — some things match."', delay: 3000 });
+  } else {
+    steps.push({ tag: '感知', tagColor: 'tag-sense', text: '螢看到你來，收起炭筆，拍了拍手上的灰：「又想我了？」', textEn: 'Ying sees you, puts away the charcoal, dusts off ' + yPo + ' hands: "Missed me already?"', delay: 2500 });
+    steps.push({ tag: '感知', tagColor: 'tag-sense', text: yP + '說完自己先紅了臉，迅速低頭翻手冊：「我是說——有什麼新發現嗎？」', textEn: yPC + ' blushes first, quickly flipping through the notebook: "I mean — any new discoveries?"', delay: 2800 });
+  }
+
+  autoExplore(steps, (function() {
+    var c = [];
+    if (!state.flags.r2YingLore3) {
+      c.push({ text: '聽螢分析採石場', textEn: 'Listen to Ying\'s quarry analysis', action: () => loadNode('r2_ying_seal') });
+    }
+    if (state.flags.r2YingLore3 && !state.flags.r2YingSketch) {
+      c.push({ text: '你在畫什麼？', textEn: 'What are you drawing?', action: () => {
+        state.flags.r2YingSketch = true;
+        autoExplore([
+          { tag: '感知', tagColor: 'tag-sense', text: '你瞥見手冊攤開的那一頁——上面不是地圖，是一幅素描。', textEn: 'You glimpse the open page — it\'s not a map, it\'s a sketch.', delay: 2200 },
+          { tag: '感知', tagColor: 'tag-sense', text: '是一個人的側臉。有些模糊，但你認出了那個輪廓——那是你。', textEn: 'A profile of someone. Blurred, but you recognize the outline — it\'s you.', delay: 2800 },
+          { tag: '感知', tagColor: 'tag-sense', text: '螢猛地合上手冊，耳根通紅：「那是——那只是練習！記錄員需要練習速寫技巧！」', textEn: 'Ying slams the notebook shut, ears burning: "That\'s — it\'s just practice! Chroniclers need to practice sketching!"', delay: 3200 },
+          { tag: '感知', tagColor: 'tag-sense', text: yP + '把手冊藏到身後，不肯讓你再看。但你注意到' + yP + '的嘴角在微微上揚。', textEn: yPC + ' hides the notebook behind ' + yPo + ' back, refusing to let you see more. But you notice the corners of ' + yPo + ' lips curving up.', delay: 3000 },
+          { tag: '情報', tagColor: 'tag-info', text: '「……你如果敢告訴別人，我就在記錄裡把你寫成禿頭。」', textEn: '"...If you tell anyone, I\'ll write you as bald in the records."', delay: 2500 },
+        ], [
+          { text: '我不會說的', textEn: 'I won\'t tell', action: () => {
+            changeHp(5);
+            changePetri(-2);
+            notify(L('HP +5，石化度 -2%（溫暖的感覺）', 'HP +5, Petri -2% (A warm feeling)'));
+            loadNode('r2_look');
+          }},
+        ], { label: L('螢的素描', 'Ying\'s sketch') });
+      }});
+    }
+    if (state.flags.r2CampVisited && !state.flags.r2YingNight) {
+      c.push({ text: '要不要一起去營地休息？', textEn: 'Want to rest at the camp together?', action: () => loadNode('r2_ying_night') });
+    }
+    if (state.flags.r2YingLore3 && state.flags.r2ChiefTalked && !state.flags.r2YingPromise) {
+      c.push({ text: '我快要去挑戰巨獸了……', textEn: 'I\'m about to face the colossus...', action: () => loadNode('r2_ying_promise') });
+    }
+    if (state.flags.r2CrystalStatueSearched && !state.flags.r2YingEngineer) {
+      c.push({ text: '告訴螢石化工程師的事', textEn: 'Tell Ying about the petrified engineer', action: () => {
+        state.flags.r2YingEngineer = true;
+        autoExplore([
+          { tag: '情報', tagColor: 'tag-info', text: '你把在結晶密林裡發現石化工程師的事告訴了螢。', textEn: 'You tell Ying about the petrified engineer you found in the crystal thicket.', delay: 2000 },
+          { tag: '感知', tagColor: 'tag-sense', text: '螢的表情凝重了。' + yP + '翻開手冊，找到一頁人員名單。', textEn: 'Ying\'s expression grows solemn. ' + yPC + ' flips to a page with a personnel list.', delay: 2500 },
+          { tag: '情報', tagColor: 'tag-info', html: '「……<b>柯薇</b>。第七號戰甲的首席工程師。失蹤於瘟疫爆發後第三天。」螢輕聲唸道。', htmlEn: '"...<b>Kwei</b>. Chief engineer of Mech Unit No.7. Missing since day three of the plague outbreak." Ying reads softly.', delay: 3200 },
+          { tag: '情報', tagColor: 'tag-info', text: '「她一定是在最後關頭還想啟動七號機甲……但來不及了。」', textEn: '"She must have been trying to activate Mech No.7 until the very end... but ran out of time."', delay: 2800 },
+          { tag: '感知', tagColor: 'tag-sense', text: '螢在手冊上柯薇的名字旁寫了一行小字：「已確認。安息。」', textEn: 'Ying writes a small note beside Kwei\'s name: "Confirmed. Rest in peace."', delay: 2500 },
+          { tag: '感知', tagColor: 'tag-sense', text: yP + '合上手冊，沉默了一會兒：「……至少有人記得她。」', textEn: yPC + ' closes the notebook, silent for a moment: "...At least someone remembers her."', delay: 2500 },
+        ], [
+          { text: '繼續', textEn: 'Continue', action: () => {
+            changeStat('wil', 1);
+            notify(L('意志 +1', 'WIL +1'));
+            loadNode('r2_ying_talk');
+          }},
+        ], { label: L('柯薇的記錄', 'Kwei\'s record') });
+      }});
+    }
+    c.push({ text: '離開', textEn: 'Leave', action: () => loadNode('r2_look') });
+    return c;
+  })(), { label: L('和螢說話', 'Talking to Ying') });
+});
+
+// ── Ying: Seal Chamber lore ──
+registerNode('r2_ying_seal', () => {
+  var isMale = state.sex === 'male';
+  var yP = isMale ? L('她', 'she') : L('他', 'he');
+  var yPC = isMale ? 'She' : 'He';
+  var yPo = isMale ? 'her' : 'his';
+  state.flags.r2YingLore3 = true;
+  autoExplore([
+    { tag: '情報', tagColor: 'tag-info', text: '螢把手冊攤在地上，指著一張泛黃的手繪地圖。', textEn: 'Ying spreads the notebook on the ground, pointing to a yellowed hand-drawn map.', delay: 2200 },
+    { tag: '情報', tagColor: 'tag-info', html: '「根據舊記錄，<b>封印石室在採石場的最底層</b>——比我們現在站的位置還要深三層。」', htmlEn: '"According to old records, <b>the Seal Chamber is on the quarry\'s deepest level</b> — three floors below where we stand now."', delay: 3200 },
+    { tag: '情報', tagColor: 'tag-info', text: '「但那條路在五十年前的瘟疫爆發時就被封死了。唯一的通道——」', textEn: '"But that path was sealed fifty years ago when the plague broke out. The only passage —"', delay: 2800 },
+    { tag: '情報', tagColor: 'tag-info', text: '螢用炭筆在地圖上劃了一條線：「——經過上升通道，再從另一側繞下去。」', textEn: 'Ying traces a line on the map: "— goes through the ascent shaft, then loops back down from the other side."', delay: 2800 },
+    { tag: '情報', tagColor: 'tag-info', html: '「換句話說——<b>我們必須先上去，才能找到下去的路。</b>」', htmlEn: '"In other words — <b>we have to go up first to find the way down.</b>"', delay: 2500 },
+    { tag: '感知', tagColor: 'tag-sense', text: '螢合上手冊，看著你的眼睛。在暗金色的光線中，' + yP + '的表情前所未有地認真。', textEn: 'Ying closes the notebook and looks into your eyes. In the dark golden light, ' + yPo + ' expression is unprecedentedly serious.', delay: 2800 },
+    { tag: '情報', tagColor: 'tag-info', text: '「你要去上面。我要去下面。但路是同一條。」', textEn: '"You need to go up. I need to go down. But the path is the same."', delay: 2500 },
+    { tag: '感知', tagColor: 'tag-sense', text: yP + '頓了頓，聲音低了下來：「……到了分岔路口，你會怎麼選？」', textEn: yPC + ' pauses, voice dropping: "...When we reach the fork, which way will you choose?"', delay: 2800 },
+    { tag: '感知', tagColor: 'tag-sense', text: '你聽出了' + yP + '話裡的意思——' + yP + '在問，你會不會和' + yP + '一起去封印石室。', textEn: 'You hear the subtext — ' + (isMale ? 'she\'s' : 'he\'s') + ' asking whether you\'d go with ' + (isMale ? 'her' : 'him') + ' to the Seal Chamber.', delay: 3000 },
+  ], [
+    { text: '到了再說吧。先活著走出這裡。', textEn: 'We\'ll decide when we get there. Survive this first.', action: () => {
+      autoExplore([
+        { tag: '感知', tagColor: 'tag-sense', text: '螢笑了一下，但那個笑容裡有一絲你看不透的東西。', textEn: 'Ying smiles, but there\'s something in that smile you can\'t quite read.', delay: 2200 },
+        { tag: '情報', tagColor: 'tag-info', text: '「也對。先活著。」' + yP + '把手冊收好，站了起來。', textEn: '"Fair enough. Survive first." ' + yPC + ' packs the notebook and stands.', delay: 2200 },
+        { tag: '感知', tagColor: 'tag-sense', text: '「——但我會在筆記裡留一頁給你的答案。」', textEn: '"— But I\'ll save a page for your answer."', delay: 2500 },
+      ], [{ text: '繼續', textEn: 'Continue', action: () => loadNode('r2_look') }]);
+    }},
+    { text: '我答應過跟你一起走', textEn: 'I promised to walk with you', action: () => {
+      state.flags.r2YingLore4 = true;
+      autoExplore([
+        { tag: '感知', tagColor: 'tag-sense', text: '螢愣了一下。然後' + yP + '別過頭去，但你看到' + yP + '的耳尖紅了。', textEn: 'Ying freezes. Then ' + (isMale ? 'she' : 'he') + ' turns away, but you see ' + yPo + ' ear tips redden.', delay: 2500 },
+        { tag: '情報', tagColor: 'tag-info', text: '「……你這個人，說話總是這麼直接。」螢的聲音有些發顫。', textEn: '"...You always speak so directly." Ying\'s voice trembles slightly.', delay: 2500 },
+        { tag: '感知', tagColor: 'tag-sense', text: yP + '轉過身，眼睛裡帶著水光，但嘴角是上揚的。', textEn: yPC + ' turns back, eyes glistening, but lips curved upward.', delay: 2500 },
+        { tag: '情報', tagColor: 'tag-info', text: '「好。我記下了。白紙黑字——你賴不掉。」', textEn: '"Good. Noted. In black and white — you can\'t take it back."', delay: 2500 },
+        { tag: '感知', tagColor: 'tag-sense', text: yP + '低頭在手冊上寫了什麼。你沒看清內容，但你看到了' + yP + '落筆時的微笑。', textEn: yPC + ' writes something in the notebook. You can\'t see what, but you see the smile as the pen touches paper.', delay: 3000 },
+      ], [{ text: '繼續', textEn: 'Continue', action: () => {
+        changeStat('wil', 1);
+        notify(L('意志 +1', 'WIL +1'));
+        loadNode('r2_look');
+      }}]);
+    }},
+  ], { label: L('封印石室的線索', 'Seal Chamber clues') });
+});
+
+// ── Ying: campfire night scene ──
+registerNode('r2_ying_night', () => {
+  var isMale = state.sex === 'male';
+  var yP = isMale ? L('她', 'she') : L('他', 'he');
+  var yPC = isMale ? 'She' : 'He';
+  var yPo = isMale ? 'her' : 'his';
+  state.flags.r2YingNight = true;
+  autoExplore([
+    { tag: '移動', tagColor: 'tag-move', text: '你帶著螢來到了營地。營火的光芒讓' + yP + '的表情柔和了不少。', textEn: 'You bring Ying to the camp. The campfire\'s glow softens ' + yPo + ' expression.', delay: 2200 },
+    { tag: '環境', tagColor: 'tag-system', text: '營地裡的人大多已經睡了。只有零星的幾個人在輪值守夜。', textEn: 'Most camp residents have turned in. Only a few stand watch.', delay: 2200 },
+    { tag: '感知', tagColor: 'tag-sense', text: '你和螢在營火旁坐下。火光在你們之間跳躍，把兩個人的影子拉得很長。', textEn: 'You and Ying sit by the campfire. Flames dance between you, casting long shadows.', delay: 2500 },
+    { tag: '環境', tagColor: 'tag-system', text: '沉默了一會兒。但這不是尷尬的沉默——是那種彼此存在就已足夠的安靜。', textEn: 'Silence for a while. Not awkward silence — the kind where each other\'s presence is enough.', delay: 2800 },
+    { tag: '情報', tagColor: 'tag-info', text: '「……如果我們能走出去——」螢忽然開口，盯著火焰。', textEn: '"...If we make it out—" Ying suddenly speaks, staring into the flames.', delay: 2500 },
+    { tag: '情報', tagColor: 'tag-info', text: '「到了地表，你想做什麼？」', textEn: '"When we reach the surface, what do you want to do?"', delay: 2200 },
+    { tag: '記憶', tagColor: 'tag-system', text: '地表……那個概念對你來說已經模糊得像一場夢了。陽光、風、天空——你甚至記不清它們的顏色。', textEn: 'The surface... that concept has grown dream-like. Sunlight, wind, sky — you can\'t even recall their colors.', delay: 3000 },
+    { tag: '感知', tagColor: 'tag-sense', text: '螢似乎看出了你的困惑。' + yP + '輕輕靠近了一些——肩膀幾乎碰到了你的。', textEn: 'Ying seems to sense your confusion. ' + yPC + ' leans slightly closer — shoulders nearly touching yours.', delay: 2800 },
+    { tag: '情報', tagColor: 'tag-info', text: '「我想……找一個安靜的地方。把這一切都寫成書。」螢的聲音很輕。', textEn: '"I want to... find a quiet place. Write all of this into a book." Ying\'s voice is soft.', delay: 2800 },
+    { tag: '情報', tagColor: 'tag-info', text: '「三百年的石化瘟疫史。從第一任爐灶少女到最後一個。」', textEn: '"Three hundred years of the Stone Plague. From the first Hearth-Maiden to the last."', delay: 2500 },
+    { tag: '感知', tagColor: 'tag-sense', text: yP + '側過頭看著你，火光映在' + yP + '的瞳孔裡，像兩顆微小的星。', textEn: yPC + ' turns to look at you, firelight reflected in ' + yPo + ' eyes like two tiny stars.', delay: 2800 },
+    { tag: '情報', tagColor: 'tag-info', text: '「如果你願意……我希望你能在旁邊。幫我校對。」', textEn: '"If you\'re willing... I\'d like you nearby. To help me proofread."', delay: 2800 },
+    { tag: '感知', tagColor: 'tag-sense', text: '那句話聽起來像是在說校對。但你知道' + yP + '的意思不只是校對。', textEn: 'It sounds like proofreading. But you know ' + (isMale ? 'she' : 'he') + ' means more than that.', delay: 2800 },
+  ], [
+    { text: '我不太會寫字', textEn: 'I\'m not great at writing', action: () => {
+      autoExplore([
+        { tag: '情報', tagColor: 'tag-info', text: '螢噗嗤一聲笑了。', textEn: 'Ying snorts a laugh.', delay: 1800 },
+        { tag: '情報', tagColor: 'tag-info', text: '「笨蛋。我是記錄員，寫字是我的事。你只要待在那裡就好。」', textEn: '"Idiot. I\'m the chronicler — writing is my job. You just have to be there."', delay: 2800 },
+        { tag: '感知', tagColor: 'tag-sense', text: yP + '說完這句話後就不再開口了。但' + yP + '的肩膀輕輕靠上了你的。', textEn: 'After saying that, ' + (isMale ? 'she' : 'he') + ' falls silent. But ' + yPo + ' shoulder gently leans against yours.', delay: 2800 },
+        { tag: '環境', tagColor: 'tag-system', text: '營火噼啪作響。頭頂的石化結晶散發出微弱的光——像一片地底的星空。', textEn: 'The campfire crackles. Overhead, faint crystal glow — like an underground starscape.', delay: 2500 },
+        { tag: '感知', tagColor: 'tag-sense', text: '過了很久，你感覺肩膀上的重量變得均勻——螢靠著你睡著了。', textEn: 'After a long while, the weight on your shoulder steadies — Ying has fallen asleep against you.', delay: 3000 },
+        { tag: '感知', tagColor: 'tag-sense', text: yP + '的呼吸很輕，嘴唇微微張開。手冊滑到了膝蓋上——攤開的那一頁寫滿了字。', textEn: yPC + ' breathes softly, lips slightly parted. The notebook has slipped to ' + yPo + ' knee — the open page covered in writing.', delay: 3000 },
+        { tag: '感知', tagColor: 'tag-sense', text: '你不敢動。在這座冰冷的地底世界裡，此刻肩上的溫度是你擁有的最珍貴的東西。', textEn: 'You dare not move. In this cold underground world, the warmth on your shoulder is the most precious thing you possess.', delay: 3200 },
+      ], [
+        { text: '靜靜地陪著', textEn: 'Stay with her quietly', action: () => {
+          changeHp(25);
+          changePetri(-8);
+          notify(L('HP +25，石化度 -8%（深層的寧靜）', 'HP +25, Petri -8% (Deep tranquility)'));
+          loadNode('r2_camp');
+        }},
+      ], { label: L('營火夜話', 'Campfire night') });
+    }},
+    { text: '那是個約定', textEn: 'It\'s a promise', action: () => {
+      autoExplore([
+        { tag: '感知', tagColor: 'tag-sense', text: '螢低下頭，火光把' + yP + '泛紅的臉映得更紅了。', textEn: 'Ying lowers ' + yPo + ' head, the firelight making ' + yPo + ' flushed face even redder.', delay: 2200 },
+        { tag: '情報', tagColor: 'tag-info', text: '「……又是這種直接的說法。」' + yP + '小聲嘟囔。', textEn: '"...There you go being direct again." ' + yPC + ' mutters.', delay: 2200 },
+        { tag: '感知', tagColor: 'tag-sense', text: '但' + yP + '伸出手——帶著墨漬的手指輕輕碰了碰你石化的左手。', textEn: 'But ' + (isMale ? 'she' : 'he') + ' reaches out — ink-stained fingers gently brush your petrified left hand.', delay: 2800 },
+        { tag: '感知', tagColor: 'tag-sense', text: '這一次，' + yP + '沒有縮回去。', textEn: 'This time, ' + (isMale ? 'she' : 'he') + ' doesn\'t pull back.', delay: 2200 },
+        { tag: '環境', tagColor: 'tag-system', text: '營火的溫暖、手指的觸感、頭頂結晶的微光——這一刻，石化的寒冷似乎很遠很遠。', textEn: 'The campfire\'s warmth, the touch of fingers, the faint crystal glow above — in this moment, petrification\'s chill seems far, far away.', delay: 3000 },
+        { tag: '感知', tagColor: 'tag-sense', text: '螢靠著你的肩膀，慢慢閉上了眼睛。手冊滑落到地上，' + yP + '也沒有去撿。', textEn: 'Ying leans against your shoulder, slowly closing ' + yPo + ' eyes. The notebook falls to the ground, but ' + (isMale ? 'she' : 'he') + ' doesn\'t pick it up.', delay: 3000 },
+        { tag: '感知', tagColor: 'tag-sense', text: '你也沒有動。就讓這一刻停留久一些吧。', textEn: 'You don\'t move either. Let this moment last a little longer.', delay: 2500 },
+      ], [
+        { text: '閉上眼睛', textEn: 'Close your eyes', action: () => {
+          changeHp(30);
+          changePetri(-10);
+          changeStat('wil', 1);
+          notify(L('HP +30，石化度 -10%，意志 +1（心的溫度）', 'HP +30, Petri -10%, WIL +1 (Warmth of heart)'));
+          loadNode('r2_camp');
+        }},
+      ], { label: L('營火夜話', 'Campfire night') });
+    }},
+  ], { label: L('營火邊的螢', 'Ying by the campfire') });
+});
+
+// ── Ying: pre-boss promise ──
+registerNode('r2_ying_promise', () => {
+  var isMale = state.sex === 'male';
+  var yP = isMale ? L('她', 'she') : L('他', 'he');
+  var yPC = isMale ? 'She' : 'He';
+  var yPo = isMale ? 'her' : 'his';
+  state.flags.r2YingPromise = true;
+  autoExplore([
+    { tag: '感知', tagColor: 'tag-sense', text: '聽到你要去挑戰石化巨獸，螢的手停了。', textEn: 'Hearing you\'re going to face the Petrified Colossus, Ying\'s hand stops.', delay: 2000 },
+    { tag: '感知', tagColor: 'tag-sense', text: yP + '慢慢合上手冊，抬起頭。' + yP + '的表情很平靜，但你看到' + yP + '咬緊了嘴唇。', textEn: yPC + ' slowly closes the notebook and looks up. ' + yPC + ' expression is calm, but you see ' + yPo + ' lips pressed tight.', delay: 2800 },
+    { tag: '情報', tagColor: 'tag-info', text: '「……我知道攔不住你。」螢站了起來，走到你面前。', textEn: '"...I know I can\'t stop you." Ying stands and walks up to you.', delay: 2500 },
+    { tag: '感知', tagColor: 'tag-sense', text: yP + '從領口解下一條細繩——上面繫著一枚小小的、打磨光滑的石頭。形狀像一顆螢火蟲。', textEn: yPC + ' unties a thin cord from ' + yPo + ' collar — on it hangs a small, polished stone. Shaped like a firefly.', delay: 3000 },
+    { tag: '情報', tagColor: 'tag-info', html: '「這是我師父留給我的。他說<b>螢火之光可以照亮最深的黑暗</b>——雖然我一直覺得這只是安慰話。」', htmlEn: '"My mentor left me this. He said <b>a firefly\'s light can illuminate the deepest dark</b> — though I always thought it was just comfort."', delay: 3500 },
+    { tag: '感知', tagColor: 'tag-sense', text: '螢把石墜掛在你的脖子上。' + yP + '的手指在你鎖骨處停留了一瞬——微微發抖。', textEn: 'Ying hangs the pendant around your neck. ' + yPC + ' fingers linger at your collarbone for a moment — trembling slightly.', delay: 3000 },
+    { tag: '物品', tagColor: 'tag-item', html: '獲得了<b>螢的護身符</b>。', htmlEn: 'Received <b>Ying\'s Charm</b>.', delay: 1500, effect: () => { addItem(L('螢的護身符', 'Ying\'s Charm')); } },
+    { tag: '情報', tagColor: 'tag-info', text: '「你給我答應——活著回來。」螢看著你的眼睛，聲音很輕但很堅定。', textEn: '"Promise me — come back alive." Ying looks into your eyes, voice soft but firm.', delay: 2800 },
+    { tag: '感知', tagColor: 'tag-sense', text: '在暗金色的光線中，' + yP + '的眼睛比你見過的任何結晶都要明亮。', textEn: 'In the dark golden light, ' + yPo + ' eyes are brighter than any crystal you\'ve seen.', delay: 2500 },
+    { tag: '情報', tagColor: 'tag-info', text: '「我還有很多東西沒寫完。你的故事——不能在這裡結束。」', textEn: '"I still have so much to write. Your story — it can\'t end here."', delay: 2800 },
+  ], [
+    { text: '我會回來的', textEn: 'I\'ll come back', action: () => {
+      autoExplore([
+        { tag: '感知', tagColor: 'tag-sense', text: '螢點了點頭。然後' + yP + '做了一件你沒料到的事——', textEn: 'Ying nods. Then ' + (isMale ? 'she' : 'he') + ' does something unexpected —', delay: 2200 },
+        { tag: '感知', tagColor: 'tag-sense', text: yP + '踮起腳尖，在你的額頭上輕輕印了一下。很快。像蜻蜓點水。', textEn: yPC + ' stands on tiptoe and lightly presses ' + yPo + ' lips to your forehead. Quickly. Like a dragonfly touching water.', delay: 3000 },
+        { tag: '感知', tagColor: 'tag-sense', text: '「……這是記錄員的祝福。」螢的聲音發顫，臉紅到了脖子。「不許多想。」', textEn: '"...That\'s a chronicler\'s blessing." Ying\'s voice wavers, blush spreading to ' + yPo + ' neck. "Don\'t read into it."', delay: 3000 },
+        { tag: '感知', tagColor: 'tag-sense', text: yP + '轉身快步走開，但你聽到' + yP + '小聲說了一句——', textEn: yPC + ' turns and walks away quickly, but you hear ' + (isMale ? 'her' : 'him') + ' whisper —', delay: 2500 },
+        { tag: '情報', tagColor: 'tag-info', text: '「——一定要回來。」', textEn: '"— Come back. Please."', delay: 2500 },
+      ], [{ text: '繼續', textEn: 'Continue', action: () => {
+        changeStat('wil', 2);
+        changeHp(15);
+        changePetri(-5);
+        notify(L('意志 +2，HP +15，石化度 -5%（不可辜負的約定）', 'WIL +2, HP +15, Petri -5% (A promise that must be kept)'));
+        loadNode('r2_look');
+      }}]);
+    }},
+  ], { label: L('螢的護身符', 'Ying\'s charm') });
+});
+
+// ═══════════════════════════════════════════════════
+//  NPC Continuation — 灰鶴 (Grey Crane) in Region 2
+// ═══════════════════════════════════════════════════
+
+registerNode('r2_crane', () => {
+  var steps = [];
+  if (!state.flags.r2CraneMet) {
+    state.flags.r2CraneMet = true;
+    steps.push({ tag: '遭遇', tagColor: 'tag-explore', text: '你在營地的角落看到一個熟悉的身影——一件灰色的斗篷，背上的大包裹叮噹作響。', textEn: 'In a camp corner, a familiar figure — a grey cloak, a large pack clinking on the back.', delay: 2500 });
+    steps.push({ tag: '遭遇', tagColor: 'tag-explore', html: '「喲——<b>又見面了</b>。」灰鶴轉過身，露出那張永遠帶著商人笑容的臉。', htmlEn: '"Well — <b>we meet again</b>." Grey Crane turns, showing that perpetual merchant\'s grin.', delay: 2500 });
+    steps.push({ tag: '情報', tagColor: 'tag-info', text: '「怎麼，你也上來了？比我想的快。」他把包裹放下，從裡面掏出一瓶酒。', textEn: '"So, you made it up too? Faster than I expected." He sets down the pack and pulls out a bottle.', delay: 2800 });
+    steps.push({ tag: '情報', tagColor: 'tag-info', text: '「我從另一條商路繞過來的。迴廊東邊有一條暗渠——做生意的都知道。」', textEn: '"I came through another trade route. There\'s a culvert east of the corridor — all the traders know it."', delay: 3000 });
+    steps.push({ tag: '情報', tagColor: 'tag-info', text: '「這個營地的人跟我買了不少東西。鐵霜那個女人殺價很狠。」灰鶴搖搖頭笑了。', textEn: '"The camp folk bought plenty from me. That Iron Frost woman drives a hard bargain." Grey Crane shakes his head, laughing.', delay: 2800 });
+  } else {
+    steps.push({ tag: '遭遇', tagColor: 'tag-explore', text: '灰鶴坐在他那堆貨物旁邊喝酒。看到你走來，他舉起酒瓶晃了晃。', textEn: 'Grey Crane sits beside his pile of goods, drinking. He waves the bottle as you approach.', delay: 2200 });
+    steps.push({ tag: '情報', tagColor: 'tag-info', text: '「又來找我？是要做生意，還是聽故事？」', textEn: '"Back again? Business, or stories?"', delay: 2000 });
+  }
+  autoExplore(steps, (function() {
+    var c = [];
+    if (!state.flags.r2CraneLore) {
+      c.push({ text: '聽灰鶴說說上面的情況', textEn: 'Ask Grey Crane about what\'s above', action: () => {
+        state.flags.r2CraneLore = true;
+        autoExplore([
+          { tag: '情報', tagColor: 'tag-info', text: '灰鶴喝了口酒，眼神變得認真了一些。', textEn: 'Grey Crane takes a swig, his eyes growing more serious.', delay: 2000 },
+          { tag: '情報', tagColor: 'tag-info', html: '「上面是<b>河城渡口</b>——曾經是地底最繁華的交通樞紐。」', htmlEn: '"Above is the <b>River City Ferry</b> — once the underground world\'s busiest transport hub."', delay: 2800 },
+          { tag: '情報', tagColor: 'tag-info', text: '「現在嘛……還有一些人在那裡。但情況很複雜。有好幾個勢力在搶地盤。」', textEn: '"Now... some people remain. But things are complicated. Several factions fighting over territory."', delay: 3000 },
+          { tag: '情報', tagColor: 'tag-info', html: '「有一個叫<b>「渡口議會」</b>的組織在維持秩序——但他們對外來者不太友善。」', htmlEn: '"An organization called the <b>Ferry Council</b> maintains order — but they aren\'t friendly to outsiders."', delay: 3000 },
+          { tag: '情報', tagColor: 'tag-info', text: '「不過對我這種商人來說，哪裡都能去。只要帶對東西。」灰鶴眨了眨眼。', textEn: '"But for a merchant like me, I can go anywhere. As long as I bring the right goods." Grey Crane winks.', delay: 2800 },
+          { tag: '情報', tagColor: 'tag-info', text: '「你要上去的話——記住一個名字：<b>銅鐘</b>。是渡口議會裡唯一還算講道理的人。」', textEn: '"If you\'re heading up — remember a name: <b>Bronze Bell</b>. The only reasonable person on the Ferry Council."', delay: 3000 },
+        ], [
+          { text: '謝了', textEn: 'Thanks', action: () => {
+            gainXp(5);
+            loadNode('r2_camp');
+          }},
+        ], { label: L('灰鶴的情報', 'Grey Crane\'s intel') });
+      }});
+    }
+    if (!state.flags.r2CraneTrade) {
+      c.push({ text: '看看有什麼好東西', textEn: 'Browse his wares', action: () => {
+        state.flags.r2CraneTrade = true;
+        autoExplore([
+          { tag: '情報', tagColor: 'tag-info', text: '灰鶴攤開他的包裹。裡面的東西比上次豐富了不少。', textEn: 'Grey Crane opens his pack. Far more goods than last time.', delay: 2000 },
+          { tag: '情報', tagColor: 'tag-info', text: '「看你面子，給你便宜點——不收錢，用情報換。」', textEn: '"Since it\'s you, I\'ll cut you a deal — no coin, just intel."', delay: 2500 },
+          { tag: '物品', tagColor: 'tag-item', html: '灰鶴遞給你一瓶渾濁的液體：「<b>石化抑制劑</b>——河城那邊的配方。比淨化液好用。」', htmlEn: 'Grey Crane hands you a murky liquid: "<b>Petri Suppressant</b> — River City formula. Better than purifiers."', delay: 2800, effect: () => { addItem(L('石化抑制劑', 'Petri Suppressant')); } },
+          { tag: '情報', tagColor: 'tag-info', text: '「你跟我說的那些迴廊裡的路線——很有價值。這就當是回報。」', textEn: '"The corridor routes you told me about — valuable intel. Consider this payback."', delay: 2500 },
+        ], [
+          { text: '道謝', textEn: 'Thank him', action: () => loadNode('r2_camp') },
+        ], { label: L('灰鶴的貨物', 'Grey Crane\'s wares') });
+      }});
+    }
+    c.push({ text: '返回營地', textEn: 'Return to camp', action: () => loadNode('r2_camp') });
+    return c;
+  })(), { label: L('灰鶴的攤位', 'Grey Crane\'s stall') });
+});
+
+// ═══════════════════════════════════════════════════
+//  NPC Continuation — 老周 (Old Zhou) traces
+// ═══════════════════════════════════════════════════
+
+registerNode('r2_zhou_trace', () => {
+  state.flags.r2ZhouTrace = true;
+  autoExplore([
+    { tag: '探索', tagColor: 'tag-explore', text: '採石台的角落裡，你注意到了一些不尋常的東西——岩壁上刻著字。', textEn: 'In a corner of the quarry platform, you notice something unusual — words carved into the rock wall.', delay: 2200 },
+    { tag: '感知', tagColor: 'tag-sense', text: '刻痕很新。不是古代的遺跡——是最近才有人用鑿子刻上去的。', textEn: 'The carvings are fresh. Not ancient ruins — someone chiseled these recently.', delay: 2200 },
+    { tag: '情報', tagColor: 'tag-info', html: '「<b>老周到此一遊。往北走了。腿快不行了。誰看到這行字，替我跟下面的人說一聲——活著就好。</b>」', htmlEn: '"<b>Old Zhou was here. Headed north. My legs are giving out. Whoever reads this, tell the folks below — just stay alive.</b>"', delay: 3500 },
+    { tag: '記憶', tagColor: 'tag-system', text: '老周……迴廊裡那個倔強的老礦工。他也上來了。而且比你更早。', textEn: 'Old Zhou... that stubborn old miner from the corridor. He made it up too. And earlier than you.', delay: 2800 },
+    { tag: '感知', tagColor: 'tag-sense', text: '刻痕旁邊還有一個小小的箭頭，指向北方——上升通道的方向。', textEn: 'Beside the carving, a small arrow points north — toward the ascent shaft.', delay: 2200 },
+    { tag: '情報', tagColor: 'tag-info', text: '他還活著。至少在刻下這些字的時候還活著。', textEn: 'He\'s alive. At least he was when he carved these words.', delay: 2200 },
+  ], [
+    { text: '在旁邊刻下「已讀。會轉告。」', textEn: 'Carve "Read. Will pass on the message." beside it', action: () => {
+      changeStat('wil', 1);
+      notify(L('意志 +1（老友的牽掛）', 'WIL +1 (An old friend\'s concern)'));
+      loadNode('r2_quarry_floor');
+    }},
+    { text: '點頭，繼續', textEn: 'Nod, continue', action: () => loadNode('r2_quarry_floor') },
+  ], { label: L('老周的留言', 'Old Zhou\'s message') });
 });
 
 // ── Region 2 Patrol ──
