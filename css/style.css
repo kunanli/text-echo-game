@@ -810,6 +810,156 @@
     color: #8a7a4a;
   }
 
+  /* ── Chapter Select ── */
+  .chapter-select-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    width: 90%;
+    max-width: 420px;
+  }
+  .chapter-title {
+    color: #d4a843;
+    font-size: 1.1rem;
+    letter-spacing: 6px;
+    margin-bottom: 4px;
+  }
+  .chapter-map {
+    font-family: "Courier New", Courier, monospace;
+    font-size: .72rem;
+    line-height: 1.2;
+    color: #5a6a5a;
+    white-space: pre;
+    text-align: center;
+    user-select: none;
+    margin: 0;
+  }
+  .chapter-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    width: 100%;
+    position: relative;
+  }
+  .chapter-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background: #12121e;
+    border: 1px solid #2a2a3a;
+    color: #c8c8d0;
+    padding: 12px 16px;
+    font-family: inherit;
+    font-size: .92rem;
+    cursor: pointer;
+    transition: all .2s;
+    text-align: left;
+    position: relative;
+  }
+  .chapter-item:first-child { border-radius: 6px 6px 0 0; }
+  .chapter-item:last-child  { border-radius: 0 0 6px 6px; }
+  .chapter-item + .chapter-item { border-top: none; }
+  .chapter-item:hover:not(.locked) {
+    background: #1a1a2e;
+    border-color: #d4a843;
+    color: #e8e8f0;
+  }
+  .chapter-item:hover:not(.locked) + .chapter-item {
+    border-top-color: #d4a843;
+  }
+  .chapter-item.locked {
+    opacity: .35;
+    cursor: default;
+  }
+  .chapter-item.current {
+    border-color: #4a6a4a;
+    background: #141e14;
+  }
+  .chapter-depth {
+    font-family: "Courier New", Courier, monospace;
+    font-size: .7rem;
+    color: #4a4a5a;
+    min-width: 28px;
+    text-align: center;
+  }
+  .chapter-icon {
+    font-size: 1rem;
+    min-width: 20px;
+    text-align: center;
+  }
+  .chapter-name {
+    flex: 1;
+    font-weight: bold;
+  }
+  .chapter-item.locked .chapter-name {
+    color: #4a4a5a;
+  }
+  .chapter-desc {
+    font-size: .72rem;
+    color: #5a5a6a;
+  }
+  .chapter-item.locked .chapter-desc {
+    color: #3a3a4a;
+  }
+  .chapter-fog {
+    color: #3a3a4a;
+    letter-spacing: 2px;
+  }
+  .chapter-tag {
+    font-family: "Courier New", Courier, monospace;
+    font-size: .65rem;
+    padding: 2px 6px;
+    border-radius: 3px;
+    border: 1px solid;
+  }
+  .chapter-tag.tag-unlocked {
+    color: #5a8a5a;
+    border-color: #2a4a2a;
+  }
+  .chapter-tag.tag-current {
+    color: #d4a843;
+    border-color: #6a5a30;
+  }
+  .chapter-tag.tag-locked {
+    color: #4a4a5a;
+    border-color: #2a2a3a;
+  }
+  .chapter-connector {
+    width: 2px;
+    height: 12px;
+    background: #2a2a3a;
+    margin: 0 auto;
+    position: relative;
+  }
+  .chapter-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 8px;
+  }
+  .chapter-select-title-btn {
+    font-size: .9rem !important;
+    padding: 10px 36px !important;
+    letter-spacing: 4px !important;
+    border-color: #5a5a6a !important;
+    color: #8a8a9a !important;
+  }
+  .chapter-select-title-btn:hover {
+    border-color: #d4a843 !important;
+    color: #d4a843 !important;
+  }
+  .chapter-ingame-btn {
+    margin-top: 6px;
+    font-size: .78rem;
+    padding: 6px 16px;
+    letter-spacing: 2px;
+  }
+  @media (max-width: 760px) {
+    .chapter-map { font-size: .58rem; }
+    .chapter-item { padding: 10px 12px; font-size: .85rem; }
+    .chapter-select-container { width: 95%; }
+  }
+
   /* ── Notification ── */
   .notification {
     position: fixed;

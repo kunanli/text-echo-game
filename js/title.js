@@ -23,9 +23,10 @@ document.getElementById('phase-splash').addEventListener('click', function(e) {
   // to happen inside a user gesture, so the splash tap is the earliest moment.
   ambientAudio.warmup();
 
-  // If clicked the continue button, load save directly
-  if (e.target.id === 'continue-btn' || e.target.closest('#continue-btn')) {
-    return; // handled by its own listener
+  // If clicked the continue/chapter button, let their own listeners handle it
+  if (e.target.id === 'continue-btn' || e.target.closest('#continue-btn') ||
+      e.target.id === 'chapter-btn' || e.target.closest('#chapter-btn')) {
+    return;
   }
   showPhase('phase-lang');
 });
@@ -135,6 +136,141 @@ document.getElementById('start-btn').addEventListener('click', startGame);
 document.getElementById('name-input').addEventListener('keydown', function(e) {
   if (e.key === 'Enter') startGame();
 });
+
+// ── Chapter Select ──
+var CHAPTERS = [
+  { id: 0, zh: '祭獻坑',   en: 'Sacrificial Pit',  node: 'r0_look', descZh: '熱泉 · 石像 · 裂縫',       descEn: 'Hot spring · Statues · Crack',      icon: '†' },
+  { id: 1, zh: '石脈迴廊', en: 'Vein Corridor',    node: 'r1_look', descZh: '鍛場 · 守衛 · 螢',         descEn: 'Forge · Guardian · Ying',            icon: '◇' },
+  { id: 2, zh: '大採石場', en: 'Great Quarry',     node: 'r2_look', descZh: '機甲 · 營地 · 巨像',       descEn: 'Mech · Camp · Colossus',             icon: '⛏' },
+  { id: 3, zh: '河城渡口', en: 'River City Ferry', node: 'r3_look', descZh: '即將開放',                 descEn: 'Coming soon',                        icon: '⚓' },
+];
+
+function buildChapterMap(container, mapPre, onSelect) {
+  var en = state.lang === 'en';
+  var devUnlocked = state.flags._devUnlockAll;
+
+  // Build ASCII map
+  var lines = [];
+  lines.push(en ? '       ☼ ☼ ☼  Surface  ☼ ☼ ☼' : '       ☼ ☼ ☼  地  表  ☼ ☼ ☼');
+  lines.push('       ┌───────────────────┐');
+  for (var i = CHAPTERS.length - 1; i >= 0; i--) {
+    var ch = CHAPTERS[i];
+    var unlocked = devUnlocked || state.region >= ch.id;
+    var isCurrent = state.region === ch.id;
+    var depth = en ? ('F' + (i + 1)) : ('第' + '一二三四'[i] + '層');
+    if (unlocked) {
+      var name = en ? ch.en : ch.zh;
+      var pad = 17 - name.length * (en ? 1 : 2);
+      var lpad = Math.floor(pad / 2);
+      var rpad = pad - lpad;
+      var marker = isCurrent ? ' ◄' : '  ';
+      lines.push('  ' + depth + ' │' + ' '.repeat(Math.max(1, lpad)) + name + ' '.repeat(Math.max(1, rpad)) + '│' + marker);
+    } else {
+      lines.push('  ' + depth + ' │ ░░░ ？？？ ░░░░ │');
+    }
+    if (i > 0) lines.push('       ├───────────────────┤');
+  }
+  lines.push('       └───────────────────┘');
+  lines.push(en ? '       ▼ ▼ ▼  Abyss   ▼ ▼ ▼' : '       ▼ ▼ ▼  深  淵  ▼ ▼ ▼');
+  mapPre.textContent = lines.join('\n');
+
+  // Build chapter buttons
+  container.innerHTML = '';
+  for (var i = CHAPTERS.length - 1; i >= 0; i--) {
+    var ch = CHAPTERS[i];
+    var unlocked = devUnlocked || state.region >= ch.id;
+    var isCurrent = state.region === ch.id;
+    var btn = document.createElement('button');
+    btn.className = 'chapter-item' + (unlocked ? '' : ' locked') + (isCurrent ? ' current' : '');
+    var tagClass = isCurrent ? 'tag-current' : (unlocked ? 'tag-unlocked' : 'tag-locked');
+    var tagText = isCurrent ? (en ? 'NOW' : '當前') : (unlocked ? (en ? 'OK' : '已解鎖') : (en ? '???' : '???'));
+    if (unlocked) {
+      btn.innerHTML = '<span class="chapter-icon">' + ch.icon + '</span>' +
+        '<span class="chapter-name">' + (en ? ch.en : ch.zh) + '</span>' +
+        '<span class="chapter-desc">' + (en ? ch.descEn : ch.descZh) + '</span>' +
+        '<span class="chapter-tag ' + tagClass + '">' + tagText + '</span>';
+    } else {
+      btn.innerHTML = '<span class="chapter-icon">?</span>' +
+        '<span class="chapter-name chapter-fog">░░░ ' + (en ? '???' : '？？？') + ' ░░░</span>' +
+        '<span class="chapter-tag ' + tagClass + '">' + tagText + '</span>';
+    }
+    if (unlocked) {
+      (function(chapter) {
+        btn.addEventListener('click', function() { onSelect(chapter); });
+      })(ch);
+    }
+    container.appendChild(btn);
+  }
+}
+
+// ── Title screen: chapter select button ──
+(function() {
+  var chapterBtn = document.getElementById('chapter-btn');
+  if (chapterBtn && hasSave()) {
+    chapterBtn.style.display = '';
+  }
+  if (!chapterBtn) return;
+
+  chapterBtn.addEventListener('click', function(e) {
+    e.stopPropagation();
+    ambientAudio.warmup();
+    if (!loadSave()) return;
+    applyLang();
+    var en = state.lang === 'en';
+    document.getElementById('chapter-title').textContent = en ? 'CHAPTER SELECT' : '章 節 選 擇';
+    document.getElementById('chapter-dev-btn').textContent = en ? 'DEV Unlock All' : 'DEV 全部解鎖';
+    document.getElementById('chapter-back-btn').textContent = en ? 'Back' : '返回';
+    buildChapterMap(
+      document.getElementById('chapter-list'),
+      document.getElementById('chapter-map'),
+      function(ch) {
+        state.region = ch.id;
+        var titleScreen = document.getElementById('title-screen');
+        titleScreen.classList.add('hidden');
+        setTimeout(function() { titleScreen.style.display = 'none'; }, 800);
+        ambientAudio.start();
+        setTimeout(updateAudioBtn, 200);
+        renderStatus();
+        loadNode(ch.node);
+      }
+    );
+    showPhase('phase-chapter');
+  });
+
+  // Dev unlock all
+  document.getElementById('chapter-dev-btn').addEventListener('click', function() {
+    state.flags._devUnlockAll = true;
+    state.region = Math.max(state.region, CHAPTERS.length - 1);
+    buildChapterMap(
+      document.getElementById('chapter-list'),
+      document.getElementById('chapter-map'),
+      function(ch) {
+        state.region = ch.id;
+        var titleScreen = document.getElementById('title-screen');
+        titleScreen.classList.add('hidden');
+        setTimeout(function() { titleScreen.style.display = 'none'; }, 800);
+        ambientAudio.start();
+        setTimeout(updateAudioBtn, 200);
+        renderStatus();
+        loadNode(ch.node);
+      }
+    );
+  });
+
+  // Back button
+  document.getElementById('chapter-back-btn').addEventListener('click', function() {
+    showPhase('phase-splash');
+  });
+})();
+
+// ── In-game chapter select ──
+(function() {
+  var ingameBtn = document.getElementById('chapter-ingame-btn');
+  if (!ingameBtn) return;
+  ingameBtn.addEventListener('click', function() {
+    loadNode('chapter_select');
+  });
+})();
 
 // ── Save Code UI ──
 (function() {

@@ -83,7 +83,7 @@ var SEED_NODES = [
   'r2_bridge_jump','r2_camp','r2_camp_chief','r2_camp_smith','r2_camp_medic',
   'r2_rest','r2_boss_prep','r2_boss','r2_gate','r2_patrol',
   'r2_ying_talk','r2_ying_seal','r2_ying_night','r2_ying_promise',
-  'r2_crane','r2_zhou_trace',
+  'r2_crane','r2_zhou_trace','chapter_select',
 ];
 
 var SEED_ITEMS_ZH = [

@@ -55,6 +55,7 @@
     </pre>
     <div class="title-version">v0.5</div>
     <button class="start-btn" id="continue-btn" style="display:none; margin-bottom:12px;">繼 續 冒 險</button>
+    <button class="start-btn chapter-select-title-btn" id="chapter-btn" style="display:none; margin-bottom:12px;">章 節 選 擇</button>
     <div class="click-prompt">— 點擊開始 · Click to Start —</div>
   </div>
 
@@ -69,6 +70,19 @@
         <span class="lang-label">English</span>
         <span class="lang-desc">English Interface</span>
       </button>
+    </div>
+  </div>
+
+  <!-- Phase 3.5: Chapter Select -->
+  <div class="title-phase" id="phase-chapter">
+    <div class="chapter-select-container">
+      <h2 class="chapter-title" id="chapter-title">章 節 選 擇</h2>
+      <pre class="chapter-map" id="chapter-map"></pre>
+      <div class="chapter-list" id="chapter-list"></div>
+      <div class="chapter-actions">
+        <button class="save-action-btn" id="chapter-dev-btn">DEV 全部解鎖</button>
+        <button class="save-action-btn save-close-btn" id="chapter-back-btn">返回</button>
+      </div>
     </div>
   </div>
 
@@ -192,6 +206,7 @@
     </div>
     <div class="status-section save-section">
       <button class="save-btn" id="save-code-btn">存檔碼</button>
+      <button class="save-btn chapter-ingame-btn" id="chapter-ingame-btn">章節</button>
     </div>
   </div>
 
