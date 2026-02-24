@@ -297,6 +297,281 @@ registerNode('r3_inn', () => {
   })(), { label: L('河畔居', 'Riverside Lodge') });
 });
 
+// ═══════════════════════════════════════════════════
+//  NPC — 銅鐘 (Bronze Bell)
+// ═══════════════════════════════════════════════════
+
+registerNode('r3_bell', () => {
+  var steps = [];
+  if (!state.flags.r3BellMet) {
+    state.flags.r3BellMet = true;
+    steps.push({ tag: '移動', tagColor: 'tag-move', text: '你走進議會廳右側走廊盡頭的房間。門半開著。', textEn: 'You enter the room at the end of the right corridor. The door is ajar.', delay: 2000 });
+    steps.push({ tag: '感知', tagColor: 'tag-sense', text: '房間不大，堆滿了文件和地圖。靠窗的桌子旁坐著一個人。', textEn: 'A small room packed with documents and maps. Someone sits at a desk by the window.', delay: 2200 });
+    steps.push({ tag: '感知', tagColor: 'tag-sense', html: '那是一個四十多歲的女人，頭髮花白，但目光銳利。她的右手從手腕到指尖已經完全石化——卻依然握著筆在寫字。', htmlEn: 'A woman in her forties, hair streaked with grey, gaze sharp. Her right hand is fully petrified from wrist to fingertips — yet she still grips a pen, writing.', delay: 3200 });
+    steps.push({ tag: '情報', tagColor: 'tag-info', html: '「進來吧。」她沒有抬頭。「我是<b>銅鐘</b>。聽說有人從下面爬上來了——想必就是你。」', htmlEn: '"Come in." She doesn\'t look up. "I\'m <b>Bronze Bell</b>. I heard someone climbed up from below — that must be you."', delay: 3000 });
+    steps.push({ tag: '情報', tagColor: 'tag-info', text: '她終於放下筆，轉過身看著你。她的目光停在你身上的石化痕跡上，沒有嫌惡，只有某種沉重的理解。', textEn: 'She finally puts down the pen and turns to face you. Her gaze rests on your petri-marks — not with disgust, but a heavy understanding.', delay: 3000 });
+    steps.push({ tag: '情報', tagColor: 'tag-info', text: '「下面的情況怎麼樣？還有多少人活著？」', textEn: '"How are things below? How many are still alive?"', delay: 2200 });
+  } else {
+    steps.push({ tag: '移動', tagColor: 'tag-move', text: '銅鐘還是坐在那張堆滿文件的桌子旁。看到你來，她放下筆。', textEn: 'Bronze Bell sits at her document-laden desk. She puts down her pen when she sees you.', delay: 2000 });
+    steps.push({ tag: '情報', tagColor: 'tag-info', text: '「有什麼進展？」', textEn: '"Any progress?"', delay: 1500 });
+  }
+
+  autoExplore(steps, (function() {
+    var c = [];
+    if (!state.flags.r3BellReport) {
+      c.push({ text: '告訴她下面的情況', textEn: 'Report on conditions below', action: () => {
+        state.flags.r3BellReport = true;
+        autoExplore([
+          { tag: '行動', tagColor: 'tag-move', text: '你把在祭獻坑、石脈迴廊和大採石場的經歷告訴了銅鐘。', textEn: 'You recount your experiences in the Sacrificial Pit, Vein Corridor, and Great Quarry.', delay: 2500 },
+          { tag: '情報', tagColor: 'tag-info', text: '鐵霜帶領的營地、迴廊裡的倖存者、老周、守衛——', textEn: 'Iron Frost\'s camp, corridor survivors, Old Zhou, the guards —', delay: 2200 },
+          { tag: '感知', tagColor: 'tag-sense', text: '銅鐘一邊聽一邊用石化的右手在紙上做記錄。那隻手雖然已經變成石頭，卻仍能寫字——像某種不屈的意志。', textEn: 'Bronze Bell takes notes with her petrified right hand as she listens. Though turned to stone, it still writes — like some indomitable will.', delay: 3000 },
+          { tag: '情報', tagColor: 'tag-info', text: '「……我就知道。」她嘆了口氣。「封鎖通道只會害死更多人。下面還有倖存者在苦撐。」', textEn: '"...I knew it." She sighs. "Sealing the passages will only kill more people. Survivors below are still holding on."', delay: 3000 },
+          { tag: '情報', tagColor: 'tag-info', html: '「你的證詞很重要。下一次議會投票時，我需要你<b>在議會上作證</b>——證明下面的人不是威脅，而是需要幫助的同胞。」', htmlEn: '"Your testimony matters. At the next Council vote, I need you to <b>testify before the Council</b> — prove the people below aren\'t a threat, but fellow humans who need help."', delay: 3500 },
+          { tag: '情報', tagColor: 'tag-info', text: '「你願意嗎？」', textEn: '"Will you?"', delay: 1800 },
+        ], [
+          { text: '我願意', textEn: 'I will', action: () => {
+            state.flags.r3BellAlliance = true;
+            gainXp(15);
+            notify(L('經驗 +15（與銅鐘建立同盟）', 'XP +15 (Allied with Bronze Bell)'));
+            loadNode('r3_bell');
+          }},
+          { text: '讓我想想', textEn: 'Let me think', action: () => loadNode('r3_council') },
+        ], { label: L('銅鐘的請求', 'Bronze Bell\'s request') });
+      }});
+    }
+    if (state.flags.r3BellAlliance && !state.flags.r3BellQuest) {
+      c.push({ text: '下一步怎麼做？', textEn: 'What\'s next?', action: () => {
+        state.flags.r3BellQuest = true;
+        autoExplore([
+          { tag: '情報', tagColor: 'tag-info', text: '銅鐘攤開一張渡口的地圖，指著幾個位置。', textEn: 'Bronze Bell spreads a map of the docks, pointing to several locations.', delay: 2200 },
+          { tag: '情報', tagColor: 'tag-info', html: '「議會投票還有三天。在那之前，你需要做三件事——」', htmlEn: '"The Council vote is in three days. Before then, you need three things —"', delay: 2500 },
+          { tag: '情報', tagColor: 'tag-info', html: '「第一：去<b>河岸隧道</b>清除那裡的變異生物。鏽刃說封鎖通道是因為怪物從下面上來——如果你能證明怪物不是來自下層，他就沒藉口了。」', htmlEn: '"First: clear the <b>river tunnels</b> of mutants. Rust Blade claims sealing is needed because monsters come from below — if you prove the creatures aren\'t from the lower levels, his excuse crumbles."', delay: 3800 },
+          { tag: '情報', tagColor: 'tag-info', html: '「第二：在市場找到<b>灰鶴</b>。他是唯一在上下層之間跑商路的人，他的證詞能動搖商會的玉秤。」', htmlEn: '"Second: find <b>Grey Crane</b> in the market. He\'s the only trader running routes between levels — his testimony can sway Jade Scale of the Merchants."', delay: 3200 },
+          { tag: '情報', tagColor: 'tag-info', html: '「第三：找到能證明<b>石化瘟疫起源</b>的證據。如果能證明瘟疫不是因為下層通道——而是因為古代封印——那封鎖通道就毫無意義。」', htmlEn: '"Third: find evidence of the <b>plague\'s true origin</b>. If you can prove it came from the ancient seal, not the lower passages — sealing is pointless."', delay: 3800 },
+          { tag: '感知', tagColor: 'tag-sense', text: '銅鐘看著你。她石化的右手不自覺地握緊了筆。', textEn: 'Bronze Bell looks at you. Her petrified hand unconsciously grips the pen tighter.', delay: 2500 },
+          { tag: '情報', tagColor: 'tag-info', text: '「……拜託你了。這不只是我一個人的戰鬥。」', textEn: '"...I\'m counting on you. This isn\'t just my fight."', delay: 2500 },
+        ], [
+          { text: '我會完成的', textEn: 'I\'ll get it done', action: () => {
+            changeStat('wil', 1);
+            notify(L('意志 +1（肩負重任）', 'WIL +1 (Shouldering responsibility)'));
+            loadNode('r3_council');
+          }},
+        ], { label: L('銅鐘的任務', 'Bronze Bell\'s mission') });
+      }});
+    }
+    c.push({ text: '離開', textEn: 'Leave', action: () => loadNode('r3_council') });
+    return c;
+  })(), { label: L('銅鐘', 'Bronze Bell') });
+});
+
+// ═══════════════════════════════════════════════════
+//  NPC — 螢 (Ying) in Region 3
+// ═══════════════════════════════════════════════════
+
+registerNode('r3_ying_talk', () => {
+  var isMale = state.sex === 'male';
+  var yP = isMale ? L('她', 'she') : L('他', 'he');
+  var yPC = isMale ? 'She' : 'He';
+  var yPo = isMale ? 'her' : 'his';
+
+  var steps = [];
+  // First time — Ying arrives
+  if (!state.flags.r3YingArrived) {
+    state.flags.r3YingArrived = true;
+    steps.push({ tag: '遭遇', tagColor: 'tag-explore', text: '你在碼頭入口聽到了一個熟悉的聲音——', textEn: 'You hear a familiar voice at the dock entrance —', delay: 2000 });
+    steps.push({ tag: '情報', tagColor: 'tag-info', text: '「等一下——我找了你半天！」', textEn: '"Wait — I\'ve been looking everywhere for you!"', delay: 2200 });
+    steps.push({ tag: '感知', tagColor: 'tag-sense', text: '螢從上升通道的出口跑出來，滿身灰塵，手冊抱在胸前，呼吸急促。', textEn: 'Ying rushes out from the ascent shaft, covered in dust, notebook clutched to ' + yPo + ' chest, breathing hard.', delay: 2800 });
+    steps.push({ tag: '感知', tagColor: 'tag-sense', text: yP + '看到你的瞬間，表情從焦急變成了釋然——然後是裝出來的不高興。', textEn: yPC + ' expression shifts from anxiety to relief the moment ' + (isMale ? 'she' : 'he') + ' sees you — then feigned annoyance.', delay: 2800 });
+    steps.push({ tag: '情報', tagColor: 'tag-info', text: '「你、你怎麼不等我？一個人就跑了？萬一出了事——」', textEn: '"You — why didn\'t you wait for me? Ran off alone? What if something happened —"', delay: 2500 });
+    steps.push({ tag: '感知', tagColor: 'tag-sense', text: yP + '的眼眶微微泛紅，但很快別過頭去，假裝在看碼頭的風景。', textEn: yPC + ' eyes redden slightly, but ' + (isMale ? 'she' : 'he') + ' quickly turns away, pretending to admire the dock.', delay: 2800 });
+    steps.push({ tag: '感知', tagColor: 'tag-sense', text: '「……算了。反正你沒事就好。」螢小聲說。', textEn: '"...Never mind. You\'re safe, that\'s what matters." Ying murmurs.', delay: 2500 });
+    steps.push({ tag: '感知', tagColor: 'tag-sense', text: yP + '環顧四周，眼睛瞬間亮了起來：「這就是河城渡口？！比手冊上的記載還要大！我要把這裡全部畫下來！」', textEn: yPC + ' looks around, eyes lighting up instantly: "This is River City Ferry?! It\'s even bigger than the records! I need to sketch everything!"', delay: 3200 });
+  } else {
+    steps.push({ tag: '移動', tagColor: 'tag-move', text: '你在碼頭邊找到了螢。' + yP + '蹲在地上，正飛速地在手冊裡畫著河城的建築速寫。', textEn: 'You find Ying at the dock\'s edge, crouching, rapidly sketching River City\'s architecture in ' + yPo + ' notebook.', delay: 2500 });
+    steps.push({ tag: '感知', tagColor: 'tag-sense', text: '看到你來，螢合上手冊，拍了拍身上的灰：「嗯？有什麼事？」', textEn: 'Seeing you, Ying closes the notebook and dusts off: "Hmm? What\'s up?"', delay: 2200 });
+  }
+
+  autoExplore(steps, (function() {
+    var c = [];
+    if (state.flags.r3YingArrived && !state.flags.r3YingCity) {
+      c.push({ text: '和螢聊聊河城', textEn: 'Talk about River City with Ying', action: () => {
+        state.flags.r3YingCity = true;
+        autoExplore([
+          { tag: '情報', tagColor: 'tag-info', text: '螢翻開手冊中一頁古老的記錄，眼中閃著光。', textEn: 'Ying flips to an ancient entry in the notebook, eyes gleaming.', delay: 2200 },
+          { tag: '情報', tagColor: 'tag-info', html: '「根據舊記錄，河城渡口是<b>石化瘟疫爆發前</b>最後建造的地底城市。建造者是第一批逃入地下的人類。」', htmlEn: '"According to old records, River City Ferry was the <b>last underground city built before the plague</b>. Its founders were the first humans to flee underground."', delay: 3500 },
+          { tag: '情報', tagColor: 'tag-info', text: '「他們本來想從河道逃往更深處——但瘟疫追上了他們。於是他們在這裡停下，建了這座城。」', textEn: '"They planned to escape deeper through the river — but the plague caught up. So they stopped here and built this city."', delay: 3000 },
+          { tag: '情報', tagColor: 'tag-info', text: '「如果我的推測沒錯——封印石室的線索應該就在這裡。因為建造河城的人……就是當年封印石化瘟疫的人。」', textEn: '"If my theory is right — clues to the Seal Chamber should be here. Because the people who built River City... were the ones who sealed the plague."', delay: 3500 },
+          { tag: '感知', tagColor: 'tag-sense', text: '螢合上手冊，看著河面。' + yP + '的眼中既有興奮，也有某種沉重。', textEn: 'Ying closes the notebook, gazing at the river. ' + yPC + ' eyes hold both excitement and something heavy.', delay: 2500 },
+          { tag: '情報', tagColor: 'tag-info', text: '「三百年的歷史——也許很快就要揭開了。」', textEn: '"Three hundred years of history — perhaps soon to be unveiled."', delay: 2500 },
+        ], [
+          { text: '我們一起找', textEn: 'We\'ll find it together', action: () => {
+            gainXp(8);
+            loadNode('r3_look');
+          }},
+        ], { label: L('螢的研究', 'Ying\'s research') });
+      }});
+    }
+    if (state.flags.r3BellQuest && !state.flags.r3YingEvidence) {
+      c.push({ text: '告訴螢銅鐘的任務', textEn: 'Tell Ying about Bronze Bell\'s mission', action: () => {
+        state.flags.r3YingEvidence = true;
+        autoExplore([
+          { tag: '情報', tagColor: 'tag-info', text: '你把銅鐘的三個任務告訴了螢。', textEn: 'You relay Bronze Bell\'s three tasks to Ying.', delay: 2000 },
+          { tag: '感知', tagColor: 'tag-sense', text: '螢聽完後沉思了一會兒，然後翻開手冊。', textEn: 'Ying thinks for a moment, then opens the notebook.', delay: 2200 },
+          { tag: '情報', tagColor: 'tag-info', html: '「第三個任務——石化瘟疫的起源證據——<b>我可以幫忙。</b>」', htmlEn: '"The third task — evidence of the plague\'s origin — <b>I can help with that.</b>"', delay: 2500 },
+          { tag: '情報', tagColor: 'tag-info', text: '「我一直在追蹤封印石室的線索。如果能找到當年建城者留下的紀錄——那就是最好的證據。」', textEn: '"I\'ve been tracking Seal Chamber clues. If we find records left by the city founders — that\'s the strongest evidence."', delay: 3200 },
+          { tag: '感知', tagColor: 'tag-sense', text: '螢的表情變得認真：「你去清怪物、找灰鶴。封印石室的線索——交給我。」', textEn: 'Ying\'s expression turns serious: "You handle the monsters and Grey Crane. Seal Chamber clues — leave those to me."', delay: 2800 },
+          { tag: '感知', tagColor: 'tag-sense', text: yP + '頓了頓，補了一句：「……小心。不准受傷。」', textEn: yPC + ' pauses, then adds: "...Be careful. Don\'t get hurt."', delay: 2500 },
+        ], [
+          { text: '你也是', textEn: 'You too', action: () => {
+            changeHp(10);
+            changePetri(-3);
+            notify(L('HP +10，石化度 -3%（牽掛的力量）', 'HP +10, Petri -3% (The strength of caring)'));
+            loadNode('r3_look');
+          }},
+        ], { label: L('分工合作', 'Division of labor') });
+      }});
+    }
+    c.push({ text: '離開', textEn: 'Leave', action: () => loadNode('r3_look') });
+    return c;
+  })(), { label: L('和螢說話', 'Talking to Ying') });
+});
+
+// ── Ying: Inn dinner scene ──
+registerNode('r3_ying_inn', () => {
+  var isMale = state.sex === 'male';
+  var yP = isMale ? L('她', 'she') : L('他', 'he');
+  var yPC = isMale ? 'She' : 'He';
+  var yPo = isMale ? 'her' : 'his';
+  state.flags.r3YingInn = true;
+  autoExplore([
+    { tag: '移動', tagColor: 'tag-move', text: '你帶螢到河畔居吃晚飯。老闆娘端上了兩碗熱騰騰的河魚湯和一盤黑麵包。', textEn: 'You bring Ying to Riverside Lodge for dinner. The landlady serves two bowls of steaming river-fish soup and a plate of black bread.', delay: 2500 },
+    { tag: '感知', tagColor: 'tag-sense', text: '螢拿起湯碗，喝了一口。' + yP + '的眼睛瞬間睜大了。', textEn: 'Ying picks up the bowl, takes a sip. ' + yPC + ' eyes widen instantly.', delay: 2200 },
+    { tag: '情報', tagColor: 'tag-info', text: '「好、好喝……！這是真正的食物！不是乾糧和蘑菇！」', textEn: '"Good — so good...! This is real food! Not rations and mushrooms!"', delay: 2500 },
+    { tag: '感知', tagColor: 'tag-sense', text: '螢幾乎是狼吞虎嚥地喝完了湯。然後' + yP + '抬起頭，嘴角沾著湯汁，臉有些紅。', textEn: 'Ying practically gulps down the soup. Then ' + (isMale ? 'she' : 'he') + ' looks up, broth on ' + yPo + ' lips, face slightly flushed.', delay: 2800 },
+    { tag: '情報', tagColor: 'tag-info', text: '「……你沒在看吧。」', textEn: '"...You weren\'t watching, right?"', delay: 2000 },
+    { tag: '感知', tagColor: 'tag-sense', text: '你笑了。在這個石化瘟疫籠罩的世界裡，這是你第一次覺得自己離正常的生活那麼近。', textEn: 'You smile. In this plague-shrouded world, it\'s the first time you feel this close to a normal life.', delay: 3000 },
+    { tag: '感知', tagColor: 'tag-sense', text: '河水在窗外流淌。燈光昏黃。螢在對面翻著手冊。一切都很安靜。', textEn: 'River water flows past the window. Dim lamplight. Ying flips through the notebook across from you. Everything is quiet.', delay: 2800 },
+    { tag: '感知', tagColor: 'tag-sense', text: '你忽然想——如果能一直這樣就好了。', textEn: 'You suddenly think — if only this could last forever.', delay: 2500 },
+  ], [
+    { text: '這裡的魚湯不錯', textEn: 'The soup is good here', action: () => {
+      changeHp(30);
+      changePetri(-10);
+      changeStat('wil', 1);
+      notify(L('HP +30，石化度 -10%，意志 +1（日常的溫暖）', 'HP +30, Petri -10%, WIL +1 (Warmth of the ordinary)'));
+      loadNode('r3_inn');
+    }},
+  ], { label: L('河畔居的晚餐', 'Dinner at Riverside Lodge') });
+});
+
+// ═══════════════════════════════════════════════════
+//  NPC — 老周 (Old Zhou) Reunion
+// ═══════════════════════════════════════════════════
+
+registerNode('r3_zhou', () => {
+  state.flags.r3ZhouMet = true;
+  autoExplore([
+    { tag: '遭遇', tagColor: 'tag-explore', text: '你在市場的一角看到了一個坐在木箱上的老人。他的左腿被粗布包裹著，旁邊靠著一根拐杖。', textEn: 'You spot an old man sitting on a crate in a market corner. His left leg is wrapped in rough cloth, a crutch leaning beside him.', delay: 2500 },
+    { tag: '感知', tagColor: 'tag-sense', html: '那張飽經風霜的臉——是<b>老周</b>。', htmlEn: 'That weathered face — it\'s <b>Old Zhou</b>.', delay: 2000 },
+    { tag: '情報', tagColor: 'tag-info', text: '老周看到你的瞬間，渾濁的眼睛亮了一下。他努力站起來，拐杖差點滑倒。', textEn: 'Old Zhou\'s cloudy eyes brighten the moment he sees you. He struggles to stand, crutch nearly slipping.', delay: 2800 },
+    { tag: '情報', tagColor: 'tag-info', text: '「你這小子——！我就知道你能活著上來！」', textEn: '"Kid — ! I knew you\'d make it up here alive!"', delay: 2500 },
+    { tag: '感知', tagColor: 'tag-sense', text: '他用力拍了拍你的肩膀。他的手已經石化到了手肘，硬邦邦的，但拍得很用力。', textEn: 'He slaps your shoulder hard. His hand is petrified to the elbow — hard as rock, but the slap is full of force.', delay: 2800 },
+    { tag: '情報', tagColor: 'tag-info', text: '「腿不太行了。」老周坐回箱子上，拍了拍左腿。「石化從腳開始往上爬。走不了多遠了。」', textEn: '"Leg\'s giving out." Old Zhou sits back down, patting his left leg. "Petri\'s creeping up from the foot. Can\'t walk far."', delay: 3000 },
+    { tag: '情報', tagColor: 'tag-info', text: '「不過——老周不是等死的人。」他從箱子後面拉出一個工具包。「我在這裡修工具。總還能做點事。」', textEn: '"But — Old Zhou doesn\'t wait to die." He pulls out a tool kit from behind the crate. "I fix tools here. Still useful."', delay: 3000 },
+    { tag: '感知', tagColor: 'tag-sense', text: '老周的臉上帶著你見過的最頑強的笑容。他還活著。這就夠了。', textEn: 'Old Zhou wears the most stubborn smile you\'ve ever seen. He\'s alive. That\'s enough.', delay: 2500 },
+  ], (function() {
+    var c = [];
+    if (!state.flags.r3ZhouUpgrade) {
+      c.push({ text: '讓老周看看你的裝備', textEn: 'Show Old Zhou your gear', action: () => {
+        state.flags.r3ZhouUpgrade = true;
+        autoExplore([
+          { tag: '行動', tagColor: 'tag-move', text: '老周接過你的武器，翻來覆去看了看，嘖了一聲。', textEn: 'Old Zhou takes your weapon, turns it over, and clicks his tongue.', delay: 2200 },
+          { tag: '情報', tagColor: 'tag-info', text: '「用的什麼破爛……等著。」', textEn: '"What junk... hold on."', delay: 2000 },
+          { tag: '情報', tagColor: 'tag-info', text: '他從工具包裡拿出錘子和銼刀，開始敲敲打打。石化的手竟然動作精準得驚人。', textEn: 'He pulls out a hammer and file, and starts working. His petrified hand moves with astonishing precision.', delay: 2800 },
+          { tag: '物品', tagColor: 'tag-item', html: '老周把武器還給你。刃口重新磨過，握把纏了新皮——獲得<b>老周的改裝</b>效果。', htmlEn: 'Old Zhou returns the weapon. The edge is re-ground, the grip re-wrapped — gained <b>Zhou\'s Modification</b> effect.', delay: 2500, effect: () => {
+            changeStat('str', 2);
+          }},
+          { tag: '情報', tagColor: 'tag-info', text: '「別嫌老周手粗——三十年的礦工手藝，不是蓋的。」他得意地笑了。', textEn: '"Don\'t mind my rough hands — thirty years of miner\'s craft is no joke." He grins proudly.', delay: 2500 },
+        ], [
+          { text: '謝了，老周', textEn: 'Thanks, Old Zhou', action: () => {
+            notify(L('力量 +2（老周的改裝）', 'STR +2 (Zhou\'s Modification)'));
+            loadNode('r3_market');
+          }},
+        ], { label: L('老周的手藝', 'Zhou\'s craftsmanship') });
+      }});
+    }
+    if (state.flags.r2ZhouTrace) {
+      c.push({ text: '告訴他你看到了他的留言', textEn: 'Tell him you saw his carved message', action: () => {
+        autoExplore([
+          { tag: '情報', tagColor: 'tag-info', text: '你告訴老周你在採石場看到了他刻在牆上的字。', textEn: 'You tell Old Zhou you saw his message carved in the quarry wall.', delay: 2200 },
+          { tag: '感知', tagColor: 'tag-sense', text: '老周愣了一下。然後他低下頭，用石化的手擦了擦眼睛。', textEn: 'Old Zhou freezes for a moment. Then he lowers his head, rubbing his eyes with his petrified hand.', delay: 2500 },
+          { tag: '情報', tagColor: 'tag-info', text: '「……刻那些字的時候，我以為自己走不動了。」他的聲音有些沙啞。', textEn: '"...When I carved those words, I thought I couldn\'t go on." His voice is hoarse.', delay: 2800 },
+          { tag: '情報', tagColor: 'tag-info', text: '「但我想——只要有人看到，就不算白活。」', textEn: '"But I thought — as long as someone sees it, my life wasn\'t wasted."', delay: 2500 },
+          { tag: '感知', tagColor: 'tag-sense', text: '老周抬起頭，用力拍了拍你的手：「你還幫我回了字……謝了，小子。」', textEn: 'Old Zhou looks up, squeezes your hand: "And you even wrote back... thanks, kid."', delay: 2500 },
+        ], [
+          { text: '老周不死', textEn: 'Old Zhou never dies', action: () => {
+            changeStat('wil', 1);
+            notify(L('意志 +1（老友重逢）', 'WIL +1 (Reunion with an old friend)'));
+            loadNode('r3_market');
+          }},
+        ], { label: L('老周的留言', 'Zhou\'s message') });
+      }});
+    }
+    c.push({ text: '離開', textEn: 'Leave', action: () => loadNode('r3_market') });
+    return c;
+  })(), { label: L('老周', 'Old Zhou') });
+});
+
+// ═══════════════════════════════════════════════════
+//  NPC — 灰鶴 (Grey Crane) in Region 3
+// ═══════════════════════════════════════════════════
+
+registerNode('r3_crane', () => {
+  var steps = [];
+  if (!state.flags.r3CraneMet3) {
+    state.flags.r3CraneMet3 = true;
+    steps.push({ tag: '遭遇', tagColor: 'tag-explore', text: '市場的角落裡，一面灰色斗篷在貨箱堆間若隱若現。', textEn: 'In a market corner, a grey cloak flickers between stacked crates.', delay: 2000 });
+    steps.push({ tag: '情報', tagColor: 'tag-info', text: '「喲——你也到這兒了？」灰鶴從貨堆後探出頭，一臉不意外的笑容。', textEn: '"Well — you made it here too?" Grey Crane peeks from behind the crates, unsurprised and smiling.', delay: 2500 });
+    steps.push({ tag: '情報', tagColor: 'tag-info', text: '「我走暗渠比你快。在這裡已經做了好幾筆生意了。」', textEn: '"My culvert route is faster. Already closed several deals here."', delay: 2500 });
+  } else {
+    steps.push({ tag: '遭遇', tagColor: 'tag-explore', text: '灰鶴的攤位前擺著各種從下層帶上來的物資。生意似乎不錯。', textEn: 'Grey Crane\'s stall displays supplies brought from below. Business looks good.', delay: 2200 });
+  }
+
+  autoExplore(steps, (function() {
+    var c = [];
+    if (state.flags.r3BellQuest && !state.flags.r3CraneTestimony) {
+      c.push({ text: '請灰鶴在議會作證', textEn: 'Ask Grey Crane to testify', action: () => {
+        state.flags.r3CraneTestimony = true;
+        autoExplore([
+          { tag: '情報', tagColor: 'tag-info', text: '你把銅鐘的計劃告訴了灰鶴——需要他在議會上證明下層通道的商業價值。', textEn: 'You tell Grey Crane about Bronze Bell\'s plan — they need him to prove the lower passages\' trade value at the Council.', delay: 2800 },
+          { tag: '情報', tagColor: 'tag-info', text: '灰鶴沉默了一會兒。他收起了商人笑容，表情變得認真。', textEn: 'Grey Crane falls silent. The merchant\'s grin fades, replaced by a serious expression.', delay: 2500 },
+          { tag: '情報', tagColor: 'tag-info', text: '「做生意的不喜歡趟政治的渾水……但封了通道，我的商路也沒了。」', textEn: '"Traders don\'t like wading into politics... but if the passages are sealed, my trade routes die too."', delay: 3000 },
+          { tag: '情報', tagColor: 'tag-info', text: '「行。我去作證。但你欠我一個人情——以後到了地表，請我喝酒。」灰鶴伸出手。', textEn: '"Fine. I\'ll testify. But you owe me — buy me a drink when we reach the surface." Grey Crane extends his hand.', delay: 3000 },
+        ], [
+          { text: '一言為定', textEn: 'Deal', action: () => {
+            gainXp(10);
+            notify(L('經驗 +10（灰鶴的盟約）', 'XP +10 (Grey Crane\'s pact)'));
+            loadNode('r3_market');
+          }},
+        ], { label: L('灰鶴的決定', 'Grey Crane\'s decision') });
+      }});
+    }
+    if (!state.flags.r3CraneTrade3) {
+      c.push({ text: '看看新貨', textEn: 'Browse new goods', action: () => {
+        state.flags.r3CraneTrade3 = true;
+        autoExplore([
+          { tag: '情報', tagColor: 'tag-info', text: '灰鶴攤開包裹。河城的物資比下面豐富得多。', textEn: 'Grey Crane opens his pack. River City\'s supplies are far more abundant than below.', delay: 2200 },
+          { tag: '物品', tagColor: 'tag-item', html: '灰鶴遞給你一瓶清澈的液體：「<b>河城淨化液</b>——最新配方。比之前那瓶好十倍。」', htmlEn: 'Grey Crane hands you a clear liquid: "<b>River City Purifier</b> — latest formula. Ten times better than the last."', delay: 2800, effect: () => { addItem(L('河城淨化液', 'River City Purifier')); } },
+          { tag: '效果', tagColor: 'tag-system', text: '石化度 -15%', delay: 800, effect: () => changePetri(-15) },
+        ], [
+          { text: '謝了', textEn: 'Thanks', action: () => loadNode('r3_market') },
+        ], { label: L('灰鶴的新貨', 'Grey Crane\'s new goods') });
+      }});
+    }
+    c.push({ text: '離開', textEn: 'Leave', action: () => loadNode('r3_market') });
+    return c;
+  })(), { label: L('灰鶴', 'Grey Crane') });
+});
+
 // ── Region 3 Patrol ──
 registerNode('r3_patrol', () => {
   autoExplore([
