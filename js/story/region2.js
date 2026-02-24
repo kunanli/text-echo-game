@@ -779,14 +779,14 @@ registerNode('r2_gate', () => {
       { tag: '感知', tagColor: 'tag-sense', text: '閘門後是一條向上延伸的斜坡隧道。你能感覺到……來自上方的風。', textEn: 'Beyond the gate, a sloped tunnel ascends. You can feel... wind from above.', delay: 2500 },
       { tag: '情報', tagColor: 'tag-info', html: '鐵霜拍了拍你的肩膀：「前面就是<b>河城渡口</b>——地底世界的交通樞紐。如果還有人類社會存在的話，就在那裡。」', htmlEn: 'Iron Frost pats your shoulder: "Ahead lies the <b>River City Ferry</b> — the underground world\'s transport hub. If human society still exists, it\'s there."', delay: 3000 },
       { tag: '情報', tagColor: 'tag-info', text: '「我會帶大家跟上來的。你先走吧——路上小心。」', textEn: '"I\'ll bring everyone along. Go ahead — be careful."', delay: 2500 },
-      { tag: '系統', tagColor: 'tag-system', html: '<i>（第四層 — 河城渡口的冒險將在後續更新中展開……）</i>', htmlEn: '<i>(Floor 4 — River City Ferry adventures coming in a future update...)</i>', delay: 1500 },
     ], [
-      { text: '在閘門口休息，準備下一段旅程', textEn: 'Rest at the gate, prepare for the next journey', action: () => {
+      { text: '踏入上升通道，前往河城渡口', textEn: 'Enter the shaft, head for River City Ferry', action: () => {
         changeHp(25);
         changePetri(-8);
         notify(L('HP +25，石化度 -8%', 'HP +25, Petri -8%'));
-        loadNode('r2_look');
+        loadNode('r3_start');
       }},
+      { text: '留下來做最後的準備', textEn: 'Stay to make final preparations', action: () => loadNode('r2_look') },
     ], { label: L('開啟上升通道', 'Opening ascent shaft') });
   } else {
     autoExplore([

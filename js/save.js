@@ -84,6 +84,8 @@ var SEED_NODES = [
   'r2_rest','r2_boss_prep','r2_boss','r2_gate','r2_patrol',
   'r2_ying_talk','r2_ying_seal','r2_ying_night','r2_ying_promise',
   'r2_crane','r2_zhou_trace','chapter_select',
+  'r3_start','r3_look','r3_dock','r3_market','r3_council','r3_inn',
+  'r3_bell','r3_ying_talk','r3_ying_inn','r3_zhou','r3_crane','r3_patrol',
 ];
 
 var SEED_ITEMS_ZH = [
@@ -93,6 +95,7 @@ var SEED_ITEMS_ZH = [
   '強化鶴嘴鋤','抗石化藥膏','高純度石化結晶','工程師筆記',
   '機甲控制鍵','精鍛戰鋤','濃縮淨化液',
   '螢的護身符','石化抑制劑',
+  '河城地圖','河城草藥包','河城淨化液',
 ];
 var SEED_ITEMS_EN = [
   'Stone Dagger','Black Bread','Glowstone','Petri-Water Flask','Dried Herbs','Rope','Petri Crystal',
@@ -101,6 +104,7 @@ var SEED_ITEMS_EN = [
   'Reinforced Pickaxe','Anti-Petri Salve','High-Purity Petri Crystal','Engineer\'s Notebook',
   'Mech Control Key','Masterwork War Pick','Concentrated Purifier',
   'Ying\'s Charm','Petri Suppressant',
+  'River City Map','River City Herb Pack','River City Purifier',
 ];
 
 var SEED_FLAGS = [
@@ -115,6 +119,13 @@ var SEED_FLAGS = [
   'r2YingArrived','r2YingLore3','r2YingLore4','r2YingSketch','r2YingNight',
   'r2YingPromise','r2YingEngineer',
   'r2CraneMet','r2CraneLore','r2CraneTrade','r2ZhouTrace',
+  'r3Looked','r3DockVisited','r3MarketVisited','r3CouncilUnlocked','r3CouncilVisited',
+  'r3CouncilEntry','r3InnUnlocked','r3InnFirstVisit',
+  'r3CaptainTalked','r3DockSearch','r3MarketRumor','r3MarketBuy',
+  'r3BellMet','r3BellReport','r3BellAlliance','r3BellQuest',
+  'r3YingArrived','r3YingCity','r3YingEvidence','r3YingInn',
+  'r3ZhouMet','r3ZhouUpgrade',
+  'r3CraneMet3','r3CraneTestimony','r3CraneTrade3',
 ];
 
 var B36 = '0123456789abcdefghijklmnopqrstuvwxyz';

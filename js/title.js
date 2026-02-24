@@ -152,7 +152,7 @@ var CHAPTERS = [
     loreZh: '巨大的採石場向深淵敞開，殘破的機甲散落四處。倖存者在營地中苦撐，而一座沉睡的巨像正等待被喚醒。螢與你並肩前行，揭開更深的秘密。',
     loreEn: 'A massive quarry yawns open toward the abyss, broken mechs scattered everywhere. Survivors huddle in camp while a dormant colossus awaits awakening. Ying walks beside you as deeper secrets unfold.' },
   { id: 3, zh: '河城渡口', en: 'River City Ferry', node: 'r3_look',
-    descZh: '即將開放', descEn: 'Coming soon', icon: '⚓',
+    descZh: '碼頭 · 議會 · 銅鐘', descEn: 'Dock · Council · Bronze Bell', icon: '⚓',
     loreZh: '地底河流匯聚之處，一座被遺忘的城市橫跨兩岸。渡口的鐘聲已沉默多年……',
     loreEn: 'Where underground rivers converge, a forgotten city spans both banks. The ferry bell has been silent for years...' },
 ];
