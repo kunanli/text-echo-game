@@ -247,11 +247,94 @@ var R2_PATROL_TEXTS = [
   { text: '你踩到了什麼軟的東西——是一塊被石化到一半的菌毯。', textEn: 'You step on something soft — a mat of fungus, half petrified.' },
 ];
 
+var R3_MONSTERS = [
+  { name: '河蛭巨蟲', nameEn: 'River Leech Worm', hp: 35, atkMin: 8, atkMax: 14, petriDmg: 4, xp: 22,
+    art: [
+      '     ╭━━━━━╮',
+      '    ╱ ● ═══ ╲',
+      '   │ ╰─○─╯ ░░│',
+      '    ╲░░░░░░░░╱',
+      '     ╰━━━━━╮╱',
+      '           ╰╯',
+    ],
+    commune: [
+      { zh: '你伸出手掌放在河水中……河蛭慢慢靠近，觸鬚碰了碰你的指尖。', en: 'You dip your palm in the river... the leech drifts closer, feelers brushing your fingertips.' },
+      { zh: '它的身體發出微弱的生物光——像是在回應你的存在。', en: 'Its body emits a faint bioluminescence — as if responding to your presence.' },
+      { zh: '河蛭蟲收起了吸盤，在水中繞著你緩緩旋轉。它不再敵視你了。', en: 'The leech retracts its suckers, slowly circling you in the water. It no longer sees you as a threat.' },
+    ],
+    spareText: { zh: '河蛭巨蟲沉入黑暗的水底，尾部的生物光漸漸消失——像一盞熄滅的燈籠。', en: 'The leech sinks into the dark water, its bioluminescence fading — like a lantern going out.' },
+  },
+  { name: '鏽鱗魚人', nameEn: 'Rust-Scale Fishman', hp: 42, atkMin: 9, atkMax: 16, petriDmg: 4, xp: 25,
+    empathyGoal: 3,
+    art: [
+      '      ╭──╮',
+      '     ╱●  ●╲',
+      '    │ ╰──╯ │',
+      '    │ ▓▓▓▓ │╮',
+      '    ╲╱╲╱╲╱╲╱│',
+      '     ╱╱  ╲╲ │',
+      '    ~~    ~~',
+    ],
+    commune: [
+      { zh: '「嘎……嘎啊……」魚人發出粗啞的聲音。不是攻擊的嘶吼——更像是……說話。', en: '"Grr... grraa..." The fishman makes rough sounds. Not battle cries — more like... speech.' },
+      { zh: '你蹲下身，模仿它的聲音回應。魚人停下了攻擊，歪著頭看你。', en: 'You crouch and mimic its sounds. The fishman stops attacking, tilting its head.' },
+      { zh: '它伸出佈滿鏽鱗的手——手掌裡握著一顆河珍珠。它在向你展示自己的寶物。', en: 'It extends a rust-scaled hand — holding a river pearl. It\'s showing you its treasure.' },
+    ],
+    spareText: { zh: '魚人把河珍珠塞進你手裡，然後轉身跳入水中。在水花中，你看到它回頭看了你一眼——像在說再見。', en: 'The fishman presses the pearl into your hand, then dives into the water. In the splash, it looks back — as if saying goodbye.' },
+  },
+  { name: '石化水母群', nameEn: 'Petrified Jellyfish Swarm', hp: 28, atkMin: 5, atkMax: 18, petriDmg: 6, xp: 24,
+    art: [
+      '    ╭═══╮  ╭══╮',
+      '   ╱ ◎◎╱  ╱◎◎ ╲',
+      '   ╲═══╱  ╲══╱',
+      '   ╱╲╱╲    ╱╲╱╲',
+      '  │ │ │   │ │ │',
+      '  · · ·   · · ·',
+    ],
+    commune: [
+      { zh: '你閉上眼睛，放鬆身體……水母群的觸手停止了蟄刺，在你身邊漂浮。', en: 'You close your eyes and relax... the jellyfish stop stinging, floating around you.' },
+      { zh: '它們發出幽藍的光芒，像是地底的星空在水中重現。', en: 'They emit a ghostly blue glow, like an underground starscape reflected in water.' },
+      { zh: '水母群形成了一個光環——將你包裹在溫柔的光芒中。它們在療癒你。', en: 'The swarm forms a halo of light — wrapping you in gentle radiance. They\'re healing you.' },
+    ],
+    spareText: { zh: '水母群散去，在水面留下了一層閃爍的磷光。你感覺到石化的痕跡略微褪去了一些。', en: 'The swarm disperses, leaving a shimmering phosphorescence on the water. Your petrification marks fade slightly.' },
+  },
+  { name: '淵底鱷龍', nameEn: 'Abyss Crocodilian', hp: 50, atkMin: 12, atkMax: 20, petriDmg: 5, xp: 30,
+    empathyGoal: 4,
+    art: [
+      '   ╭━━━━━━━━━━━━╮',
+      '  ╱ ◆        ◆  ╲',
+      ' │ ╰════════════╯ │',
+      ' │ ▓▓▓▓▓▓▓▓▓▓▓▓▓▓ │',
+      '  ╲═══╤══════╤═══╱',
+      '     ╱╱      ╲╲',
+      '    ~~  ~~~~~~  ~~',
+    ],
+    commune: [
+      { zh: '你面對巨大的鱷龍，沒有退後。它的瞳孔收縮——在打量你。', en: 'You face the massive crocodilian without retreating. Its pupils contract — sizing you up.' },
+      { zh: '你伸出手，慢慢碰觸它的鱗甲。粗糙的表面下有心跳的振動。', en: 'You extend your hand and slowly touch its scales. Beneath the rough surface, a heartbeat pulses.' },
+      { zh: '鱷龍闔上了嘴。它低沉的喉音不再是咆哮——而是一種安靜的呼嚕聲。', en: 'The crocodilian closes its mouth. Its deep throat sounds shift from roaring to a quiet rumble.' },
+      { zh: '它趴在地上，巨大的頭顱靠在你腳邊。這個地底的頂級掠食者——選擇了信任你。', en: 'It lies down, resting its massive head at your feet. The underground\'s apex predator — chooses to trust you.' },
+    ],
+    spareText: { zh: '淵底鱷龍站起身，用尾巴輕輕碰了碰你的手。然後它轉身滑入河流深處——水面上泛起的漣漪漸漸消失。', en: 'The crocodilian rises, gently tapping your hand with its tail. Then it slides into the river depths — ripples fading on the surface.' },
+  },
+];
+
+var R3_PATROL_TEXTS = [
+  { text: '你沿著濕滑的河岸隧道前進，水聲在石壁間迴盪。', textEn: 'You advance through slippery river tunnels, water sounds echoing off stone walls.' },
+  { text: '腳下是黏膩的河泥，每一步都發出吸盤般的聲音。', textEn: 'Sticky river mud underfoot, each step making a squelching sound.' },
+  { text: '隧道壁上附著著發光的水藻，映出你警惕的身影。', textEn: 'Bioluminescent algae clings to tunnel walls, casting your wary silhouette.' },
+  { text: '你經過一個地下瀑布，水霧打濕了你的臉。', textEn: 'You pass an underground waterfall, mist dampening your face.' },
+  { text: '遠處傳來某種生物拍打水面的聲音。', textEn: 'The distant sound of some creature slapping the water surface.' },
+  { text: '一股腥臭的氣味從隧道深處飄來——有什麼東西住在那裡。', textEn: 'A foul stench drifts from deep in the tunnel — something lives there.' },
+  { text: '你踩過一灘散發螢光的淺水。水底有什麼東西在游動。', textEn: 'You wade through luminescent shallows. Something swims below.' },
+  { text: '隧道分岔了。你選了水聲更大的那條——那裡通常有更多生物。', textEn: 'The tunnel forks. You choose the louder water sound — usually means more creatures.' },
+];
+
 // Region-aware helpers
 var PATROL_TEXTS = R0_PATROL_TEXTS; // kept for backwards compat
-function getPatrolMonsters() { return state.region >= 2 ? R2_MONSTERS : state.region >= 1 ? R1_MONSTERS : R0_MONSTERS; }
-function getPatrolTexts() { return state.region >= 2 ? R2_PATROL_TEXTS : state.region >= 1 ? R1_PATROL_TEXTS : R0_PATROL_TEXTS; }
-function getPatrolReturnNode() { return state.region >= 2 ? 'r2_look' : state.region >= 1 ? 'r1_look' : 'r0_look'; }
+function getPatrolMonsters() { return state.region >= 3 ? R3_MONSTERS : state.region >= 2 ? R2_MONSTERS : state.region >= 1 ? R1_MONSTERS : R0_MONSTERS; }
+function getPatrolTexts() { return state.region >= 3 ? R3_PATROL_TEXTS : state.region >= 2 ? R2_PATROL_TEXTS : state.region >= 1 ? R1_PATROL_TEXTS : R0_PATROL_TEXTS; }
+function getPatrolReturnNode() { return state.region >= 3 ? 'r3_look' : state.region >= 2 ? 'r2_look' : state.region >= 1 ? 'r1_look' : 'r0_look'; }
 
 var patrolActive = false;
 var patrolTimers = [];
