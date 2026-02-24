@@ -139,43 +139,102 @@ document.getElementById('name-input').addEventListener('keydown', function(e) {
 
 // ── Chapter Select ──
 var CHAPTERS = [
-  { id: 0, zh: '祭獻坑',   en: 'Sacrificial Pit',  node: 'r0_look', descZh: '熱泉 · 石像 · 裂縫',       descEn: 'Hot spring · Statues · Crack',      icon: '†' },
-  { id: 1, zh: '石脈迴廊', en: 'Vein Corridor',    node: 'r1_look', descZh: '鍛場 · 守衛 · 螢',         descEn: 'Forge · Guardian · Ying',            icon: '◇' },
-  { id: 2, zh: '大採石場', en: 'Great Quarry',     node: 'r2_look', descZh: '機甲 · 營地 · 巨像',       descEn: 'Mech · Camp · Colossus',             icon: '⛏' },
-  { id: 3, zh: '河城渡口', en: 'River City Ferry', node: 'r3_look', descZh: '即將開放',                 descEn: 'Coming soon',                        icon: '⚓' },
+  { id: 0, zh: '祭獻坑',   en: 'Sacrificial Pit',  node: 'r0_look',
+    descZh: '熱泉 · 石像 · 裂縫', descEn: 'Hot spring · Statues · Crack', icon: '†',
+    loreZh: '你從滾燙的熱泉中醒來，四周盡是扭曲的石像。記憶模糊，唯一清晰的是——你是被獻祭的。向下攀爬，逃離這座活人祭壇。',
+    loreEn: 'You awaken in a scalding hot spring surrounded by twisted statues. Your memory is hazy, but one thing is clear — you were sacrificed. Climb down and escape this altar of the living.' },
+  { id: 1, zh: '石脈迴廊', en: 'Vein Corridor',    node: 'r1_look',
+    descZh: '鍛場 · 守衛 · 螢', descEn: 'Forge · Guardian · Ying', icon: '◇',
+    loreZh: '石壁間流動著發光的礦脈，空氣中瀰漫鍛鐵的氣味。這裡曾是繁忙的工坊區，如今守衛封鎖了通道。一個叫螢的女孩在暗處等待著同伴。',
+    loreEn: 'Glowing veins pulse through the stone walls, the air thick with the scent of forged iron. Once a busy workshop district, now sealed by guards. A girl named Ying waits in the shadows for a companion.' },
+  { id: 2, zh: '大採石場', en: 'Great Quarry',     node: 'r2_look',
+    descZh: '機甲 · 營地 · 巨像', descEn: 'Mech · Camp · Colossus', icon: '⛏',
+    loreZh: '巨大的採石場向深淵敞開，殘破的機甲散落四處。倖存者在營地中苦撐，而一座沉睡的巨像正等待被喚醒。螢與你並肩前行，揭開更深的秘密。',
+    loreEn: 'A massive quarry yawns open toward the abyss, broken mechs scattered everywhere. Survivors huddle in camp while a dormant colossus awaits awakening. Ying walks beside you as deeper secrets unfold.' },
+  { id: 3, zh: '河城渡口', en: 'River City Ferry', node: 'r3_look',
+    descZh: '即將開放', descEn: 'Coming soon', icon: '⚓',
+    loreZh: '地底河流匯聚之處，一座被遺忘的城市橫跨兩岸。渡口的鐘聲已沉默多年……',
+    loreEn: 'Where underground rivers converge, a forgotten city spans both banks. The ferry bell has been silent for years...' },
 ];
 
 function buildChapterMap(container, mapPre, onSelect) {
   var en = state.lang === 'en';
   var devUnlocked = state.flags._devUnlockAll;
 
-  // Build ASCII map
+  // ── Build enlarged ASCII map ──
   var lines = [];
-  lines.push(en ? '       ☼ ☼ ☼  Surface  ☼ ☼ ☼' : '       ☼ ☼ ☼  地  表  ☼ ☼ ☼');
-  lines.push('       ┌───────────────────┐');
+  lines.push(en ? '          ☼  ☼  ☼   S U R F A C E   ☼  ☼  ☼' : '          ☼  ☼  ☼    地       表    ☼  ☼  ☼');
+  lines.push('         ╔════════════════════════════════╗');
+  lines.push(en ? '         ║    ~~~  ocean  ~~~            ║' : '         ║    ～～～ 海  面 ～～～         ║');
+  lines.push('         ╠════════════════════════════════╣');
+
   for (var i = CHAPTERS.length - 1; i >= 0; i--) {
     var ch = CHAPTERS[i];
     var unlocked = devUnlocked || state.region >= ch.id;
     var isCurrent = state.region === ch.id;
-    var depth = en ? ('F' + (i + 1)) : ('第' + '一二三四'[i] + '層');
+    var depth = en ? ('  F' + (i + 1) + ' ') : (' ' + '一二三四'[i] + '層 ');
+    var marker = isCurrent ? ' ◄◄' : '   ';
+
     if (unlocked) {
       var name = en ? ch.en : ch.zh;
-      var pad = 17 - name.length * (en ? 1 : 2);
-      var lpad = Math.floor(pad / 2);
-      var rpad = pad - lpad;
-      var marker = isCurrent ? ' ◄' : '  ';
-      lines.push('  ' + depth + ' │' + ' '.repeat(Math.max(1, lpad)) + name + ' '.repeat(Math.max(1, rpad)) + '│' + marker);
+      var icon = ch.icon;
+      // Each chapter gets 3 lines: icon row, name row, desc row
+      var desc = en ? ch.descEn : ch.descZh;
+      lines.push('         ║                                ║');
+      lines.push(depth + '    ║    ' + icon + '  ' + name + marker);
+      lines.push('         ║    ' + desc);
+      lines.push('         ║                                ║');
     } else {
-      lines.push('  ' + depth + ' │ ░░░ ？？？ ░░░░ │');
+      lines.push('         ║                                ║');
+      lines.push(depth + '    ║    ░░░░░  ？？？  ░░░░░');
+      lines.push('         ║    ░░░░░░░░░░░░░░░░░░░░');
+      lines.push('         ║                                ║');
     }
-    if (i > 0) lines.push('       ├───────────────────┤');
+    if (i > 0) lines.push('         ╠────────────────────────────────╣');
   }
-  lines.push('       └───────────────────┘');
-  lines.push(en ? '       ▼ ▼ ▼  Abyss   ▼ ▼ ▼' : '       ▼ ▼ ▼  深  淵  ▼ ▼ ▼');
+  lines.push('         ╚════════════════════════════════╝');
+  lines.push(en ? '          ▼  ▼  ▼   A  B  Y  S  S   ▼  ▼  ▼' : '          ▼  ▼  ▼    深       淵    ▼  ▼  ▼');
   mapPre.textContent = lines.join('\n');
 
-  // Build chapter buttons
+  // ── Build chapter buttons ──
   container.innerHTML = '';
+
+  // Confirm panel (hidden by default)
+  var confirmPanel = document.createElement('div');
+  confirmPanel.className = 'chapter-confirm';
+  confirmPanel.style.display = 'none';
+  confirmPanel.innerHTML =
+    '<div class="chapter-confirm-name"></div>' +
+    '<div class="chapter-confirm-lore"></div>' +
+    '<div class="chapter-confirm-actions">' +
+      '<button class="chapter-confirm-go">' + (en ? 'Confirm' : '確認前往') + '</button>' +
+      '<button class="chapter-confirm-cancel">' + (en ? 'Cancel' : '取消') + '</button>' +
+    '</div>';
+  container.appendChild(confirmPanel);
+
+  var selectedChapter = null;
+
+  function showConfirm(ch) {
+    selectedChapter = ch;
+    confirmPanel.querySelector('.chapter-confirm-name').textContent = ch.icon + '  ' + (en ? ch.en : ch.zh);
+    confirmPanel.querySelector('.chapter-confirm-lore').textContent = en ? ch.loreEn : ch.loreZh;
+    confirmPanel.style.display = '';
+    // Highlight selected button
+    container.querySelectorAll('.chapter-item').forEach(function(b) { b.classList.remove('selected'); });
+    var idx = CHAPTERS.length - 1 - ch.id; // reverse order
+    var items = container.querySelectorAll('.chapter-item');
+    if (items[idx]) items[idx].classList.add('selected');
+  }
+
+  confirmPanel.querySelector('.chapter-confirm-go').addEventListener('click', function() {
+    if (selectedChapter) onSelect(selectedChapter);
+  });
+  confirmPanel.querySelector('.chapter-confirm-cancel').addEventListener('click', function() {
+    confirmPanel.style.display = 'none';
+    selectedChapter = null;
+    container.querySelectorAll('.chapter-item').forEach(function(b) { b.classList.remove('selected'); });
+  });
+
   for (var i = CHAPTERS.length - 1; i >= 0; i--) {
     var ch = CHAPTERS[i];
     var unlocked = devUnlocked || state.region >= ch.id;
@@ -196,7 +255,7 @@ function buildChapterMap(container, mapPre, onSelect) {
     }
     if (unlocked) {
       (function(chapter) {
-        btn.addEventListener('click', function() { onSelect(chapter); });
+        btn.addEventListener('click', function() { showConfirm(chapter); });
       })(ch);
     }
     container.appendChild(btn);

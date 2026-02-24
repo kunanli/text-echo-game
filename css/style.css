@@ -816,8 +816,8 @@
     flex-direction: column;
     align-items: center;
     gap: 16px;
-    width: 90%;
-    max-width: 420px;
+    width: 92%;
+    max-width: 520px;
   }
   .chapter-title {
     color: #d4a843;
@@ -827,13 +827,15 @@
   }
   .chapter-map {
     font-family: "Courier New", Courier, monospace;
-    font-size: .72rem;
-    line-height: 1.2;
+    font-size: .68rem;
+    line-height: 1.25;
     color: #5a6a5a;
     white-space: pre;
-    text-align: center;
+    text-align: left;
     user-select: none;
     margin: 0;
+    max-width: 100%;
+    overflow-x: auto;
   }
   .chapter-list {
     display: flex;
@@ -954,10 +956,87 @@
     padding: 6px 16px;
     letter-spacing: 2px;
   }
+  .chapter-item.selected {
+    border-color: #d4a843;
+    background: #1e1a12;
+    box-shadow: 0 0 8px rgba(212,168,67,.25);
+  }
+  .chapter-item.selected .chapter-name {
+    color: #d4a843;
+  }
+
+  /* ── Chapter Confirm Panel ── */
+  .chapter-confirm {
+    width: 100%;
+    border: 1px solid #3a3a2a;
+    border-radius: 6px;
+    background: #121218;
+    padding: 16px 18px;
+    margin-bottom: 8px;
+    animation: fadeSlideIn .25s ease;
+  }
+  @keyframes fadeSlideIn {
+    from { opacity: 0; transform: translateY(-8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .chapter-confirm-name {
+    color: #d4a843;
+    font-size: 1.05rem;
+    font-weight: bold;
+    letter-spacing: 2px;
+    margin-bottom: 10px;
+  }
+  .chapter-confirm-lore {
+    color: #9a9aaa;
+    font-size: .85rem;
+    line-height: 1.65;
+    margin-bottom: 14px;
+  }
+  .chapter-confirm-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+  }
+  .chapter-confirm-go,
+  .chapter-confirm-cancel {
+    font-family: inherit;
+    font-size: .85rem;
+    padding: 8px 22px;
+    border-radius: 4px;
+    border: 1px solid;
+    cursor: pointer;
+    transition: all .2s;
+  }
+  .chapter-confirm-go {
+    background: #1a1a12;
+    border-color: #d4a843;
+    color: #d4a843;
+  }
+  .chapter-confirm-go:hover {
+    background: #2a2a18;
+    box-shadow: 0 0 8px rgba(212,168,67,.3);
+  }
+  .chapter-confirm-cancel {
+    background: #12121e;
+    border-color: #3a3a4a;
+    color: #6a6a7a;
+  }
+  .chapter-confirm-cancel:hover {
+    border-color: #5a5a6a;
+    color: #9a9aaa;
+  }
+
+  .chapter-map {
+    font-size: .68rem;
+    line-height: 1.25;
+  }
+
   @media (max-width: 760px) {
-    .chapter-map { font-size: .58rem; }
+    .chapter-map { font-size: .52rem; }
     .chapter-item { padding: 10px 12px; font-size: .85rem; }
     .chapter-select-container { width: 95%; }
+    .chapter-confirm-go,
+    .chapter-confirm-cancel { font-size: .8rem; padding: 7px 16px; }
   }
 
   /* ── Notification ── */

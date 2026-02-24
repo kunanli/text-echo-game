@@ -60,36 +60,53 @@ registerNode('chapter_select', function() {
   var en = state.lang === 'en';
   var devUnlocked = state.flags._devUnlockAll;
 
-  var chData = [
-    { id: 0, zh: '祭獻坑',   en: 'Sacrificial Pit',  node: 'r0_look', icon: '†' },
-    { id: 1, zh: '石脈迴廊', en: 'Vein Corridor',    node: 'r1_look', icon: '◇' },
-    { id: 2, zh: '大採石場', en: 'Great Quarry',     node: 'r2_look', icon: '⛏' },
-    { id: 3, zh: '河城渡口', en: 'River City Ferry', node: 'r3_look', icon: '⚓' },
+  // Use the shared CHAPTERS array from title.js
+  var chData = typeof CHAPTERS !== 'undefined' ? CHAPTERS : [
+    { id: 0, zh: '祭獻坑',   en: 'Sacrificial Pit',  node: 'r0_look', icon: '†',
+      loreZh: '你從滾燙的熱泉中醒來……', loreEn: 'You awaken in a scalding hot spring...' },
+    { id: 1, zh: '石脈迴廊', en: 'Vein Corridor',    node: 'r1_look', icon: '◇',
+      loreZh: '石壁間流動著發光的礦脈……', loreEn: 'Glowing veins pulse through the stone walls...' },
+    { id: 2, zh: '大採石場', en: 'Great Quarry',     node: 'r2_look', icon: '⛏',
+      loreZh: '巨大的採石場向深淵敞開……', loreEn: 'A massive quarry yawns open toward the abyss...' },
+    { id: 3, zh: '河城渡口', en: 'River City Ferry', node: 'r3_look', icon: '⚓',
+      loreZh: '地底河流匯聚之處……', loreEn: 'Where underground rivers converge...' },
   ];
 
+  // ── Enlarged ASCII map ──
   var lines = [];
-  lines.push(en ? '    ☼ ☼ ☼  Surface  ☼ ☼ ☼' : '    ☼ ☼ ☼  地  表  ☼ ☼ ☼');
-  lines.push('    ┌───────────────────┐');
+  lines.push(en ? '       ☼  ☼  ☼   S U R F A C E   ☼  ☼  ☼' : '       ☼  ☼  ☼    地       表    ☼  ☼  ☼');
+  lines.push('      ╔════════════════════════════════╗');
+  lines.push(en ? '      ║    ~~~  ocean  ~~~            ║' : '      ║    ～～～ 海  面 ～～～         ║');
+  lines.push('      ╠════════════════════════════════╣');
+
   for (var i = chData.length - 1; i >= 0; i--) {
     var ch = chData[i];
     var unlocked = devUnlocked || state.region >= ch.id;
     var isCurrent = state.region === ch.id;
-    var depth = en ? ('F' + (i + 1)) : ('第' + '一二三四'[i] + '層');
+    var depth = en ? (' F' + (i + 1) + ' ') : (' ' + '一二三四'[i] + '層 ');
+    var marker = isCurrent ? ' ◄◄' : '   ';
+
     if (unlocked) {
       var name = en ? ch.en : ch.zh;
-      var marker = isCurrent ? ' ◄' : '';
-      lines.push('  ' + depth + ' │ ' + ch.icon + ' ' + name + marker);
+      var desc = en ? (ch.descEn || '') : (ch.descZh || '');
+      lines.push('      ║                                ║');
+      lines.push(depth + ' ║    ' + ch.icon + '  ' + name + marker);
+      lines.push('      ║    ' + desc);
+      lines.push('      ║                                ║');
     } else {
-      lines.push('  ' + depth + ' │ ░░░ ？？？ ░░░░');
+      lines.push('      ║                                ║');
+      lines.push(depth + ' ║    ░░░░░  ？？？  ░░░░░');
+      lines.push('      ║    ░░░░░░░░░░░░░░░░░░░░');
+      lines.push('      ║                                ║');
     }
-    if (i > 0) lines.push('    ├───────────────────┤');
+    if (i > 0) lines.push('      ╠────────────────────────────────╣');
   }
-  lines.push('    └───────────────────┘');
-  lines.push(en ? '    ▼ ▼ ▼  Abyss   ▼ ▼ ▼' : '    ▼ ▼ ▼  深  淵  ▼ ▼ ▼');
+  lines.push('      ╚════════════════════════════════╝');
+  lines.push(en ? '       ▼  ▼  ▼   A  B  Y  S  S   ▼  ▼  ▼' : '       ▼  ▼  ▼    深       淵    ▼  ▼  ▼');
 
   var steps = [
     { art: '<pre class="ascii-art gold">' + lines.join('\n') + '</pre>', delay: 300 },
-    { tag: en ? 'SYSTEM' : '系統', tagColor: 'tag-system', text: en ? 'Select a chapter to travel to.' : '選擇一個章節前往。', delay: 300 },
+    { tag: en ? 'SYSTEM' : '系統', tagColor: 'tag-system', text: en ? 'Select a chapter to preview, then confirm.' : '選擇一個章節查看，再確認前往。', delay: 300 },
   ];
 
   var choices = [];
@@ -98,10 +115,23 @@ registerNode('chapter_select', function() {
       var unlocked = devUnlocked || state.region >= chapter.id;
       if (!unlocked) return;
       var isCurrent = state.region === chapter.id;
-      var label = (en ? chapter.en : chapter.zh) + (isCurrent ? (en ? ' (current)' : ' （當前）') : '');
+      var label = chapter.icon + ' ' + (en ? chapter.en : chapter.zh) + (isCurrent ? (en ? ' (current)' : ' （當前）') : '');
       choices.push({ text: label, textEn: label, action: function() {
-        state.region = chapter.id;
-        loadNode(chapter.node);
+        // Show confirmation with lore description
+        var lore = en ? (chapter.loreEn || '') : (chapter.loreZh || '');
+        var confirmSteps = [
+          { tag: en ? chapter.en : chapter.zh, tagColor: 'tag-npc',
+            text: lore, delay: 400 },
+        ];
+        var confirmChoices = [
+          { text: en ? 'Confirm — go to ' + chapter.en : '確認前往 —— ' + chapter.zh,
+            textEn: 'Confirm — go to ' + chapter.en,
+            action: function() { state.region = chapter.id; loadNode(chapter.node); } },
+          { text: en ? 'Back to chapter list' : '返回章節列表',
+            textEn: 'Back to chapter list',
+            action: function() { loadNode('chapter_select'); } },
+        ];
+        autoExplore(confirmSteps, confirmChoices, { label: L('確認章節', 'Confirm Chapter') });
       }});
     })(chData[i]);
   }
