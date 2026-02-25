@@ -62,6 +62,7 @@ registerNode('r1_start', () => {
 });
 
 registerNode('r1_look', () => {
+  state.region = 1;
   var firstVisit = !state.flags.r1Looked;
   state.flags.r1Looked = true;
 

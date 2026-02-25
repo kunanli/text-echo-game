@@ -64,6 +64,7 @@ registerNode('r2_start', () => {
 
 // ── Hub: Quarry Overview ──
 registerNode('r2_look', () => {
+  state.region = 2;
   var firstVisit = !state.flags.r2Looked;
   state.flags.r2Looked = true;
 

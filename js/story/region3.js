@@ -64,6 +64,7 @@ registerNode('r3_start', () => {
 
 // ── Hub node ──
 registerNode('r3_look', () => {
+  state.region = 3;
   state.flags.r3Looked = true;
   var steps = [];
 
