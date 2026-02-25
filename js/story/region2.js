@@ -157,8 +157,11 @@ registerNode('r2_look', () => {
 
 // ── Quarry Floor — 採石台 ──
 registerNode('r2_quarry_floor', () => {
-  var steps = [
-    { art: `<pre class="ascii-art gold">
+  var firstVisit = !state.flags.r2FloorVisited;
+  state.flags.r2FloorVisited = true;
+  var steps = [];
+  if (firstVisit) {
+    steps.push({ art: `<pre class="ascii-art gold">
   ════════════════════════════════════════
       ╱╲              ╱╲              ╱╲
      ╱░░╲  .:*~*:.   ╱░░╲  .:*~*:.  ╱░░╲
@@ -181,11 +184,13 @@ registerNode('r2_quarry_floor', () => {
          ║Platfm ║        ║ Rack  ║
          ╚═══════╝        ╚═══════╝
   ════════════════════════════════════════
-</pre>`, delay: 800 },
-    { tag: '探索', tagColor: 'tag-explore', text: '你來到了採石場的主作業區。巨大的採石台上還留著開鑿的痕跡。', textEn: 'You reach the quarry\'s main work area. Massive platforms still bear chisel marks.', delay: 2200 },
-    { tag: '感知', tagColor: 'tag-sense', text: '採石台之間生長著密集的石化結晶——有些高達兩米，散發出危險的金色光芒。', textEn: 'Dense petrification crystals grow between platforms — some two meters tall, radiating dangerous golden light.', delay: 2500 },
-    { tag: '環境', tagColor: 'tag-system', text: '地面上散落著巨型鑿岩工具和採礦車的殘骸。', textEn: 'Giant rock-carving tools and mining cart remains litter the ground.', delay: 2000 },
-  ];
+</pre>`, delay: 800 });
+    steps.push({ tag: '探索', tagColor: 'tag-explore', text: '你來到了採石場的主作業區。巨大的採石台上還留著開鑿的痕跡。', textEn: 'You reach the quarry\'s main work area. Massive platforms still bear chisel marks.', delay: 2200 });
+    steps.push({ tag: '感知', tagColor: 'tag-sense', text: '採石台之間生長著密集的石化結晶——有些高達兩米，散發出危險的金色光芒。', textEn: 'Dense petrification crystals grow between platforms — some two meters tall, radiating dangerous golden light.', delay: 2500 });
+    steps.push({ tag: '環境', tagColor: 'tag-system', text: '地面上散落著巨型鑿岩工具和採礦車的殘骸。', textEn: 'Giant rock-carving tools and mining cart remains litter the ground.', delay: 2000 });
+  } else {
+    steps.push({ tag: '移動', tagColor: 'tag-move', text: '你回到了採石台。結晶的金色光芒依舊不減，石化粒子在空氣中漂浮。', textEn: 'You return to the quarry platforms. Crystal light still burns gold, petri-particles drift in the air.', delay: 1800 });
+  }
   if (!state.flags.r2FloorSearched) {
     steps.push({ tag: '探索', tagColor: 'tag-explore', text: '工具架上還有一些完好的裝備。', textEn: 'Some intact equipment remains on the tool rack.', delay: 1800 });
     steps.push({ tag: '發現', tagColor: 'tag-item', html: '你找到了一把<b>強化鶴嘴鋤</b>和一瓶<b>抗石化藥膏</b>。', htmlEn: 'You find a <b>Reinforced Pickaxe</b> and a jar of <b>Anti-Petri Salve</b>.', delay: 2500, effect: () => {

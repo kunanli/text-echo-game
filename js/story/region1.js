@@ -141,8 +141,13 @@ registerNode('r1_look', () => {
 
 // ── Forge Room ──
 registerNode('r1_forge', () => {
+  var firstVisit = !state.flags.r1ForgeVisited;
   state.flags.r1ForgeVisited = true;
-  var steps = [
+  var steps = [];
+  if (!firstVisit) {
+    steps.push({ tag: '移動', tagColor: 'tag-move', text: '你再次走進了鍛造間。熔爐的餘火依舊微弱地燃著。', textEn: 'You enter the forge room again. Faint embers still glow in the furnace.', delay: 1500 });
+  }
+  steps = steps.concat([
     { art: `<pre class="ascii-art red">
   ╔═══════════════════════════════════════════╗
   ║                                           ║
@@ -176,12 +181,14 @@ registerNode('r1_forge', () => {
   ║                                           ║
   ╚═══════════════════════════════════════════╝
 </pre>`, delay: 800 },
-    { tag: '探索', tagColor: 'tag-explore', text: '北面通道盡頭是一間廢棄的鍛造間。', textEn: 'The northern passage ends at an abandoned forge room.', delay: 2000 },
-    { tag: '感知', tagColor: 'tag-sense', text: '出乎意料的是——熔爐裡還有微弱的餘火。', textEn: 'Surprisingly — faint embers still glow in the furnace.', delay: 2500 },
-    { tag: '情報', tagColor: 'tag-info', text: '這裡曾用來冶煉石化礦石。工具架上還掛著幾把鏽蝕的工具。', textEn: 'This place smelted petrification ore. A few rusted tools still hang on the rack.', delay: 2500 },
-    { tag: '感知', tagColor: 'tag-sense', text: '鐵砧旁有一個皮革工具包，看起來保存得還不錯。', textEn: 'A leather tool pouch sits beside the anvil, still in decent condition.', delay: 2200 },
-    { tag: '探索', tagColor: 'tag-explore', text: '角落裡堆著一些未加工的礦石，其中幾塊散發著異樣的光芒。', textEn: 'Unprocessed ore piles up in the corner, some pieces glowing strangely.', delay: 2200 },
-  ];
+  ]);
+  if (firstVisit) {
+    steps.push({ tag: '探索', tagColor: 'tag-explore', text: '北面通道盡頭是一間廢棄的鍛造間。', textEn: 'The northern passage ends at an abandoned forge room.', delay: 2000 });
+    steps.push({ tag: '感知', tagColor: 'tag-sense', text: '出乎意料的是——熔爐裡還有微弱的餘火。', textEn: 'Surprisingly — faint embers still glow in the furnace.', delay: 2500 });
+    steps.push({ tag: '情報', tagColor: 'tag-info', text: '這裡曾用來冶煉石化礦石。工具架上還掛著幾把鏽蝕的工具。', textEn: 'This place smelted petrification ore. A few rusted tools still hang on the rack.', delay: 2500 });
+    steps.push({ tag: '感知', tagColor: 'tag-sense', text: '鐵砧旁有一個皮革工具包，看起來保存得還不錯。', textEn: 'A leather tool pouch sits beside the anvil, still in decent condition.', delay: 2200 });
+    steps.push({ tag: '探索', tagColor: 'tag-explore', text: '角落裡堆著一些未加工的礦石，其中幾塊散發著異樣的光芒。', textEn: 'Unprocessed ore piles up in the corner, some pieces glowing strangely.', delay: 2200 });
+  }
   if (!state.flags.r1ForgeSearched) {
     steps.push({ tag: '發現', tagColor: 'tag-item', html: '工具包裡有一把品質不錯的<b>鍛造鐵錘</b>。', htmlEn: 'Inside the pouch — a decent-quality <b>Forged Hammer</b>.', delay: 2000, effect: () => { addItem(L('鍛造鐵錘', 'Forged Hammer')); state.flags.r1ForgeSearched = true; } });
   }
@@ -241,7 +248,13 @@ registerNode('r1_forge_search', () => {
 
 // ── Crystal Vein (West) ──
 registerNode('r1_crystal', () => {
-  autoExplore([
+  var firstVisit = !state.flags.r1CrystalVisited;
+  state.flags.r1CrystalVisited = true;
+  var steps = [];
+  if (!firstVisit) {
+    steps.push({ tag: '移動', tagColor: 'tag-move', text: '你再次走向結晶區。空氣中的石化粒子依舊濃密，但你已經比較習慣了。', textEn: 'You head for the crystal area again. Petri-particles are still thick, but you\'re more used to it.', delay: 1800 });
+  }
+  steps = steps.concat([
     { art: `<pre class="ascii-art purple">
      .:*~*:.    .:*~*:.    .:*~*:.    .:*~*:.
     *~*~*~*~*  *~*~*~*~*  *~*~*~*~*  *~*~*~*~*
@@ -269,12 +282,15 @@ registerNode('r1_crystal', () => {
     ░░ Petri particles float in the air ░░░░
     ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
 </pre>`, delay: 800 },
-    { tag: '移動', tagColor: 'tag-move', text: '你走向西面結晶密集的區域。', textEn: 'You head toward the crystal-dense western area.', delay: 1500 },
-    { tag: '警告', tagColor: 'tag-warn', text: '越靠近，空氣越沉重——石化粒子肉眼可見地漂浮著。', textEn: 'The closer you get, the heavier the air — petrification particles visibly float.', delay: 2200 },
-    { tag: '石化', tagColor: 'tag-petri', text: '你感覺到皮膚表面微微發緊。', textEn: 'Your skin begins to feel taut.', delay: 2000 },
-    { tag: '探索', tagColor: 'tag-explore', text: '巨大的石化結晶從牆壁和天花板生長出來，像冰凌一樣交錯。', textEn: 'Enormous petrification crystals jut from walls and ceiling, criss-crossing like icicles.', delay: 2500 },
-    { tag: '發現', tagColor: 'tag-item', text: '結晶叢中隱約可以看到一些被石化的物品——武器、盔甲的碎片。', textEn: 'Among the crystals, petrified objects are visible — weapon and armor fragments.', delay: 2500 },
-  ], [
+  ]);
+  if (firstVisit) {
+    steps.push({ tag: '移動', tagColor: 'tag-move', text: '你走向西面結晶密集的區域。', textEn: 'You head toward the crystal-dense western area.', delay: 1500 });
+    steps.push({ tag: '警告', tagColor: 'tag-warn', text: '越靠近，空氣越沉重——石化粒子肉眼可見地漂浮著。', textEn: 'The closer you get, the heavier the air — petrification particles visibly float.', delay: 2200 });
+    steps.push({ tag: '石化', tagColor: 'tag-petri', text: '你感覺到皮膚表面微微發緊。', textEn: 'Your skin begins to feel taut.', delay: 2000 });
+    steps.push({ tag: '探索', tagColor: 'tag-explore', text: '巨大的石化結晶從牆壁和天花板生長出來，像冰凌一樣交錯。', textEn: 'Enormous petrification crystals jut from walls and ceiling, criss-crossing like icicles.', delay: 2500 });
+    steps.push({ tag: '發現', tagColor: 'tag-item', text: '結晶叢中隱約可以看到一些被石化的物品——武器、盔甲的碎片。', textEn: 'Among the crystals, petrified objects are visible — weapon and armor fragments.', delay: 2500 });
+  }
+  autoExplore(steps, [
     { label: checkLabel('嘗試採集結晶', 'Try to harvest crystals', 'wil', 9), action: () => {
       changePetri(3);
       var r = statCheck('wil', 9);
@@ -464,12 +480,17 @@ registerNode('r1_guard_sneak', () => {
 
 // ── Deep Corridor ──
 registerNode('r1_deep', () => {
-  var steps = [
-    { tag: '移動', tagColor: 'tag-move', text: '你沿著鐵軌深入迴廊。', textEn: 'You follow the rails deeper into the corridor.', delay: 2000 },
-    { tag: '感知', tagColor: 'tag-sense', text: '這一段的礦脈更加粗大，藍色冷光照亮了整條走廊。', textEn: 'The ore veins here are thicker, blue light illuminating the entire corridor.', delay: 2500 },
-    { tag: '環境', tagColor: 'tag-system', text: '空氣變得異常冰冷——你能看到自己的呼吸化為白霧。', textEn: 'The air turns bitterly cold — you can see your breath forming white mist.', delay: 2200 },
-    { tag: '探索', tagColor: 'tag-explore', text: '鐵軌在這裡分叉——一條通往左邊的礦工宿舍，一條通往前方的大門。', textEn: 'The rails fork — one track to a miners\' quarters on the left, another to a great door ahead.', delay: 2500 },
-  ];
+  var firstVisit = !state.flags.r1DeepVisited;
+  state.flags.r1DeepVisited = true;
+  var steps = [];
+  if (firstVisit) {
+    steps.push({ tag: '移動', tagColor: 'tag-move', text: '你沿著鐵軌深入迴廊。', textEn: 'You follow the rails deeper into the corridor.', delay: 2000 });
+    steps.push({ tag: '感知', tagColor: 'tag-sense', text: '這一段的礦脈更加粗大，藍色冷光照亮了整條走廊。', textEn: 'The ore veins here are thicker, blue light illuminating the entire corridor.', delay: 2500 });
+    steps.push({ tag: '環境', tagColor: 'tag-system', text: '空氣變得異常冰冷——你能看到自己的呼吸化為白霧。', textEn: 'The air turns bitterly cold — you can see your breath forming white mist.', delay: 2200 });
+    steps.push({ tag: '探索', tagColor: 'tag-explore', text: '鐵軌在這裡分叉——一條通往左邊的礦工宿舍，一條通往前方的大門。', textEn: 'The rails fork — one track to a miners\' quarters on the left, another to a great door ahead.', delay: 2500 });
+  } else {
+    steps.push({ tag: '移動', tagColor: 'tag-move', text: '你回到了迴廊深處的分叉路口。冰冷的空氣和藍色礦脈光依舊如初。', textEn: 'You return to the deep corridor fork. Cold air and blue ore-glow remain unchanged.', delay: 1800 });
+  }
   // ── Foreshadowing: traces of Ying (螢) ──
   if (!state.flags.r1YingHintSeen) {
     state.flags.r1YingHintSeen = true;
