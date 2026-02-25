@@ -115,10 +115,11 @@ var SEED_FLAGS = [
   'tookCrystal','hiddenFound',
   'r1Looked','r1ForgeVisited','r1ForgeSearched','r1ForgeFullSearch',
   'r1GuardHint','r1GuardDefeated','r1CrystalItemsTaken','r1QuartersSearched',
+  'r1CrystalVisited','r1DeepVisited',
   'r2Looked','r2FloorSearched','r2CrystalHarvested','r2CrystalStatueSearched',
   'r2MachineInspected','r2MachineCore','r2BridgeFixed','r2CampVisited',
   'r2ChiefTalked','r2PickaxeUpgraded','r2ArmorUpgraded',
-  'r2MedicHealed','r2MedicElixir','r2BossDefeated',
+  'r2MedicHealed','r2MedicElixir','r2BossDefeated','r2FloorVisited',
   'r2YingArrived','r2YingLore3','r2YingLore4','r2YingSketch','r2YingNight',
   'r2YingPromise','r2YingEngineer',
   'r2CraneMet','r2CraneLore','r2CraneTrade','r2ZhouTrace',
@@ -152,11 +153,34 @@ function fromB36(str) {
   return n;
 }
 
+// Pack boolean flags into b36 string (5 bits per char, safe from 32-bit overflow)
+function packBitsB36(list, lookup) {
+  var s = '';
+  for (var i = 0; i < list.length; i += 5) {
+    var val = 0;
+    for (var j = 0; j < 5 && i + j < list.length; j++) {
+      if (lookup(i + j)) val |= (1 << j);
+    }
+    s += B36[val];
+  }
+  return s;
+}
+
+// Unpack b36 string into callback (5 bits per char)
+function unpackBitsB36(str, count, setter) {
+  for (var i = 0; i < count; i++) {
+    var ci = Math.floor(i / 5);
+    var bi = i % 5;
+    var val = B36.indexOf(str[ci].toLowerCase());
+    if (val & (1 << bi)) setter(i);
+  }
+}
+
 function exportSaveCode() {
   try {
     var parts = [];
-    // Header
-    parts.push('PA1');
+    // Header (PA2 = fixed bit-packing format)
+    parts.push('PA2');
     // Sex + lang (1 char each)
     parts.push(state.sex === 'female' ? '1' : '0');
     parts.push(state.lang === 'en' ? '1' : '0');
@@ -176,21 +200,20 @@ function exportSaveCode() {
     var nodeIdx = SEED_NODES.indexOf(state.node);
     if (nodeIdx < 0) nodeIdx = 0;
     parts.push(toB36(nodeIdx, 2));
-    // Inventory bitmask (base36, up to ~15 items = need ceil(15/5)=3 chars using 36^n)
-    var invBits = 0;
-    var itemList = state.lang === 'en' ? SEED_ITEMS_EN : SEED_ITEMS_ZH;
-    for (var i = 0; i < SEED_ITEMS_ZH.length; i++) {
-      if (state.inventory.indexOf(SEED_ITEMS_ZH[i]) !== -1 || state.inventory.indexOf(SEED_ITEMS_EN[i]) !== -1) {
-        invBits |= (1 << i);
-      }
-    }
-    parts.push(toB36(invBits, 3));
-    // Flags bitmask
-    var flagBits = 0;
-    for (var i = 0; i < SEED_FLAGS.length; i++) {
-      if (state.flags[SEED_FLAGS[i]]) flagBits |= (1 << i);
-    }
-    parts.push(toB36(flagBits, 3));
+    // Inventory + flags char counts (stored before data for forward compat)
+    var invChars = Math.ceil(SEED_ITEMS_ZH.length / 5);
+    var flagChars = Math.ceil(SEED_FLAGS.length / 5);
+    parts.push(toB36(invChars, 1));
+    parts.push(toB36(flagChars, 1));
+    // Inventory bits (5 items per b36 char)
+    parts.push(packBitsB36(SEED_ITEMS_ZH, function(i) {
+      return state.inventory.indexOf(SEED_ITEMS_ZH[i]) !== -1
+          || state.inventory.indexOf(SEED_ITEMS_EN[i]) !== -1;
+    }));
+    // Flags bits (5 flags per b36 char)
+    parts.push(packBitsB36(SEED_FLAGS, function(i) {
+      return !!state.flags[SEED_FLAGS[i]];
+    }));
     // Name (URI-encode then base36 length prefix + raw)
     var nameEnc = encodeURIComponent(state.name);
     parts.push(toB36(nameEnc.length, 2) + nameEnc);
@@ -207,9 +230,12 @@ function exportSaveCode() {
 function importSaveCode(code) {
   try {
     code = code.trim();
-    // Try new seed format first
+    if (code.indexOf('PA2') === 0) {
+      return importSeedV2(code);
+    }
+    // Legacy PA1 format (broken for >32 flags, kept for old save codes)
     if (code.indexOf('PA1') === 0) {
-      return importSeed(code);
+      return importSeedV1(code);
     }
     // Fallback: try legacy base64 format
     return importLegacy(code);
@@ -218,10 +244,11 @@ function importSaveCode(code) {
   }
 }
 
-function importSeed(code) {
+// PA2: bit-packed format (5 flags per b36 char, no 32-bit overflow)
+function importSeedV2(code) {
   try {
-    if (code.substring(0, 3) !== 'PA1') return false;
-    var p = 3; // cursor position
+    if (code.substring(0, 3) !== 'PA2') return false;
+    var p = 3;
     // Sex + lang
     state.sex = code[p++] === '1' ? 'female' : 'male';
     state.lang = code[p++] === '1' ? 'en' : 'zh';
@@ -242,24 +269,76 @@ function importSeed(code) {
     // Node
     var nodeIdx = fromB36(code.substring(p, p + 2)); p += 2;
     state.node = SEED_NODES[nodeIdx] || 'r0_start';
-    // Inventory
-    var invBits = fromB36(code.substring(p, p + 3)); p += 3;
+    // Read inv/flag char counts (stored before packed data for forward compat)
+    var invChars = fromB36(code.substring(p, p + 1)); p += 1;
+    var flagChars = fromB36(code.substring(p, p + 1)); p += 1;
+    // Inventory (bit-packed)
+    var invStr = code.substring(p, p + invChars); p += invChars;
     state.inventory = [];
     var itemList = state.lang === 'en' ? SEED_ITEMS_EN : SEED_ITEMS_ZH;
-    for (var i = 0; i < itemList.length; i++) {
-      if (invBits & (1 << i)) state.inventory.push(itemList[i]);
-    }
-    // Flags
-    var flagBits = fromB36(code.substring(p, p + 3)); p += 3;
+    unpackBitsB36(invStr, Math.min(itemList.length, invChars * 5), function(i) {
+      if (i < itemList.length) state.inventory.push(itemList[i]);
+    });
+    // Flags (bit-packed)
+    var flagStr = code.substring(p, p + flagChars); p += flagChars;
     state.flags = {};
-    for (var i = 0; i < SEED_FLAGS.length; i++) {
-      if (flagBits & (1 << i)) state.flags[SEED_FLAGS[i]] = true;
-    }
+    unpackBitsB36(flagStr, Math.min(SEED_FLAGS.length, flagChars * 5), function(i) {
+      if (i < SEED_FLAGS.length) state.flags[SEED_FLAGS[i]] = true;
+    });
     // Name
     var nameLen = fromB36(code.substring(p, p + 2)); p += 2;
     var nameEnc = code.substring(p, p + nameLen); p += nameLen;
     state.name = decodeURIComponent(nameEnc) || '旅者';
     // Checksum
+    var all = code.substring(0, p);
+    var cksum = 0;
+    for (var i = 0; i < all.length; i++) cksum = (cksum + all.charCodeAt(i)) % 36;
+    if (code[p] !== B36[cksum]) return false;
+    state.mood = 'normal';
+    saveGame();
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+
+// PA1: legacy format (broken for >32 flags/items, kept for backward compat)
+function importSeedV1(code) {
+  try {
+    if (code.substring(0, 3) !== 'PA1') return false;
+    var p = 3;
+    state.sex = code[p++] === '1' ? 'female' : 'male';
+    state.lang = code[p++] === '1' ? 'en' : 'zh';
+    var rawHp = fromB36(code.substring(p, p + 3)); p += 3;
+    state.maxHp = fromB36(code.substring(p, p + 3)) || 100; p += 3;
+    state.hp = clamp(rawHp, 0, state.maxHp);
+    state.petri = clamp(fromB36(code.substring(p, p + 2)), 0, 99); p += 2;
+    state.str = fromB36(code.substring(p, p + 2)); p += 2;
+    state.agi = fromB36(code.substring(p, p + 2)); p += 2;
+    state.wil = fromB36(code.substring(p, p + 2)); p += 2;
+    state.xp = fromB36(code.substring(p, p + 3)); p += 3;
+    state.level = fromB36(code.substring(p, p + 2)); p += 2;
+    state.region = fromB36(code.substring(p, p + 1)); p += 1;
+    state.deathCount = fromB36(code.substring(p, p + 2)); p += 2;
+    state.xpToNext = xpForLevel(state.level);
+    var nodeIdx = fromB36(code.substring(p, p + 2)); p += 2;
+    state.node = SEED_NODES[nodeIdx] || 'r0_start';
+    // Legacy: 3-char bitmask (only first ~15 items reliable)
+    var invBits = fromB36(code.substring(p, p + 3)); p += 3;
+    state.inventory = [];
+    var itemList = state.lang === 'en' ? SEED_ITEMS_EN : SEED_ITEMS_ZH;
+    for (var i = 0; i < Math.min(itemList.length, 15); i++) {
+      if (invBits & (1 << i)) state.inventory.push(itemList[i]);
+    }
+    // Legacy: 3-char bitmask (only first ~15 flags reliable)
+    var flagBits = fromB36(code.substring(p, p + 3)); p += 3;
+    state.flags = {};
+    for (var i = 0; i < Math.min(SEED_FLAGS.length, 15); i++) {
+      if (flagBits & (1 << i)) state.flags[SEED_FLAGS[i]] = true;
+    }
+    var nameLen = fromB36(code.substring(p, p + 2)); p += 2;
+    var nameEnc = code.substring(p, p + nameLen); p += nameLen;
+    state.name = decodeURIComponent(nameEnc) || '旅者';
     var all = code.substring(0, p);
     var cksum = 0;
     for (var i = 0; i < all.length; i++) cksum = (cksum + all.charCodeAt(i)) % 36;

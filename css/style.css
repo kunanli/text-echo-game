@@ -199,6 +199,7 @@
   .ascii-art.purple { color: #6a5a8a; }
   .ascii-art.red { color: #8a4a3a; }
   .ascii-art.blue { color: #4a5a7a; }
+  .ascii-art.cyan { color: #4a8a8a; }
 
   /* ── Monster art in patrol ── */
   .ascii-art.monster-art {

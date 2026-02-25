@@ -227,7 +227,7 @@ registerNode('r3_market', () => {
         ], { label: L('市場購物', 'Market shopping') });
       }});
     }
-    if (state.flags.r3CraneMet3) {
+    if (state.flags.r3CraneMet3 || state.flags.r2CraneMet) {
       c.push({ text: '灰鶴的攤位', textEn: 'Grey Crane\'s stall', action: () => loadNode('r3_crane') });
     }
     c.push({ text: '返回', textEn: 'Return', action: () => loadNode('r3_look') });
