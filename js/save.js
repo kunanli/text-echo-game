@@ -86,6 +86,9 @@ var SEED_NODES = [
   'r2_crane','r2_zhou_trace','chapter_select',
   'r3_start','r3_look','r3_dock','r3_market','r3_council','r3_inn',
   'r3_bell','r3_ying_talk','r3_ying_inn','r3_zhou','r3_crane','r3_patrol',
+  'r3_quest_check','r3_boss_prep','r3_boss','r3_vote','r3_testimony',
+  'r3_ending_dawn','r3_ending_compromise','r3_ending_lockdown','r3_ending_sacrifice',
+  'r3_epilogue',
 ];
 
 var SEED_ITEMS_ZH = [
@@ -126,6 +129,7 @@ var SEED_FLAGS = [
   'r3YingArrived','r3YingCity','r3YingEvidence','r3YingInn',
   'r3ZhouMet','r3ZhouUpgrade',
   'r3CraneMet3','r3CraneTestimony','r3CraneTrade3',
+  'r3PlagueProof','r3BossDefeated','r3Ending',
 ];
 
 var B36 = '0123456789abcdefghijklmnopqrstuvwxyz';

@@ -94,6 +94,12 @@ registerNode('r3_look', () => {
     if (state.flags.r1YingCompanion) {
       c.push({ text: '找螢', textEn: 'Find Ying', action: () => loadNode('r3_ying_talk') });
     }
+    if (state.flags.r3MarketVisited && !state.flags.r3ZhouMet) {
+      c.push({ text: '市場角落的老人', textEn: 'Old man in the market corner', action: () => loadNode('r3_zhou') });
+    }
+    if (state.flags.r3BellQuest && !state.flags.r3Ending) {
+      c.push({ text: '回報銅鐘（任務進度）', textEn: 'Report to Bronze Bell (quest progress)', action: () => loadNode('r3_quest_check') });
+    }
     c.push({ text: '巡邏（練級）', textEn: 'Patrol (grind)', action: () => loadNode('r3_patrol') });
     c.push({ text: '返回上升通道', textEn: 'Return to ascent shaft', action: () => loadNode('r2_gate') });
     return c;
@@ -581,4 +587,588 @@ registerNode('r3_patrol', () => {
     { text: '開始巡邏', textEn: 'Begin patrol', action: () => startPatrol() },
     { text: '返回', textEn: 'Return', action: () => loadNode('r3_look') },
   ], { label: L('準備巡邏', 'Preparing patrol') });
+});
+
+// ═══════════════════════════════════════════════════
+//  Region 3 — Quest Check + Council Vote
+// ═══════════════════════════════════════════════════
+
+registerNode('r3_quest_check', () => {
+  // Count completed quests
+  var questsDone = 0;
+  if (state.level >= 5) questsDone++; // Quest 1: monsters cleared (high enough level = proven)
+  if (state.flags.r3CraneTestimony) questsDone++; // Quest 2: Grey Crane
+  if (state.flags.r3YingEvidence) questsDone++; // Quest 3: plague origin (Ying working on it)
+
+  var steps = [];
+  steps.push({ tag: '系統', tagColor: 'tag-system', text: '你回到議會廳向銅鐘匯報進展。', textEn: 'You return to the Council Hall to report to Bronze Bell.', delay: 2000 });
+
+  // Quest 1 status
+  if (state.level >= 5) {
+    steps.push({ tag: '情報', tagColor: 'tag-info', html: '✓ 「河岸隧道的變異生物——你已經證明了它們不是來自下層。做得好。」', htmlEn: '✓ "River tunnel mutants — you\'ve proven they don\'t come from below. Well done."', delay: 2500 });
+  } else {
+    steps.push({ tag: '警告', tagColor: 'tag-warn', html: '✗ 「河岸隧道的怪物——你的實力還不夠有說服力。再多歷練一下吧。」<i>（需要等級 5+）</i>', htmlEn: '✗ "Tunnel creatures — your combat record isn\'t convincing yet. Train more." <i>(Need level 5+)</i>', delay: 2800 });
+  }
+
+  // Quest 2 status
+  if (state.flags.r3CraneTestimony) {
+    steps.push({ tag: '情報', tagColor: 'tag-info', html: '✓ 「灰鶴答應作證了。商會的玉秤應該會動搖。」', htmlEn: '✓ "Grey Crane agreed to testify. Jade Scale of the Merchants should waver."', delay: 2500 });
+  } else {
+    steps.push({ tag: '警告', tagColor: 'tag-warn', html: '✗ 「灰鶴的證詞還沒到手。去市場找他吧。」', htmlEn: '✗ "Grey Crane\'s testimony isn\'t secured yet. Find him at the market."', delay: 2500 });
+  }
+
+  // Quest 3 status
+  if (state.flags.r3YingEvidence) {
+    steps.push({ tag: '情報', tagColor: 'tag-info', html: '✓ 「螢在調查瘟疫起源的證據。她說快找到了。」', htmlEn: '✓ "Ying is investigating plague origin evidence. She says she\'s close."', delay: 2500 });
+  } else {
+    steps.push({ tag: '警告', tagColor: 'tag-warn', html: '✗ 「瘟疫起源的證據——需要螢的幫助。去找她談談銅鐘的任務。」', htmlEn: '✗ "Plague origin evidence — you need Ying\'s help. Talk to her about Bell\'s mission."', delay: 2800 });
+  }
+
+  // Summary
+  steps.push({ tag: '情報', tagColor: 'tag-info', html: L(
+    '銅鐘看著你：「完成了 <b>' + questsDone + '/3</b> 個任務。',
+    'Bronze Bell looks at you: "Completed <b>' + questsDone + '/3</b> tasks.'
+  ) + (questsDone >= 2
+    ? L('——勉強夠了。我們可以行動了。」', ' — That\'s enough. We can proceed."')
+    : L('——還不夠。再努力一下。」', ' — Not enough. Keep at it."')
+  ), delay: 2500 });
+
+  autoExplore(steps, (function() {
+    var c = [];
+    if (questsDone >= 2) {
+      c.push({ text: '準備參加議會投票', textEn: 'Prepare for the Council vote', action: () => loadNode('r3_boss_prep') });
+    }
+    if (questsDone < 3) {
+      c.push({ text: '繼續完成任務', textEn: 'Continue completing tasks', action: () => loadNode('r3_look') });
+    }
+    if (questsDone >= 3) {
+      c.push({ text: '直接進入議會大廳', textEn: 'Go straight to the Council chamber', action: () => loadNode('r3_vote') });
+    }
+    c.push({ text: '返回', textEn: 'Return', action: () => loadNode('r3_council') });
+    return c;
+  })(), { label: L('任務進度', 'Quest progress') });
+});
+
+// ── Boss Prep ──
+registerNode('r3_boss_prep', () => {
+  var steps = [];
+  steps.push({ tag: '情報', tagColor: 'tag-info', text: '銅鐘站起身，整理了一下衣領。她的表情前所未有地凝重。', textEn: 'Bronze Bell stands, straightening her collar. Her expression is graver than ever.', delay: 2200 });
+  steps.push({ tag: '情報', tagColor: 'tag-info', text: '「議會大廳在走廊盡頭。其他四個人應該已經到了。」', textEn: '"The Council chamber is at the end of the hall. The other four should already be there."', delay: 2500 });
+  steps.push({ tag: '警告', tagColor: 'tag-warn', html: '「但我必須警告你——守衛隊長<b>鏽刃</b>不會讓你這麼容易走進去。他反對外來者的態度最為激烈。」', htmlEn: '"But I must warn you — Guard Captain <b>Rust Blade</b> won\'t let you in easily. He\'s the most hostile toward outsiders."', delay: 3200 });
+  steps.push({ tag: '情報', tagColor: 'tag-info', text: '「如果他攔路，你可能需要用你的方式……解決他。」', textEn: '"If he blocks you, you may need to... handle it your way."', delay: 2500 });
+
+  if (state.flags.r3YingArrived) {
+    steps.push({ tag: '感知', tagColor: 'tag-sense', text: '門外傳來腳步聲——螢出現在門口，手冊緊緊抱在懷裡。', textEn: 'Footsteps outside — Ying appears in the doorway, notebook clutched tight.', delay: 2500 });
+    steps.push({ tag: '情報', tagColor: 'tag-info', text: '「我找到了。」螢的聲音平穩但帶著壓抑的激動。「建城者的封印記錄——就在圖書室的暗格裡。」', textEn: '"I found it." Ying\'s voice is steady but barely containing excitement. "The founders\' seal records — in a hidden compartment of the library."', delay: 3200 });
+    steps.push({ tag: '情報', tagColor: 'tag-info', html: '螢翻開手冊：「上面清楚寫著——<b>石化瘟疫的源頭是古代封印的崩壞，不是下層通道</b>。這就是鐵證。」', htmlEn: 'Ying opens the notebook: "It clearly states — <b>the plague originated from the ancient seal\'s collapse, not the lower passages</b>. This is ironclad proof."', delay: 3500 });
+    state.flags.r3PlagueProof = true;
+  }
+
+  autoExplore(steps, [
+    { text: '走向議會大廳', textEn: 'Head to the Council chamber', action: () => loadNode('r3_boss') },
+    { text: '先去準備一下', textEn: 'Prepare first', action: () => loadNode('r3_look') },
+  ], { label: L('決戰前夕', 'Eve of the showdown') });
+});
+
+// ═══════════════════════════════════════════════════
+//  BOSS — 鏽刃 (Rust Blade)
+// ═══════════════════════════════════════════════════
+
+registerNode('r3_boss', () => {
+  var BOSS = {
+    name: '鏽刃', nameEn: 'Rust Blade',
+    hp: 55, atkMin: 10, atkMax: 18, petriDmg: 4, xp: 45,
+    empathyGoal: 3,
+    art: [
+      '        ╭──╮',
+      '       ╱ ▪▪ ╲',
+      '      │ ═════ │',
+      '    ╭─╧───────╧─╮',
+      '    │ ▓ 鏽 刃 ▓ │',
+      '    │ ▓▓▓▓▓▓▓▓▓ │',
+      '    ╰─╤──╥──╥──╤─╯',
+      '    ╱╱ ╲ ║  ║╱╱ ╲',
+      '   ╱╱   ╲║  ║   ╲╲',
+    ],
+    commune: [
+      { zh: '你沒有舉起武器——而是看著鏽刃的眼睛。你在那裡看到了……恐懼。', en: 'You don\'t raise your weapon — you look into Rust Blade\'s eyes. You see... fear.' },
+      { zh: '「你不懂！」鏽刃的聲音發顫。「你沒見過石化瘟疫爬上親人的臉——」', en: '"You don\'t understand!" Rust Blade\'s voice trembles. "You haven\'t seen the plague crawl up a loved one\'s face —"' },
+      { zh: '他的攻勢漸漸變慢。你說：「我也在石化。但我不會因此放棄希望。」', en: 'His attacks slow. You say: "I\'m petrifying too. But I won\'t give up hope."' },
+    ],
+    spareText: { zh: '鏽刃的劍落在地上。他單膝跪下，用手捂住了臉。「……我只是怕了。我怕我們都會死。」', en: 'Rust Blade\'s sword clatters to the ground. He kneels, face in his hands. "...I was just afraid. Afraid we\'d all die."' },
+  };
+
+  var steps = [];
+  steps.push({ tag: '移動', tagColor: 'tag-move', text: '你走向議會大廳的大門。', textEn: 'You approach the Council chamber\'s grand doors.', delay: 2000 });
+  steps.push({ art: `<pre class="ascii-art red">
+        ╭──╮
+       ╱ ▪▪ ╲
+      │ ═════ │
+    ╭─╧───────╧─╮
+    │ ▓ 鏽 刃 ▓ │
+    │ ▓▓▓▓▓▓▓▓▓ │
+    ╰─╤──╥──╥──╤─╯
+    ╱╱ ╲ ║  ║╱╱ ╲
+   ╱╱   ╲║  ║   ╲╲
+</pre>`, artEn: `<pre class="ascii-art red">
+        ╭──╮
+       ╱ ▪▪ ╲
+      │ ═════ │
+    ╭─╧───────╧─╮
+    │ RUST BLADE │
+    │ ▓▓▓▓▓▓▓▓▓ │
+    ╰─╤──╥──╥──╤─╯
+    ╱╱ ╲ ║  ║╱╱ ╲
+   ╱╱   ╲║  ║   ╲╲
+</pre>`, delay: 800 });
+  steps.push({ tag: '遭遇', tagColor: 'tag-combat', html: '一個高大的男人擋在門前。全身鏽蝕的鎧甲，手中握著一把缺了口的長劍——<b>守衛隊長鏽刃</b>。', htmlEn: 'A tall man blocks the door. Rust-eaten armor, a chipped longsword in hand — <b>Guard Captain Rust Blade</b>.', delay: 2800 });
+  steps.push({ tag: '遭遇', tagColor: 'tag-combat', text: '「外來者——你不屬於這裡。我不會讓你踏進這扇門。」', textEn: '"Outsider — you don\'t belong here. I won\'t let you through that door."', delay: 2500 });
+
+  // High AGI allows sneaking past
+  if (state.agi >= 10) {
+    steps.push({ tag: '感知', tagColor: 'tag-sense', html: '<i>你注意到側面有一條僕人通道……你的敏捷足以從那裡繞過去。</i>', htmlEn: '<i>You notice a servant\'s passage to the side... your agility is enough to slip through.</i>', delay: 2200 });
+  }
+
+  autoExplore(steps, (function() {
+    var c = [];
+    c.push({ text: '戰鬥！', textEn: 'Fight!', action: () => {
+      startCombat(BOSS, function() {
+        state.flags.r3BossDefeated = true;
+        state.flags.r3BossMethod = 'fight';
+        loadNode('r3_vote');
+      }, function() {
+        loadNode('r3_council');
+      });
+    }});
+    if (state.agi >= 10) {
+      c.push({ text: '從僕人通道潛入（敏捷 10+）', textEn: 'Sneak through servant\'s passage (AGI 10+)', action: () => {
+        state.flags.r3BossDefeated = true;
+        state.flags.r3BossMethod = 'sneak';
+        autoExplore([
+          { tag: '潛行', tagColor: 'tag-explore', text: '你趁鏽刃不注意，無聲地滑入了側面的窄門。', textEn: 'While Rust Blade\'s attention wavers, you silently slip through the narrow side door.', delay: 2000 },
+          { tag: '潛行', tagColor: 'tag-explore', text: '黑暗的通道蜿蜒向上——你在議會大廳的帷幕後面找到了出口。', textEn: 'The dark passage winds upward — you find an exit behind the Council chamber\'s curtains.', delay: 2500 },
+          { tag: '成功', tagColor: 'tag-system', text: '你成功避開了鏽刃，出現在議會大廳中。', textEn: 'You\'ve bypassed Rust Blade and emerged in the Council chamber.', delay: 2000 },
+        ], [
+          { text: '繼續', textEn: 'Continue', action: () => loadNode('r3_vote') },
+        ], { label: L('潛入議會廳', 'Sneaking into the chamber') });
+      }});
+    }
+    if (state.wil >= 12) {
+      c.push({ text: '用言語說服他（意志 12+）', textEn: 'Persuade him with words (WIL 12+)', action: () => {
+        state.flags.r3BossDefeated = true;
+        state.flags.r3BossMethod = 'persuade';
+        autoExplore([
+          { tag: '意志', tagColor: 'tag-system', text: '你沒有拔武器。你直視著鏽刃的眼睛。', textEn: 'You don\'t draw your weapon. You meet Rust Blade\'s eyes.', delay: 2000 },
+          { tag: '行動', tagColor: 'tag-move', text: '「鏽刃隊長。你守護這座城多久了？」', textEn: '"Captain Rust Blade. How long have you guarded this city?"', delay: 2200 },
+          { tag: '感知', tagColor: 'tag-sense', text: '他愣了一下：「……二十三年。」', textEn: 'He pauses: "...Twenty-three years."', delay: 2000 },
+          { tag: '行動', tagColor: 'tag-move', text: '「二十三年。你見過多少人被石化瘟疫帶走？」', textEn: '"Twenty-three years. How many have you lost to the plague?"', delay: 2500 },
+          { tag: '感知', tagColor: 'tag-sense', text: '鏽刃的嘴唇微微顫抖。他的手握緊了劍柄——但沒有揮下。', textEn: 'Rust Blade\'s lips tremble. His hand grips the hilt — but doesn\'t swing.', delay: 2500 },
+          { tag: '行動', tagColor: 'tag-move', text: '「封鎖通道不會讓瘟疫消失。它只會讓更多人在黑暗裡孤獨地死去。」', textEn: '"Sealing the passages won\'t stop the plague. It only means more people die alone in the dark."', delay: 3000 },
+          { tag: '行動', tagColor: 'tag-move', text: '「如果你真的想保護這座城——就讓我進去，告訴議會真相。」', textEn: '"If you truly want to protect this city — let me in, and let me tell the Council the truth."', delay: 3000 },
+          { tag: '感知', tagColor: 'tag-sense', text: '鏽刃的劍慢慢放下了。他讓開了門。', textEn: 'Rust Blade slowly lowers his sword. He steps aside.', delay: 2500 },
+          { tag: '情報', tagColor: 'tag-info', text: '「……進去吧。但如果你說謊——我不會放過你。」', textEn: '"...Go. But if you lie — I won\'t forgive you."', delay: 2500 },
+        ], [
+          { text: '踏入議會大廳', textEn: 'Enter the Council chamber', action: () => {
+            gainXp(20);
+            changeStat('wil', 1);
+            notify(L('經驗 +20，意志 +1（以言語代替刀劍）', 'XP +20, WIL +1 (Words over swords)'));
+            loadNode('r3_vote');
+          }},
+        ], { label: L('說服鏽刃', 'Persuading Rust Blade') });
+      }});
+    }
+    c.push({ text: '撤退準備', textEn: 'Retreat to prepare', action: () => loadNode('r3_council') });
+    return c;
+  })(), { label: L('鏽刃擋路', 'Rust Blade blocks the way') });
+});
+
+// ═══════════════════════════════════════════════════
+//  Council Vote — Branching Endings
+// ═══════════════════════════════════════════════════
+
+registerNode('r3_vote', () => {
+  // Calculate ending score
+  var score = 0;
+  if (state.level >= 5) score += 2;
+  if (state.flags.r3CraneTestimony) score += 2;
+  if (state.flags.r3PlagueProof) score += 3;
+  if (state.flags.r3YingEvidence) score += 1;
+  if (state.wil >= 10) score += 2;
+  if (state.flags.r3BossMethod === 'persuade') score += 2;
+  if (state.flags.r3BossMethod === 'sneak') score += 1;
+  if (hasItem(L('螢的護身符', 'Ying\'s Charm'))) score += 1;
+  if (state.flags.r3ZhouMet) score += 1;
+  // Store score for ending determination
+  state.flags.r3VoteScore = score;
+
+  autoExplore([
+    { tag: '移動', tagColor: 'tag-move', text: '議會大廳是一個圓形的石砌空間。中央放著一張長桌，五把椅子圍在四周。', textEn: 'The Council chamber is a circular stone space. A long table at the center, five chairs around it.', delay: 2500 },
+    { art: `<pre class="ascii-art">
+     ╔══════════════════════════╗
+     ║                          ║
+     ║    鉛   黑   玉   鏽    ║
+     ║    錘   鰭   秤   刃    ║
+     ║     ○    ○    ○    ○    ║
+     ║          ╔══╗            ║
+     ║          ║桌║            ║
+     ║          ╚══╝            ║
+     ║     ○                    ║
+     ║    銅                    ║
+     ║    鐘         ▲ 你      ║
+     ║                          ║
+     ╚══════════════════════════╝
+</pre>`, artEn: `<pre class="ascii-art">
+     ╔══════════════════════════╗
+     ║                          ║
+     ║   Lead  Black Jade  Rust ║
+     ║   Hamr  Fin  Scale  Blde ║
+     ║     ○    ○    ○    ○    ║
+     ║          ╔══╗            ║
+     ║          ║  ║            ║
+     ║          ╚══╝            ║
+     ║     ○                    ║
+     ║   Bronze                 ║
+     ║    Bell       ▲ You     ║
+     ║                          ║
+     ╚══════════════════════════╝
+</pre>`, delay: 800 },
+    { tag: '感知', tagColor: 'tag-sense', text: '四個人的目光同時落在你身上——帶著不同程度的敵意和好奇。', textEn: 'Four pairs of eyes fall on you simultaneously — varying degrees of hostility and curiosity.', delay: 2500 },
+    { tag: '情報', tagColor: 'tag-info', text: '銅鐘站起身：「各位——這就是我說的從下層上來的倖存者。今天，請你們聽聽他的證詞。」', textEn: 'Bronze Bell stands: "Colleagues — this is the survivor from below I mentioned. Today, hear their testimony."', delay: 3000 },
+    { tag: '情報', tagColor: 'tag-info', text: '鉛錘敲了敲桌子：「快點說完。我還有一百把刀要打。」', textEn: 'Lead Hammer taps the table: "Make it quick. I have a hundred blades to forge."', delay: 2500 },
+    { tag: '情報', tagColor: 'tag-info', text: '黑鰭瞇著眼看你：「一個石化了一半的外來者……有什麼資格在這裡說話？」', textEn: 'Black Fin narrows his eyes: "A half-petrified outsider... what right have you to speak here?"', delay: 2800 },
+    { tag: '情報', tagColor: 'tag-info', text: '玉秤微微一笑，什麼也沒說。她在等你表現。', textEn: 'Jade Scale smiles faintly, saying nothing. She\'s waiting to see your performance.', delay: 2200 },
+  ], [
+    { text: '開始作證', textEn: 'Begin testimony', action: () => loadNode('r3_testimony') },
+  ], { label: L('議會大廳', 'Council chamber') });
+});
+
+// ── Testimony ──
+registerNode('r3_testimony', () => {
+  var score = state.flags.r3VoteScore || 0;
+  var steps = [];
+
+  // Core testimony
+  steps.push({ tag: '行動', tagColor: 'tag-move', text: '你站在議會桌前，深吸一口氣。', textEn: 'You stand before the Council table and take a deep breath.', delay: 2000 });
+  steps.push({ tag: '行動', tagColor: 'tag-move', text: '「我從最底層的祭獻坑爬上來。經過石脈迴廊、大採石場，一路到這裡。」', textEn: '"I climbed from the Sacrificial Pit at the very bottom. Through the Vein Corridor, the Great Quarry, all the way here."', delay: 3000 });
+  steps.push({ tag: '行動', tagColor: 'tag-move', text: '「下面還有人在活著——還有人在希望著有一天能上來。」', textEn: '"People below are still alive — still hoping to someday make it up."', delay: 2800 });
+
+  // Conditional evidence
+  if (state.flags.r3PlagueProof) {
+    steps.push({ tag: '情報', tagColor: 'tag-info', html: '你拿出螢整理的封印記錄：「<b>石化瘟疫的真正源頭是古代封印的崩壞——不是下層通道。</b>」', htmlEn: 'You present Ying\'s compiled seal records: "<b>The plague\'s true source is the ancient seal\'s collapse — not the lower passages.</b>"', delay: 3200 });
+    steps.push({ tag: '感知', tagColor: 'tag-sense', text: '玉秤拿過記錄翻了翻。她的表情變了。', textEn: 'Jade Scale takes the records and flips through them. Her expression changes.', delay: 2500 });
+  }
+
+  if (state.flags.r3CraneTestimony) {
+    steps.push({ tag: '情報', tagColor: 'tag-info', text: '灰鶴從人群中站出來：「我在上下層之間跑商路十幾年。封了通道，河城的物資供應線就斷了三分之一。」', textEn: 'Grey Crane steps forward: "I\'ve run trade routes between levels for over a decade. Seal the passages, and a third of River City\'s supply lines die."', delay: 3500 });
+    steps.push({ tag: '感知', tagColor: 'tag-sense', text: '玉秤的眉頭皺了起來。她是商人——她聽得懂數字的語言。', textEn: 'Jade Scale\'s brow furrows. She\'s a merchant — she understands the language of numbers.', delay: 2500 });
+  }
+
+  if (state.level >= 5) {
+    steps.push({ tag: '情報', tagColor: 'tag-info', text: '「至於河岸隧道的變異生物——我已經親手清除了多次。它們是河裡的原生種，不是從下面來的。」', textEn: '"As for the river tunnel mutants — I\'ve cleared them myself, repeatedly. They\'re native river species, not from below."', delay: 3200 });
+  }
+
+  // WIL-based speech power
+  if (state.wil >= 12) {
+    steps.push({ tag: '意志', tagColor: 'tag-system', text: '你的聲音不大，但每個字都像石頭一樣沉重。議會廳裡安靜得能聽到河水的聲音。', textEn: 'Your voice is quiet, but each word lands like stone. The chamber is so silent you can hear the river.', delay: 2800 });
+    steps.push({ tag: '行動', tagColor: 'tag-move', text: '「封鎖通道不是在保護你們。是在拋棄和你們一樣的人。」', textEn: '"Sealing the passages doesn\'t protect you. It abandons people just like you."', delay: 2800 });
+  } else if (state.wil >= 8) {
+    steps.push({ tag: '行動', tagColor: 'tag-move', text: '「封鎖通道……不是解決辦法。我們應該一起面對瘟疫——而不是互相拋棄。」', textEn: '"Sealing the passages... isn\'t the answer. We should face the plague together — not abandon each other."', delay: 2800 });
+  } else {
+    steps.push({ tag: '行動', tagColor: 'tag-move', text: '「我……我只是想說，下面的人……他們不是敵人。」你的聲音有些結巴，但你盡力了。', textEn: '"I... I just want to say, the people below... they\'re not enemies." Your voice falters, but you try your best.', delay: 2800 });
+  }
+
+  // Sacrifice check — high petri during testimony
+  var sacrificeTriggered = state.petri >= 50;
+  if (sacrificeTriggered) {
+    steps.push({ tag: '石化', tagColor: 'tag-petri', text: '——說話的時候，你感到一陣劇痛。左臂的石化紋路正在蔓延。', textEn: '— While speaking, a sharp pain hits. Petrification on your left arm is spreading.', delay: 2500 });
+    steps.push({ tag: '石化', tagColor: 'tag-petri', text: '你的皮膚在議會成員面前一塊一塊地變成石頭。但你沒有停下。', textEn: 'Your skin turns to stone piece by piece before the Council\'s eyes. But you don\'t stop.', delay: 2800 });
+    steps.push({ tag: '石化', tagColor: 'tag-petri', text: '「看清楚了嗎——這就是石化瘟疫。它不會因為你封了一扇門就消失。」', textEn: '"Look closely — this is the Stone Plague. It won\'t vanish just because you close a door."', delay: 3000 });
+    steps.push({ tag: '感知', tagColor: 'tag-sense', text: '議會廳裡一片死寂。連黑鰭都不說話了。', textEn: 'Dead silence in the chamber. Even Black Fin is speechless.', delay: 2500 });
+    score += 3; // Sacrifice dramatically increases persuasion
+    state.flags.r3VoteScore = score;
+  }
+
+  autoExplore(steps, [
+    { text: '等待投票結果', textEn: 'Await the vote', action: () => {
+      // Determine ending
+      if (score >= 12 && state.flags.r3PlagueProof) {
+        loadNode('r3_ending_dawn');
+      } else if (score >= 8) {
+        loadNode('r3_ending_compromise');
+      } else if (sacrificeTriggered) {
+        loadNode('r3_ending_sacrifice');
+      } else {
+        loadNode('r3_ending_lockdown');
+      }
+    }},
+  ], { label: L('作證', 'Testimony') });
+});
+
+// ═══════════════════════════════════════════════════
+//  ENDING A — 黎明 (Dawn) — Best Ending
+// ═══════════════════════════════════════════════════
+
+registerNode('r3_ending_dawn', () => {
+  state.flags.r3Ending = 'dawn';
+  var isMale = state.sex === 'male';
+  var yP = isMale ? L('她', 'she') : L('他', 'he');
+  var yPC = isMale ? 'She' : 'He';
+
+  autoExplore([
+    { tag: '系統', tagColor: 'tag-system', html: '<b>投票結果——</b>', htmlEn: '<b>Vote result —</b>', delay: 2000 },
+    { tag: '情報', tagColor: 'tag-info', text: '銅鐘：反對封鎖。', textEn: 'Bronze Bell: Against sealing.', delay: 1500 },
+    { tag: '情報', tagColor: 'tag-info', text: '玉秤：……反對封鎖。', textEn: 'Jade Scale: ...Against sealing.', delay: 1800 },
+    { tag: '情報', tagColor: 'tag-info', text: '鉛錘：棄權。「跟我打鐵沒關係。」', textEn: 'Lead Hammer: Abstains. "None of my business as a smith."', delay: 2000 },
+    { tag: '情報', tagColor: 'tag-info', text: '黑鰭：贊成封鎖。但他的聲音已經沒有之前那麼底氣了。', textEn: 'Black Fin: For sealing. But his voice lacks its earlier conviction.', delay: 2200 },
+    { tag: '情報', tagColor: 'tag-info', text: '鏽刃：……', textEn: 'Rust Blade: ...', delay: 2000 },
+    { tag: '感知', tagColor: 'tag-sense', text: '所有人都看向鏽刃。他沉默了很久。', textEn: 'All eyes turn to Rust Blade. He is silent for a long time.', delay: 2500 },
+    { tag: '情報', tagColor: 'tag-info', text: '「……反對封鎖。」鏽刃低聲說。然後他站起身，不看任何人，走出了大廳。', textEn: '"...Against sealing." Rust Blade says quietly. Then he stands and walks out without looking at anyone.', delay: 3000 },
+    { tag: '系統', tagColor: 'tag-system', html: '<b>3 票反對，1 票贊成，1 票棄權。——通道保持開放。</b>', htmlEn: '<b>3 against, 1 for, 1 abstain. — The passages remain open.</b>', delay: 3000 },
+    { tag: '感知', tagColor: 'tag-sense', text: '銅鐘閉上眼睛，長長地出了一口氣。她石化的右手在桌下微微顫抖。', textEn: 'Bronze Bell closes her eyes and exhales deeply. Her petrified right hand trembles under the table.', delay: 2800 },
+    { tag: '情報', tagColor: 'tag-info', text: '她睜開眼，看著你。眼中有淚光，但嘴角在笑。', textEn: 'She opens her eyes and looks at you. Tears glisten, but she smiles.', delay: 2500 },
+    { tag: '情報', tagColor: 'tag-info', text: '「……謝謝你。」', textEn: '"...Thank you."', delay: 2000 },
+    { art: `<pre class="ascii-art cyan">
+    ·    .    ·    .    ·    .    ·    .    ·
+         .         ╭─────────╮         .
+    .        .     │ 結 局 A │    .        .
+         .         │  黎  明  │         .
+    ·        ·     ╰─────────╯    ·        ·
+         .              .              .
+    ═══════════════════════════════════════════
+</pre>`, artEn: `<pre class="ascii-art cyan">
+    ·    .    ·    .    ·    .    ·    .    ·
+         .         ╭──────────╮        .
+    .        .     │ ENDING A │   .        .
+         .         │   DAWN   │        .
+    ·        ·     ╰──────────╯   ·        ·
+         .              .              .
+    ═══════════════════════════════════════════
+</pre>`, delay: 1500 },
+  ], [
+    { text: '繼續', textEn: 'Continue', action: () => loadNode('r3_epilogue') },
+  ], { label: L('結局 A — 黎明', 'Ending A — Dawn') });
+});
+
+// ═══════════════════════════════════════════════════
+//  ENDING B — 妥協 (Compromise) — Partial Success
+// ═══════════════════════════════════════════════════
+
+registerNode('r3_ending_compromise', () => {
+  state.flags.r3Ending = 'compromise';
+  autoExplore([
+    { tag: '系統', tagColor: 'tag-system', html: '<b>投票結果——</b>', htmlEn: '<b>Vote result —</b>', delay: 2000 },
+    { tag: '情報', tagColor: 'tag-info', text: '銅鐘：反對封鎖。', textEn: 'Bronze Bell: Against sealing.', delay: 1500 },
+    { tag: '情報', tagColor: 'tag-info', text: '玉秤：……反對「完全」封鎖。「但外來者必須通過檢疫。」', textEn: 'Jade Scale: ...Against "total" sealing. "But outsiders must pass quarantine."', delay: 2200 },
+    { tag: '情報', tagColor: 'tag-info', text: '鉛錘：贊成封鎖。', textEn: 'Lead Hammer: For sealing.', delay: 1800 },
+    { tag: '情報', tagColor: 'tag-info', text: '黑鰭：贊成封鎖。', textEn: 'Black Fin: For sealing.', delay: 1800 },
+    { tag: '情報', tagColor: 'tag-info', text: '鏽刃：贊成封鎖。', textEn: 'Rust Blade: For sealing.', delay: 1800 },
+    { tag: '系統', tagColor: 'tag-system', html: '<b>3 票贊成，2 票反對。——通道將被限制性開放。</b>', htmlEn: '<b>3 for, 2 against. — Passages will be restrictively opened.</b>', delay: 3000 },
+    { tag: '情報', tagColor: 'tag-info', text: '結果不是最好的——但也不是最壞的。通道不會完全封死。', textEn: 'Not the best result — but not the worst. Passages won\'t be completely sealed.', delay: 2500 },
+    { tag: '情報', tagColor: 'tag-info', text: '下面的人需要通過檢疫才能上來。這意味著更多的等待——但至少還有機會。', textEn: 'People below must pass quarantine to come up. More waiting — but at least there\'s a chance.', delay: 3000 },
+    { tag: '感知', tagColor: 'tag-sense', text: '銅鐘拍了拍你的肩膀：「不算完美。但你已經改變了很多。」', textEn: 'Bronze Bell pats your shoulder: "Not perfect. But you\'ve changed a lot."', delay: 2500 },
+    { art: `<pre class="ascii-art yellow">
+    ·    .    ·    .    ·    .    ·    .    ·
+         .         ╭─────────╮         .
+    .        .     │ 結 局 B │    .        .
+         .         │  妥  協  │         .
+    ·        ·     ╰─────────╯    ·        ·
+         .              .              .
+    ═══════════════════════════════════════════
+</pre>`, artEn: `<pre class="ascii-art yellow">
+    ·    .    ·    .    ·    .    ·    .    ·
+         .         ╭────────────╮       .
+    .        .     │  ENDING B  │  .        .
+         .         │ COMPROMISE │       .
+    ·        ·     ╰────────────╯  ·        ·
+         .              .              .
+    ═══════════════════════════════════════════
+</pre>`, delay: 1500 },
+  ], [
+    { text: '繼續', textEn: 'Continue', action: () => loadNode('r3_epilogue') },
+  ], { label: L('結局 B — 妥協', 'Ending B — Compromise') });
+});
+
+// ═══════════════════════════════════════════════════
+//  ENDING C — 封鎖 (Lockdown) — Bad Ending
+// ═══════════════════════════════════════════════════
+
+registerNode('r3_ending_lockdown', () => {
+  state.flags.r3Ending = 'lockdown';
+  autoExplore([
+    { tag: '系統', tagColor: 'tag-system', html: '<b>投票結果——</b>', htmlEn: '<b>Vote result —</b>', delay: 2000 },
+    { tag: '情報', tagColor: 'tag-info', text: '銅鐘：反對封鎖。', textEn: 'Bronze Bell: Against sealing.', delay: 1500 },
+    { tag: '情報', tagColor: 'tag-info', text: '玉秤：贊成封鎖。', textEn: 'Jade Scale: For sealing.', delay: 1800 },
+    { tag: '情報', tagColor: 'tag-info', text: '鉛錘：贊成封鎖。', textEn: 'Lead Hammer: For sealing.', delay: 1800 },
+    { tag: '情報', tagColor: 'tag-info', text: '黑鰭：贊成封鎖。「早就該這麼做了。」', textEn: 'Black Fin: For sealing. "Should\'ve done this long ago."', delay: 2200 },
+    { tag: '情報', tagColor: 'tag-info', text: '鏽刃：贊成封鎖。', textEn: 'Rust Blade: For sealing.', delay: 1800 },
+    { tag: '系統', tagColor: 'tag-system', html: '<b>4 票贊成，1 票反對。——通道將被完全封鎖。</b>', htmlEn: '<b>4 for, 1 against. — Passages will be completely sealed.</b>', delay: 3000 },
+    { tag: '感知', tagColor: 'tag-sense', text: '銅鐘的拳頭砸在桌上——但沒有人理她。', textEn: 'Bronze Bell slams her fist on the table — but no one listens.', delay: 2500 },
+    { tag: '感知', tagColor: 'tag-sense', text: '你站在那裡，感到一種深入骨髓的寒冷。不是石化的寒——是絕望。', textEn: 'You stand there, feeling a chill that sinks into your bones. Not petrification\'s cold — despair.', delay: 3000 },
+    { tag: '情報', tagColor: 'tag-info', text: '下面的人……鐵霜、迴廊的倖存者——他們再也上不來了。', textEn: 'The people below... Iron Frost, the corridor survivors — they\'ll never make it up.', delay: 2800 },
+    { tag: '感知', tagColor: 'tag-sense', text: '銅鐘走到你身邊，聲音很輕：「……我們失敗了。但這不是結束。」', textEn: 'Bronze Bell approaches, her voice soft: "...We failed. But this isn\'t the end."', delay: 2800 },
+    { tag: '情報', tagColor: 'tag-info', text: '「通道被封鎖了。但人心——不是石頭做的。」', textEn: '"The passages are sealed. But hearts — aren\'t made of stone."', delay: 2500 },
+    { art: `<pre class="ascii-art red">
+    ·    .    ·    .    ·    .    ·    .    ·
+         .         ╭─────────╮         .
+    .        .     │ 結 局 C │    .        .
+         .         │  封  鎖  │         .
+    ·        ·     ╰─────────╯    ·        ·
+         .              .              .
+    ═══════════════════════════════════════════
+</pre>`, artEn: `<pre class="ascii-art red">
+    ·    .    ·    .    ·    .    ·    .    ·
+         .         ╭──────────╮        .
+    .        .     │ ENDING C │   .        .
+         .         │ LOCKDOWN │        .
+    ·        ·     ╰──────────╯   ·        ·
+         .              .              .
+    ═══════════════════════════════════════════
+</pre>`, delay: 1500 },
+  ], [
+    { text: '繼續', textEn: 'Continue', action: () => loadNode('r3_epilogue') },
+  ], { label: L('結局 C — 封鎖', 'Ending C — Lockdown') });
+});
+
+// ═══════════════════════════════════════════════════
+//  ENDING D — 犧牲 (Sacrifice) — Petrification Ending
+// ═══════════════════════════════════════════════════
+
+registerNode('r3_ending_sacrifice', () => {
+  state.flags.r3Ending = 'sacrifice';
+  var isMale = state.sex === 'male';
+  var yP = isMale ? L('她', 'she') : L('他', 'he');
+
+  autoExplore([
+    { tag: '石化', tagColor: 'tag-petri', text: '你的證詞結束了。但你的身體——沒能撐到最後。', textEn: 'Your testimony is over. But your body — didn\'t make it.', delay: 2500 },
+    { tag: '石化', tagColor: 'tag-petri', text: '石化從你的指尖蔓延到手臂、胸口、脖頸——在所有人面前。', textEn: 'Petrification spreads from fingertips to arms, chest, neck — before everyone.', delay: 2800 },
+    { tag: '感知', tagColor: 'tag-sense', text: '議會廳裡爆發出驚呼。有人尖叫，有人後退——只有銅鐘衝了上來。', textEn: 'Gasps erupt in the chamber. Someone screams, others retreat — only Bronze Bell rushes forward.', delay: 2800 },
+    { tag: '情報', tagColor: 'tag-info', text: '「不——！」銅鐘用石化的右手抓住了你的肩膀。', textEn: '"No — !" Bronze Bell grips your shoulder with her petrified hand.', delay: 2500 },
+    { tag: '感知', tagColor: 'tag-sense', text: '你能感覺到四肢在變硬。視野在縮小。但你轉頭看了看四周——', textEn: 'You feel your limbs hardening. Vision narrowing. But you look around —', delay: 2500 },
+    { tag: '感知', tagColor: 'tag-sense', text: '鏽刃跪在了地上。黑鰭低下了頭。就連鉛錘都放下了錘子。', textEn: 'Rust Blade kneels. Black Fin lowers his head. Even Lead Hammer puts down his hammer.', delay: 2800 },
+    { tag: '系統', tagColor: 'tag-system', html: '<b>沒有投票。沒有人再提封鎖的事。</b>', htmlEn: '<b>No vote. No one speaks of sealing again.</b>', delay: 2500 },
+    { tag: '感知', tagColor: 'tag-sense', text: '你的意識在最後的瞬間聽到了一個聲音——', textEn: 'In the last moment, you hear a voice —', delay: 2200 },
+    { tag: '感知', tagColor: 'tag-sense', text: '螢的聲音，從很遠的地方傳來：「不——你答應過我要回來的——！」', textEn: 'Ying\'s voice, from far away: "No — you promised you\'d come back — !"', delay: 3000 },
+    { tag: '石化', tagColor: 'tag-petri', text: '然後一切都變成了石頭。', textEn: 'Then everything turns to stone.', delay: 3000 },
+    { tag: '系統', tagColor: 'tag-system', text: '……', textEn: '...', delay: 3000 },
+    { tag: '系統', tagColor: 'tag-system', text: '……但你還能聽到。在石殼的深處，你的意識沒有完全消失。', textEn: '...But you can still hear. Deep within the stone shell, your consciousness lingers.', delay: 3000 },
+    { tag: '情報', tagColor: 'tag-info', text: '你聽到銅鐘的聲音：「——馬上派人下去通知鐵霜。通道不會封鎖。永遠不會。」', textEn: 'You hear Bronze Bell: "— Send word to Iron Frost immediately. The passages won\'t be sealed. Ever."', delay: 3200 },
+    { tag: '感知', tagColor: 'tag-sense', text: '你聽到螢在哭。' + yP + '的手冊落在地上。但' + yP + '很快又撿了起來。', textEn: 'You hear Ying crying. The notebook falls. But it\'s quickly picked up again.', delay: 2800 },
+    { tag: '情報', tagColor: 'tag-info', text: '「……我會記住一切。你的名字。你的故事。每一個字。」螢的聲音在顫抖，但很堅定。', textEn: '"...I\'ll remember everything. Your name. Your story. Every word." Ying\'s voice trembles, but holds firm.', delay: 3200 },
+    { art: `<pre class="ascii-art">
+    ·    .    ·    .    ·    .    ·    .    ·
+         .         ╭─────────╮         .
+    .        .     │ 結 局 D │    .        .
+         .         │  犧  牲  │         .
+    ·        ·     ╰─────────╯    ·        ·
+         .              .              .
+    ═══════════════════════════════════════════
+</pre>`, artEn: `<pre class="ascii-art">
+    ·    .    ·    .    ·    .    ·    .    ·
+         .         ╭───────────╮       .
+    .        .     │ ENDING D  │  .        .
+         .         │ SACRIFICE │       .
+    ·        ·     ╰───────────╯  ·        ·
+         .              .              .
+    ═══════════════════════════════════════════
+</pre>`, delay: 1500 },
+  ], [
+    { text: '……', textEn: '...', action: () => loadNode('r3_epilogue') },
+  ], { label: L('結局 D — 犧牲', 'Ending D — Sacrifice') });
+});
+
+// ═══════════════════════════════════════════════════
+//  Epilogue — varies by ending + relationships
+// ═══════════════════════════════════════════════════
+
+registerNode('r3_epilogue', () => {
+  var ending = state.flags.r3Ending || 'lockdown';
+  var isMale = state.sex === 'male';
+  var yP = isMale ? L('她', 'she') : L('他', 'he');
+  var yPC = isMale ? 'She' : 'He';
+  var yPo = isMale ? 'her' : 'his';
+  var hasYing = state.flags.r1YingCompanion && state.flags.r3YingArrived;
+  var hasZhou = state.flags.r3ZhouMet;
+
+  var steps = [];
+
+  // Time skip
+  steps.push({ tag: '系統', tagColor: 'tag-system', text: '——三個月後。', textEn: '— Three months later.', delay: 3000 });
+
+  if (ending === 'dawn') {
+    steps.push({ tag: '環境', tagColor: 'tag-system', text: '通道開放了。下面的人陸續來到河城渡口。', textEn: 'The passages are open. People from below are steadily arriving at River City Ferry.', delay: 2500 });
+    steps.push({ tag: '情報', tagColor: 'tag-info', text: '鐵霜帶著營地的倖存者上來了。她的第一件事是找到你，狠狠拍了你一巴掌——然後擁抱了你。', textEn: 'Iron Frost leads the camp survivors up. Her first act is finding you, slapping you hard — then hugging you.', delay: 3000 });
+    steps.push({ tag: '情報', tagColor: 'tag-info', text: '銅鐘成立了「上下層聯合委員會」。她擔任主席——石化的右手終於可以寫些好消息了。', textEn: 'Bronze Bell establishes the "Upper-Lower Joint Committee." She chairs it — her petrified hand finally writes good news.', delay: 3200 });
+    if (hasZhou) {
+      steps.push({ tag: '情報', tagColor: 'tag-info', text: '老周的修理攤成了渡口最受歡迎的店鋪。他說：「老周的手藝，不分上下層。」', textEn: 'Old Zhou\'s repair stall becomes the docks\' most popular shop. He says: "Old Zhou\'s craft serves all levels."', delay: 2800 });
+    }
+  } else if (ending === 'compromise') {
+    steps.push({ tag: '環境', tagColor: 'tag-system', text: '檢疫站建在了通道入口。過程漫長而繁瑣——但至少有人能上來了。', textEn: 'A quarantine station is built at the passage entrance. The process is slow and tedious — but at least some make it through.', delay: 2800 });
+    steps.push({ tag: '情報', tagColor: 'tag-info', text: '銅鐘在檢疫站日夜奔走，確保每個通過的人都得到公正對待。', textEn: 'Bronze Bell works day and night at the quarantine station, ensuring everyone is treated fairly.', delay: 2800 });
+    steps.push({ tag: '情報', tagColor: 'tag-info', text: '你成了她最信賴的助手——連接上下層的橋樑。', textEn: 'You become her most trusted aide — a bridge between the levels.', delay: 2500 });
+  } else if (ending === 'lockdown') {
+    steps.push({ tag: '環境', tagColor: 'tag-system', text: '通道被封鎖了。巨大的石門永遠關上了。', textEn: 'The passages are sealed. The great stone doors close forever.', delay: 2500 });
+    steps.push({ tag: '感知', tagColor: 'tag-sense', text: '你站在封鎖的石門前。門的另一邊——是你曾經走過的路。', textEn: 'You stand before the sealed door. On the other side — the path you once walked.', delay: 2800 });
+    steps.push({ tag: '感知', tagColor: 'tag-sense', text: '但你選擇留在河城。因為銅鐘說得對——這不是結束。', textEn: 'But you choose to stay in River City. Because Bronze Bell was right — this isn\'t the end.', delay: 2800 });
+    steps.push({ tag: '情報', tagColor: 'tag-info', text: '你和銅鐘私下開始了秘密計劃——尋找另一條繞過封鎖的路線。', textEn: 'You and Bronze Bell secretly begin a new plan — finding another route around the seal.', delay: 2800 });
+  } else if (ending === 'sacrifice') {
+    steps.push({ tag: '環境', tagColor: 'tag-system', text: '議會廳的中央，多了一座石像。那是你——永遠站在那裡，手舉向議會桌。', textEn: 'In the center of the Council chamber stands a new statue. It\'s you — forever reaching toward the table.', delay: 3000 });
+    steps.push({ tag: '情報', tagColor: 'tag-info', text: '人們叫它「石語者」——一個用石化換來自由的人。', textEn: 'They call it "The Stone Speaker" — one who traded petrification for freedom.', delay: 2800 });
+    steps.push({ tag: '情報', tagColor: 'tag-info', text: '通道沒有被封鎖。因為沒有人有臉在你的石像面前投那一票。', textEn: 'The passages remain open. Because no one can cast that vote before your statue.', delay: 3000 });
+  }
+
+  // Ying epilogue — varies by ending
+  if (hasYing) {
+    steps.push({ tag: '系統', tagColor: 'tag-system', text: '——', textEn: '—', delay: 2000 });
+    if (ending === 'sacrifice') {
+      steps.push({ tag: '感知', tagColor: 'tag-sense', text: '螢每天都會來看你的石像。' + yP + '會在石像前坐很久，翻著手冊，寫著什麼。', textEn: 'Ying visits your statue every day. ' + yPC + ' sits there for hours, flipping through the notebook, writing.', delay: 3000 });
+      steps.push({ tag: '感知', tagColor: 'tag-sense', text: '有一天，' + yP + '把一本寫完的手冊放在石像的手中。', textEn: 'One day, ' + (isMale ? 'she' : 'he') + ' places a finished notebook in the statue\'s hand.', delay: 2800 });
+      steps.push({ tag: '情報', tagColor: 'tag-info', text: '封面上寫著：「石化深淵——三百年的瘟疫與人性。獻給 ' + state.name + '。」', textEn: 'The cover reads: "Petrification Abyss — Three Centuries of Plague and Humanity. Dedicated to ' + state.name + '."', delay: 3200 });
+      steps.push({ tag: '感知', tagColor: 'tag-sense', text: '「……說好了要幫我校對的，笨蛋。」螢的聲音很輕。', textEn: '"...You promised to proofread, idiot." Ying\'s voice is barely a whisper.', delay: 3000 });
+    } else {
+      steps.push({ tag: '感知', tagColor: 'tag-sense', text: '你在河畔居的陽台上找到了螢。' + yP + '正在寫手冊的最後幾頁。', textEn: 'You find Ying on Riverside Lodge\'s balcony, writing the final pages of the notebook.', delay: 2500 });
+      steps.push({ tag: '情報', tagColor: 'tag-info', text: '「快寫完了。」螢說。' + yP + '沒有抬頭，但你聽到了' + yP + '聲音裡的笑意。', textEn: '"Almost done." Ying says without looking up, but you hear a smile in ' + yPo + ' voice.', delay: 2500 });
+      steps.push({ tag: '感知', tagColor: 'tag-sense', text: '你坐在' + yP + '身邊。河水在遠處流淌。地底的天頂上，結晶散發出暖色的光。', textEn: 'You sit beside ' + (isMale ? 'her' : 'him') + '. River water flows in the distance. Crystals on the underground ceiling glow warmly.', delay: 2800 });
+      if (state.flags.r2YingNight || state.flags.r3YingInn) {
+        steps.push({ tag: '感知', tagColor: 'tag-sense', text: '螢合上手冊，輕輕靠在了你的肩膀上。就像在營火旁的那一夜。', textEn: 'Ying closes the notebook and gently leans against your shoulder. Just like that night by the campfire.', delay: 2800 });
+        steps.push({ tag: '情報', tagColor: 'tag-info', text: '「……你說過要幫我校對。現在可以開始了。」', textEn: '"...You said you\'d help proofread. We can start now."', delay: 2500 });
+        steps.push({ tag: '感知', tagColor: 'tag-sense', text: '你知道' + yP + '的意思不只是校對。你接過手冊，翻開了第一頁。', textEn: 'You know ' + (isMale ? 'she' : 'he') + ' means more than proofreading. You take the notebook and open the first page.', delay: 2800 });
+        steps.push({ tag: '情報', tagColor: 'tag-info', html: '第一行寫著：「<b>記錄者螢與' + state.name + '的石化深淵紀行</b>」。', htmlEn: 'The first line reads: "<b>A Chronicle of the Petrification Abyss, by Ying and ' + state.name + '</b>."', delay: 3000 });
+      } else {
+        steps.push({ tag: '情報', tagColor: 'tag-info', text: '螢把手冊遞給你：「第一個讀者——你來。」', textEn: 'Ying hands you the notebook: "First reader — you."', delay: 2200 });
+      }
+    }
+  }
+
+  // Final text
+  steps.push({ tag: '系統', tagColor: 'tag-system', text: '——', textEn: '—', delay: 2000 });
+  steps.push({ tag: '系統', tagColor: 'tag-system', text: '石化瘟疫還沒有消失。也許永遠不會消失。', textEn: 'The Stone Plague hasn\'t ended. Perhaps it never will.', delay: 2500 });
+  steps.push({ tag: '系統', tagColor: 'tag-system', text: '但在這座地底世界的角落裡，有人還在活著。還在記錄。還在希望。', textEn: 'But in corners of this underground world, people still live. Still record. Still hope.', delay: 3000 });
+  steps.push({ tag: '系統', tagColor: 'tag-system', html: '<b>你的故事——被記住了。</b>', htmlEn: '<b>Your story — is remembered.</b>', delay: 3000 });
+
+  // Stats summary
+  var statsHtml = L(
+    '<br>═══ 冒險紀錄 ═══<br>' +
+    '名字：' + state.name + '<br>' +
+    '等級：' + state.level + '<br>' +
+    '力量：' + state.str + '　敏捷：' + state.agi + '　意志：' + state.wil + '<br>' +
+    '石化度：' + state.petri + '%<br>' +
+    '結局：' + ({dawn:'A — 黎明',compromise:'B — 妥協',lockdown:'C — 封鎖',sacrifice:'D — 犧牲'}[ending] || '？') + '<br>' +
+    '死亡次數：' + state.deathCount + '<br>',
+    '<br>═══ ADVENTURE LOG ═══<br>' +
+    'Name: ' + state.name + '<br>' +
+    'Level: ' + state.level + '<br>' +
+    'STR: ' + state.str + '  AGI: ' + state.agi + '  WIL: ' + state.wil + '<br>' +
+    'Petrification: ' + state.petri + '%<br>' +
+    'Ending: ' + ({dawn:'A — Dawn',compromise:'B — Compromise',lockdown:'C — Lockdown',sacrifice:'D — Sacrifice'}[ending] || '?') + '<br>' +
+    'Deaths: ' + state.deathCount + '<br>'
+  );
+  steps.push({ tag: '系統', tagColor: 'tag-system', html: statsHtml, delay: 1000 });
+
+  autoExplore(steps, [
+    { text: '回到標題畫面', textEn: 'Return to title screen', action: () => {
+      deleteSave();
+      location.reload();
+    }},
+    { text: '留在河城（自由探索）', textEn: 'Stay in River City (free explore)', action: () => loadNode('r3_look') },
+  ], { label: L('尾聲', 'Epilogue') });
 });

@@ -22,7 +22,7 @@ function revive() {
   renderStatus();
   // Return to a safe node — avoid reloading combat/patrol/tunnel nodes
   // (tunnel nodes replay long auto-explore sequences with combat encounters)
-  var REVIVE_SAFE = { 'r0_tunnel': 'r0_climb_check', 'r1_guard_fight': 'r1_look', 'r1_guard_check': 'r1_look', 'r2_boss': 'r2_camp', 'r2_boss_prep': 'r2_camp', 'r3_patrol': 'r3_look' };
+  var REVIVE_SAFE = { 'r0_tunnel': 'r0_climb_check', 'r1_guard_fight': 'r1_look', 'r1_guard_check': 'r1_look', 'r2_boss': 'r2_camp', 'r2_boss_prep': 'r2_camp', 'r3_patrol': 'r3_look', 'r3_boss': 'r3_council', 'r3_boss_prep': 'r3_council' };
   var safeNode = state.node;
   if (REVIVE_SAFE[safeNode]) {
     safeNode = REVIVE_SAFE[safeNode];
