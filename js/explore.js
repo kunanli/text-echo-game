@@ -117,6 +117,7 @@ function stopAuto() {
   if (autoClockTimer) { clearInterval(autoClockTimer); autoClockTimer = null; }
   autoRunning = false;
   removePending();
+  voiceNarrator.cancel();
 }
 
 // ── Main autoExplore function ──
@@ -299,6 +300,9 @@ function autoExplore(steps, choices, opts) {
 
       $story.appendChild(line);
       $story.scrollTop = $story.scrollHeight;
+
+      // Voice narration — speak when typewriter begins
+      voiceNarrator.speak(textContent || htmlContent, state.lang);
 
       var fullText = textContent || '';
       var fullHtml = htmlContent || '';

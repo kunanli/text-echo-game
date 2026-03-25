@@ -461,3 +461,26 @@ $audioBtn.addEventListener('click', function() {
     setTimeout(updateAudioBtn, 200);
   }
 });
+
+// ── Voice Narration Toggle ──
+var $voiceBtn = document.getElementById('voice-toggle');
+
+function updateVoiceBtn() {
+  if (voiceNarrator.isEnabled()) {
+    $voiceBtn.innerHTML = '&#x1F5E3; ON';
+    $voiceBtn.classList.add('on');
+  } else {
+    $voiceBtn.innerHTML = '&#x1F5E3; OFF';
+    $voiceBtn.classList.remove('on');
+  }
+}
+
+// Hide button if TTS not supported
+if (!voiceNarrator.isSupported()) {
+  $voiceBtn.style.display = 'none';
+}
+
+$voiceBtn.addEventListener('click', function() {
+  voiceNarrator.toggle();
+  updateVoiceBtn();
+});

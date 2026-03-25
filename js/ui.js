@@ -50,6 +50,8 @@ function renderScene(text, choices) {
     removePending();
     var block = document.createElement('div');
     block.innerHTML = text;
+    // Voice narration for scene text
+    voiceNarrator.speak(text, state.lang);
     $story.appendChild(block);
     $story.scrollTop = $story.scrollHeight;
     renderStatus();
