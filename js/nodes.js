@@ -135,14 +135,6 @@ registerNode('chapter_select', function() {
       }});
     })(chData[i]);
   }
-  if (!devUnlocked) {
-    choices.push({ text: en ? 'DEV: Unlock All' : 'DEV：全部解鎖', textEn: 'DEV: Unlock All', action: function() {
-      state.flags._devUnlockAll = true;
-      state.region = Math.max(state.region, chData.length - 1);
-      notify(en ? 'All chapters unlocked!' : '全部章節已解鎖！');
-      loadNode('chapter_select');
-    }});
-  }
   choices.push({ text: en ? 'Cancel' : '取消', textEn: 'Cancel', action: function() { loadNode(regionStartNode()); } });
 
   autoExplore(steps, choices, { label: L('章節選擇', 'Chapter Select') });

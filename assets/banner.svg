@@ -1,0 +1,76 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="540" viewBox="0 0 960 540">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="40%" r="60%">
+      <stop offset="0%" stop-color="#1a0a2e"/>
+      <stop offset="100%" stop-color="#000"/>
+    </radialGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="2"/>
+      <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="softGlow">
+      <feGaussianBlur stdDeviation="6"/>
+      <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <rect width="960" height="540" fill="url(#bg)"/>
+
+  <!-- Simulated terminal window -->
+  <rect x="80" y="40" width="800" height="460" rx="8" fill="#0a0a0a" stroke="#333" stroke-width="1.5"/>
+  <!-- Title bar -->
+  <rect x="80" y="40" width="800" height="32" rx="8" fill="#1a1a1a"/>
+  <rect x="80" y="60" width="800" height="12" fill="#1a1a1a"/>
+  <circle cx="102" cy="56" r="6" fill="#ff5f57"/>
+  <circle cx="122" cy="56" r="6" fill="#febc2e"/>
+  <circle cx="142" cy="56" r="6" fill="#28c840"/>
+  <text x="480" y="60" text-anchor="middle" font-family="monospace" font-size="13" fill="#666">petriabyss.html</text>
+
+  <!-- Terminal content -->
+  <g font-family="'Courier New', monospace" transform="translate(120, 105)">
+    <!-- ASCII art title -->
+    <text y="0" font-size="11" fill="#555">╔═══════════════════════════════════════════════════════════╗</text>
+    <text y="18" font-size="11" fill="#555">║ <tspan fill="#333">░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░</tspan> ║</text>
+    <text y="36" font-size="11" fill="#555">║ <tspan fill="#333">░</tspan>           <tspan fill="#c8a0ff" font-size="18" font-weight="bold">石    化    深    淵</tspan>              <tspan fill="#333">░</tspan> ║</text>
+    <text y="54" font-size="11" fill="#555">║ <tspan fill="#333">░</tspan>      <tspan fill="#9a7bbb" font-size="10">P E T R I F I C A T I O N   A B Y S S</tspan>       <tspan fill="#333">░</tspan> ║</text>
+    <text y="72" font-size="11" fill="#555">║ <tspan fill="#333">░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░</tspan> ║</text>
+    <text y="90" font-size="11" fill="#555">╚═══════════════════════════════════════════════════════════╝</text>
+
+    <!-- Game text simulation -->
+    <text y="130" font-size="13" fill="#7b8b6b">[ 石脈隧道 · Vein Corridor ]</text>
+    <text y="155" font-size="13" fill="#c0b8a0">你沿著狹窄的石脈隧道前行。</text>
+    <text y="175" font-size="13" fill="#c0b8a0">牆壁上的紫色結晶發出微弱的光芒，</text>
+    <text y="195" font-size="13" fill="#c0b8a0">空氣中瀰漫著一股石化的氣息……</text>
+
+    <text y="230" font-size="13" fill="#c8a0ff" filter="url(#glow)">  你感到左臂傳來一陣刺痛。石化度 +5%</text>
+
+    <!-- Choices -->
+    <text y="270" font-size="13" fill="#aaa">───────────────────────────────────</text>
+    <text y="295" font-size="13" fill="#e8d8c0">[A] 繼續深入隧道</text>
+    <text y="315" font-size="13" fill="#e8d8c0">[B] 調查紫色結晶</text>
+    <text y="335" font-size="13" fill="#e8d8c0">[C] 停下來休息，檢查傷口</text>
+    <text y="355" font-size="13" fill="#e8d8c0">[D] 嘗試與結晶共鳴</text>
+
+    <!-- Cursor blink -->
+    <rect x="0" y="378" width="8" height="16" fill="#c8a0ff" opacity="0.8"/>
+  </g>
+
+  <!-- Side status panel hint -->
+  <g transform="translate(730, 105)">
+    <rect x="0" y="0" width="130" height="380" fill="#0f0f0f" stroke="#222" stroke-width="1" rx="4"/>
+    <text x="65" y="25" text-anchor="middle" font-family="monospace" font-size="10" fill="#666">──── 狀態 ────</text>
+    <text x="12" y="50" font-family="monospace" font-size="11" fill="#888">HP</text>
+    <rect x="12" y="56" width="106" height="6" rx="2" fill="#1a1a1a"/>
+    <rect x="12" y="56" width="85" height="6" rx="2" fill="#4a8b4a"/>
+    <text x="12" y="80" font-family="monospace" font-size="11" fill="#888">石化度</text>
+    <rect x="12" y="86" width="106" height="6" rx="2" fill="#1a1a1a"/>
+    <rect x="12" y="86" width="25" height="6" rx="2" fill="#7b2fbe"/>
+    <text x="12" y="115" font-family="monospace" font-size="10" fill="#666">力量  <tspan fill="#c0b8a0">5</tspan></text>
+    <text x="12" y="132" font-family="monospace" font-size="10" fill="#666">敏捷  <tspan fill="#c0b8a0">4</tspan></text>
+    <text x="12" y="149" font-family="monospace" font-size="10" fill="#666">意志  <tspan fill="#c0b8a0">6</tspan></text>
+    <text x="12" y="180" font-family="monospace" font-size="10" fill="#666">Lv. <tspan fill="#c8a0ff">3</tspan></text>
+    <text x="12" y="210" font-family="monospace" font-size="10" fill="#666">──── 物品 ────</text>
+    <text x="12" y="230" font-family="monospace" font-size="10" fill="#8b7b5b">· 黑麵包</text>
+    <text x="12" y="247" font-family="monospace" font-size="10" fill="#8b7b5b">· 石化解藥</text>
+    <text x="12" y="264" font-family="monospace" font-size="10" fill="#8b7b5b">· 鐵鎬</text>
+  </g>
+</svg>

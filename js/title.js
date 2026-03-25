@@ -296,8 +296,23 @@ function buildChapterMap(container, mapPre, onSelect) {
     showPhase('phase-chapter');
   });
 
-  // Dev unlock all
-  document.getElementById('chapter-dev-btn').addEventListener('click', function() {
+  // Dev unlock all (hidden — triple-click title to reveal)
+  var devBtn = document.getElementById('chapter-dev-btn');
+  devBtn.style.display = 'none';
+  var devClicks = 0, devTimer = null;
+  var chTitle = document.getElementById('chapter-title');
+  if (chTitle) {
+    chTitle.addEventListener('click', function() {
+      devClicks++;
+      clearTimeout(devTimer);
+      devTimer = setTimeout(function() { devClicks = 0; }, 600);
+      if (devClicks >= 5) {
+        devClicks = 0;
+        devBtn.style.display = '';
+      }
+    });
+  }
+  devBtn.addEventListener('click', function() {
     state.flags._devUnlockAll = true;
     state.region = Math.max(state.region, CHAPTERS.length - 1);
     buildChapterMap(
