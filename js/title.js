@@ -303,7 +303,6 @@ function buildChapterMap(container, mapPre, onSelect) {
     applyLang();
     var en = state.lang === 'en';
     document.getElementById('chapter-title').textContent = en ? 'CHAPTER SELECT' : '章 節 選 擇';
-    document.getElementById('chapter-dev-btn').textContent = en ? 'DEV Unlock All' : 'DEV 全部解鎖';
     document.getElementById('chapter-back-btn').textContent = en ? 'Back' : '返回';
     buildChapterMap(
       document.getElementById('chapter-list'),
@@ -540,28 +539,7 @@ $audioBtn.addEventListener('click', function() {
   }
 });
 
-// ── Voice Narration Toggle ──
-var $voiceBtn = document.getElementById('voice-toggle');
-
-function updateVoiceBtn() {
-  if (voiceNarrator.isEnabled()) {
-    $voiceBtn.innerHTML = '&#x1F5E3; ON';
-    $voiceBtn.classList.add('on');
-  } else {
-    $voiceBtn.innerHTML = '&#x1F5E3; OFF';
-    $voiceBtn.classList.remove('on');
-  }
-}
-
-// Hide button if TTS not supported
-if (!voiceNarrator.isSupported()) {
-  $voiceBtn.style.display = 'none';
-}
-
-$voiceBtn.addEventListener('click', function() {
-  voiceNarrator.toggle();
-  updateVoiceBtn();
-});
+// ── Voice Narration Toggle (disabled — no DOM button) ──
 
 // ── Achievement UI ──
 (function() {
