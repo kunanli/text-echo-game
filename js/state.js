@@ -1,5 +1,5 @@
 // ══ State, i18n, DOM refs ══
-var VERSION = '1.0';
+var VERSION = '1.1';
 var DEBUG = false;
 
 const state = {
