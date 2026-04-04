@@ -7,6 +7,8 @@ var ambientAudio = (function() {
   var masterGain = null;
   var running = false;
   var volume = 0.35;  // default volume
+  var isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) ||
+                 window.innerWidth <= 760;
 
   function init() {
     if (ctx) return;
@@ -38,14 +40,16 @@ var ambientAudio = (function() {
     droneNode.buffer = buf;
     droneNode.loop = true;
 
-    // Low-pass filter for deep rumble
+    // Low-pass filter for rumble.
+    // Mobile speakers cannot reproduce very low frequencies (<200Hz),
+    // so we use a higher cutoff on mobile to keep the sound audible.
     var lp = ctx.createBiquadFilter();
     lp.type = 'lowpass';
-    lp.frequency.value = 80;
+    lp.frequency.value = isMobile ? 250 : 80;
     lp.Q.value = 1.0;
 
     droneGain = ctx.createGain();
-    droneGain.gain.value = 0.6;
+    droneGain.gain.value = isMobile ? 0.9 : 0.6;
 
     droneNode.connect(lp);
     lp.connect(droneGain);
@@ -100,7 +104,22 @@ var ambientAudio = (function() {
   // so calling this early makes subsequent start() calls reliable.
   function warmup() {
     init();
-    if (ctx && ctx.state === 'suspended') ctx.resume();
+    if (ctx && ctx.state === 'suspended') {
+      ctx.resume().catch(function() {});
+    }
+    // iOS Safari workaround: play a silent buffer to fully unlock audio output.
+    // Without this, the AudioContext may remain effectively muted even after
+    // resume() resolves, because iOS requires actual audio output within the
+    // first user gesture to "unlock" the audio hardware.
+    if (ctx && isMobile) {
+      try {
+        var silentBuf = ctx.createBuffer(1, 1, ctx.sampleRate);
+        var src = ctx.createBufferSource();
+        src.buffer = silentBuf;
+        src.connect(ctx.destination);
+        src.start();
+      } catch (e) {}
+    }
   }
 
   function setVolume(v) {
