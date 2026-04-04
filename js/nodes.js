@@ -15,48 +15,18 @@ function die(msg) {
 
   // Update revive button based on revival stone availability
   var hasStone = hasItem('復活石') || hasItem('Revival Stone');
-  var $gameOver = document.getElementById('death-gameover');
+  var $goBtn = document.getElementById('gameover-btn');
   $revive.textContent = hasStone
     ? L('使用復活石', 'Use Revival Stone')
     : L('沒有復活石……', 'No Revival Stone...');
   $revive.style.opacity = hasStone ? '1' : '0.4';
   $revive.disabled = !hasStone;
 
-  if (!hasStone && $gameOver) {
-    // Game over — show endcard + leaderboard
-    state.deathCount++;
-    $gameOver.style.display = '';
-    var $cardContainer = document.getElementById('death-card-container');
-    $cardContainer.innerHTML = '';
-    if (typeof generateEndCard === 'function') {
-      var canvas = generateEndCard();
-      canvas.style.maxWidth = '280px';
-      canvas.style.height = 'auto';
-      canvas.style.borderRadius = '6px';
-      $cardContainer.appendChild(canvas);
-
-      var $dlBtn = document.getElementById('death-download-btn');
-      if ($dlBtn) {
-        $dlBtn.textContent = L('下載卡片', 'Download Card');
-        $dlBtn.onclick = function() {
-          var link = document.createElement('a');
-          link.download = 'petriabyss-gameover.png';
-          link.href = canvas.toDataURL('image/png');
-          link.click();
-        };
-      }
-    }
-    var $lbBtn = document.getElementById('death-leaderboard-btn');
-    if ($lbBtn) {
-      $lbBtn.textContent = L('排行榜', 'Leaderboard');
-      $lbBtn.onclick = function() {
-        if (typeof showLeaderboard === 'function') showLeaderboard();
-      };
-    }
-    // Submit score
-    if (typeof submitToLeaderboard === 'function') submitToLeaderboard();
-  } else if ($gameOver) {
-    $gameOver.style.display = 'none';
+  // Show "accept fate" button when no stone
+  if ($goBtn) {
+    $goBtn.style.display = hasStone ? 'none' : '';
+    $goBtn.textContent = L('接受命運', 'Accept Fate');
+    if (!hasStone) state.deathCount++;
   }
 
   $deathOv.classList.add('active');
@@ -105,6 +75,84 @@ if ($restartBtn) {
     if (typeof localStorage !== 'undefined') localStorage.removeItem('petriabyss_save');
     location.reload();
   });
+}
+
+// Game Over → Fortune Teller → Endcard → Leaderboard
+var $goBtn = document.getElementById('gameover-btn');
+if ($goBtn) {
+  $goBtn.addEventListener('click', function() {
+    $deathOv.classList.remove('active');
+    startGameOverSequence();
+  });
+}
+
+function startGameOverSequence() {
+  var en = state.lang === 'en';
+  var fortuneArt = [
+    '          ╭─────╮',
+    '         ╱ ◉   ◉ ╲',
+    '        │    ▽    │',
+    '        │  ╰───╯  │',
+    '      ╭─┤─────────├─╮',
+    '     ╱░░│ ◇ ◇ ◇ ◇│░░╲',
+    '    │░░░╰─────────╯░░░│',
+    '    │░░░░░╱     ╲░░░░░│',
+    '    │░░░╱ ╭─────╮ ╲░░░│',
+    '     ╲░╱  │ ✦✦✦ │  ╲░╱',
+    '      ╱   │ ✦✦✦ │   ╲',
+    '     ╱    ╰─────╯    ╲',
+  ];
+
+  var regionNames = [
+    L('祭獻坑', 'Sacrificial Pit'),
+    L('石脈迴廊', 'Vein Corridor'),
+    L('大採石場', 'Great Quarry'),
+    L('河城渡口', 'River City Ferry'),
+  ];
+  var regionName = regionNames[state.region] || regionNames[0];
+
+  var lines = [
+    { zh: '「……又一個旅者倒下了。」', en: '"...Another traveler has fallen."' },
+    { zh: '「讓我看看你的命運之石。」', en: '"Let me read your stone of fate."' },
+    { zh: '「' + state.name + '……' + regionName + '……」', en: '"' + state.name + '... ' + regionName + '..."' },
+    { zh: '「你走了很遠，但深淵不會輕易放過任何人。」', en: '"You came far, but the abyss spares no one easily."' },
+    { zh: '「這就是刻在你石碑上的名字。」', en: '"This is the name carved upon your stone."' },
+  ];
+
+  var steps = [
+    { tag: '???', tagColor: 'tag-petri',
+      art: '<pre class="ascii-art" style="color:#9a8ac8; font-size:.7rem;">' + fortuneArt.join('\n') + '</pre>',
+      delay: 2500 },
+    { tag: '占卜師', tagColor: 'tag-petri',
+      text: lines[0].zh, textEn: lines[0].en, delay: 2500 },
+    { tag: '占卜師', tagColor: 'tag-petri',
+      text: lines[1].zh, textEn: lines[1].en, delay: 2500 },
+    { tag: '占卜師', tagColor: 'tag-petri',
+      text: lines[2].zh, textEn: lines[2].en, delay: 3000 },
+    { tag: '占卜師', tagColor: 'tag-petri',
+      text: lines[3].zh, textEn: lines[3].en, delay: 3000 },
+    { tag: '占卜師', tagColor: 'tag-petri',
+      text: lines[4].zh, textEn: lines[4].en, delay: 2500 },
+  ];
+
+  autoExplore(steps, [
+    { text: '查看石碑', textEn: 'View the stone tablet', action: function() {
+      if (typeof showEndCard === 'function') showEndCard();
+      // After endcard is closed, show leaderboard
+      var $ecOverlay = document.getElementById('endcard-overlay');
+      var $ecClose = document.getElementById('endcard-close-btn');
+      if ($ecClose) {
+        var origClose = $ecClose.onclick;
+        $ecClose.onclick = function() {
+          if (origClose) origClose();
+          $ecOverlay.classList.remove('active');
+          setTimeout(function() {
+            if (typeof showLeaderboard === 'function') showLeaderboard();
+          }, 300);
+        };
+      }
+    }},
+  ], { label: L('命運揭示', 'Fate Revealed') });
 }
 
 function regionStartNode() {
