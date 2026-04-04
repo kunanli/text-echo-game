@@ -1,0 +1,70 @@
+# 石化深淵 PETRIABYSS — 開發指引
+
+## 專案概述
+
+瀏覽器端文字冒險 RPG，純前端（vanilla JS + HTML + CSS），無後端、無框架依賴。
+玩家在地下深淵中探索，管理 HP 與石化度，做出分歧選擇，橫跨 4 大區域。
+
+## 技術架構
+
+- **語言**：vanilla JavaScript (ES5 compatible)，無打包工具
+- **載入順序**：`index.html` 底部按順序載入 `<script>`，全域變數互相引用
+- **狀態管理**：`js/state.js` 中的 `state` 物件為唯一遊戲狀態
+- **i18n**：雙語（繁體中文 zh-TW / English），在 `state.lang` 切換
+- **存檔**：localStorage 自動存 + Base64 存檔碼手動分享
+
+## 檔案結構
+
+```
+index.html          # 單頁應用入口
+css/style.css       # 所有樣式（暗黑奇幻主題）
+js/
+  audio.js          # 程序化環境音（Web Audio API，棕色噪音）
+  voice.js          # 語音旁白引擎（目前已停用，待換更好的 TTS）
+  state.js          # 遊戲狀態 + i18n 翻譯
+  utils.js          # 工具函式
+  avatar.js         # ASCII 角色肖像（6 種情緒）
+  ui.js             # UI 渲染 + 鍵盤輸入
+  explore.js        # 自動探索日誌引擎（idle RPG 風格）
+  combat.js         # 回合制戰鬥（攻擊/觀察/交流/逃跑）
+  save.js           # 存讀檔 + 分享碼
+  nodes.js          # 節點系統 + 死亡/復活
+  patrol.js         # 隨機巡邏遭遇
+  title.js          # 標題畫面 + 角色創建（最後載入，綁定事件）
+  story/
+    region0.js      # 祭獻坑（教學區）
+    region1.js      # 石脈迴廊
+    region2.js      # 大採石場
+    region3.js      # 河城渡口（含 4 結局）
+assets/
+  banner.svg        # itch.io 用橫幅
+  cover.svg         # 封面圖
+```
+
+## 開發慣例
+
+- **全域變數**：各模組透過 IIFE 或直接 `var` 暴露全域 API（如 `ambientAudio`, `voiceNarrator`, `state`）
+- **劇情節點**：每個 region 檔案 export 一個 `regionN` 物件，key 為節點 ID，value 為函式
+- **探索步驟**：用 `{ tag, tagColor, text, textEn, delay }` 格式描述每一步
+- **選項按鈕**：用 `{ text, textEn, action }` 格式
+- **HTML 內容**：部分步驟用 `html`/`htmlEn` 取代 `text`/`textEn`，支援粗體等標記
+- **CSS 命名**：用 `.tag-xxx` 管理標籤顏色（tag-combat, tag-info, tag-sense 等）
+
+## 目前狀態
+
+- 4 個區域全部完成，含 4 種結局
+- 語音旁白功能已停用（Web Speech API 品質不足），UI 按鈕已隱藏
+- 環境音正常運作（程序化棕色噪音）
+- 已準備 itch.io 發布（DEV 工具已隱藏）
+
+## 待辦 / 已知問題
+
+- [ ] 語音旁白：尋找更好的 TTS 方案（Fish Audio / ElevenLabs / Kokoro）替換 Web Speech API
+- [ ] `voice.js` 保留完整 API 介面（speak/cancel/toggle 等），目前為 no-op，方便未來接入新 TTS
+
+## 開發注意事項
+
+- 修改 JS 時注意 `index.html` 中的載入順序，`title.js` 必須最後載入
+- 測試時注意 iOS Safari 的音頻限制（AudioContext 需要用戶手勢啟動）
+- 存檔碼向後相容很重要——改 `state` 結構時要考慮舊存檔能否讀取
+- 所有 story 內容都有中英雙語，新增劇情時兩個語言都要寫

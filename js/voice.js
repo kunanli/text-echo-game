@@ -1,11 +1,12 @@
 // ══ Voice Narration Engine (Web Speech API TTS) ══
-// Reads story text aloud using the browser's built-in speech synthesis.
-// Uses a self-managed queue instead of the browser's native queue to avoid
-// iOS Safari dropping or overlapping queued utterances.
+// Currently disabled — Web Speech API quality is insufficient.
+// TODO: Replace with a proper TTS solution (Fish Audio / ElevenLabs / Kokoro).
+// The public API surface is preserved as no-ops so callers don't need changes.
 
 var voiceNarrator = (function() {
+  var DISABLED = true;  // Feature flag — set to false to re-enable
   var enabled = false;
-  var synth = window.speechSynthesis || null;
+  var synth = DISABLED ? null : (window.speechSynthesis || null);
   // Storytelling pace — slower and deeper for an adventure narrator feel
   var rate = 0.82;
   var pitch = 0.9;
