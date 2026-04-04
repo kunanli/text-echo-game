@@ -158,21 +158,21 @@ var ambientAudio = (function() {
   // Region 2: 大採石場 — Open space, wind + distant echoes, mechanical rumble
   function buildRegion2() {
     var brown = makeBrownNoise(2);
-    var wind = makeFilteredNoise(brown, 'bandpass', isMobile ? 600 : 250, 0.5, 0.5);
-    pushRegionLayer(wind, isMobile ? 0.6 : 0.45, 2);
+    var wind = makeFilteredNoise(brown, 'bandpass', isMobile ? 400 : 180, 0.4, 0.35);
+    pushRegionLayer(wind, isMobile ? 0.4 : 0.3, 2);
 
     var mech = makeOscDrone(isMobile ? 120 : 38, 'sawtooth');
     var mechFilter = ctx.createBiquadFilter();
     mechFilter.type = 'lowpass';
-    mechFilter.frequency.value = isMobile ? 250 : 80;
+    mechFilter.frequency.value = isMobile ? 200 : 70;
     mech.node.disconnect();
     mech.node.connect(mechFilter);
     mechFilter.connect(mech.gain);
-    pushRegionLayer(mech, 0.08, 2);
+    pushRegionLayer(mech, 0.06, 2);
 
     var white = makeWhiteNoise(2);
     var echo = makeFilteredNoise(white, 'highpass', 4000, 2, 0.02);
-    pushRegionLayer(echo, 0.025, 3);
+    pushRegionLayer(echo, 0.02, 3);
   }
 
   // Region 3: 河城渡口 — Water flow + civilization hum + warmth
