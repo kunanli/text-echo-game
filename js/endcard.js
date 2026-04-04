@@ -12,20 +12,20 @@ var ENDING_META = {
 
 var ENDING_FLAVOR = {
   dawn: {
-    zh: '"帶著真相穿越了深淵的黑暗，將光明\n重新引入這被遺忘的地底世界。石化的\n詛咒終將褪去，而這個名字會被銘刻在\n新時代的起點。"',
-    en: '"Carried the truth through darkness,\nbringing light back to the forgotten\nunderworld. The curse shall fade, and\nthis name marks a new dawn."',
+    zh: '"帶著真相穿越了深淵的黑暗，將光明重新引入這被遺忘的地底世界。石化的詛咒終將褪去，而這個名字會被銘刻在新時代的起點。"',
+    en: '"Carried the truth through darkness, bringing light back to the forgotten underworld. The curse shall fade, and this name marks a new dawn."',
   },
   sacrifice: {
-    zh: '"選擇了以自身為代價換取眾人的安全。\n石化的命運並未消失，只是由一人承擔。\n深淵會記住這份犧牲。"',
-    en: '"Chose to bear the cost so others\nmight live. The curse did not vanish\n— simply taken upon oneself.\nThe abyss remembers."',
+    zh: '"選擇了以自身為代價換取眾人的安全。石化的命運並未消失，只是由一人承擔。深淵會記住這份犧牲。"',
+    en: '"Chose to bear the cost so others might live. The curse did not vanish — simply taken upon oneself. The abyss remembers."',
   },
   compromise: {
-    zh: '"在對立的勢力之間找到了一條脆弱但\n可行的中間道路。沒有英雄式的結局，\n但每個人都活了下來。"',
-    en: '"Found a fragile but viable path\nbetween opposing forces. No heroic\nending — but everyone lived to see\nanother day."',
+    zh: '"在對立的勢力之間找到了一條脆弱但可行的中間道路。沒有英雄式的結局，但每個人都活了下來。"',
+    en: '"Found a fragile but viable path between opposing forces. No heroic ending — but everyone lived to see another day."',
   },
   lockdown: {
-    zh: '"深淵的入口被永遠封閉。地底的一切\n——包括真相——都被埋葬在石壁之下。\n安全，但代價是永遠的沉默。"',
-    en: '"The abyss was sealed forever.\nAll beneath — truth included —\nburied under stone. Safe, yes.\nBut at the cost of eternal silence."',
+    zh: '"深淵的入口被永遠封閉。地底的一切——包括真相——都被埋葬在石壁之下。安全，但代價是永遠的沉默。"',
+    en: '"The abyss was sealed forever. All beneath — truth included — buried under stone. Safe, yes. But at the cost of eternal silence."',
   },
 };
 
@@ -213,6 +213,24 @@ function _drawBlockBar(ctx, x, y, val, maxVal, numBlocks) {
   }
 }
 
+// ── Text word-wrap (supports CJK + latin) ──
+function _wrapText(ctx, text, maxW) {
+  var lines = [];
+  var line = '';
+  for (var i = 0; i < text.length; i++) {
+    var ch = text[i];
+    var test = line + ch;
+    if (ctx.measureText(test).width > maxW && line.length > 0) {
+      lines.push(line);
+      line = ch;
+    } else {
+      line = test;
+    }
+  }
+  if (line) lines.push(line);
+  return lines;
+}
+
 // ── Rounded rect ──
 function _roundRect(ctx, x, y, w, h, r) {
   ctx.beginPath();
@@ -318,10 +336,11 @@ function generateEndCard() {
   // ═════════════════════════════════
   curY += 28;
   var flavor = ENDING_FLAVOR[ending] || ENDING_FLAVOR.lockdown;
-  var flavorLines = (en ? flavor.en : flavor.zh).split('\n');
+  var flavorRaw = en ? flavor.en : flavor.zh;
   ctx.font = '12px "Courier New", monospace';
   ctx.fillStyle = '#555568';
   ctx.textAlign = 'left';
+  var flavorLines = _wrapText(ctx, flavorRaw, ENDCARD_W - pad * 2);
   for (var fi = 0; fi < flavorLines.length; fi++) {
     ctx.fillText(flavorLines[fi], pad, curY + fi * 18);
   }
@@ -367,12 +386,15 @@ function generateEndCard() {
   // ═════════════════════════════════
   //  BOTTOM: highlights (left) + score (right)
   // ═════════════════════════════════
-  var hlItems = [];
-  if (state.deathCount === 0) hlItems.push(en ? 'Deathless Run' : '零死亡通關');
-  if (state.petri <= 10) hlItems.push(en ? 'Stone Resistant' : '抗石化體質');
-  if (state.flags.r1YingCompanion) hlItems.push(en ? 'Ying\'s Companion' : '螢的同伴');
-  if (state.flags.r3PlagueProof) hlItems.push(en ? 'Plague Proof' : '瘟疫證據');
-  if (state.flags.r3CraneTestimony) hlItems.push(en ? 'Crane Testified' : '灰鶴作證');
+  // Highlights: sorted by rarity (highest first), show top 3
+  var hlAll = [];
+  if (state.deathCount === 0)          hlAll.push({ text: en ? 'Deathless Run'    : '零死亡通關', color: '#d4a843', rank: 5 });
+  if (state.petri <= 10)               hlAll.push({ text: en ? 'Stone Resistant'  : '抗石化體質', color: '#9a5ac8', rank: 4 });
+  if (state.flags.r3CraneTestimony)    hlAll.push({ text: en ? 'Crane Testified'  : '灰鶴作證',   color: '#4a8ac8', rank: 3 });
+  if (state.flags.r3PlagueProof)       hlAll.push({ text: en ? 'Plague Proof'     : '瘟疫證據',   color: '#4a8ac8', rank: 3 });
+  if (state.flags.r1YingCompanion)     hlAll.push({ text: en ? 'Ying\'s Companion': '螢的同伴',   color: '#4a9e4a', rank: 2 });
+  hlAll.sort(function(a, b) { return b.rank - a.rank; });
+  var hlItems = hlAll.slice(0, 3);
 
   // Highlights on left side
   if (hlItems.length > 0) {
@@ -382,9 +404,9 @@ function generateEndCard() {
     ctx.fillText(en ? 'highlights' : '成就亮點', pad, curY + 6);
 
     ctx.font = '11px "Courier New", monospace';
-    ctx.fillStyle = '#6a6a7a';
     for (var hi = 0; hi < hlItems.length; hi++) {
-      ctx.fillText('· ' + hlItems[hi], pad, curY + 24 + hi * 18);
+      ctx.fillStyle = hlItems[hi].color;
+      ctx.fillText('· ' + hlItems[hi].text, pad, curY + 24 + hi * 18);
     }
   }
 
