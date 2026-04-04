@@ -455,7 +455,8 @@
     var sex = document.getElementById('dev-sex').value;
     var tier = document.getElementById('dev-score').value;
     var p = presets[tier];
-    state.name = sex === 'male' ? '石隱' : '月影';
+    var names = { dawn: ['曙隱','曙影'], sacrifice: ['獻隱','獻影'], compromise: ['灰行','灰影'], lockdown: ['守隱','守華'] };
+    state.name = (names[ending] || ['旅者','旅者'])[sex === 'female' ? 1 : 0];
     state.sex = sex;
     state.deathCount = p.deathCount;
     state.petri = p.petri;
