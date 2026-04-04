@@ -18,10 +18,21 @@ function showPhase(id) {
   }
 })();
 
+// iOS requires audio unlock from a touchstart (not just click), so listen
+// for the earliest touch/click on the splash to warm up AudioContext.
+var _splashWarmedUp = false;
+function splashWarmup() {
+  if (!_splashWarmedUp) {
+    _splashWarmedUp = true;
+    ambientAudio.warmup();
+  }
+}
+document.getElementById('phase-splash').addEventListener('touchstart', splashWarmup, { passive: true });
+
 document.getElementById('phase-splash').addEventListener('click', function(e) {
   // Warm up AudioContext on first touch — mobile browsers require this
   // to happen inside a user gesture, so the splash tap is the earliest moment.
-  ambientAudio.warmup();
+  splashWarmup();
 
   // If clicked the continue/chapter button, let their own listeners handle it
   if (e.target.id === 'continue-btn' || e.target.closest('#continue-btn') ||
@@ -35,9 +46,10 @@ document.getElementById('phase-splash').addEventListener('click', function(e) {
 (function() {
   var continueBtn = document.getElementById('continue-btn');
   if (continueBtn) {
+    continueBtn.addEventListener('touchstart', splashWarmup, { passive: true });
     continueBtn.addEventListener('click', function(e) {
       e.stopPropagation();
-      ambientAudio.warmup();   // ensure AudioContext is alive for this gesture
+      splashWarmup();   // ensure AudioContext is alive for this gesture
       if (loadSave()) {
         applyLang();
         var titleScreen = document.getElementById('title-screen');

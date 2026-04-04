@@ -20,6 +20,14 @@ var ambientAudio = (function() {
     masterGain.connect(ctx.destination);
   }
 
+  // Ensure AudioContext is running — call inside every user gesture that
+  // triggers audio.  Returns a Promise so callers can chain off it.
+  function ensureResumed() {
+    if (!ctx) return Promise.resolve();
+    if (ctx.state === 'running') return Promise.resolve();
+    return ctx.resume().catch(function() {});
+  }
+
   // ── Layer 1: Low cave drone (filtered noise) ──
   var droneNode = null;
   var droneGain = null;
@@ -41,15 +49,16 @@ var ambientAudio = (function() {
     droneNode.loop = true;
 
     // Low-pass filter for rumble.
-    // Mobile speakers cannot reproduce very low frequencies (<200Hz),
-    // so we use a higher cutoff on mobile to keep the sound audible.
+    // Mobile/phone speakers cannot reproduce very low frequencies — their
+    // effective range starts around 300-500 Hz.  Use a much higher cutoff
+    // on mobile so the sound is actually audible through tiny speakers.
     var lp = ctx.createBiquadFilter();
     lp.type = 'lowpass';
-    lp.frequency.value = isMobile ? 250 : 80;
-    lp.Q.value = 1.0;
+    lp.frequency.value = isMobile ? 400 : 80;
+    lp.Q.value = isMobile ? 0.7 : 1.0;
 
     droneGain = ctx.createGain();
-    droneGain.gain.value = isMobile ? 0.9 : 0.6;
+    droneGain.gain.value = isMobile ? 1.0 : 0.6;
 
     droneNode.connect(lp);
     lp.connect(droneGain);
@@ -63,9 +72,18 @@ var ambientAudio = (function() {
     if (running) return;  // guard against double-start
     running = true;
 
-    // Fade in master volume
-    masterGain.gain.setValueAtTime(0, ctx.currentTime);
-    masterGain.gain.linearRampToValueAtTime(volume, ctx.currentTime + 2);
+    // Fade in master volume.
+    // Use setTargetAtTime as fallback-safe alternative to linearRamp,
+    // which has known issues on some iOS Safari versions.
+    var now = ctx.currentTime;
+    masterGain.gain.cancelScheduledValues(now);
+    masterGain.gain.setValueAtTime(0, now);
+    if (isMobile) {
+      // setTargetAtTime is more reliable on iOS
+      masterGain.gain.setTargetAtTime(volume, now, 0.6);
+    } else {
+      masterGain.gain.linearRampToValueAtTime(volume, now + 2);
+    }
 
     startDrone();
   }
@@ -75,16 +93,12 @@ var ambientAudio = (function() {
     init();
     if (!ctx) return;
 
-    // Mobile browsers require AudioContext.resume() inside a user gesture.
-    // resume() returns a Promise — we must wait for it before creating nodes,
-    // otherwise nodes are silently dropped on iOS Safari / Android Chrome.
-    if (ctx.state === 'suspended') {
-      ctx.resume().then(function() {
-        beginPlayback();
-      });
-    } else {
+    // Always attempt resume — on iOS the context can slip back to
+    // "suspended" between user gestures, and we must resume inside
+    // the current gesture to satisfy autoplay policy.
+    ensureResumed().then(function() {
       beginPlayback();
-    }
+    });
   }
 
   function stop() {
@@ -104,14 +118,12 @@ var ambientAudio = (function() {
   // so calling this early makes subsequent start() calls reliable.
   function warmup() {
     init();
-    if (ctx && ctx.state === 'suspended') {
-      ctx.resume().catch(function() {});
-    }
-    // iOS Safari workaround: play a silent buffer to fully unlock audio output.
-    // Without this, the AudioContext may remain effectively muted even after
-    // resume() resolves, because iOS requires actual audio output within the
-    // first user gesture to "unlock" the audio hardware.
-    if (ctx && isMobile) {
+    ensureResumed();
+    // iOS Safari workaround: play a silent buffer to fully unlock the audio
+    // output path.  Without this, iOS may keep audio muted even after
+    // resume() resolves, because the OS requires actual audio output within
+    // a user gesture to "unlock" the hardware audio session.
+    if (ctx) {
       try {
         var silentBuf = ctx.createBuffer(1, 1, ctx.sampleRate);
         var src = ctx.createBufferSource();
