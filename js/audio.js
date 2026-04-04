@@ -6,7 +6,7 @@ var ambientAudio = (function() {
   var ctx = null;
   var masterGain = null;
   var running = false;
-  var volume = 0.35;
+  var volume = 0.18;
   var isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) ||
                  window.innerWidth <= 760;
 
@@ -126,44 +126,41 @@ var ambientAudio = (function() {
   //  Region Soundscapes
   // ══════════════════════════════════════════
 
+  // Push a region layer and remember its target gain for combat restore
+  function pushRegionLayer(layer, targetGain, fadeDur) {
+    layer._origGain = targetGain;
+    fadeGain(layer.gain.gain, targetGain, fadeDur);
+    activeNodes.push(layer);
+  }
+
   // Region 0: 祭獻坑 — Deep cave rumble, dripping water feel
   function buildRegion0() {
     var brown = makeBrownNoise(2);
     var cutoff = isMobile ? 400 : 80;
     var layer = makeFilteredNoise(brown, 'lowpass', cutoff, isMobile ? 0.7 : 1.0, 0.6);
-    fadeGain(layer.gain.gain, isMobile ? 1.0 : 0.6, 2);
-    activeNodes.push(layer);
+    pushRegionLayer(layer, isMobile ? 1.0 : 0.6, 2);
   }
 
   // Region 1: 石脈迴廊 — Resonant hum + mid-frequency drone (glowing ore veins)
   function buildRegion1() {
     var brown = makeBrownNoise(2);
-    // Base rumble (lighter than R0)
     var base = makeFilteredNoise(brown, 'lowpass', isMobile ? 350 : 100, 0.8, 0.4);
-    fadeGain(base.gain.gain, isMobile ? 0.7 : 0.4, 2);
-    activeNodes.push(base);
+    pushRegionLayer(base, isMobile ? 0.7 : 0.4, 2);
 
-    // Resonant mid hum — ore veins pulsing
     var drone = makeOscDrone(isMobile ? 180 : 55, 'sine');
-    fadeGain(drone.gain.gain, 0.12, 2.5);
-    activeNodes.push(drone);
+    pushRegionLayer(drone, 0.12, 2.5);
 
-    // Crystalline shimmer layer
     var white = makeWhiteNoise(2);
     var shimmer = makeFilteredNoise(white, 'bandpass', isMobile ? 3000 : 2200, 8, 0.05);
-    fadeGain(shimmer.gain.gain, 0.04, 3);
-    activeNodes.push(shimmer);
+    pushRegionLayer(shimmer, 0.04, 3);
   }
 
   // Region 2: 大採石場 — Open space, wind + distant echoes, mechanical rumble
   function buildRegion2() {
     var brown = makeBrownNoise(2);
-    // Wind-like broadband noise
     var wind = makeFilteredNoise(brown, 'bandpass', isMobile ? 600 : 250, 0.5, 0.5);
-    fadeGain(wind.gain.gain, isMobile ? 0.6 : 0.45, 2);
-    activeNodes.push(wind);
+    pushRegionLayer(wind, isMobile ? 0.6 : 0.45, 2);
 
-    // Deep mechanical throb
     var mech = makeOscDrone(isMobile ? 120 : 38, 'sawtooth');
     var mechFilter = ctx.createBiquadFilter();
     mechFilter.type = 'lowpass';
@@ -171,34 +168,25 @@ var ambientAudio = (function() {
     mech.node.disconnect();
     mech.node.connect(mechFilter);
     mechFilter.connect(mech.gain);
-    fadeGain(mech.gain.gain, 0.08, 2);
-    activeNodes.push(mech);
+    pushRegionLayer(mech, 0.08, 2);
 
-    // Sparse high echo
     var white = makeWhiteNoise(2);
     var echo = makeFilteredNoise(white, 'highpass', 4000, 2, 0.02);
-    fadeGain(echo.gain.gain, 0.025, 3);
-    activeNodes.push(echo);
+    pushRegionLayer(echo, 0.025, 3);
   }
 
   // Region 3: 河城渡口 — Water flow + civilization hum + warmth
   function buildRegion3() {
     var brown = makeBrownNoise(2);
-    // River flow — wider band, more presence
     var water = makeFilteredNoise(brown, 'bandpass', isMobile ? 800 : 400, 0.6, 0.5);
-    fadeGain(water.gain.gain, isMobile ? 0.55 : 0.4, 2);
-    activeNodes.push(water);
+    pushRegionLayer(water, isMobile ? 0.55 : 0.4, 2);
 
-    // Warm low hum — civilization
     var hum = makeOscDrone(isMobile ? 150 : 65, 'triangle');
-    fadeGain(hum.gain.gain, 0.1, 2.5);
-    activeNodes.push(hum);
+    pushRegionLayer(hum, 0.1, 2.5);
 
-    // Light high texture — distant activity
     var white = makeWhiteNoise(2);
     var activity = makeFilteredNoise(white, 'bandpass', 1500, 3, 0.03);
-    fadeGain(activity.gain.gain, 0.03, 3);
-    activeNodes.push(activity);
+    pushRegionLayer(activity, 0.03, 3);
   }
 
   var regionBuilders = [buildRegion0, buildRegion1, buildRegion2, buildRegion3];
@@ -305,15 +293,24 @@ var ambientAudio = (function() {
   }
 
   // Toggle combat/patrol intensity layer
+  // Fades region ambient down so combat and ambient don't overlap
   function setCombat(on) {
     if (!ctx || !running) { combatMode = on; return; }
     if (on === combatMode) return;
     combatMode = on;
 
     if (on) {
+      // Fade region layers to near-silence
+      for (var i = 0; i < activeNodes.length; i++) {
+        fadeGain(activeNodes[i].gain.gain, 0.03, 1.0);
+      }
       buildCombatLayer();
     } else {
       cleanupNodes(combatNodes, 0.8);
+      // Restore region layers
+      for (var i = 0; i < activeNodes.length; i++) {
+        fadeGain(activeNodes[i].gain.gain, activeNodes[i]._origGain || 0.4, 1.2);
+      }
     }
   }
 
