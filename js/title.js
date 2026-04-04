@@ -13,8 +13,20 @@ function showPhase(id) {
 // Show continue button if save exists
 (function() {
   var continueBtn = document.getElementById('continue-btn');
+  var chapterBtn = document.getElementById('chapter-btn');
   if (continueBtn && hasSave()) {
     continueBtn.style.display = '';
+    // Peek at saved language to show correct text for returning players
+    try {
+      var json = localStorage.getItem(SAVE_KEY);
+      if (json) {
+        var d = JSON.parse(json);
+        if (d.lang === 'en') {
+          continueBtn.textContent = 'CONTINUE';
+          if (chapterBtn) chapterBtn.textContent = 'CHAPTER SELECT';
+        }
+      }
+    } catch (e) { /* ignore */ }
   }
 })();
 

@@ -162,7 +162,7 @@ function autoExplore(steps, choices, opts) {
   currentChoices = [];
   renderStatus();
 
-  var label = (opts && opts.label) || '自動探索中';
+  var label = (opts && opts.label) || L('自動探索中', 'Auto-exploring');
   showExploreBar(label);
 
   // Start the clock (ticks every 200ms for smooth display)
