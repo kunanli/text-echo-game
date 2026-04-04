@@ -194,24 +194,20 @@ var ENDCARD_ART = {
   },
 };
 
-// ── Pixel block bar: total blocks = maxVal, filled = val ──
-function _drawBlockBar(ctx, x, y, val, maxVal) {
-  var total = maxVal;
-  var filled = Math.min(val, maxVal);
-  var bs = 7;    // block size
-  var gap = 2;   // gap between blocks
-
-  for (var i = 0; i < total; i++) {
-    var bx = x + i * (bs + gap);
-    var by = y;
-    if (i < filled) {
-      ctx.fillStyle = '#46464f';
-    } else {
-      ctx.fillStyle = '#161620';
-    }
-    ctx.fillRect(bx, by, bs, bs);
+// ── Progress bar for stats ──
+function _drawStatBar(ctx, x, y, val, maxVal, barW, barH) {
+  var ratio = Math.min(val / maxVal, 1);
+  // Background track
+  ctx.fillStyle = '#161620';
+  _roundRect(ctx, x, y, barW, barH, 3);
+  ctx.fill();
+  // Filled portion
+  if (ratio > 0) {
+    var fw = Math.max(barW * ratio, 6);
+    ctx.fillStyle = '#46464f';
+    _roundRect(ctx, x, y, fw, barH, 3);
+    ctx.fill();
   }
-  return bs;
 }
 
 // ── Text word-wrap (supports CJK + latin) ──
@@ -350,20 +346,20 @@ function generateEndCard() {
   // ═════════════════════════════════
   //  STATS — pixel blocks (1 block = 1 point)
   // ═════════════════════════════════
-  // PETRI scaled: each block = 5 pts (max 20 blocks)
-  var petriBlocks = Math.round(state.petri / 5);
   var statDefs = [
-    { zh: '力量',   en: 'STR',   val: state.str, max: 15, display: state.str },
-    { zh: '敏捷',   en: 'AGI',   val: state.agi, max: 15, display: state.agi },
-    { zh: '意志',   en: 'WIL',   val: state.wil, max: 15, display: state.wil },
-    { zh: '石化度', en: 'PETRI', val: petriBlocks, max: 20, display: state.petri },
-    { zh: '深度',   en: 'DEPTH', val: state.level, max: 10, display: state.level },
+    { zh: '力量',   en: 'STR',   val: state.str, max: 15 },
+    { zh: '敏捷',   en: 'AGI',   val: state.agi, max: 15 },
+    { zh: '意志',   en: 'WIL',   val: state.wil, max: 15 },
+    { zh: '石化度', en: 'PETRI', val: state.petri, max: 100 },
+    { zh: '深度',   en: 'DEPTH', val: state.level, max: 10 },
   ];
 
-  var blockH = 7; // single row height
+  var barH = 6;
   var labelColW = en ? 56 : 50;
+  var numColW = 36;
   var barX = pad + labelColW;
-  var rowH = blockH + 14;
+  var barW = ENDCARD_W - pad * 2 - labelColW - numColW;
+  var rowH = barH + 16;
 
   for (var si = 0; si < statDefs.length; si++) {
     var sd = statDefs[si];
@@ -373,16 +369,16 @@ function generateEndCard() {
     ctx.font = '11px "Courier New", monospace';
     ctx.textAlign = 'left';
     ctx.fillStyle = '#555568';
-    ctx.fillText(en ? sd.en : sd.zh, pad, sy + blockH / 2 + 4);
+    ctx.fillText(en ? sd.en : sd.zh, pad, sy + barH / 2 + 4);
 
-    // Pixel blocks (total = max, filled = val)
-    _drawBlockBar(ctx, barX, sy, sd.val, sd.max);
+    // Progress bar
+    _drawStatBar(ctx, barX, sy, sd.val, sd.max, barW, barH);
 
     // Number
     ctx.textAlign = 'right';
     ctx.fillStyle = '#6a6a7a';
     ctx.font = '11px "Courier New", monospace';
-    ctx.fillText('' + sd.display, ENDCARD_W - pad, sy + blockH / 2 + 4);
+    ctx.fillText('' + sd.val, ENDCARD_W - pad, sy + barH / 2 + 4);
   }
   curY += statDefs.length * rowH + 12;
 
