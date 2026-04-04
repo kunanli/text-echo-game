@@ -65,6 +65,9 @@ assets/
 - 存檔系統：auto-save + 3 個手動槽位 + Base64 存檔碼
 - 結局卡（v1.1）：身分牌風格收藏卡片（450×740 canvas），含半身 ASCII art、評分系統、5 級稀有度、進度條能力值、成就亮點（top 3）、NPC 留言，支援下載/複製分享
 - 全域統計：跨遊玩累計數據（死亡、結局分布、戰鬥、石化度等），結局後展示
+- 玩家排行榜（Dreamlo API）：自動提交分數，首頁+結局可查看排名
+- 難度 v1.1：所有怪物攻擊/石化傷害 ×2，復活需消耗「復活石」道具（R0/R1/R2 各一顆）
+- Game Over 流程：占卜師 ASCII art 揭露 → 結局卡展示 → 排行榜
 - 已準備 itch.io 發布（DEV 工具已隱藏）
 
 ## 待辦 / 已知問題
@@ -87,6 +90,28 @@ assets/
 8. 底部：網址 + 遊玩時間
 
 **評分 & 稀有度**：`calculateEndScore()` 綜合屬性、等級、道具、NPC 關係、進程旗標、死亡/石化/結局加成。5 級稀有度：普通(<30)、精良(30-49)、稀有(50-69)、史詩(70-84)、傳說(≥85)。
+
+## ✅ 已完成：玩家排行榜（leaderboard.js）
+
+使用 Dreamlo 免費排行榜服務（純 HTTP fetch，零 SDK）。
+
+**功能**：
+- 死亡（無復活石）或通關結局時，自動提交分數到 Dreamlo
+- 排行榜顯示：排名、玩家名稱、結局卡片稱號（曙光者/獻身者/斡旋者/守門者）、稀有度星級
+- 首頁標題畫面有「高分榜」按鈕，可隨時查看
+- Game Over 流程：占卜師揭露 → 結局卡 → 自動開啟排行榜
+
+**Dreamlo API**：
+- Private Key: `cewmb78CnUmsLIJuKmd6GQgL6TlyH9LkCyWxwfHbqkRQ`
+- Public Key: `69d1277e8f40bc2f60f2d6f8`
+- 提交：`GET /lb/{privateKey}/add/{name}/{score}/{seconds}/{ending}`
+- 讀取：`GET /lb/{publicKey}/json/{limit}`
+
+**已知問題**：
+- [ ] **Dreamlo API 在部分環境被封鎖** — 開發沙盒（sandbox proxy）會回傳 403 `host_not_allowed`，導致分數送不出去、排行榜顯示「暫無記錄」。這不是程式碼 bug，是網路環境限制。需在實際瀏覽器（手機/itch.io）測試驗證。
+- 已加入 `console.log` debug 記錄所有 API 請求 URL 和狀態碼
+- 提交失敗時會顯示 toast 提示「排行榜提交失敗，請檢查網路連線」
+- 若 itch.io 上仍無法使用，備選方案：改用 CORS proxy 或換 jsonbin.io / Firebase Realtime DB
 
 ## 未來開發方向
 
@@ -113,7 +138,7 @@ assets/
 
 - [x] **分享結局卡** — `endcard.js` 身分牌風格收藏卡片（評分/稀有度/ASCII art/NPC 語錄），支援下載/複製
 - [x] **數據統計頁** — `stats.js` 用 localStorage 記錄全域統計（死亡次數、結局分布、戰鬥次數、石化度等），結局後展示
-- [ ] **玩家排行榜** — 通關後提交評分到線上排行榜，結局畫面可查看全球排名。方案：Dreamlo（免費、純 HTTP fetch、零 SDK），新增 `js/leaderboard.js`
+- [x] **玩家排行榜** — `js/leaderboard.js`，Dreamlo API。詳見下方「玩家排行榜（leaderboard.js）」
 - [ ] **多語言擴展** — 架構已支援 i18n，可加日文或其他社群翻譯
 
 ## ASCII 美術圖現況分析
