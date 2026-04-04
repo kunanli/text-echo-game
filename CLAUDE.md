@@ -19,7 +19,7 @@
 index.html          # 單頁應用入口
 css/style.css       # 所有樣式（暗黑奇幻主題）
 js/
-  audio.js          # 程序化環境音（Web Audio API，棕色噪音）
+  audio.js          # 程序化環境音（Web Audio API，4 區域音景 + 戰鬥層）
   sfx.js            # 程序化音效（點擊/命中/受傷/石化/升級/死亡/物品/判定）
   voice.js          # 語音旁白引擎（目前已停用，待換更好的 TTS）
   state.js          # 遊戲狀態 + i18n 翻譯
@@ -55,7 +55,8 @@ assets/
 
 - 4 個區域全部完成，含 4 種結局
 - 語音旁白功能已停用（Web Speech API 品質不足），UI 按鈕已隱藏
-- 環境音正常運作（程序化棕色噪音）+ 程序化音效（sfx.js）
+- 環境音：4 區域獨立音景 + 戰鬥/巡邏高強度層，自動切換
+- 程序化音效（sfx.js）：9 種事件音效
 - 存檔系統：auto-save + 3 個手動槽位 + Base64 存檔碼
 - 已準備 itch.io 發布（DEV 工具已隱藏）
 

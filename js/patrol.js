@@ -377,6 +377,7 @@ function startPatrol() {
   clearPatrolTimers();
   patrolActive = true;
   state.mood = 'combat';
+  ambientAudio.setCombat(true);
   renderStatus();
   appendDivider();
   showExploreBar(L('警戒巡邏中', 'Patrolling'));
@@ -402,6 +403,7 @@ function stopPatrol() {
   patrolActive = false;
   clearPatrolTimers();
   state.mood = 'normal';
+  ambientAudio.setCombat(false);
   if (autoClockTimer) { clearInterval(autoClockTimer); autoClockTimer = null; }
   finishExploreBar();
   renderStatus();

@@ -7,6 +7,7 @@ function die(msg) {
   clearPatrolTimers();
   stopAuto();
   state.mood = 'normal';
+  ambientAudio.setCombat(false);
   $choices.innerHTML = '';
   currentChoices = [];
   $deathMsg.textContent = msg || L('你死了……', 'You died...');
@@ -47,6 +48,8 @@ function registerNode(id, fn) { nodes[id] = fn; }
 function loadNode(id) {
   state.node = id;
   if (typeof saveGame === 'function') saveGame();
+  // Update ambient audio to match current region
+  ambientAudio.setRegion(state.region);
   if (nodes[id]) {
     nodes[id]();
   } else {

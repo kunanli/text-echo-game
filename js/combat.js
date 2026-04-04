@@ -7,6 +7,7 @@
 
 function startCombat(enemy, onWin, onFlee) {
   state.mood = 'combat';
+  ambientAudio.setCombat(true);
   let enemyHp = enemy.hp;
   const eName = enemy.name;
   let observed = false;   // next attack deals 2x
@@ -63,7 +64,7 @@ function startCombat(enemy, onWin, onFlee) {
       { text: L('感應 [意志]', 'Commune [WIL]'), action: function() { doCommune(); } },
     ];
     if (onFlee) {
-      choices.push({ text: L('逃跑', 'Flee'), action: function() { state.mood = 'normal'; onFlee(); } });
+      choices.push({ text: L('逃跑', 'Flee'), action: function() { state.mood = 'normal'; ambientAudio.setCombat(false); onFlee(); } });
     }
     renderScene(text, choices);
   }
@@ -91,6 +92,7 @@ function startCombat(enemy, onWin, onFlee) {
         + L('被擊敗了！', 'has been defeated!')
         + '</div>';
       state.mood = 'normal';
+      ambientAudio.setCombat(false);
       var xpGain = enemy.xp || 5;
       gainXp(xpGain);
       renderScene(log, [{ text: L('繼續', 'Continue'), action: function() { onWin(); } }]);
@@ -166,6 +168,7 @@ function startCombat(enemy, onWin, onFlee) {
           + L(spareText.zh, spareText.en)
           + '</div>';
         state.mood = 'normal';
+        ambientAudio.setCombat(false);
         // Bonus: more XP, petri reduction
         var xpGain = Math.floor((enemy.xp || 5) * 1.5);
         gainXp(xpGain);
