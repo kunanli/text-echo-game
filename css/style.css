@@ -1014,6 +1014,17 @@
     border-color: #d4a843 !important;
     color: #d4a843 !important;
   }
+  .title-lb-btn {
+    font-size: .9rem !important;
+    padding: 10px 36px !important;
+    letter-spacing: 4px !important;
+    border-color: #5a5a6a !important;
+    color: #8a8a9a !important;
+  }
+  .title-lb-btn:hover {
+    border-color: #d4a843 !important;
+    color: #d4a843 !important;
+  }
   .chapter-ingame-btn {
     margin-top: 6px;
     font-size: .78rem;

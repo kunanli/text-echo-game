@@ -48,7 +48,8 @@ document.getElementById('phase-splash').addEventListener('click', function(e) {
 
   // If clicked the continue/chapter button, let their own listeners handle it
   if (e.target.id === 'continue-btn' || e.target.closest('#continue-btn') ||
-      e.target.id === 'chapter-btn' || e.target.closest('#chapter-btn')) {
+      e.target.id === 'chapter-btn' || e.target.closest('#chapter-btn') ||
+      e.target.id === 'title-leaderboard-btn' || e.target.closest('#title-leaderboard-btn')) {
     return;
   }
   showPhase('phase-lang');
@@ -557,6 +558,24 @@ $audioBtn.addEventListener('click', function() {
 });
 
 // ── Voice Narration Toggle (disabled — no DOM button) ──
+
+// ── Title Leaderboard Button ──
+(function() {
+  var $lbBtn = document.getElementById('title-leaderboard-btn');
+  if (!$lbBtn) return;
+  $lbBtn.addEventListener('click', function(e) {
+    e.stopPropagation();
+    // Try to peek saved language; default to zh
+    try {
+      var json = localStorage.getItem(SAVE_KEY);
+      if (json) {
+        var d = JSON.parse(json);
+        if (d.lang) state.lang = d.lang;
+      }
+    } catch (ex) {}
+    if (typeof showLeaderboard === 'function') showLeaderboard();
+  });
+})();
 
 // ── Achievement UI ──
 (function() {
