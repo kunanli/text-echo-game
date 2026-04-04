@@ -194,23 +194,28 @@ var ENDCARD_ART = {
   },
 };
 
-// ── Monochrome pixel block bar ──
-function _drawBlockBar(ctx, x, y, val, maxVal, numBlocks) {
-  var bs = 10;
-  var bh = 10;
-  var gap = 3;
-  var filled = Math.round((val / maxVal) * numBlocks);
+// ── 2D pixel grid bar (buddy style) ──
+function _drawBlockBar(ctx, x, y, val, maxVal, cols, rows) {
+  var bs = 7;    // block size
+  var gap = 2;   // gap between blocks
+  var total = cols * rows;
+  var filled = Math.round((val / maxVal) * total);
 
-  for (var i = 0; i < numBlocks; i++) {
-    var bx = x + i * (bs + gap);
-    if (i < filled) {
-      ctx.fillStyle = '#d0d0d8';
-      ctx.fillRect(bx, y, bs, bh);
-    } else {
-      ctx.fillStyle = '#1e1e28';
-      ctx.fillRect(bx, y, bs, bh);
+  for (var row = 0; row < rows; row++) {
+    for (var col = 0; col < cols; col++) {
+      var idx = row * cols + col;
+      var bx = x + col * (bs + gap);
+      var by = y + row * (bs + gap);
+      if (idx < filled) {
+        ctx.fillStyle = '#c8c8d0';
+        ctx.fillRect(bx, by, bs, bs);
+      } else {
+        ctx.fillStyle = '#1e1e28';
+        ctx.fillRect(bx, by, bs, bs);
+      }
     }
   }
+  return rows * (bs + gap); // return total height
 }
 
 // ── Text word-wrap (supports CJK + latin) ──
@@ -357,31 +362,33 @@ function generateEndCard() {
     { zh: '深度',   en: 'DEPTH', val: state.level, max: 10 },
   ];
 
-  var labelColW = en ? 74 : 64;
+  var gridCols = 8;
+  var gridRows = 3;
+  var gridH = gridRows * (7 + 2); // bs + gap
+  var labelColW = en ? 90 : 72;
   var barX = pad + labelColW;
-  var numBlocks = 10;
-  var rowH = 28;
+  var rowH = gridH + 12; // grid height + spacing
 
   for (var si = 0; si < statDefs.length; si++) {
     var sd = statDefs[si];
     var sy = curY + si * rowH;
 
-    // Label
+    // Label (vertically centered with grid)
     ctx.font = '13px "Courier New", monospace';
     ctx.textAlign = 'left';
     ctx.fillStyle = '#555568';
-    ctx.fillText(en ? sd.en : sd.zh, pad, sy + 10);
+    ctx.fillText(en ? sd.en : sd.zh, pad, sy + gridH / 2 + 4);
 
-    // Block bar
-    _drawBlockBar(ctx, barX, sy, sd.val, sd.max, numBlocks);
+    // 2D pixel grid
+    _drawBlockBar(ctx, barX, sy, sd.val, sd.max, gridCols, gridRows);
 
-    // Number
+    // Number (vertically centered)
     ctx.textAlign = 'right';
     ctx.fillStyle = '#6a6a7a';
     ctx.font = '13px "Courier New", monospace';
-    ctx.fillText('' + sd.val, ENDCARD_W - pad, sy + 10);
+    ctx.fillText('' + sd.val, ENDCARD_W - pad, sy + gridH / 2 + 4);
   }
-  curY += statDefs.length * rowH + 20;
+  curY += statDefs.length * rowH + 16;
 
   // ═════════════════════════════════
   //  BOTTOM: highlights (left) + score (right)
