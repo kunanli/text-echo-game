@@ -15,11 +15,49 @@ function die(msg) {
 
   // Update revive button based on revival stone availability
   var hasStone = hasItem('復活石') || hasItem('Revival Stone');
+  var $gameOver = document.getElementById('death-gameover');
   $revive.textContent = hasStone
     ? L('使用復活石', 'Use Revival Stone')
     : L('沒有復活石……', 'No Revival Stone...');
   $revive.style.opacity = hasStone ? '1' : '0.4';
   $revive.disabled = !hasStone;
+
+  if (!hasStone && $gameOver) {
+    // Game over — show endcard + leaderboard
+    state.deathCount++;
+    $gameOver.style.display = '';
+    var $cardContainer = document.getElementById('death-card-container');
+    $cardContainer.innerHTML = '';
+    if (typeof generateEndCard === 'function') {
+      var canvas = generateEndCard();
+      canvas.style.maxWidth = '280px';
+      canvas.style.height = 'auto';
+      canvas.style.borderRadius = '6px';
+      $cardContainer.appendChild(canvas);
+
+      var $dlBtn = document.getElementById('death-download-btn');
+      if ($dlBtn) {
+        $dlBtn.textContent = L('下載卡片', 'Download Card');
+        $dlBtn.onclick = function() {
+          var link = document.createElement('a');
+          link.download = 'petriabyss-gameover.png';
+          link.href = canvas.toDataURL('image/png');
+          link.click();
+        };
+      }
+    }
+    var $lbBtn = document.getElementById('death-leaderboard-btn');
+    if ($lbBtn) {
+      $lbBtn.textContent = L('排行榜', 'Leaderboard');
+      $lbBtn.onclick = function() {
+        if (typeof showLeaderboard === 'function') showLeaderboard();
+      };
+    }
+    // Submit score
+    if (typeof submitToLeaderboard === 'function') submitToLeaderboard();
+  } else if ($gameOver) {
+    $gameOver.style.display = 'none';
+  }
 
   $deathOv.classList.add('active');
 }
