@@ -196,8 +196,8 @@ var ENDCARD_ART = {
 
 // ── 2D pixel grid bar (buddy style) ──
 function _drawBlockBar(ctx, x, y, val, maxVal, cols, rows) {
-  var bs = 7;    // block size
-  var gap = 2;   // gap between blocks
+  var bs = 6;    // block size
+  var gap = 1;   // tight gap
   var total = cols * rows;
   var filled = Math.round((val / maxVal) * total);
 
@@ -207,15 +207,15 @@ function _drawBlockBar(ctx, x, y, val, maxVal, cols, rows) {
       var bx = x + col * (bs + gap);
       var by = y + row * (bs + gap);
       if (idx < filled) {
-        ctx.fillStyle = '#c8c8d0';
+        ctx.fillStyle = '#58586a';
         ctx.fillRect(bx, by, bs, bs);
       } else {
-        ctx.fillStyle = '#1e1e28';
+        ctx.fillStyle = '#1a1a22';
         ctx.fillRect(bx, by, bs, bs);
       }
     }
   }
-  return rows * (bs + gap); // return total height
+  return rows * (bs + gap);
 }
 
 // ── Text word-wrap (supports CJK + latin) ──
@@ -364,7 +364,7 @@ function generateEndCard() {
 
   var gridCols = 8;
   var gridRows = 3;
-  var gridH = gridRows * (7 + 2); // bs + gap
+  var gridH = gridRows * (6 + 1); // bs + gap
   var labelColW = en ? 90 : 72;
   var barX = pad + labelColW;
   var rowH = gridH + 12; // grid height + spacing
