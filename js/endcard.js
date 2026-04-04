@@ -365,7 +365,7 @@ function generateEndCard() {
   curY += statDefs.length * rowH + 20;
 
   // ═════════════════════════════════
-  //  HIGHLIGHTS BOX
+  //  BOTTOM: highlights (left) + score (right)
   // ═════════════════════════════════
   var hlItems = [];
   if (state.deathCount === 0) hlItems.push(en ? 'Deathless Run' : '零死亡通關');
@@ -374,59 +374,52 @@ function generateEndCard() {
   if (state.flags.r3PlagueProof) hlItems.push(en ? 'Plague Proof' : '瘟疫證據');
   if (state.flags.r3CraneTestimony) hlItems.push(en ? 'Crane Testified' : '灰鶴作證');
 
+  // Highlights on left side
   if (hlItems.length > 0) {
-    var boxPadV = 12;
-    var boxLineH = 20;
-    var boxH = boxPadV + 16 + hlItems.length * boxLineH + boxPadV;
-
-    _roundRect(ctx, pad - 2, curY, ENDCARD_W - pad * 2 + 4, boxH, 8);
-    ctx.strokeStyle = '#252530';
-    ctx.lineWidth = 1.5;
-    ctx.stroke();
-
-    // Header
     ctx.font = '10px "Courier New", monospace';
     ctx.textAlign = 'left';
     ctx.fillStyle = '#3a3a4a';
-    ctx.fillText(en ? 'highlights' : '成就亮點', pad + 10, curY + boxPadV + 6);
+    ctx.fillText(en ? 'highlights' : '成就亮點', pad, curY + 6);
 
-    // Items
-    ctx.font = '12px "Courier New", monospace';
-    ctx.fillStyle = '#7a7a8a';
+    ctx.font = '11px "Courier New", monospace';
+    ctx.fillStyle = '#6a6a7a';
     for (var hi = 0; hi < hlItems.length; hi++) {
-      ctx.fillText('  · ' + hlItems[hi], pad + 10, curY + boxPadV + 24 + hi * boxLineH);
+      ctx.fillText('· ' + hlItems[hi], pad, curY + 24 + hi * 18);
     }
-    curY += boxH + 16;
   }
 
-  // ═════════════════════════════════
-  //  BOTTOM: score + time + url
-  // ═════════════════════════════════
-  var bottomY = ENDCARD_H - 54;
+  // Score on right side (vertically centered with highlights)
+  var scoreBlockY = curY + (hlItems.length > 0 ? 10 : 0);
 
-  ctx.font = '11px "Courier New", monospace';
-  ctx.textAlign = 'left';
+  ctx.font = '10px "Courier New", monospace';
+  ctx.textAlign = 'right';
   ctx.fillStyle = '#3a3a4a';
-  ctx.fillText(en ? 'score' : '評分', pad, bottomY);
+  ctx.fillText(en ? 'score' : '評分', ENDCARD_W - pad, scoreBlockY + 6);
 
-  ctx.font = 'bold 24px "Courier New", monospace';
+  ctx.font = 'bold 32px "Courier New", monospace';
   ctx.fillStyle = rarity.color;
   if (rarity.stars >= 4) {
     ctx.shadowColor = rarity.color;
     ctx.shadowBlur = 12;
   }
-  ctx.fillText('' + totalScore, pad + (en ? 56 : 44), bottomY);
+  ctx.textAlign = 'right';
+  ctx.fillText('' + totalScore, ENDCARD_W - pad, scoreBlockY + 40);
   ctx.shadowBlur = 0;
 
-  // Time + URL (right)
-  ctx.textAlign = 'right';
+  // ═════════════════════════════════
+  //  FOOTER: time + url
+  // ═════════════════════════════════
+  var footerY = ENDCARD_H - 36;
+  ctx.textAlign = 'left';
   ctx.font = '9px "Courier New", monospace';
   ctx.fillStyle = '#2a2a3a';
+  ctx.fillText('petriabyss.itch.io', pad, footerY);
+
+  ctx.textAlign = 'right';
   if (typeof globalStats !== 'undefined' && globalStats.currentRunStartMs > 0) {
     var runTime = Date.now() - globalStats.currentRunStartMs;
-    ctx.fillText((en ? 'time ' : '時間 ') + formatTime(runTime), ENDCARD_W - pad, bottomY - 12);
+    ctx.fillText((en ? 'time ' : '時間 ') + formatTime(runTime), ENDCARD_W - pad, footerY);
   }
-  ctx.fillText('petriabyss.itch.io', ENDCARD_W - pad, bottomY);
 
   return canvas;
 }
