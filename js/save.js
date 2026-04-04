@@ -31,7 +31,7 @@ function saveGame() {
     if (e.name === 'QuotaExceededError' || e.code === 22) {
       if (typeof notify === 'function') notify(typeof state !== 'undefined' && state.lang === 'en' ? 'Storage full — save failed!' : '存檔空間已滿！');
     }
-    console.warn('saveGame failed:', e);
+    DEBUG && console.warn('saveGame failed:', e);
   }
 }
 
@@ -417,7 +417,7 @@ function saveToSlot(n) {
     if (e.name === 'QuotaExceededError' || e.code === 22) {
       if (typeof notify === 'function') notify(typeof state !== 'undefined' && state.lang === 'en' ? 'Storage full — save failed!' : '存檔空間已滿！');
     }
-    console.warn('saveToSlot failed:', e);
+    DEBUG && console.warn('saveToSlot failed:', e);
     return false;
   }
 }

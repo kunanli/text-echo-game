@@ -241,7 +241,7 @@ function autoExplore(steps, choices, opts) {
 
     if (artContent) {
       line.innerHTML = artContent;
-      if (step.effect) { try { step.effect(); renderStatus(); } catch(e) { console.warn('Step effect error:', e); } }
+      if (step.effect) { try { step.effect(); renderStatus(); } catch(e) { DEBUG && console.warn('Step effect error:', e); } }
       $story.appendChild(line);
     } else {
       line.className = 'log-line';
@@ -262,7 +262,7 @@ function autoExplore(steps, choices, opts) {
       if (htmlContent) { contentSpan.innerHTML = htmlContent; }
       else { contentSpan.textContent = textContent || ''; }
       line.appendChild(contentSpan);
-      if (step.effect) { try { step.effect(); renderStatus(); } catch(e) { console.warn('Step effect error:', e); } }
+      if (step.effect) { try { step.effect(); renderStatus(); } catch(e) { DEBUG && console.warn('Step effect error:', e); } }
       $story.appendChild(line);
     }
     $story.scrollTop = $story.scrollHeight;
@@ -278,7 +278,7 @@ function autoExplore(steps, choices, opts) {
     if (artContent) {
       line.innerHTML = artContent;
       // Run side effect
-      if (step.effect) { try { step.effect(); renderStatus(); } catch(e) { console.warn('Step effect error:', e); } }
+      if (step.effect) { try { step.effect(); renderStatus(); } catch(e) { DEBUG && console.warn('Step effect error:', e); } }
       $story.appendChild(line);
       $story.scrollTop = $story.scrollHeight;
       _autoResume = function() { showNext(); };
@@ -308,7 +308,7 @@ function autoExplore(steps, choices, opts) {
       line.appendChild(contentSpan);
 
       // Run side effect
-      if (step.effect) { try { step.effect(); renderStatus(); } catch(e) { console.warn('Step effect error:', e); } }
+      if (step.effect) { try { step.effect(); renderStatus(); } catch(e) { DEBUG && console.warn('Step effect error:', e); } }
 
       $story.appendChild(line);
       $story.scrollTop = $story.scrollHeight;

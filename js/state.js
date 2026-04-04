@@ -1,4 +1,7 @@
 // ══ State, i18n, DOM refs ══
+var VERSION = '1.0';
+var DEBUG = false;
+
 const state = {
   name: '旅者',
   sex: 'male',       // 'male' | 'female'

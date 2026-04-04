@@ -26,7 +26,7 @@ function showPhase(id) {
           if (chapterBtn) chapterBtn.textContent = 'CHAPTER SELECT';
         }
       }
-    } catch (e) { console.warn('Failed to peek saved language:', e); }
+    } catch (e) { DEBUG && console.warn('Failed to peek saved language:', e); }
   }
 })();
 
@@ -322,40 +322,6 @@ function buildChapterMap(container, mapPre, onSelect) {
     showPhase('phase-chapter');
   });
 
-  // Dev unlock all (hidden — triple-click title to reveal)
-  var devBtn = document.getElementById('chapter-dev-btn');
-  devBtn.style.display = 'none';
-  var devClicks = 0, devTimer = null;
-  var chTitle = document.getElementById('chapter-title');
-  if (chTitle) {
-    chTitle.addEventListener('click', function() {
-      devClicks++;
-      clearTimeout(devTimer);
-      devTimer = setTimeout(function() { devClicks = 0; }, 600);
-      if (devClicks >= 5) {
-        devClicks = 0;
-        devBtn.style.display = '';
-      }
-    });
-  }
-  devBtn.addEventListener('click', function() {
-    state.flags._devUnlockAll = true;
-    state.region = Math.max(state.region, CHAPTERS.length - 1);
-    buildChapterMap(
-      document.getElementById('chapter-list'),
-      document.getElementById('chapter-map'),
-      function(ch) {
-        state.region = ch.id;
-        var titleScreen = document.getElementById('title-screen');
-        titleScreen.classList.add('hidden');
-        setTimeout(function() { titleScreen.style.display = 'none'; }, 800);
-        ambientAudio.start();
-        setTimeout(updateAudioBtn, 200);
-        renderStatus();
-        loadNode(ch.node);
-      }
-    );
-  });
 
   // Back button
   document.getElementById('chapter-back-btn').addEventListener('click', function() {

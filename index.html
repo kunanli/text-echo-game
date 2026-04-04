@@ -3,7 +3,18 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>石化深淵 — 文字冒險</title>
+<title>石化深淵 PETRIABYSS — 文字冒險 RPG</title>
+<meta name="description" content="在無盡深淵中探索、戰鬥、抵抗石化——純文字冒險 RPG。A browser-based text adventure RPG: explore the abyss, fight monsters, resist petrification.">
+<meta name="author" content="PETRIABYSS">
+<meta name="theme-color" content="#0a0a10">
+<meta property="og:title" content="石化深淵 PETRIABYSS">
+<meta property="og:description" content="在無盡深淵中探索、戰鬥、抵抗石化——純文字冒險 RPG">
+<meta property="og:type" content="website">
+<meta property="og:image" content="assets/cover.svg">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="石化深淵 PETRIABYSS">
+<meta name="twitter:description" content="Browser-based text adventure RPG — explore the abyss, fight monsters, resist petrification.">
+<meta name="twitter:image" content="assets/cover.svg">
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <link rel="stylesheet" href="css/style.css">
 </head>
@@ -54,7 +65,7 @@
                                / ░░ 深  淵 ░░ \
                               /░░░░░░░░░░░░░░░░\
     </pre>
-    <div class="title-version">v1.0</div>
+    <div class="title-version" id="title-version">v1.0</div>
     <button class="start-btn" id="continue-btn" style="display:none; margin-bottom:12px;" aria-label="Continue adventure">繼 續 冒 險</button>
     <button class="start-btn chapter-select-title-btn" id="chapter-btn" style="display:none; margin-bottom:12px;" aria-label="Chapter select">章 節 選 擇</button>
     <div class="click-prompt">— 點擊開始 · Click to Start —</div>
@@ -81,7 +92,6 @@
       <pre class="chapter-map" id="chapter-map"></pre>
       <div class="chapter-list" id="chapter-list"></div>
       <div class="chapter-actions">
-        <button class="save-action-btn" id="chapter-dev-btn">DEV 全部解鎖</button>
         <button class="save-action-btn save-close-btn" id="chapter-back-btn">返回</button>
       </div>
     </div>
@@ -147,8 +157,6 @@
     <span class="header-subtitle" id="header-subtitle">PETRIABYSS</span>
     <span class="header-deco">◆</span>
     <button class="audio-toggle" id="audio-toggle" title="Toggle audio" aria-label="Toggle background music">♪ OFF</button>
-    <!-- Voice narration hidden — revisit with better TTS solution later -->
-    <button class="audio-toggle" id="voice-toggle" title="Toggle voice narration" aria-label="Toggle voice narration" style="display:none;">🗣 OFF</button>
   </div>
 </header>
 
