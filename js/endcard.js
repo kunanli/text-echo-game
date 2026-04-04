@@ -317,7 +317,7 @@ function generateEndCard() {
   for (var ai = 0; ai < art.length; ai++) {
     ctx.fillText(art[ai], pad + 24, curY + ai * 17);
   }
-  curY += art.length * 17 + 16;
+  curY += art.length * 17 + 28;
 
   // ═════════════════════════════════
   //  PLAYER NAME (large, prominent)
