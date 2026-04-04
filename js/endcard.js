@@ -194,29 +194,24 @@ var ENDCARD_ART = {
   },
 };
 
-// ── 2D pixel grid bar (buddy style) ──
-function _drawBlockBar(ctx, x, y, val, maxVal, availW, rows) {
-  var bs = 6;    // block size
+// ── Pixel block bar: total blocks = maxVal, filled = val ──
+function _drawBlockBar(ctx, x, y, val, maxVal) {
+  var total = maxVal;
+  var filled = Math.min(val, maxVal);
+  var bs = 7;    // block size
   var gap = 2;   // gap between blocks
-  var cols = Math.floor((availW + gap) / (bs + gap));
-  var total = cols * rows;
-  var filled = Math.round((val / maxVal) * total);
 
-  for (var row = 0; row < rows; row++) {
-    for (var col = 0; col < cols; col++) {
-      var idx = row * cols + col;
-      var bx = x + col * (bs + gap);
-      var by = y + row * (bs + gap);
-      if (idx < filled) {
-        ctx.fillStyle = '#46464f';
-        ctx.fillRect(bx, by, bs, bs);
-      } else {
-        ctx.fillStyle = '#161620';
-        ctx.fillRect(bx, by, bs, bs);
-      }
+  for (var i = 0; i < total; i++) {
+    var bx = x + i * (bs + gap);
+    var by = y;
+    if (i < filled) {
+      ctx.fillStyle = '#46464f';
+    } else {
+      ctx.fillStyle = '#161620';
     }
+    ctx.fillRect(bx, by, bs, bs);
   }
-  return rows * (bs + gap);
+  return bs;
 }
 
 // ── Text word-wrap (supports CJK + latin) ──
@@ -353,42 +348,41 @@ function generateEndCard() {
   curY += flavorLines.length * 16 + 18;
 
   // ═════════════════════════════════
-  //  STATS — monochrome pixel blocks
+  //  STATS — pixel blocks (1 block = 1 point)
   // ═════════════════════════════════
+  // PETRI scaled: each block = 5 pts (max 20 blocks)
+  var petriBlocks = Math.round(state.petri / 5);
   var statDefs = [
-    { zh: '力量',   en: 'STR',   val: state.str, max: 15 },
-    { zh: '敏捷',   en: 'AGI',   val: state.agi, max: 15 },
-    { zh: '意志',   en: 'WIL',   val: state.wil, max: 15 },
-    { zh: '石化度', en: 'PETRI', val: state.petri, max: 100 },
-    { zh: '深度',   en: 'DEPTH', val: state.level, max: 10 },
+    { zh: '力量',   en: 'STR',   val: state.str, max: 15, display: state.str },
+    { zh: '敏捷',   en: 'AGI',   val: state.agi, max: 15, display: state.agi },
+    { zh: '意志',   en: 'WIL',   val: state.wil, max: 15, display: state.wil },
+    { zh: '石化度', en: 'PETRI', val: petriBlocks, max: 20, display: state.petri },
+    { zh: '深度',   en: 'DEPTH', val: state.level, max: 10, display: state.level },
   ];
 
-  var gridRows = 2;
-  var gridH = gridRows * (6 + 2); // bs + gap
+  var blockH = 7; // single row height
   var labelColW = en ? 56 : 50;
-  var numColW = 36;
   var barX = pad + labelColW;
-  var barAvailW = ENDCARD_W - pad * 2 - labelColW - numColW;
-  var rowH = gridH + 8;
+  var rowH = blockH + 14;
 
   for (var si = 0; si < statDefs.length; si++) {
     var sd = statDefs[si];
     var sy = curY + si * rowH;
 
-    // Label (vertically centered with grid)
+    // Label
     ctx.font = '11px "Courier New", monospace';
     ctx.textAlign = 'left';
     ctx.fillStyle = '#555568';
-    ctx.fillText(en ? sd.en : sd.zh, pad, sy + gridH / 2 + 4);
+    ctx.fillText(en ? sd.en : sd.zh, pad, sy + blockH / 2 + 4);
 
-    // 2D pixel grid (fills available width)
-    _drawBlockBar(ctx, barX, sy, sd.val, sd.max, barAvailW, gridRows);
+    // Pixel blocks (total = max, filled = val)
+    _drawBlockBar(ctx, barX, sy, sd.val, sd.max);
 
-    // Number (vertically centered)
+    // Number
     ctx.textAlign = 'right';
     ctx.fillStyle = '#6a6a7a';
     ctx.font = '11px "Courier New", monospace';
-    ctx.fillText('' + sd.val, ENDCARD_W - pad, sy + gridH / 2 + 4);
+    ctx.fillText('' + sd.display, ENDCARD_W - pad, sy + blockH / 2 + 4);
   }
   curY += statDefs.length * rowH + 12;
 
@@ -436,6 +430,63 @@ function generateEndCard() {
   ctx.textAlign = 'right';
   ctx.fillText('' + totalScore, ENDCARD_W - pad, scoreBlockY + 40);
   ctx.shadowBlur = 0;
+
+  curY += Math.max(hlItems.length * 18 + 24, 50) + 16;
+
+  // ═════════════════════════════════
+  //  NPC FAREWELL QUOTE
+  // ═════════════════════════════════
+  var npcQuotes = [
+    { key: 'ying', flags: ['r1YingTrustUp','r1YingCompanion','r2YingNight','r2YingLore4','r3YingInn'], max: 5,
+      name: '螢', nameEn: 'Ying',
+      zh: '「說好了要幫我校對的，笨蛋。」', en: '"You promised to proofread for me, idiot."' },
+    { key: 'zhou', flags: ['r1SurvivorMet','r1SurvivorFed','r1SurvivorFullTrust','r2ZhouTrace','r3ZhouMet'], max: 5,
+      name: '老周', nameEn: 'Old Zhou',
+      zh: '「帶著這塊石頭，比我有用。」', en: '"Take this stone. It\'ll serve you better than me."' },
+    { key: 'crane', flags: ['r1WandererMet','r1WandererLore','r2CraneMet','r2CraneLore','r3CraneTestimony'], max: 5,
+      name: '灰鶴', nameEn: 'Grey Crane',
+      zh: '「別弄丟了，我可沒第二把。」', en: '"Don\'t lose it. I don\'t have a spare."' },
+    { key: 'bell', flags: ['r3BellMet','r3BellAlliance','r3BellQuest'], max: 3,
+      name: '銅鐘', nameEn: 'Bronze Bell',
+      zh: '「通道不會封鎖。永遠不會。」', en: '"The passages won\'t be sealed. Ever."' },
+    { key: 'frost', flags: ['r2ChiefTalked','r2BossDefeated','r3BellAlliance'], max: 3,
+      name: '鐵霜', nameEn: 'Iron Frost',
+      zh: '「你比我更需要這把刀。」', en: '"You need this blade more than I do."' },
+    { key: 'dew', flags: ['r2CampVisited','r2MedicHealed','r2MedicElixir'], max: 3,
+      name: '清露', nameEn: 'Dew',
+      zh: '「你撐到現在……比我更值得活下去。」', en: '"You\'ve lasted this long... you deserve to live."' },
+    { key: 'cast', flags: ['r2CampVisited','r2PickaxeUpgraded','r2ArmorUpgraded'], max: 3,
+      name: '老鑄', nameEn: 'Old Cast',
+      zh: '「……最後一件了。用最好的料。」', en: '"...Last one. Best materials."' },
+  ];
+
+  // Find NPC with highest affinity
+  var bestNpc = null;
+  var bestAff = 0;
+  for (var ni = 0; ni < npcQuotes.length; ni++) {
+    var nq = npcQuotes[ni];
+    var aff = 0;
+    for (var fi = 0; fi < nq.flags.length; fi++) {
+      if (state.flags[nq.flags[fi]]) aff++;
+    }
+    if (aff > bestAff) { bestAff = aff; bestNpc = nq; }
+  }
+
+  if (bestNpc && bestAff > 0) {
+    ctx.font = '10px "Courier New", monospace';
+    ctx.textAlign = 'left';
+    ctx.fillStyle = '#3a3a4a';
+    ctx.fillText('— ' + (en ? bestNpc.nameEn : bestNpc.name), pad, curY);
+
+    curY += 16;
+    ctx.font = '11px "Courier New", monospace';
+    ctx.fillStyle = '#4a4a5a';
+    var quoteText = en ? bestNpc.en : bestNpc.zh;
+    var quoteLines = _wrapText(ctx, quoteText, ENDCARD_W - pad * 2);
+    for (var qi = 0; qi < quoteLines.length; qi++) {
+      ctx.fillText(quoteLines[qi], pad, curY + qi * 15);
+    }
+  }
 
   // ═════════════════════════════════
   //  FOOTER: time + url
