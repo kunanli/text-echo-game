@@ -110,32 +110,33 @@ function showLeaderboard() {
       return;
     }
 
-    var endingNames = {
-      dawn: L('黎明', 'Dawn'),
-      sacrifice: L('犧牲', 'Sacrifice'),
-      compromise: L('妥協', 'Compromise'),
-      lockdown: L('封鎖', 'Lockdown'),
+    var endingMeta = (typeof ENDING_META !== 'undefined') ? ENDING_META : {};
+    var endingCards = {
+      dawn:       { zh: '曙光者', en: 'DAWNBRINGER' },
+      sacrifice:  { zh: '獻身者', en: 'MARTYR' },
+      compromise: { zh: '斡旋者', en: 'MEDIATOR' },
+      lockdown:   { zh: '守門者', en: 'WARDEN' },
     };
 
     var html = '<table class="lb-table">';
-    html += '<tr class="lb-header"><th>#</th><th>' + L('名稱', 'Name') + '</th><th>' + L('評分', 'Score') + '</th><th>' + L('結局', 'Ending') + '</th><th>' + L('時間', 'Time') + '</th></tr>';
+    html += '<tr class="lb-header"><th>#</th><th>' + L('玩家', 'Player') + '</th><th>' + L('卡片', 'Card') + '</th><th>' + L('稀有度', 'Rarity') + '</th></tr>';
 
     for (var i = 0; i < entries.length; i++) {
       var e = entries[i];
       var rankClass = i < 3 ? ' lb-top' + (i + 1) : '';
-      var medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : (i + 1);
-      var mins = Math.floor(e.seconds / 60);
-      var timeStr = mins > 0 ? mins + 'm' : '--';
-      var endingStr = endingNames[e.ending] || e.ending;
       var rarity = (typeof getRarity === 'function') ? getRarity(e.score) : null;
-      var scoreColor = rarity ? rarity.color : '#9a9ab0';
+      var rarityName = rarity ? (en ? rarity.en : rarity.zh) : '--';
+      var rarityColor = rarity ? rarity.color : '#6a6a7a';
+      var card = endingCards[e.ending];
+      var cardName = card ? (en ? card.en : card.zh) : '--';
+      var stars = rarity ? '' : '';
+      for (var si = 0; si < (rarity ? rarity.stars : 0); si++) stars += '★';
 
       html += '<tr class="lb-row' + rankClass + '">';
-      html += '<td class="lb-rank">' + medal + '</td>';
+      html += '<td class="lb-rank">' + (i + 1) + '</td>';
       html += '<td class="lb-name">' + e.name + '</td>';
-      html += '<td class="lb-score" style="color:' + scoreColor + '">' + e.score + '</td>';
-      html += '<td class="lb-ending">' + endingStr + '</td>';
-      html += '<td class="lb-time">' + timeStr + '</td>';
+      html += '<td class="lb-card">' + cardName + '</td>';
+      html += '<td class="lb-rarity" style="color:' + rarityColor + '"><span class="lb-stars">' + stars + '</span> ' + rarityName + '</td>';
       html += '</tr>';
     }
     html += '</table>';
