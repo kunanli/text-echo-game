@@ -87,7 +87,7 @@ function applyLang() {
   if ($achViewBtn) $achViewBtn.textContent = en ? 'View Achievements' : '查看成就';
   // Ending card overlay
   var $endcardTitle = document.getElementById('endcard-title');
-  if ($endcardTitle) $endcardTitle.textContent = en ? 'ENDING CARD' : '結 局 卡';
+  if ($endcardTitle) $endcardTitle.style.display = 'none';
   var $endcardDl = document.getElementById('endcard-download-btn');
   if ($endcardDl) $endcardDl.textContent = en ? 'Download' : '下載圖片';
   var $endcardShare = document.getElementById('endcard-share-btn');

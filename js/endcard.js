@@ -1,7 +1,7 @@
 // ══ Ending Card Generator — Collectible Card ══
 
 var ENDCARD_W = 450;
-var ENDCARD_H = 700;
+var ENDCARD_H = 740;
 
 var ENDING_META = {
   dawn:       { zh: '黎明', en: 'DAWN',       type: '曙光者',  typeEn: 'DAWNBRINGER', color: '#60c8e0' },
@@ -69,7 +69,7 @@ function calculateEndScore() {
   return s;
 }
 
-// ── Half-body ASCII Art — simple, iconic, cute ──
+// ── Half-body ASCII Art ──
 
 var ENDCARD_ART = {
   dawn: {
@@ -194,31 +194,23 @@ var ENDCARD_ART = {
   },
 };
 
-// ── Pixel block bar (2-row thick, like reference) ──
-function _drawBlockBar(ctx, x, y, val, maxVal, numBlocks, color) {
-  var bs = 10;   // block width
-  var bh = 8;    // block height
-  var gap = 2;
+// ── Monochrome pixel block bar ──
+function _drawBlockBar(ctx, x, y, val, maxVal, numBlocks) {
+  var bs = 10;
+  var bh = 10;
+  var gap = 3;
   var filled = Math.round((val / maxVal) * numBlocks);
 
   for (var i = 0; i < numBlocks; i++) {
     var bx = x + i * (bs + gap);
     if (i < filled) {
-      // filled: 2×2 block pattern for pixel look
-      ctx.fillStyle = color;
-      ctx.globalAlpha = 0.85;
+      ctx.fillStyle = '#d0d0d8';
       ctx.fillRect(bx, y, bs, bh);
-      // inner shadow for pixel depth
-      ctx.fillStyle = '#000';
-      ctx.globalAlpha = 0.15;
-      ctx.fillRect(bx, y + bh - 2, bs, 2);
     } else {
-      ctx.fillStyle = '#1a1a24';
-      ctx.globalAlpha = 0.5;
+      ctx.fillStyle = '#1e1e28';
       ctx.fillRect(bx, y, bs, bh);
     }
   }
-  ctx.globalAlpha = 1;
 }
 
 // ── Rounded rect ──
@@ -262,7 +254,7 @@ function generateEndCard() {
   ctx.stroke();
   ctx.globalAlpha = 1;
 
-  // Inner card background
+  // Inner fill
   _roundRect(ctx, 12, 12, ENDCARD_W - 24, ENDCARD_H - 24, 16);
   ctx.fillStyle = '#101018';
   ctx.fill();
@@ -282,7 +274,6 @@ function generateEndCard() {
   // ═════════════════════════════════
   var curY = 44;
 
-  // Stars + rarity label
   var stars = '';
   for (var i = 0; i < rarity.stars; i++) stars += '★';
   ctx.font = 'bold 15px "Courier New", monospace';
@@ -290,7 +281,6 @@ function generateEndCard() {
   ctx.fillStyle = rarity.color;
   ctx.fillText(stars + '  ' + (en ? rarity.en : rarity.zh), pad, curY);
 
-  // Type label (right)
   ctx.textAlign = 'right';
   ctx.font = '13px "Courier New", monospace';
   ctx.fillStyle = meta.color;
@@ -299,7 +289,7 @@ function generateEndCard() {
   // ═════════════════════════════════
   //  ASCII ART
   // ═════════════════════════════════
-  curY += 28;
+  curY += 32;
   var artSet = ENDCARD_ART[ending] || ENDCARD_ART.lockdown;
   var art = artSet[state.sex] || artSet.male;
   ctx.font = '14px "Courier New", monospace';
@@ -308,53 +298,50 @@ function generateEndCard() {
   for (var ai = 0; ai < art.length; ai++) {
     ctx.fillText(art[ai], pad + 24, curY + ai * 17);
   }
-  curY += art.length * 17 + 20;
+  curY += art.length * 17 + 24;
 
   // ═════════════════════════════════
-  //  CHARACTER NAME
+  //  PLAYER NAME (large, prominent)
   // ═════════════════════════════════
-  ctx.font = 'bold 22px "Courier New", monospace';
-  ctx.fillStyle = '#e0e0e8';
+  ctx.font = 'bold 24px "Courier New", monospace';
+  ctx.fillStyle = '#e8e8f0';
   ctx.textAlign = 'left';
   ctx.fillText(state.name, pad, curY);
 
-  // Sex symbol next to name
   var nameW = ctx.measureText(state.name).width;
   ctx.font = '14px sans-serif';
   ctx.fillStyle = '#5a5a6a';
-  ctx.fillText(state.sex === 'female' ? '♀' : '♂', pad + nameW + 8, curY);
+  ctx.fillText(state.sex === 'female' ? '♀' : '♂', pad + nameW + 10, curY);
 
   // ═════════════════════════════════
   //  FLAVOR TEXT
   // ═════════════════════════════════
-  curY += 24;
+  curY += 28;
   var flavor = ENDING_FLAVOR[ending] || ENDING_FLAVOR.lockdown;
   var flavorLines = (en ? flavor.en : flavor.zh).split('\n');
   ctx.font = '12px "Courier New", monospace';
-  ctx.fillStyle = '#5a5a6a';
+  ctx.fillStyle = '#555568';
   ctx.textAlign = 'left';
   for (var fi = 0; fi < flavorLines.length; fi++) {
     ctx.fillText(flavorLines[fi], pad, curY + fi * 18);
   }
-  curY += flavorLines.length * 18 + 22;
+  curY += flavorLines.length * 18 + 28;
 
   // ═════════════════════════════════
-  //  STATS — pixel block bars
+  //  STATS — monochrome pixel blocks
   // ═════════════════════════════════
   var statDefs = [
-    { zh: '力量',   en: 'STR',   val: state.str, max: 15, color: '#c06060' },
-    { zh: '敏捷',   en: 'AGI',   val: state.agi, max: 15, color: '#60c060' },
-    { zh: '意志',   en: 'WIL',   val: state.wil, max: 15, color: '#6080c0' },
-    { zh: '石化度', en: 'PETRI', val: state.petri, max: 100, color: '#9a6ac8' },
-    { zh: '深度',   en: 'DEPTH', val: state.level, max: 10, color: '#c0a040' },
+    { zh: '力量',   en: 'STR',   val: state.str, max: 15 },
+    { zh: '敏捷',   en: 'AGI',   val: state.agi, max: 15 },
+    { zh: '意志',   en: 'WIL',   val: state.wil, max: 15 },
+    { zh: '石化度', en: 'PETRI', val: state.petri, max: 100 },
+    { zh: '深度',   en: 'DEPTH', val: state.level, max: 10 },
   ];
 
-  var labelColW = en ? 80 : 70;
+  var labelColW = en ? 74 : 64;
   var barX = pad + labelColW;
   var numBlocks = 10;
-  var barTotalW = numBlocks * 12; // (10+2) per block
-  var numX = barX + barTotalW + 12;
-  var rowH = 26;
+  var rowH = 28;
 
   for (var si = 0; si < statDefs.length; si++) {
     var sd = statDefs[si];
@@ -363,22 +350,22 @@ function generateEndCard() {
     // Label
     ctx.font = '13px "Courier New", monospace';
     ctx.textAlign = 'left';
-    ctx.fillStyle = '#5a5a6a';
-    ctx.fillText(en ? sd.en : sd.zh, pad, sy + 8);
+    ctx.fillStyle = '#555568';
+    ctx.fillText(en ? sd.en : sd.zh, pad, sy + 10);
 
     // Block bar
-    _drawBlockBar(ctx, barX, sy, sd.val, sd.max, numBlocks, sd.color);
+    _drawBlockBar(ctx, barX, sy, sd.val, sd.max, numBlocks);
 
     // Number
     ctx.textAlign = 'right';
     ctx.fillStyle = '#6a6a7a';
     ctx.font = '13px "Courier New", monospace';
-    ctx.fillText('' + sd.val, ENDCARD_W - pad, sy + 8);
+    ctx.fillText('' + sd.val, ENDCARD_W - pad, sy + 10);
   }
-  curY += statDefs.length * rowH + 16;
+  curY += statDefs.length * rowH + 20;
 
   // ═════════════════════════════════
-  //  HIGHLIGHTS BOX (like "last said")
+  //  HIGHLIGHTS BOX
   // ═════════════════════════════════
   var hlItems = [];
   if (state.deathCount === 0) hlItems.push(en ? 'Deathless Run' : '零死亡通關');
@@ -388,8 +375,10 @@ function generateEndCard() {
   if (state.flags.r3CraneTestimony) hlItems.push(en ? 'Crane Testified' : '灰鶴作證');
 
   if (hlItems.length > 0) {
-    var boxH = 14 + hlItems.length * 18 + 10;
-    // Box
+    var boxPadV = 12;
+    var boxLineH = 20;
+    var boxH = boxPadV + 16 + hlItems.length * boxLineH + boxPadV;
+
     _roundRect(ctx, pad - 2, curY, ENDCARD_W - pad * 2 + 4, boxH, 8);
     ctx.strokeStyle = '#252530';
     ctx.lineWidth = 1.5;
@@ -399,27 +388,26 @@ function generateEndCard() {
     ctx.font = '10px "Courier New", monospace';
     ctx.textAlign = 'left';
     ctx.fillStyle = '#3a3a4a';
-    ctx.fillText(en ? 'highlights' : '成就亮點', pad + 10, curY + 14);
+    ctx.fillText(en ? 'highlights' : '成就亮點', pad + 10, curY + boxPadV + 6);
 
     // Items
     ctx.font = '12px "Courier New", monospace';
     ctx.fillStyle = '#7a7a8a';
     for (var hi = 0; hi < hlItems.length; hi++) {
-      ctx.fillText('  · ' + hlItems[hi], pad + 10, curY + 32 + hi * 18);
+      ctx.fillText('  · ' + hlItems[hi], pad + 10, curY + boxPadV + 24 + hi * boxLineH);
     }
-    curY += boxH + 12;
+    curY += boxH + 16;
   }
 
   // ═════════════════════════════════
   //  BOTTOM: score + time + url
   // ═════════════════════════════════
-  curY = ENDCARD_H - 56;
+  var bottomY = ENDCARD_H - 54;
 
-  // Score label + number
   ctx.font = '11px "Courier New", monospace';
   ctx.textAlign = 'left';
   ctx.fillStyle = '#3a3a4a';
-  ctx.fillText(en ? 'score' : '評分', pad, curY);
+  ctx.fillText(en ? 'score' : '評分', pad, bottomY);
 
   ctx.font = 'bold 24px "Courier New", monospace';
   ctx.fillStyle = rarity.color;
@@ -427,18 +415,18 @@ function generateEndCard() {
     ctx.shadowColor = rarity.color;
     ctx.shadowBlur = 12;
   }
-  ctx.fillText('' + totalScore, pad + (en ? 56 : 44), curY);
+  ctx.fillText('' + totalScore, pad + (en ? 56 : 44), bottomY);
   ctx.shadowBlur = 0;
 
-  // Time + URL (right side)
+  // Time + URL (right)
   ctx.textAlign = 'right';
   ctx.font = '9px "Courier New", monospace';
   ctx.fillStyle = '#2a2a3a';
   if (typeof globalStats !== 'undefined' && globalStats.currentRunStartMs > 0) {
     var runTime = Date.now() - globalStats.currentRunStartMs;
-    ctx.fillText((en ? 'time ' : '時間 ') + formatTime(runTime), ENDCARD_W - pad, curY - 12);
+    ctx.fillText((en ? 'time ' : '時間 ') + formatTime(runTime), ENDCARD_W - pad, bottomY - 12);
   }
-  ctx.fillText('petriabyss.itch.io', ENDCARD_W - pad, curY);
+  ctx.fillText('petriabyss.itch.io', ENDCARD_W - pad, bottomY);
 
   return canvas;
 }
