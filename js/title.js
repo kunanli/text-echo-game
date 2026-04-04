@@ -140,6 +140,23 @@ document.querySelectorAll('.sex-btn').forEach(function(btn) {
 function startGame() {
   var nameInput = document.getElementById('name-input');
   var name = nameInput.value.trim() || L('無名旅者', 'Nameless Wanderer');
+
+  // Reset all state to defaults before applying character creation values.
+  // This prevents stale data from a previous save (e.g. if the player opened
+  // chapter select which calls loadSave(), then went back to start a new game).
+  state.hp = 100;
+  state.maxHp = 100;
+  state.petri = 0;
+  state.xp = 0;
+  state.level = 1;
+  state.xpToNext = 20;
+  state.inventory = [];
+  state.region = 0;
+  state.node = 'start';
+  state.flags = {};
+  state.deathCount = 0;
+  state.mood = 'normal';
+
   state.name = name;
   state.sex = selectedSex;
   state.str = allocStats.str;

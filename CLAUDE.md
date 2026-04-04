@@ -48,11 +48,12 @@ assets/
 ## 開發慣例
 
 - **全域變數**：各模組透過 IIFE 或直接 `var` 暴露全域 API（如 `ambientAudio`, `voiceNarrator`, `state`）
-- **劇情節點**：每個 region 檔案 export 一個 `regionN` 物件，key 為節點 ID，value 為函式
+- **劇情節點**：每個 region 檔案用 `registerNode(id, fn)` 註冊節點，用 `loadNode(id)` 跳轉
 - **探索步驟**：用 `{ tag, tagColor, text, textEn, delay }` 格式描述每一步
 - **選項按鈕**：用 `{ text, textEn, action }` 格式
 - **HTML 內容**：部分步驟用 `html`/`htmlEn` 取代 `text`/`textEn`，支援粗體等標記
-- **CSS 命名**：用 `.tag-xxx` 管理標籤顏色（tag-combat, tag-info, tag-sense 等）
+- **CSS 命名**：用 `.tag-xxx` 管理標籤顏色（tag-combat, tag-info, tag-sense, tag-system, tag-warn, tag-petri 等）
+- **雙語必備**：所有面向玩家的文字都必須同時提供 `zh` 和 `en` 版本
 
 ## 目前狀態
 
@@ -97,9 +98,234 @@ assets/
 - [x] **數據統計頁** — `stats.js` 用 localStorage 記錄全域統計（死亡次數、結局分布、戰鬥次數、石化度等），結局後展示
 - [ ] **多語言擴展** — 架構已支援 i18n，可加日文或其他社群翻譯
 
+## API 速查表
+
+### 狀態物件 (`state.js`)
+
+```javascript
+state = {
+  name: '旅者', sex: 'male',
+  hp: 100, maxHp: 100, petri: 0,    // petri: 0-100，到 100 即石化死亡
+  str: 5, agi: 5, wil: 5,           // 三圍屬性
+  xp: 0, level: 1, xpToNext: 20,
+  inventory: [],                      // 物品名稱陣列
+  region: 0, node: 'start',          // 目前位置
+  flags: {},                          // 劇情進度旗標（任意 key-value）
+  deathCount: 0, lang: 'zh',
+  mood: 'normal'  // normal|happy|hurt|danger|petri|combat（影響 avatar 表情）
+};
+
+// i18n 工具函式
+L(zh, en)       // 根據 state.lang 回傳對應語言字串
+applyLang()     // 更新所有 DOM 元素的語言顯示
+```
+
+### 節點系統 (`nodes.js`)
+
+```javascript
+registerNode('r0_body', () => { ... });  // 註冊節點
+loadNode('r0_look');                      // 跳轉節點（自動存檔）
+```
+
+### 探索引擎 (`explore.js`)
+
+```javascript
+autoExplore(steps, choices, opts);
+// steps:   探索步驟陣列
+// choices: 結束後顯示的選項陣列
+// opts:    { label: L('標籤', 'Label') }  顯示在探索過程中的區塊標題
+```
+
+**步驟物件格式**：
+
+```javascript
+{
+  tag: '系統',               // 顯示為 [系統]
+  tagColor: 'tag-system',    // CSS class
+  text: '中文描述……',        // 打字機效果逐字渲染
+  textEn: 'English desc...', // 英文版
+  html: '<b>粗體</b>內容',   // 用 html 取代 text 則不觸發打字機，直接渲染
+  htmlEn: '<b>bold</b> content',
+  art: '<pre class="ascii-art">...</pre>',  // ASCII 藝術（直接渲染）
+  artEn: '<pre>...</pre>',
+  delay: 2500,               // 停留毫秒數再進下一步
+  effect: function() { state.hp -= 5; },    // 副作用函式（立即執行）
+}
+```
+
+**選項物件格式**：
+
+```javascript
+{ text: '檢查身體', textEn: 'Check body', action: () => loadNode('r0_body') }
+```
+
+### 工具函式 (`utils.js`)
+
+```javascript
+rng(min, max)               // 隨機整數 [min, max]
+clamp(v, lo, hi)            // 限制範圍
+L(zh, en)                   // i18n 選擇
+notify(msg)                 // 彈出 toast 通知（2 秒）
+
+// 屬性檢定
+statCheck(stat, dc)         // → 'crit' | 'pass' | 'fail'（d6 + stat vs DC）
+checkRate(stat, dc)         // → 百分比（顯示成功率用）
+
+// HP / 石化度
+changeHp(delta)             // → true 表示死亡
+changePetri(delta)          // → true 表示完全石化
+changeStat(stat, delta)     // 永久屬性變動
+
+// 經驗值
+gainXp(amount)              // 含升級處理
+xpForLevel(lv)              // = 20 * 1.4^(lv-1)
+
+// 物品
+hasItem(name)               // 檢查是否持有
+addItem(name)               // 加入背包
+removeItem(name)            // 從背包移除
+```
+
+### 戰鬥系統 (`combat.js`)
+
+```javascript
+startCombat(enemy, onWin, onFlee);
+
+// 敵人定義格式：
+{
+  name: '石化蝙蝠', nameEn: 'Petrified Bat',
+  hp: 12, atkMin: 2, atkMax: 5,
+  petriDmg: 1,           // 每次攻擊附加石化傷害
+  xp: 5,
+  empathyGoal: 3,        // 交流次數達標即可饒恕（預設 3）
+  art: ['  ╱╲    ╱╲', ...],  // ASCII 藝術行陣列
+  commune: [              // 交流成功文字池
+    { zh: '蝙蝠的翅膀微微停頓。', en: 'The bat\'s wings pause.' }
+  ],
+  communeFail: [          // 交流失敗文字池（選填）
+    { zh: '它完全無法理解……', en: 'It cannot comprehend...' }
+  ],
+  spareText: { zh: '蝙蝠飛走了。', en: 'The bat flies away.' }
+}
+```
+
+**4 種戰鬥行動**：
+- **攻擊**（STR）：`baseDmg = rng(3,6) + str*1.2 + 武器加成`；觀察後 2 倍傷害
+- **觀察**（AGI 檢定 DC7）：成功則下次攻擊 2 倍
+- **交流**（WIL 檢定 DC8）：`empathy++`，達 `empathyGoal` 可饒恕（1.5 倍 XP，-3 石化）
+- **逃跑**：需提供 `onFlee` callback
+
+### 巡邏遭遇 (`patrol.js`)
+
+```javascript
+// 各區域怪物池
+var R0_MONSTERS = [ { name: '石化蝙蝠', ... }, ... ];
+var R1_MONSTERS = [ ... ];
+
+// 觸發隨機戰鬥
+startCombat(
+  R0_MONSTERS[Math.floor(Math.random() * R0_MONSTERS.length)],
+  onWin, onFlee
+);
+```
+
+### 音效 (`sfx.js`)
+
+```javascript
+sfx.click()     // UI 點擊音
+sfx.hit()       // 攻擊命中
+sfx.hurt()      // 受到傷害
+sfx.petri()     // 石化效果（水晶音）
+sfx.levelUp()   // 升級
+sfx.death()     // 死亡
+sfx.item()      // 獲得物品
+sfx.pass()      // 檢定成功
+sfx.fail()      // 檢定失敗
+sfx.setEnabled(bool)   // 開關
+sfx.setVolume(0-1)     // 音量
+```
+
+### 環境音 (`audio.js`)
+
+```javascript
+ambientAudio.setRegion(regionIndex)  // 切換區域音景（0-3）
+ambientAudio.setCombat(true/false)   // 疊加戰鬥音效層
+```
+
+### 存檔系統 (`save.js`)
+
+```javascript
+saveGame()          // 自動存到 localStorage
+loadSave()          // 讀取自動存檔
+exportSaveCode()    // 生成 Base64 分享碼（PA2 格式，含 checksum）
+importSaveCode(code)// 讀取分享碼
+// 手動存檔：3 個槽位，UI 在存檔面板中操作
+```
+
+## 新增劇情節點範例（完整模板）
+
+```javascript
+registerNode('r1_example', () => {
+  autoExplore([
+    { tag: '環境', tagColor: 'tag-sense',
+      text: '你來到一條幽暗的走廊，空氣中瀰漫著礦石的氣味。',
+      textEn: 'You arrive at a dim corridor, the air thick with mineral scent.',
+      delay: 2500 },
+    { tag: '警告', tagColor: 'tag-warn',
+      text: '前方的地面上散落著碎石，踩上去可能會滑倒。',
+      textEn: 'Loose gravel covers the ground ahead — you might slip.',
+      delay: 2200 },
+    { tag: '檢定', tagColor: 'tag-info',
+      text: L('你小心翼翼地通過（AGI 檢定）', 'You carefully proceed (AGI check)'),
+      textEn: 'You carefully proceed (AGI check)',
+      delay: 1500,
+      effect: function() {
+        var result = statCheck('agi', 6);
+        if (result === 'fail') { changeHp(-5); sfx.fail(); }
+        else { sfx.pass(); }
+      }
+    },
+  ], [
+    { text: '繼續前進', textEn: 'Continue forward',
+      action: () => loadNode('r1_next') },
+    { text: '返回', textEn: 'Return',
+      action: () => loadNode('r1_prev') },
+  ], { label: L('探索走廊', 'Exploring Corridor') });
+});
+```
+
+## 新增怪物範例（完整模板）
+
+```javascript
+{
+  name: '結晶蜘蛛', nameEn: 'Crystal Spider',
+  hp: 18, atkMin: 3, atkMax: 7, petriDmg: 2, xp: 8,
+  empathyGoal: 3,
+  art: [
+    '   /\\_/\\',
+    '  ( o.o )',
+    '   > ^ <',
+  ],
+  commune: [
+    { zh: '蜘蛛的多隻眼睛閃爍著微光，似乎在觀察你。',
+      en: 'The spider\'s many eyes glimmer, watching you intently.' },
+    { zh: '它收起前肢，不再擺出攻擊姿態。',
+      en: 'It retracts its forelegs, abandoning its attack stance.' },
+  ],
+  spareText: { zh: '結晶蜘蛛默默爬上石壁，消失在黑暗中。',
+               en: 'The crystal spider crawls up the wall, vanishing into darkness.' }
+}
+```
+
 ## 開發注意事項
 
 - 修改 JS 時注意 `index.html` 中的載入順序，`title.js` 必須最後載入
 - 測試時注意 iOS Safari 的音頻限制（AudioContext 需要用戶手勢啟動）
 - 存檔碼向後相容很重要——改 `state` 結構時要考慮舊存檔能否讀取
 - 所有 story 內容都有中英雙語，新增劇情時兩個語言都要寫
+- 新增 JS 檔案時，需同時在 `index.html` 底部加入 `<script>` 標籤，注意順序
+- `flags` 物件可自由新增 key，用於追蹤劇情分歧（如 `state.flags.metNpc = true`）
+- 節點 ID 命名慣例：`r{region}_{描述}`，如 `r0_start`, `r1_guard_fight`, `r3_ending_a`
+- `mood` 變更會影響 `avatar.js` 的 ASCII 表情：`normal|happy|hurt|danger|petri|combat`
+- 探索步驟的 `delay` 建議值：短描述 1500-2000ms，長描述 2500-3000ms，戲劇性場景 3000-4000ms
+- 巡邏怪物池按區域分開（`R0_MONSTERS`, `R1_MONSTERS` 等），新增怪物加入對應陣列即可
