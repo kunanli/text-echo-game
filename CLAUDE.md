@@ -72,6 +72,61 @@ assets/
 - [ ] 語音旁白：尋找更好的 TTS 方案（Fish Audio / ElevenLabs / Kokoro）替換 Web Speech API
 - [ ] `voice.js` 保留完整 API 介面（speak/cancel/toggle 等），目前為 no-op，方便未來接入新 TTS
 
+## 🔨 進行中：結局卡片重製（endcard.js）
+
+**目標**：將結局卡從簡易資訊卡重製為「身分牌」風格的收藏卡片。
+
+**需求規格**：
+- **尺寸**：3:4 長方形（建議 450×600 canvas）
+- **主視覺**：大型 ASCII 角色全身藝術圖，代表結局身分與寓意（每種結局 × 每種性別各一套）
+- **評分系統**：將能力值、道具、進程旗標全部轉換為分數，計算總評級
+- **稀有度**：根據總分解鎖不同稀有度的邊框/底色
+
+**設計細節（已研究完成，尚未寫碼）**：
+
+### 評分公式
+| 項目 | 計算方式 | 最大貢獻 |
+|------|----------|----------|
+| 屬性總和 | (STR+AGI+WIL) × 2 | ~30 |
+| 等級 | level × 2 | ~20 |
+| 道具收集 | inventory.length × 2（上限 20） | 20 |
+| NPC 關係 | r1YingCompanion +5, r3ZhouMet +3, r3BellMet +3, r3CraneMet3/r2CraneMet +3 | 14 |
+| 關鍵進程 | r3PlagueProof +4, r3CraneTestimony +4, r3BellAlliance +3, r3CouncilEntry +2 | 13 |
+| 零死亡 | deathCount === 0 → +8 | 8 |
+| 低石化 | petri <= 10 → +5, petri <= 30 → +3 | 5 |
+| 結局加成 | dawn +5, sacrifice +4, compromise +2, lockdown +0 | 5 |
+
+### 稀有度等級
+| 等級 | 分數門檻 | 顏色 | 英文 |
+|------|----------|------|------|
+| 普通 | < 30 | #8a8a8a 灰 | Common |
+| 精良 | 30-49 | #4a9e4a 綠 | Uncommon |
+| 稀有 | 50-69 | #4a8ac8 藍 | Rare |
+| 史詩 | 70-84 | #9a5ac8 紫 | Epic |
+| 傳說 | ≥ 85 | #d4a843 金 | Legendary |
+
+### 卡片佈局（由上到下）
+1. 稀有度邊框（雙線框，外框 = 稀有度顏色）
+2. 標題：`P E T R I A B Y S S` + 結局名稱
+3. **大型 ASCII 全身藝術圖**（約 15-18 行，根據結局主題設計）
+   - dawn：持光源的站立姿態
+   - sacrifice：雙手展開的犧牲姿態
+   - compromise：握手/交涉姿態
+   - lockdown：防禦/封閉姿態
+4. 角色名 + 性別符號
+5. 評分區：六個指標用小型條狀圖顯示（STR/AGI/WIL/探索/交際/生存）
+6. 總分 + 稀有度徽章（帶光暈效果）
+7. 底部：石化度條 + 遊玩時間 + 網址
+
+### 現有檔案狀態
+- `js/endcard.js`：**尚未修改**，仍為舊版 600×400 卡片
+- `css/style.css`：`.endcard-dialog` max-width 需改為適配 3:4
+- `index.html`：overlay 結構不需改動
+
+### ASCII 藝術需求
+需為 4 結局 × 2 性別 = 8 套全身 ASCII art（約 15-18 行 × 24 字元寬）。
+可參考 `avatar.js` 的頭像風格延伸為全身版本。
+
 ## 未來開發方向
 
 ### 體驗提升（投入產出比高）
