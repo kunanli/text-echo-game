@@ -283,7 +283,7 @@ function generateEndCard() {
 
   ctx.textAlign = 'right';
   ctx.font = '13px "Courier New", monospace';
-  ctx.fillStyle = meta.color;
+  ctx.fillStyle = rarity.color;
   ctx.fillText(en ? meta.typeEn : meta.type, ENDCARD_W - pad, curY);
 
   // ═════════════════════════════════
