@@ -12,20 +12,20 @@ var ENDING_META = {
 
 var ENDING_FLAVOR = {
   dawn: {
-    zh: '"帶著真相穿越了深淵的黑暗，將光明重新引入這被遺忘的地底世界。石化的詛咒終將褪去，而這個名字會被銘刻在新時代的起點。"',
-    en: '"Carried the truth through darkness, bringing light back to the forgotten underworld. The curse shall fade, and this name marks a new dawn."',
+    zh: '"帶著真相穿越了深淵的黑暗，將光明重新引入這被遺忘的地底世界。石化的詛咒終將褪去，而這個名字會被銘刻在新時代的起點。當第一縷曙光照進石壁，所有沉睡者終於再次睜開雙眼。"',
+    en: '"Carried the truth through darkness, bringing light back to the forgotten underworld. The curse shall fade, and this name marks a new dawn. When the first light touched the stone walls, all who slumbered finally opened their eyes again."',
   },
   sacrifice: {
-    zh: '"選擇了以自身為代價換取眾人的安全。石化的命運並未消失，只是由一人承擔。深淵會記住這份犧牲。"',
-    en: '"Chose to bear the cost so others might live. The curse did not vanish — simply taken upon oneself. The abyss remembers."',
+    zh: '"選擇了以自身為代價換取眾人的安全。石化的命運並未消失，只是由一人承擔。深淵會記住這份犧牲——在石壁最深處，一尊完美的石像靜靜佇立，面容安詳。"',
+    en: '"Chose to bear the cost so others might live. The curse did not vanish — simply taken upon oneself. The abyss remembers this sacrifice. Deep within, a perfect stone figure stands in serene silence."',
   },
   compromise: {
-    zh: '"在對立的勢力之間找到了一條脆弱但可行的中間道路。沒有英雄式的結局，但每個人都活了下來。"',
-    en: '"Found a fragile but viable path between opposing forces. No heroic ending — but everyone lived to see another day."',
+    zh: '"在對立的勢力之間找到了一條脆弱但可行的中間道路。沒有英雄式的結局，但每個人都活了下來。有時候最勇敢的選擇不是戰鬥，而是放下武器，開口對話。"',
+    en: '"Found a fragile but viable path between opposing forces. No heroic ending — but everyone lived to see another day. Sometimes the bravest choice is not to fight, but to lay down arms and speak."',
   },
   lockdown: {
-    zh: '"深淵的入口被永遠封閉。地底的一切——包括真相——都被埋葬在石壁之下。安全，但代價是永遠的沉默。"',
-    en: '"The abyss was sealed forever. All beneath — truth included — buried under stone. Safe, yes. But at the cost of eternal silence."',
+    zh: '"深淵的入口被永遠封閉。地底的一切——包括真相——都被埋葬在石壁之下。安全，但代價是永遠的沉默。也許有一天，會有人重新找到這扇被封印的門。"',
+    en: '"The abyss was sealed forever. All beneath — truth included — buried under stone. Safe, yes. But at the cost of eternal silence. Perhaps someday, someone will find this sealed gate once more."',
   },
 };
 
@@ -195,9 +195,10 @@ var ENDCARD_ART = {
 };
 
 // ── 2D pixel grid bar (buddy style) ──
-function _drawBlockBar(ctx, x, y, val, maxVal, cols, rows) {
+function _drawBlockBar(ctx, x, y, val, maxVal, availW, rows) {
   var bs = 6;    // block size
-  var gap = 1;   // tight gap
+  var gap = 2;   // gap between blocks
+  var cols = Math.floor((availW + gap) / (bs + gap));
   var total = cols * rows;
   var filled = Math.round((val / maxVal) * total);
 
@@ -207,10 +208,10 @@ function _drawBlockBar(ctx, x, y, val, maxVal, cols, rows) {
       var bx = x + col * (bs + gap);
       var by = y + row * (bs + gap);
       if (idx < filled) {
-        ctx.fillStyle = '#58586a';
+        ctx.fillStyle = '#46464f';
         ctx.fillRect(bx, by, bs, bs);
       } else {
-        ctx.fillStyle = '#1a1a22';
+        ctx.fillStyle = '#161620';
         ctx.fillRect(bx, by, bs, bs);
       }
     }
@@ -321,12 +322,12 @@ function generateEndCard() {
   for (var ai = 0; ai < art.length; ai++) {
     ctx.fillText(art[ai], pad + 24, curY + ai * 17);
   }
-  curY += art.length * 17 + 24;
+  curY += art.length * 17 + 16;
 
   // ═════════════════════════════════
   //  PLAYER NAME (large, prominent)
   // ═════════════════════════════════
-  ctx.font = 'bold 24px "Courier New", monospace';
+  ctx.font = 'bold 22px "Courier New", monospace';
   ctx.fillStyle = '#e8e8f0';
   ctx.textAlign = 'left';
   ctx.fillText(state.name, pad, curY);
@@ -334,22 +335,22 @@ function generateEndCard() {
   var nameW = ctx.measureText(state.name).width;
   ctx.font = '14px sans-serif';
   ctx.fillStyle = '#5a5a6a';
-  ctx.fillText(state.sex === 'female' ? '♀' : '♂', pad + nameW + 10, curY);
+  ctx.fillText(state.sex === 'female' ? '♀' : '♂', pad + nameW + 8, curY);
 
   // ═════════════════════════════════
   //  FLAVOR TEXT
   // ═════════════════════════════════
-  curY += 28;
+  curY += 22;
   var flavor = ENDING_FLAVOR[ending] || ENDING_FLAVOR.lockdown;
   var flavorRaw = en ? flavor.en : flavor.zh;
-  ctx.font = '12px "Courier New", monospace';
+  ctx.font = '11px "Courier New", monospace';
   ctx.fillStyle = '#555568';
   ctx.textAlign = 'left';
   var flavorLines = _wrapText(ctx, flavorRaw, ENDCARD_W - pad * 2);
   for (var fi = 0; fi < flavorLines.length; fi++) {
-    ctx.fillText(flavorLines[fi], pad, curY + fi * 18);
+    ctx.fillText(flavorLines[fi], pad, curY + fi * 16);
   }
-  curY += flavorLines.length * 18 + 28;
+  curY += flavorLines.length * 16 + 18;
 
   // ═════════════════════════════════
   //  STATS — monochrome pixel blocks
@@ -362,33 +363,34 @@ function generateEndCard() {
     { zh: '深度',   en: 'DEPTH', val: state.level, max: 10 },
   ];
 
-  var gridCols = 8;
-  var gridRows = 3;
-  var gridH = gridRows * (6 + 1); // bs + gap
-  var labelColW = en ? 90 : 72;
+  var gridRows = 2;
+  var gridH = gridRows * (6 + 2); // bs + gap
+  var labelColW = en ? 56 : 50;
+  var numColW = 36;
   var barX = pad + labelColW;
-  var rowH = gridH + 12; // grid height + spacing
+  var barAvailW = ENDCARD_W - pad * 2 - labelColW - numColW;
+  var rowH = gridH + 8;
 
   for (var si = 0; si < statDefs.length; si++) {
     var sd = statDefs[si];
     var sy = curY + si * rowH;
 
     // Label (vertically centered with grid)
-    ctx.font = '13px "Courier New", monospace';
+    ctx.font = '11px "Courier New", monospace';
     ctx.textAlign = 'left';
     ctx.fillStyle = '#555568';
     ctx.fillText(en ? sd.en : sd.zh, pad, sy + gridH / 2 + 4);
 
-    // 2D pixel grid
-    _drawBlockBar(ctx, barX, sy, sd.val, sd.max, gridCols, gridRows);
+    // 2D pixel grid (fills available width)
+    _drawBlockBar(ctx, barX, sy, sd.val, sd.max, barAvailW, gridRows);
 
     // Number (vertically centered)
     ctx.textAlign = 'right';
     ctx.fillStyle = '#6a6a7a';
-    ctx.font = '13px "Courier New", monospace';
+    ctx.font = '11px "Courier New", monospace';
     ctx.fillText('' + sd.val, ENDCARD_W - pad, sy + gridH / 2 + 4);
   }
-  curY += statDefs.length * rowH + 16;
+  curY += statDefs.length * rowH + 12;
 
   // ═════════════════════════════════
   //  BOTTOM: highlights (left) + score (right)
