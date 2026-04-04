@@ -358,7 +358,7 @@ function generateEndCard() {
   var labelColW = en ? 56 : 50;
   var numColW = 36;
   var barX = pad + labelColW;
-  var barW = ENDCARD_W - pad * 2 - labelColW - numColW;
+  var barW = Math.floor((ENDCARD_W - pad * 2 - labelColW - numColW) / 2);
   var rowH = barH + 16;
 
   for (var si = 0; si < statDefs.length; si++) {
@@ -469,19 +469,33 @@ function generateEndCard() {
   }
 
   if (bestNpc && bestAff > 0) {
-    ctx.font = '10px "Courier New", monospace';
-    ctx.textAlign = 'left';
-    ctx.fillStyle = '#3a3a4a';
-    ctx.fillText('— ' + (en ? bestNpc.nameEn : bestNpc.name), pad, curY);
-
-    curY += 16;
-    ctx.font = '11px "Courier New", monospace';
-    ctx.fillStyle = '#4a4a5a';
+    var qPad = 14;
     var quoteText = en ? bestNpc.en : bestNpc.zh;
-    var quoteLines = _wrapText(ctx, quoteText, ENDCARD_W - pad * 2);
+    ctx.font = '11px "Courier New", monospace';
+    var quoteLines = _wrapText(ctx, quoteText, ENDCARD_W - pad * 2 - qPad * 2);
+    var nameStr = '— ' + (en ? bestNpc.nameEn : bestNpc.name);
+
+    var boxH = qPad + quoteLines.length * 15 + 8 + 14 + qPad;
+    var boxX = pad;
+    var boxW = ENDCARD_W - pad * 2;
+
+    // Border box
+    _roundRect(ctx, boxX, curY, boxW, boxH, 6);
+    ctx.strokeStyle = '#2a2a3a';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+
+    // Quote text
+    ctx.fillStyle = '#4a4a5a';
+    ctx.textAlign = 'left';
     for (var qi = 0; qi < quoteLines.length; qi++) {
-      ctx.fillText(quoteLines[qi], pad, curY + qi * 15);
+      ctx.fillText(quoteLines[qi], boxX + qPad, curY + qPad + 12 + qi * 15);
     }
+
+    // NPC name
+    ctx.font = '10px "Courier New", monospace';
+    ctx.fillStyle = '#3a3a4a';
+    ctx.fillText(nameStr, boxX + qPad, curY + qPad + 12 + quoteLines.length * 15 + 12);
   }
 
   // ═════════════════════════════════
