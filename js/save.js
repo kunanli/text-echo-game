@@ -100,6 +100,7 @@ var SEED_ITEMS_ZH = [
   '機甲控制鍵','精鍛戰鋤','濃縮淨化液',
   '螢的護身符','石化抑制劑',
   '河城地圖','河城草藥包','河城淨化液',
+  '老周的護石','灰鶴的祕藏匕首','螢的手繪護符','鐵霜的指揮佩刀','精鍛強化甲','清露的特製藥劑','銅鐘的議事令牌',
 ];
 var SEED_ITEMS_EN = [
   'Stone Dagger','Black Bread','Glowstone','Petri-Water Flask','Dried Herbs','Rope','Petri Crystal',
@@ -109,6 +110,7 @@ var SEED_ITEMS_EN = [
   'Mech Control Key','Masterwork War Pick','Concentrated Purifier',
   'Ying\'s Charm','Petri Suppressant',
   'River City Map','River City Herb Pack','River City Purifier',
+  "Zhou's Ward Stone","Grey Crane's Hidden Blade","Ying's Hand-drawn Charm","Iron Frost's Command Saber",'Master-forged Armor',"Dew's Special Elixir","Bronze Bell's Council Token",
 ];
 
 var SEED_FLAGS = [
@@ -133,6 +135,11 @@ var SEED_FLAGS = [
   'r3CraneMet3','r3CraneTestimony','r3CraneTrade3',
   'r3PlagueProof','r3BossDefeated','r3Ending',
   'craneSwordOffered','r3DicePlayed',
+  'r1SurvivorMet','r1SurvivorFed','r1SurvivorHelped','r1SurvivorFullTrust',
+  'r1WandererMet','r1WandererLore','r1TradedBread','r1TradedScale','r1TradedCrystal',
+  'r1YingMet','r1YingTrustUp','r1YingCompanion','r1YingHerb','r1YingFed',
+  'r1YingLore1','r1YingLore2',
+  'giftZhou','giftCrane','giftYing','giftFrost','giftCast','giftDew','giftBell',
 ];
 
 var B36 = '0123456789abcdefghijklmnopqrstuvwxyz';

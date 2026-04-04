@@ -37,7 +37,53 @@ function renderStatus() {
   if (state.inventory.length === 0) {
     $inv.innerHTML = '<li class="inventory-empty">' + L('空', 'Empty') + '</li>';
   } else {
-    $inv.innerHTML = state.inventory.map(it => '<li>' + it + '</li>').join('');
+    $inv.innerHTML = state.inventory.map(function(it) {
+      var rarity = (typeof getItemRarity === 'function') ? getItemRarity(it) : 'common';
+      return '<li class="rarity-' + rarity + '">' + it + '</li>';
+    }).join('');
+  }
+
+  // NPC Affinity display
+  if (typeof getAllNpcAffinity === 'function') {
+    var npcList = getAllNpcAffinity();
+    var $npcSection = document.getElementById('npc-section');
+    var $npcList = document.getElementById('npc-affinity-list');
+    if (npcList.length > 0) {
+      $npcSection.style.display = '';
+      document.getElementById('label-npc').textContent = L('好感度', 'AFFINITY');
+      var html = '';
+      for (var ni = 0; ni < npcList.length; ni++) {
+        var npc = npcList[ni];
+        var hearts = '';
+        for (var hi = 0; hi < npc.max; hi++) {
+          hearts += hi < npc.affinity
+            ? '<span class="npc-heart-full">♥</span>'
+            : '<span class="npc-heart-empty">♡</span>';
+        }
+        var giftHtml = '';
+        if (typeof isGiftAvailable === 'function' && isGiftAvailable(npc.id)) {
+          giftHtml = '<button class="npc-gift-btn" data-npc="' + npc.id + '">'
+            + L('領取', 'Claim') + '</button>';
+        } else if (typeof isGiftClaimed === 'function' && isGiftClaimed(npc.id)) {
+          giftHtml = '<span class="npc-gift-claimed">✓</span>';
+        }
+        html += '<div class="npc-row">'
+          + '<span class="npc-name">' + (state.lang === 'en' ? npc.nameEn : npc.name) + '</span>'
+          + '<span class="npc-hearts">' + hearts + '</span>'
+          + giftHtml
+          + '</div>';
+      }
+      $npcList.innerHTML = html;
+      // Bind gift buttons
+      var giftBtns = $npcList.querySelectorAll('.npc-gift-btn');
+      for (var gi = 0; gi < giftBtns.length; gi++) {
+        giftBtns[gi].addEventListener('click', (function(npcId) {
+          return function() { claimNpcGift(npcId); };
+        })(giftBtns[gi].getAttribute('data-npc')));
+      }
+    } else {
+      $npcSection.style.display = 'none';
+    }
   }
 
   // Mobile mini status bar
@@ -45,6 +91,18 @@ function renderStatus() {
   $mstLv.textContent = 'Lv.' + state.level;
   $mstHp.textContent = 'HP ' + state.hp;
   $mstPetri.textContent = L('石化 ', 'Petri ') + state.petri + '%';
+  // Show top NPC on mobile
+  var $mstNpc = document.getElementById('mst-npc');
+  if ($mstNpc && typeof getTopNpc === 'function') {
+    var topNpc = getTopNpc();
+    if (topNpc) {
+      $mstNpc.style.display = '';
+      var nLabel = state.lang === 'en' ? topNpc.nameEn : topNpc.name;
+      $mstNpc.textContent = '♥' + nLabel + ' ' + topNpc.affinity + '/' + topNpc.max;
+    } else {
+      $mstNpc.style.display = 'none';
+    }
+  }
 
   renderAvatar();
 }

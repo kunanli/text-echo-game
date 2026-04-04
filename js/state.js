@@ -73,6 +73,8 @@ function applyLang() {
   document.getElementById('save-code-btn').textContent = en ? 'Save Code' : '存檔碼';
   var $chapterIngame = document.getElementById('chapter-ingame-btn');
   if ($chapterIngame) $chapterIngame.textContent = en ? 'Chapters' : '章節';
+  var $labelNpc = document.getElementById('label-npc');
+  if ($labelNpc) $labelNpc.textContent = en ? 'AFFINITY' : '好感度';
   // Level-up dialog (static labels)
   document.getElementById('levelup-str-desc').textContent = en ? 'Attack · Climb' : '攻擊·攀爬';
   document.getElementById('levelup-agi-desc').textContent = en ? 'Dodge · Stealth' : '閃避·潛行';
