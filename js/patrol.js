@@ -1,6 +1,6 @@
 // ══ Patrol / Idle Grind System ══
 var R0_MONSTERS = [
-  { name: '石化蝙蝠', nameEn: 'Petrified Bat', hp: 12, atkMin: 2, atkMax: 5, petriDmg: 1, xp: 5,
+  { name: '石化蝙蝠', nameEn: 'Petrified Bat', hp: 12, atkMin: 4, atkMax: 10, petriDmg: 2, xp: 5,
     art: [
       '        ╱╲    ╱╲',
       '       ╱  ╲╭╮╱  ╲',
@@ -16,7 +16,7 @@ var R0_MONSTERS = [
     ],
     spareText: { zh: '石化蝙蝠發出一聲細小的嗚咽，拍著翅膀飛向洞穴深處。', en: 'The bat lets out a tiny whimper and flutters away into the cave.' },
   },
-  { name: '灰蘑菇怪', nameEn: 'Grey Mushroom', hp: 8, atkMin: 1, atkMax: 4, petriDmg: 0, xp: 3,
+  { name: '灰蘑菇怪', nameEn: 'Grey Mushroom', hp: 8, atkMin: 2, atkMax: 8, petriDmg: 1, xp: 3,
     empathyGoal: 2,
     art: [
       '        ╭━━━━━╮',
@@ -32,7 +32,7 @@ var R0_MONSTERS = [
     ],
     spareText: { zh: '灰蘑菇怪滿意地縮回地面，留下一小撮發光的孢子。', en: 'The mushroom happily sinks back into the ground, leaving glowing spores.' },
   },
-  { name: '石蜥蜴幼體', nameEn: 'Baby Stone Lizard', hp: 18, atkMin: 3, atkMax: 7, petriDmg: 2, xp: 8,
+  { name: '石蜥蜴幼體', nameEn: 'Baby Stone Lizard', hp: 18, atkMin: 6, atkMax: 14, petriDmg: 4, xp: 8,
     art: [
       '             ╱╲',
       '    ╱╲╱╲╱╲╱╱  ╲',
@@ -48,7 +48,7 @@ var R0_MONSTERS = [
     ],
     spareText: { zh: '石蜥蜴幼體發出輕快的叫聲，蹦跳著跑向石縫。也許它的母親還在某處等著。', en: 'The baby lizard chirps and bounces away toward a crevice. Perhaps its mother waits somewhere.' },
   },
-  { name: '石化鼠群', nameEn: 'Petrified Rat Swarm', hp: 15, atkMin: 2, atkMax: 6, petriDmg: 1, xp: 6,
+  { name: '石化鼠群', nameEn: 'Petrified Rat Swarm', hp: 15, atkMin: 4, atkMax: 12, petriDmg: 2, xp: 6,
     empathyGoal: 4,
     art: [
       '    ╭╮   ╭╮   ╭╮',
@@ -68,7 +68,7 @@ var R0_MONSTERS = [
 ];
 
 var R1_MONSTERS = [
-  { name: '礦脈蠕蟲', nameEn: 'Ore Vein Worm', hp: 22, atkMin: 4, atkMax: 8, petriDmg: 2, xp: 10,
+  { name: '礦脈蠕蟲', nameEn: 'Ore Vein Worm', hp: 22, atkMin: 8, atkMax: 16, petriDmg: 4, xp: 10,
     art: [
       '    ╭━━━╮',
       '   ╱ ◎◎ ╲━━╮',
@@ -84,7 +84,7 @@ var R1_MONSTERS = [
     ],
     spareText: { zh: '礦脈蠕蟲鑽入石壁，留下一條閃著礦光的隧道。', en: 'The worm burrows into the wall, leaving a tunnel that glints with ore.' },
   },
-  { name: '鐵甲石蟲', nameEn: 'Ironclad Stonebug', hp: 28, atkMin: 5, atkMax: 9, petriDmg: 2, xp: 12,
+  { name: '鐵甲石蟲', nameEn: 'Ironclad Stonebug', hp: 28, atkMin: 10, atkMax: 18, petriDmg: 4, xp: 12,
     empathyGoal: 4,
     art: [
       '     ╭══════╮',
@@ -102,7 +102,7 @@ var R1_MONSTERS = [
     ],
     spareText: { zh: '鐵甲石蟲翻了個身，像一顆圓石般滾向暗處，發出咔嗒咔嗒的聲音。', en: 'The stonebug rolls away like a boulder, its plates clicking softly.' },
   },
-  { name: '石化礦工亡魂', nameEn: 'Petrified Miner Ghost', hp: 20, atkMin: 3, atkMax: 10, petriDmg: 3, xp: 14,
+  { name: '石化礦工亡魂', nameEn: 'Petrified Miner Ghost', hp: 20, atkMin: 6, atkMax: 20, petriDmg: 6, xp: 14,
     empathyGoal: 2,
     art: [
       '      ╱▔▔▔╲',
@@ -118,7 +118,7 @@ var R1_MONSTERS = [
     ],
     spareText: { zh: '礦工亡魂向你深深鞠了一躬：「謝謝你……記得我就好。」它的身影化為光點消散。', en: 'The miner\'s ghost bows deeply: "Thank you... just remember me." Its form dissolves into light.' },
   },
-  { name: '結晶蝎', nameEn: 'Crystal Scorpion', hp: 25, atkMin: 6, atkMax: 11, petriDmg: 3, xp: 15,
+  { name: '結晶蝎', nameEn: 'Crystal Scorpion', hp: 25, atkMin: 12, atkMax: 22, petriDmg: 6, xp: 15,
     empathyGoal: 4,
     art: [
       '        ╭╮',
@@ -161,7 +161,7 @@ var R1_PATROL_TEXTS = [
 ];
 
 var R2_MONSTERS = [
-  { name: '石化巨蟻', nameEn: 'Petrified Giant Ant', hp: 30, atkMin: 6, atkMax: 12, petriDmg: 3, xp: 16,
+  { name: '石化巨蟻', nameEn: 'Petrified Giant Ant', hp: 30, atkMin: 12, atkMax: 24, petriDmg: 6, xp: 16,
     art: [
       '      ╭━━╮',
       '     ╱ ◆◆ ╲',
@@ -178,7 +178,7 @@ var R2_MONSTERS = [
     ],
     spareText: { zh: '石化巨蟻轉身朝巢穴走去，走了幾步又回頭看了你一眼——然後消失在石壁的裂縫中。', en: 'The giant ant turns toward its nest, glances back at you once, then vanishes into a crack in the rock.' },
   },
-  { name: '碎岩傀儡', nameEn: 'Rubble Golem', hp: 40, atkMin: 8, atkMax: 13, petriDmg: 3, xp: 18,
+  { name: '碎岩傀儡', nameEn: 'Rubble Golem', hp: 40, atkMin: 16, atkMax: 26, petriDmg: 6, xp: 18,
     empathyGoal: 4,
     art: [
       '     ╔═══╗',
@@ -197,7 +197,7 @@ var R2_MONSTERS = [
     ],
     spareText: { zh: '碎岩傀儡站起身，用石臂輕輕拍了拍你的肩膀——然後一塊塊散開，回歸為採石場的碎石。', en: 'The golem rises, gently pats your shoulder with a stone arm — then crumbles piece by piece, returning to quarry rubble.' },
   },
-  { name: '鏽蝕機甲殘骸', nameEn: 'Rusted Mech Wraith', hp: 35, atkMin: 7, atkMax: 15, petriDmg: 4, xp: 20,
+  { name: '鏽蝕機甲殘骸', nameEn: 'Rusted Mech Wraith', hp: 35, atkMin: 14, atkMax: 30, petriDmg: 8, xp: 20,
     empathyGoal: 3,
     art: [
       '     ╔══╗',
@@ -215,7 +215,7 @@ var R2_MONSTERS = [
     ],
     spareText: { zh: '機甲殘骸的眼部亮了最後一下：「……任務完成。」然後永遠沉寂了下去。地上留下了一枚鏽蝕的徽章。', en: 'The wraith\'s eyes flash one last time: "...mission complete." Then silence forever. A rusted badge remains on the ground.' },
   },
-  { name: '深層石化蟒', nameEn: 'Deep Stone Serpent', hp: 38, atkMin: 9, atkMax: 16, petriDmg: 5, xp: 22,
+  { name: '深層石化蟒', nameEn: 'Deep Stone Serpent', hp: 38, atkMin: 18, atkMax: 32, petriDmg: 10, xp: 22,
     empathyGoal: 4,
     art: [
       '    ╭━━━╮',
@@ -248,7 +248,7 @@ var R2_PATROL_TEXTS = [
 ];
 
 var R3_MONSTERS = [
-  { name: '河蛭巨蟲', nameEn: 'River Leech Worm', hp: 35, atkMin: 8, atkMax: 14, petriDmg: 4, xp: 22,
+  { name: '河蛭巨蟲', nameEn: 'River Leech Worm', hp: 35, atkMin: 16, atkMax: 28, petriDmg: 8, xp: 22,
     art: [
       '     ╭━━━━━╮',
       '    ╱ ● ═══ ╲',
@@ -264,7 +264,7 @@ var R3_MONSTERS = [
     ],
     spareText: { zh: '河蛭巨蟲沉入黑暗的水底，尾部的生物光漸漸消失——像一盞熄滅的燈籠。', en: 'The leech sinks into the dark water, its bioluminescence fading — like a lantern going out.' },
   },
-  { name: '鏽鱗魚人', nameEn: 'Rust-Scale Fishman', hp: 42, atkMin: 9, atkMax: 16, petriDmg: 4, xp: 25,
+  { name: '鏽鱗魚人', nameEn: 'Rust-Scale Fishman', hp: 42, atkMin: 18, atkMax: 32, petriDmg: 8, xp: 25,
     empathyGoal: 3,
     art: [
       '      ╭──╮',
@@ -282,7 +282,7 @@ var R3_MONSTERS = [
     ],
     spareText: { zh: '魚人把河珍珠塞進你手裡，然後轉身跳入水中。在水花中，你看到它回頭看了你一眼——像在說再見。', en: 'The fishman presses the pearl into your hand, then dives into the water. In the splash, it looks back — as if saying goodbye.' },
   },
-  { name: '石化水母群', nameEn: 'Petrified Jellyfish Swarm', hp: 28, atkMin: 5, atkMax: 18, petriDmg: 6, xp: 24,
+  { name: '石化水母群', nameEn: 'Petrified Jellyfish Swarm', hp: 28, atkMin: 10, atkMax: 36, petriDmg: 12, xp: 24,
     art: [
       '    ╭═══╮  ╭══╮',
       '   ╱ ◎◎╱  ╱◎◎ ╲',
@@ -298,7 +298,7 @@ var R3_MONSTERS = [
     ],
     spareText: { zh: '水母群散去，在水面留下了一層閃爍的磷光。你感覺到石化的痕跡略微褪去了一些。', en: 'The swarm disperses, leaving a shimmering phosphorescence on the water. Your petrification marks fade slightly.' },
   },
-  { name: '淵底鱷龍', nameEn: 'Abyss Crocodilian', hp: 50, atkMin: 12, atkMax: 20, petriDmg: 5, xp: 30,
+  { name: '淵底鱷龍', nameEn: 'Abyss Crocodilian', hp: 50, atkMin: 24, atkMax: 40, petriDmg: 10, xp: 30,
     empathyGoal: 4,
     art: [
       '   ╭━━━━━━━━━━━━╮',

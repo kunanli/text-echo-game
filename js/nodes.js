@@ -12,18 +12,41 @@ function die(msg) {
   currentChoices = [];
   $deathMsg.textContent = msg || L('你死了……', 'You died...');
   sfx.death();
+
+  // Update revive button based on revival stone availability
+  var hasStone = hasItem('復活石') || hasItem('Revival Stone');
+  $revive.textContent = hasStone
+    ? L('使用復活石', 'Use Revival Stone')
+    : L('沒有復活石……', 'No Revival Stone...');
+  $revive.style.opacity = hasStone ? '1' : '0.4';
+  $revive.disabled = !hasStone;
+
   $deathOv.classList.add('active');
 }
 
 function revive() {
+  var stoneZh = '復活石';
+  var stoneEn = 'Revival Stone';
+  var hasStone = hasItem(stoneZh) || hasItem(stoneEn);
+
+  if (!hasStone) {
+    // No revival stone — cannot revive
+    notify(L('你沒有復活石……無法復活。', 'No Revival Stone... cannot revive.'));
+    return;
+  }
+
+  // Consume the revival stone
+  if (hasItem(stoneZh)) removeItem(stoneZh);
+  else removeItem(stoneEn);
+
   state.deathCount++;
   state.hp = Math.floor(state.maxHp * 0.6);
   state.petri = Math.max(0, state.petri - 30);
   $deathOv.classList.remove('active');
-  notify(L('你從石殼中掙脫，重新站起。（復活次數：' + state.deathCount + '）', 'You break free from the stone shell. (Deaths: ' + state.deathCount + ')'));
+  sfx.item();
+  notify(L('復活石碎裂——你從石殼中掙脫！（復活次數：' + state.deathCount + '）', 'Revival Stone shatters — you break free! (Deaths: ' + state.deathCount + ')'));
   renderStatus();
   // Return to a safe node — avoid reloading combat/patrol/tunnel nodes
-  // (tunnel nodes replay long auto-explore sequences with combat encounters)
   var REVIVE_SAFE = { 'r0_tunnel': 'r0_climb_check', 'r1_guard_fight': 'r1_look', 'r1_guard_check': 'r1_look', 'r2_boss': 'r2_camp', 'r2_boss_prep': 'r2_camp', 'r3_patrol': 'r3_look', 'r3_boss': 'r3_council', 'r3_boss_prep': 'r3_council' };
   var safeNode = state.node;
   if (REVIVE_SAFE[safeNode]) {
@@ -35,6 +58,16 @@ function revive() {
 }
 
 $revive.addEventListener('click', revive);
+
+// Restart from beginning
+var $restartBtn = document.getElementById('restart-btn');
+if ($restartBtn) {
+  $restartBtn.addEventListener('click', function() {
+    $deathOv.classList.remove('active');
+    if (typeof localStorage !== 'undefined') localStorage.removeItem('petriabyss_save');
+    location.reload();
+  });
+}
 
 function regionStartNode() {
   return ['r0_start','r1_start','r2_start','r3_start'][state.region] || 'r0_start';

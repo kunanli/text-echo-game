@@ -512,6 +512,7 @@ registerNode('r0_hidden', () => {
   steps.push(
     { tag: '發現', tagColor: 'tag-item', html: '一小包乾燥的<b>草藥</b>，包在皮革裡。', htmlEn: 'A small bundle of dried <b>herbs</b>, wrapped in leather.', delay: 1800, effect: () => addItem(L('乾燥草藥', 'Dried Herbs')) },
     { tag: '發現', tagColor: 'tag-item', text: '一段粗糙的繩索，大約兩個人高的長度。', textEn: 'A length of crude rope, about two body-lengths long.', delay: 1800, effect: () => addItem(L('粗繩', 'Rope')) },
+    { tag: '發現', tagColor: 'tag-item', html: '角落裡還有一塊散發微光的石頭——<b>復活石</b>。握在手中有種溫暖的脈動。', htmlEn: 'In the corner, a faintly glowing stone — a <b>Revival Stone</b>. It pulses warmly in your hand.', delay: 2200, effect: () => { addItem(L('復活石', 'Revival Stone')); sfx.item(); } },
     { tag: '情報', tagColor: 'tag-info', text: '有人曾經在這裡藏了求生物資。看來你不是第一個試圖逃出去的人。', textEn: 'Someone stashed survival supplies here. You\'re not the first to try escaping.', delay: 2500 },
     { tag: '感知', tagColor: 'tag-sense', text: '但那個人……最終成功了嗎？', textEn: 'But did that person... ever make it out?', delay: 2500 }
   );
@@ -859,7 +860,7 @@ registerNode('r0_tunnel', () => {
   ], [
     { text: '戰鬥', textEn: 'Fight', action: () => {
       startCombat(
-        { name: lizardName, hp: 30, atkMin: 4, atkMax: 9, petriDmg: 3, desc: lizardDesc },
+        { name: lizardName, hp: 30, atkMin: 8, atkMax: 18, petriDmg: 6, desc: lizardDesc },
         () => { changeStat('str', 1); notify(L('力量 +1', 'STR +1')); loadNode('r0_after_lizard'); },
         () => {
           changePetri(5);
@@ -893,7 +894,7 @@ registerNode('r0_tunnel', () => {
           { tag: '石化', tagColor: 'tag-petri', text: '你的皮膚瞬間僵硬了幾秒——石蜥蜴擺出攻擊姿態。', textEn: 'Your skin goes rigid for seconds — the lizard assumes attack stance.', delay: 2000 },
         ], [{ text: '被迫戰鬥', textEn: 'Forced to fight', action: () => {
           startCombat(
-            { name: lizardName, hp: 30, atkMin: 4, atkMax: 9, petriDmg: 3, desc: lizardDescShort },
+            { name: lizardName, hp: 30, atkMin: 8, atkMax: 18, petriDmg: 6, desc: lizardDescShort },
             () => { changeStat('str', 1); notify(L('力量 +1', 'STR +1')); loadNode('r0_after_lizard'); },
             null
           );
@@ -914,7 +915,7 @@ registerNode('r0_tunnel', () => {
           { tag: '失敗', tagColor: 'tag-warn', text: '石蜥蜴歪了歪頭……然後直接撲了過來！', textEn: 'The lizard tilts its head... then lunges at you!', delay: 1800 },
         ], [{ text: '戰鬥', textEn: 'Fight', action: () => {
           startCombat(
-            { name: lizardName, hp: 30, atkMin: 4, atkMax: 9, petriDmg: 3, desc: lizardDescShort },
+            { name: lizardName, hp: 30, atkMin: 8, atkMax: 18, petriDmg: 6, desc: lizardDescShort },
             () => { changeStat('str', 1); notify(L('力量 +1', 'STR +1')); loadNode('r0_after_lizard'); },
             () => { changePetri(5); loadNode('r0_climb_check'); }
           );

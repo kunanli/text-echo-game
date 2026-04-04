@@ -605,6 +605,7 @@ registerNode('r2_camp_medic', () => {
           { tag: '恢復', tagColor: 'tag-explore', text: '清露用特製的藥膏塗抹你的石化部位，然後纏上浸泡過淨化液的繃帶。', textEn: 'Dew applies a special salve to your petrified areas, then wraps them in purified bandages.', delay: 2200 },
           { tag: '恢復', tagColor: 'tag-explore', text: '一股清涼的感覺擴散開來——石化的灰色紋路明顯消退了。', textEn: 'A cool sensation spreads — the grey petrification patterns visibly recede.', delay: 2200 },
           { tag: '恢復', tagColor: 'tag-explore', text: '「這是我僅剩的藥膏了。好好利用。」清露嘆了口氣。', textEn: '"That\'s the last of my salve. Use it well." Dew sighs.', delay: 2200 },
+          { tag: '物品', tagColor: 'tag-item', html: '清露又從藥箱深處翻出一塊發光的石頭：「<b>復活石</b>——這是在深處採集到的，能在瀕死時將你從石化中拉回來。」', htmlEn: 'Dew digs out a glowing stone from deep in her kit: "<b>Revival Stone</b> — found in the depths. It can pull you back from the brink of petrification."', delay: 2800, effect: () => { addItem(L('復活石', 'Revival Stone')); sfx.item(); } },
         ], [
           { text: '返回營地', textEn: 'Return to camp', action: () => loadNode('r2_camp') },
         ], { label: L('接受治療', 'Receiving treatment') });
@@ -700,7 +701,7 @@ registerNode('r2_boss_prep', () => {
 registerNode('r2_boss', () => {
   var BOSS = {
     name: '石化巨像', nameEn: 'Petrified Colossus',
-    hp: 60, atkMin: 8, atkMax: 14, petriDmg: 5, xp: 40,
+    hp: 60, atkMin: 16, atkMax: 28, petriDmg: 10, xp: 40,
     empathyGoal: 4,
     art: [
       '       ╔═══════════╗',

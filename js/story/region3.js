@@ -771,7 +771,7 @@ registerNode('r3_boss_prep', () => {
 registerNode('r3_boss', () => {
   var BOSS = {
     name: '鏽刃', nameEn: 'Rust Blade',
-    hp: 55, atkMin: 10, atkMax: 18, petriDmg: 4, xp: 45,
+    hp: 55, atkMin: 20, atkMax: 36, petriDmg: 8, xp: 45,
     empathyGoal: 3,
     art: [
       '        ╭──╮',

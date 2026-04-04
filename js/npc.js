@@ -38,6 +38,8 @@ var ITEM_RARITY = {
   '濃縮淨化液': 'rare',     'Concentrated Purifier': 'rare',
   '螢的護身符': 'epic',     "Ying's Charm": 'epic',
   '石化抑制劑': 'rare',     'Petri Suppressant': 'rare',
+  // Revival stones
+  '復活石': 'rare',         'Revival Stone': 'rare',
   // Region 3
   '河城地圖': 'common',     'River City Map': 'common',
   '河城草藥包': 'uncommon', 'River City Herb Pack': 'uncommon',

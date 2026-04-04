@@ -407,7 +407,7 @@ registerNode('r1_guard_fight', () => {
   var gName = L('石脈守衛', 'Vein Guardian');
   var gDesc = L('石脈守衛緩慢但攻擊力極強，每次重擊都帶有強烈的石化效果。', 'The Vein Guardian is slow but hits hard. Each blow carries intense petrification.');
   startCombat(
-    { name: gName, hp: 55, atkMin: 8, atkMax: 14, petriDmg: 4, desc: gDesc },
+    { name: gName, hp: 55, atkMin: 16, atkMax: 28, petriDmg: 8, desc: gDesc },
     () => {
       state.flags.r1GuardDefeated = true;
       changeStat('str', 2);
@@ -437,6 +437,7 @@ registerNode('r1_guard_weak', () => {
     { tag: '戰鬥', tagColor: 'tag-combat', text: '「喀啦——！」核心應聲碎裂！', textEn: '"CRACK—!" The core shatters!', delay: 1500 },
     { tag: '勝利', tagColor: 'tag-explore', text: '守衛的雙眼熄滅，巨大的身軀轟然倒塌。', textEn: 'The guardian\'s eyes go dark. Its massive body collapses.', delay: 2200 },
     { tag: '物品', tagColor: 'tag-item', html: '碎裂的核心中掉出一塊<b>守衛核心石</b>。', htmlEn: 'A <b>Guardian Core Stone</b> drops from the shattered core.', delay: 2000, effect: () => { addItem(L('守衛核心石', 'Guardian Core Stone')); changeStat('str', 1); gainXp(25); } },
+    { tag: '發現', tagColor: 'tag-item', html: '碎石堆裡閃爍著一塊<b>復活石</b>——守衛曾經守護的東西之一。', htmlEn: 'Among the rubble, a <b>Revival Stone</b> glimmers — one of the things the guardian once protected.', delay: 2200, effect: () => { addItem(L('復活石', 'Revival Stone')); sfx.item(); } },
   ], [
     { text: '繼續前進', textEn: 'Continue forward', action: () => loadNode('r1_look') },
   ], { label: L('攻擊弱點', 'Striking weakness') });
