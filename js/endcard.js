@@ -255,7 +255,7 @@ function generateEndCard() {
   var meta = ENDING_META[ending] || ENDING_META.lockdown;
   var totalScore = calculateEndScore();
   var rarity = getRarity(totalScore);
-  var pad = 36;
+  var pad = 52;
 
   // ── Background ──
   ctx.fillStyle = '#0d0d15';
