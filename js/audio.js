@@ -115,9 +115,17 @@ var ambientAudio = (function() {
     for (var i = 0; i < list.length; i++) {
       var item = list[i];
       fadeGain(item.gain.gain, 0, dur);
-      (function(n) {
-        setTimeout(function() { try { n.stop(); } catch(e) { DEBUG && console.warn('Audio node stop failed:', e); } }, (dur + 0.5) * 1000);
-      })(item.node);
+      (function(n, extras) {
+        setTimeout(function() {
+          try { n.stop(); } catch(e) { DEBUG && console.warn('Audio node stop failed:', e); }
+          if (extras) {
+            for (var j = 0; j < extras.length; j++) {
+              try { extras[j].disconnect(); } catch(e) {}
+              try { extras[j].stop(); } catch(e) {}
+            }
+          }
+        }, (dur + 0.5) * 1000);
+      })(item.node, item._extraNodes);
     }
     list.length = 0;
   }
@@ -155,24 +163,38 @@ var ambientAudio = (function() {
     pushRegionLayer(shimmer, 0.04, 3);
   }
 
-  // Region 2: 大採石場 — Open space, wind + distant echoes, mechanical rumble
+  // Region 2: 大採石場 — Vast cavern resonance, slow wind, distant metallic echoes
   function buildRegion2() {
-    var brown = makeBrownNoise(2);
-    var wind = makeFilteredNoise(brown, 'bandpass', isMobile ? 400 : 250, 0.5, 0.5);
-    pushRegionLayer(wind, isMobile ? 0.6 : 0.5, 2);
+    // Layer 1: Deep sub-bass resonance — the massive space itself humming
+    var sub = makeOscDrone(isMobile ? 80 : 40, 'sine');
+    pushRegionLayer(sub, isMobile ? 0.25 : 0.2, 2.5);
 
-    var mech = makeOscDrone(isMobile ? 120 : 45, 'sawtooth');
-    var mechFilter = ctx.createBiquadFilter();
-    mechFilter.type = 'lowpass';
-    mechFilter.frequency.value = isMobile ? 200 : 100;
-    mech.node.disconnect();
-    mech.node.connect(mechFilter);
-    mechFilter.connect(mech.gain);
-    pushRegionLayer(mech, 0.15, 2);
+    // Layer 2: Slow-moving wind through open cavern (LFO-modulated filter)
+    var brown = makeBrownNoise(3);
+    var wind = makeFilteredNoise(brown, 'bandpass', isMobile ? 500 : 300, 0.8, 0.5);
+    // LFO to slowly sweep the filter frequency — breathing wind effect
+    var windLfo = ctx.createOscillator();
+    windLfo.type = 'sine';
+    windLfo.frequency.value = 0.15; // very slow sweep
+    var windLfoGain = ctx.createGain();
+    windLfoGain.gain.value = isMobile ? 150 : 100;
+    windLfo.connect(windLfoGain);
+    windLfoGain.connect(wind.filter.frequency);
+    windLfo.start();
+    wind._extraNodes = [windLfo, windLfoGain];
+    pushRegionLayer(wind, isMobile ? 0.5 : 0.4, 2);
 
+    // Layer 3: Distant metallic resonance — two detuned triangle drones (fifth interval)
+    var drone1 = makeOscDrone(isMobile ? 165 : 82, 'triangle');
+    pushRegionLayer(drone1, 0.08, 3);
+
+    var drone2 = makeOscDrone(isMobile ? 248 : 123, 'triangle');
+    pushRegionLayer(drone2, 0.06, 3.5);
+
+    // Layer 4: Faint dust/gravel texture — gentle mid-high filtered noise
     var white = makeWhiteNoise(2);
-    var echo = makeFilteredNoise(white, 'highpass', 3500, 2, 0.05);
-    pushRegionLayer(echo, 0.06, 3);
+    var dust = makeFilteredNoise(white, 'bandpass', isMobile ? 2000 : 1200, 3, 0.03);
+    pushRegionLayer(dust, 0.04, 4);
   }
 
   // Region 3: 河城渡口 — Water flow + civilization hum + warmth
