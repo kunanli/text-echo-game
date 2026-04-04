@@ -130,6 +130,7 @@ document.addEventListener('keyup', (e) => {
 
 function selectChoice(idx) {
   if (idx >= currentChoices.length) return;
+  sfx.click();
   const action = currentChoices[idx].action;
   currentChoices = [];
   action();

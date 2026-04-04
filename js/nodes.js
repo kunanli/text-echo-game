@@ -10,6 +10,7 @@ function die(msg) {
   $choices.innerHTML = '';
   currentChoices = [];
   $deathMsg.textContent = msg || L('你死了……', 'You died...');
+  sfx.death();
   $deathOv.classList.add('active');
 }
 

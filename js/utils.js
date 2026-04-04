@@ -18,6 +18,7 @@ function hasItem(name) { return state.inventory.includes(name); }
 function addItem(name) {
   if (!hasItem(name)) {
     state.inventory.push(name);
+    sfx.item();
     notify(L('獲得物品：', 'Acquired: ') + name);
   }
 }
@@ -45,6 +46,7 @@ function gainXp(amount) {
     state.maxHp += 5;
     state.hp = Math.min(state.hp + 5, state.maxHp);
     pendingLevelUps++;
+    sfx.levelUp();
     notify(L('等級提升！ Lv.' + state.level + '  HP上限 +5',
              'Level Up! Lv.' + state.level + '  Max HP +5'));
   }
@@ -91,6 +93,7 @@ function showLevelUpChoice() {
 
 function changeHp(delta) {
   state.hp = clamp(state.hp + delta, 0, state.maxHp);
+  if (delta < 0) sfx.hurt();
   if (state.hp <= 0) {
     die(L('你的生命力耗盡，倒在了冰冷的石地上……', 'Your life force fades... You collapse on the cold stone floor...'));
     return true; // dead
@@ -100,6 +103,7 @@ function changeHp(delta) {
 
 function changePetri(delta) {
   state.petri = clamp(state.petri + delta, 0, 100);
+  if (delta > 0) sfx.petri();
   if (state.petri >= 100) {
     die(L('你的身體已完全化為冰冷的石頭……', 'Your body has completely turned to cold stone...'));
     return true; // dead
@@ -121,6 +125,7 @@ function statCheck(stat, dc) {
   var name = state.lang === 'en' ? statNames[stat][1] : statNames[stat][0];
   var sym = result !== 'fail' ? ' >= ' : ' < ';
   var tag = result === 'crit' ? (state.lang === 'en' ? 'CRITICAL!' : '大成功！') : result === 'pass' ? (state.lang === 'en' ? 'Passed!' : '成功！') : (state.lang === 'en' ? 'Failed...' : '失敗……');
+  if (result !== 'fail') sfx.pass(); else sfx.fail();
   notify(name + ' ' + state[stat] + ' + ' + roll + ' = ' + total + sym + dc + '  ' + tag);
   return result;
 }

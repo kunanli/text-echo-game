@@ -1,7 +1,8 @@
 // ══ Save / Load System ══
-// localStorage auto-save + shareable base64 save code
+// localStorage auto-save + shareable base64 save code + 3 manual save slots
 
 var SAVE_KEY = 'petrification_abyss_save';
+var SLOT_KEY_PREFIX = 'petrification_abyss_slot_';
 
 function saveGame() {
   try {
@@ -378,4 +379,72 @@ function importLegacy(code) {
   } catch (e) {
     return false;
   }
+}
+
+// ── Save Slots (3 manual slots) ──
+
+function slotKey(n) { return SLOT_KEY_PREFIX + n; }
+
+function saveToSlot(n) {
+  try {
+    var data = {
+      name: state.name, sex: state.sex,
+      hp: state.hp, maxHp: state.maxHp, petri: state.petri,
+      str: state.str, agi: state.agi, wil: state.wil,
+      xp: state.xp, level: state.level, xpToNext: state.xpToNext,
+      inventory: state.inventory.slice(),
+      region: state.region, node: state.node,
+      flags: JSON.parse(JSON.stringify(state.flags)),
+      deathCount: state.deathCount, lang: state.lang, mood: state.mood,
+      savedAt: Date.now()
+    };
+    localStorage.setItem(slotKey(n), JSON.stringify(data));
+    return true;
+  } catch (e) { return false; }
+}
+
+function loadFromSlot(n) {
+  try {
+    var json = localStorage.getItem(slotKey(n));
+    if (!json) return false;
+    var data = JSON.parse(json);
+    state.name = data.name || '旅者';
+    state.sex = data.sex || 'male';
+    state.maxHp = data.maxHp || 100;
+    state.hp = clamp(data.hp != null ? data.hp : 100, 0, state.maxHp);
+    state.petri = clamp(data.petri || 0, 0, 99);
+    state.str = data.str || 5;
+    state.agi = data.agi || 5;
+    state.wil = data.wil || 5;
+    state.xp = data.xp || 0;
+    state.level = data.level || 1;
+    state.xpToNext = data.xpToNext || 20;
+    state.inventory = data.inventory || [];
+    state.region = data.region || 0;
+    state.node = data.node || 'r0_start';
+    state.flags = data.flags || {};
+    state.deathCount = data.deathCount || 0;
+    state.lang = data.lang || 'zh';
+    state.mood = data.mood || 'normal';
+    saveGame();
+    return true;
+  } catch (e) { return false; }
+}
+
+function getSlotInfo(n) {
+  try {
+    var json = localStorage.getItem(slotKey(n));
+    if (!json) return null;
+    var d = JSON.parse(json);
+    return {
+      name: d.name || '旅者',
+      level: d.level || 1,
+      region: d.region || 0,
+      savedAt: d.savedAt || 0
+    };
+  } catch (e) { return null; }
+}
+
+function deleteSlot(n) {
+  localStorage.removeItem(slotKey(n));
 }

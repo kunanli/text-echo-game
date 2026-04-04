@@ -1276,6 +1276,64 @@
     min-height: 1.2em;
   }
 
+  /* ── Save Slots ── */
+  .save-slots { margin-bottom: 14px; }
+  .save-slot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 10px;
+    margin-bottom: 6px;
+    background: #0e0e1a;
+    border: 1px solid #2a2a3a;
+    border-radius: 6px;
+  }
+  .slot-info {
+    flex: 1;
+    text-align: left;
+    color: #6a6a7a;
+    font-size: .8rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .slot-info.has-data { color: #c8c8d0; }
+  .slot-actions {
+    display: flex;
+    gap: 4px;
+    flex-shrink: 0;
+  }
+  .slot-btn {
+    background: #1a1a2e;
+    color: #8a8a9a;
+    border: 1px solid #2a2a3a;
+    border-radius: 4px;
+    padding: 4px 10px;
+    font-family: inherit;
+    font-size: .75rem;
+    cursor: pointer;
+    transition: all .2s;
+  }
+  .slot-btn:hover:not(:disabled) { background: #222238; color: #d4a843; border-color: #d4a843; }
+  .slot-btn:disabled { opacity: .35; cursor: default; }
+  .slot-save-btn:hover:not(:disabled) { color: #5a5; border-color: #5a5; }
+  .slot-del-btn:hover:not(:disabled) { color: #a55; border-color: #a55; }
+
+  /* ── Save Code Collapsible ── */
+  .save-code-section { margin-top: 10px; }
+  .save-code-toggle {
+    color: #6a6a7a;
+    font-size: .8rem;
+    cursor: pointer;
+    letter-spacing: 2px;
+    padding: 6px 0;
+    list-style: none;
+  }
+  .save-code-toggle::-webkit-details-marker { display: none; }
+  .save-code-toggle::before { content: '▸ '; }
+  details[open] > .save-code-toggle::before { content: '▾ '; }
+  .save-code-toggle:hover { color: #d4a843; }
+
   /* ══ Level-Up UI ══ */
   .levelup-dialog { max-width: 360px; }
   .levelup-choices {

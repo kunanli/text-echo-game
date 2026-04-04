@@ -370,19 +370,105 @@ function buildChapterMap(container, mapPre, onSelect) {
   var $importBtn = document.getElementById('save-import-btn');
   var $closeBtn = document.getElementById('save-close-btn');
   var $openBtn = document.getElementById('save-code-btn');
+  var $codeToggle = document.getElementById('save-code-toggle');
+
+  // ── Slot UI helpers ──
+  var REGION_NAMES_ZH = ['祭獻坑','石脈迴廊','大採石場','河城渡口'];
+  var REGION_NAMES_EN = ['Sacrificial Pit','Vein Corridor','Great Quarry','River City Ferry'];
+
+  function formatSlotInfo(info, en) {
+    if (!info) return en ? 'Empty' : '空';
+    var region = en ? (REGION_NAMES_EN[info.region] || '?') : (REGION_NAMES_ZH[info.region] || '?');
+    var time = '';
+    if (info.savedAt) {
+      var d = new Date(info.savedAt);
+      time = ' · ' + d.getMonth() + '/' + d.getDate() + ' ' +
+        (d.getHours() < 10 ? '0' : '') + d.getHours() + ':' +
+        (d.getMinutes() < 10 ? '0' : '') + d.getMinutes();
+    }
+    return info.name + '  Lv.' + info.level + '  ' + region + time;
+  }
+
+  function refreshSlots() {
+    var en = state.lang === 'en';
+    for (var i = 1; i <= 3; i++) {
+      var info = getSlotInfo(i);
+      var $info = document.getElementById('slot-info-' + i);
+      $info.textContent = (en ? 'Slot ' + i + ': ' : '槽 ' + i + '：') + formatSlotInfo(info, en);
+      if (info) {
+        $info.classList.add('has-data');
+      } else {
+        $info.classList.remove('has-data');
+      }
+      var $slotEl = $info.parentElement;
+      var loadBtn = $slotEl.querySelector('.slot-load-btn');
+      var delBtn = $slotEl.querySelector('.slot-del-btn');
+      var saveBtn = $slotEl.querySelector('.slot-save-btn');
+      loadBtn.disabled = !info;
+      delBtn.disabled = !info;
+      loadBtn.textContent = en ? 'Load' : '讀取';
+      saveBtn.textContent = en ? 'Save' : '存檔';
+      delBtn.textContent = en ? 'Del' : '刪除';
+    }
+  }
+
+  // Slot button events
+  document.querySelectorAll('.slot-save-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var n = parseInt(btn.dataset.slot);
+      var en = state.lang === 'en';
+      if (saveToSlot(n)) {
+        $msg.style.color = '#5a5';
+        $msg.textContent = en ? 'Saved to slot ' + n + '!' : '已存檔至槽 ' + n + '！';
+        refreshSlots();
+      }
+    });
+  });
+
+  document.querySelectorAll('.slot-load-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var n = parseInt(btn.dataset.slot);
+      var en = state.lang === 'en';
+      if (loadFromSlot(n)) {
+        applyLang();
+        renderStatus();
+        $msg.style.color = '#5a5';
+        $msg.textContent = en ? 'Loaded from slot ' + n + '!' : '已從槽 ' + n + ' 讀取！';
+        setTimeout(function() {
+          $overlay.classList.remove('active');
+          loadNode(state.node);
+        }, 800);
+      } else {
+        $msg.style.color = '#a55';
+        $msg.textContent = en ? 'Slot is empty.' : '槽位為空。';
+      }
+    });
+  });
+
+  document.querySelectorAll('.slot-del-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var n = parseInt(btn.dataset.slot);
+      var en = state.lang === 'en';
+      deleteSlot(n);
+      $msg.style.color = '#6a6a7a';
+      $msg.textContent = en ? 'Slot ' + n + ' deleted.' : '槽 ' + n + ' 已刪除。';
+      refreshSlots();
+    });
+  });
 
   function openSaveDialog() {
     var en = state.lang === 'en';
-    $title.textContent = en ? 'SAVE CODE' : '存 檔 碼';
+    $title.textContent = en ? 'SAVE / LOAD' : '存 檔 管 理';
     $hint.textContent = en ? 'Copy this code to save progress, or paste a code to load:' : '複製此代碼以保存進度，或貼上代碼來讀取：';
     $copyBtn.textContent = en ? 'Copy' : '複製';
     $pasteBtn.textContent = en ? 'Paste' : '貼上';
     $importBtn.textContent = en ? 'Load' : '讀取';
     $closeBtn.textContent = en ? 'Close' : '關閉';
+    $codeToggle.textContent = en ? 'Save Code' : '存檔碼';
     $textarea.value = exportSaveCode();
     $msg.textContent = '';
+    refreshSlots();
     $overlay.classList.add('active');
-    setTimeout(function() { $textarea.select(); }, 100);
   }
 
   $openBtn.addEventListener('click', openSaveDialog);

@@ -76,6 +76,7 @@ function startCombat(enemy, onWin, onFlee) {
     observed = false;
     var enemyDmg = Math.max(0, rng(enemy.atkMin, enemy.atkMax) - Math.floor(state.agi * 0.3));
     enemyHp -= dmg;
+    sfx.hit();
 
     var log = '<div class="combat-log combat-log-player">'
       + '<span class="cl-tag cl-you">' + L('【你】', '[YOU]') + '</span> '
