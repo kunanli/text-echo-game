@@ -25,7 +25,7 @@ const TAG_EN = {
   '移動':'MOVE','記憶':'MEMORY','成功':'SUCCESS','失敗':'FAIL',
   '遭遇':'ENCOUNTER','戰鬥':'COMBAT','勝利':'VICTORY','潛行':'STEALTH',
   '撤退':'RETREAT','休息':'REST','恢復':'RECOVER','環境':'ENV',
-  '意志':'WILL','傷害':'DMG',
+  '意志':'WILL','傷害':'DMG','援助':'ALLY','恢復':'HEAL',
 };
 
 const REGIONS_ZH = ['祭獻坑','石脈迴廊','大採石場','河城渡口'];

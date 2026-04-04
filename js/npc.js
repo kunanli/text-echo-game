@@ -281,3 +281,123 @@ function claimNpcGift(id) {
   ]);
   saveGame();
 }
+
+// ══════════════════════════════════════════
+//  NPC Patrol Aid System
+// ══════════════════════════════════════════
+// Each NPC can appear in certain regions to assist during patrol.
+// Aid type and text vary per NPC.
+
+var NPC_PATROL_AID = {
+  zhou: {
+    regions: [1, 2, 3],
+    minAffinity: 2,
+    // Reduces damage taken
+    apply: function(result) { result.dmgMult = 0.5; },
+    text: [
+      { zh: '老周的聲音從暗處傳來：「小心，那東西喜歡從右邊偷襲！」你及時閃開了幾次攻擊。',
+        en: 'Old Zhou\'s voice echoes from the dark: "Watch out, it likes to flank from the right!" You dodge several attacks in time.' },
+      { zh: '你聽見拐杖敲擊地面的聲音——老周蹣跚地趕來，用他的採礦經驗幫你判斷了敵人的弱點。',
+        en: 'You hear a cane tapping the ground — Zhou hobbles over, using his mining experience to spot the enemy\'s weakness.' },
+    ]
+  },
+  crane: {
+    regions: [1, 2, 3],
+    minAffinity: 2,
+    // Adds bonus damage (kills faster, fewer rounds)
+    apply: function(result) { result.bonusDmg = 8 + rng(0, 6); },
+    text: [
+      { zh: '一道黑影掠過——灰鶴從側面切入，短刀在敵人身上劃出一道深痕，隨即消失在暗處。「別發呆，繼續打。」',
+        en: 'A shadow flickers — Grey Crane darts in from the side, her blade cutting deep, then vanishes. "Don\'t space out. Keep fighting."' },
+      { zh: '灰鶴不知何時出現在你身後，一腳踢飛了撲向你的敵人：「又欠我一頓酒。」',
+        en: 'Grey Crane appears behind you, kicking the lunging enemy aside: "You owe me another drink."' },
+    ]
+  },
+  ying: {
+    regions: [1, 2, 3],
+    minAffinity: 2,
+    // Reduces petrification damage
+    apply: function(result) { result.petriMult = 0; },
+    text: [
+      { zh: '螢從背包裡翻出一片浸了藥液的布，快速蒙住你的口鼻：「石化粒子太濃了，先擋一下！」',
+        en: 'Ying pulls a medicated cloth from her pack and covers your face: "Petri-particles are too dense — use this!"' },
+      { zh: '「等一下！」螢擋在你前面，在空中展開一張寫滿符文的紙——石化能量被短暫地偏轉了。\n她氣喘吁吁：「我的護符……有效的。」',
+        en: '"Wait!" Ying steps in front of you, unfolding a rune-covered paper — petrification energy deflects briefly.\nShe pants: "My ward... it works."' },
+    ]
+  },
+  frost: {
+    regions: [2],
+    minAffinity: 2,
+    // Heavy bonus damage + damage reduction
+    apply: function(result) { result.bonusDmg = 12 + rng(0, 4); result.dmgMult = 0.7; },
+    text: [
+      { zh: '鐵霜帶著巡邏隊趕到，石化的左臂揮出沉重的一擊：「這裡是我的地盤！」他的隊員掩護了你的側翼。',
+        en: 'Iron Frost arrives with a patrol squad, his petrified arm dealing a crushing blow: "This is MY territory!" His men cover your flanks.' },
+    ]
+  },
+  cast: {
+    regions: [2],
+    minAffinity: 2,
+    // Bonus weapon damage
+    apply: function(result) { result.bonusDmg = 6 + rng(0, 4); },
+    text: [
+      { zh: '一把鋒利的投擲斧從旁邊的通道飛來，深深嵌入敵人體內。你轉頭一看——老鑄站在角落，面無表情地點了點頭。',
+        en: 'A sharp throwing axe flies from a side passage, embedding deep in the enemy. You look — Old Cast stands in the corner, nodding expressionlessly.' },
+    ]
+  },
+  dew: {
+    regions: [2],
+    minAffinity: 2,
+    // Heals some HP, negates petri
+    apply: function(result) { result.healHp = 15 + rng(0, 10); result.petriMult = 0.3; },
+    text: [
+      { zh: '戰鬥結束後，清露快步走來，手上拿著急救包：「坐下，讓我看看。」她手法熟練地處理了你的傷口，又塗上了抗石化藥膏。',
+        en: 'After the fight, Dew hurries over with a first aid kit: "Sit down, let me look." She treats your wounds expertly and applies anti-petri salve.' },
+    ]
+  },
+  bell: {
+    regions: [3],
+    minAffinity: 2,
+    // Damage reduction + petri reduction
+    apply: function(result) { result.dmgMult = 0.6; result.petriMult = 0.5; },
+    text: [
+      { zh: '幾名持盾的議事廳衛兵出現在你身旁：「銅鐘議員的命令——協助深淵來客。」他們用盾牆擋住了大部分攻擊。',
+        en: 'Council guards with shields appear at your side: "By order of Councilor Bronze Bell — assist the Abyss visitor." Their shield wall blocks most attacks.' },
+    ]
+  }
+};
+
+// Roll for NPC patrol aid. Returns null or {id, name, nameEn, text, apply}.
+// Chance scales with affinity: (affinity / max) * 30%
+function rollPatrolAid() {
+  var candidates = [];
+  for (var i = 0; i < NPC_IDS.length; i++) {
+    var id = NPC_IDS[i];
+    var aid = NPC_PATROL_AID[id];
+    if (!aid) continue;
+    if (aid.regions.indexOf(state.region) === -1) continue;
+    var aff = getNpcAffinity(id);
+    if (aff < aid.minAffinity) continue;
+    candidates.push({ id: id, affinity: aff, max: getNpcMaxAffinity(id), aid: aid });
+  }
+  if (candidates.length === 0) return null;
+
+  // Pick highest affinity candidate (ties broken randomly)
+  candidates.sort(function(a, b) { return b.affinity - a.affinity || (Math.random() - 0.5); });
+  var pick = candidates[0];
+
+  // Chance: (affinity / max) * 30%, minimum 10% at minAffinity
+  var chance = (pick.affinity / pick.max) * 0.30;
+  if (Math.random() > chance) return null;
+
+  var def = NPC_DEFS[pick.id];
+  var texts = pick.aid.text;
+  var t = texts[rng(0, texts.length - 1)];
+  return {
+    id: pick.id,
+    name: def.name,
+    nameEn: def.nameEn,
+    text: L(t.zh, t.en),
+    apply: pick.aid.apply
+  };
+}

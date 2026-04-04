@@ -517,11 +517,40 @@ function runPatrolCycle() {
       delay: d, pending: entry.who === 'player' });
   }
 
+  // NPC Patrol Aid — roll for ally assistance
+  var npcAid = (typeof rollPatrolAid === 'function') ? rollPatrolAid() : null;
+  if (npcAid) {
+    // Build modified result
+    var aidResult = { dmgMult: 1, petriMult: 1, bonusDmg: 0, healHp: 0 };
+    npcAid.apply(aidResult);
+    totalDmg = Math.max(0, Math.floor(totalDmg * aidResult.dmgMult));
+    totalPetri = Math.max(0, Math.floor(totalPetri * aidResult.petriMult));
+    if (aidResult.bonusDmg > 0) {
+      // Extra damage shortens fight — just narrate it
+    }
+    var aidName = L(npcAid.name, npcAid.nameEn);
+    queue.push({ tag: L('援助','ALLY'), color: 'tag-info',
+      text: npcAid.text,
+      delay: 2200, pending: true });
+    // Heal effect if present
+    if (aidResult.healHp > 0) {
+      var healAmt = aidResult.healHp;
+      queue.push({ tag: L('恢復','Heal'), color: 'tag-item',
+        text: L(aidName + ' 為你治療了 ' + healAmt + ' HP。',
+                aidName + ' heals you for ' + healAmt + ' HP.'),
+        delay: 1400,
+        effect: function() { changeHp(healAmt); renderStatus(); }
+      });
+    }
+  }
+
   // Result + apply effects
   var mXp = monster.xp + rng(0, 2);
   queue.push({ tag: L('結果','Result'), color: 'tag-item',
-    text: L('勝利！ HP -' + totalDmg + '  石化 +' + totalPetri + '%  經驗 +' + mXp,
-            'Victory! HP -' + totalDmg + '  Petri +' + totalPetri + '%  XP +' + mXp),
+    text: L('勝利！ HP -' + totalDmg + '  石化 +' + totalPetri + '%  經驗 +' + mXp
+            + (npcAid ? '  (' + L(npcAid.name, npcAid.nameEn) + L('的援助！', '\'s aid!') + ')' : ''),
+            'Victory! HP -' + totalDmg + '  Petri +' + totalPetri + '%  XP +' + mXp
+            + (npcAid ? '  (' + L(npcAid.name, npcAid.nameEn) + L('的援助！', '\'s aid!') + ')' : '')),
     delay: 2000,
     pending: true,
     effect: function() {

@@ -266,6 +266,7 @@
   .log-tag.tag-move    { color: #6a7a6a; }
   .log-tag.tag-system  { color: #6a6a8a; }
   .log-tag.tag-petri   { color: #7a7ac0; }
+  .log-tag.tag-ally    { color: #e06080; }
 
   /* ── Explore status bar (ASCII style) ── */
   .explore-bar {
