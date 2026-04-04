@@ -1492,3 +1492,118 @@
   .gift-item.rarity-rare       { color: #4a8af0; border-left: 3px solid #3a6ac0; }
   .gift-item.rarity-epic       { color: #b060e0; border-left: 3px solid #8a40b0; }
   .gift-item.rarity-legendary  { color: #e8b840; border-left: 3px solid #d4a030; text-shadow: 0 0 6px rgba(232,184,64,.3); }
+
+  /* ══ Achievement System ══ */
+
+  /* Achievement notification (top center, golden) */
+  .ach-notif {
+    position: fixed;
+    top: 60px; left: 50%;
+    transform: translateX(-50%) translateY(-20px);
+    background: linear-gradient(135deg, #1a1a2e 0%, #12121e 100%);
+    border: 1px solid #d4a843;
+    color: #d4a843;
+    padding: 14px 32px;
+    border-radius: 8px;
+    font-size: .95rem;
+    opacity: 0;
+    transition: all .4s ease;
+    z-index: 250;
+    pointer-events: none;
+    text-align: center;
+    box-shadow: 0 0 20px rgba(212,168,67,.25);
+  }
+  .ach-notif.show {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+  }
+
+  /* Status panel achievement section */
+  .ach-val { color: #d4a843; }
+  .ach-view-btn {
+    display: block;
+    width: 100%;
+    margin-top: 6px;
+    background: none;
+    border: 1px solid #2a2a3a;
+    color: #8a8a9a;
+    font-family: inherit;
+    font-size: .78rem;
+    padding: 5px 0;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all .2s;
+  }
+  .ach-view-btn:hover { border-color: #d4a843; color: #d4a843; }
+
+  /* Achievement overlay dialog */
+  .ach-dialog { max-width: 420px; max-height: 80vh; }
+  .ach-progress-label {
+    text-align: center;
+    color: #d4a843;
+    font-size: .9rem;
+    margin-bottom: 12px;
+  }
+  .ach-list {
+    max-height: 50vh;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding-right: 4px;
+  }
+  .ach-list::-webkit-scrollbar { width: 4px; }
+  .ach-list::-webkit-scrollbar-thumb { background: #2a2a3a; border-radius: 2px; }
+
+  .ach-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    border-radius: 6px;
+    border: 1px solid #1e1e2e;
+    transition: all .2s;
+  }
+  .ach-unlocked {
+    background: #14142a;
+    border-color: #3a3a5a;
+  }
+  .ach-locked {
+    background: #0e0e18;
+    border-color: #1a1a2a;
+    opacity: .5;
+  }
+  .ach-icon {
+    font-size: 1.4rem;
+    min-width: 32px;
+    text-align: center;
+    flex-shrink: 0;
+  }
+  .ach-locked .ach-icon { filter: grayscale(1); }
+  .ach-text { flex: 1; min-width: 0; }
+  .ach-name {
+    color: #d4a843;
+    font-size: .88rem;
+    font-weight: bold;
+    margin-bottom: 2px;
+  }
+  .ach-locked .ach-name { color: #5a5a6a; }
+  .ach-desc {
+    color: #7a7a8a;
+    font-size: .76rem;
+    line-height: 1.4;
+  }
+  .ach-locked .ach-desc { color: #4a4a5a; }
+
+  /* Epilogue achievement badges */
+  .ach-summary { margin: 6px 0; line-height: 2; }
+  .ach-badge {
+    display: inline-block;
+    background: #14142a;
+    border: 1px solid #3a3a5a;
+    border-radius: 4px;
+    padding: 2px 8px;
+    font-size: .82rem;
+    color: #d4a843;
+    margin: 2px 4px;
+  }

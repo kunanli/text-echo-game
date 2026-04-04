@@ -104,6 +104,9 @@ function renderStatus() {
     }
   }
 
+  // Achievement count
+  if (typeof renderAchievementCount === 'function') renderAchievementCount();
+
   renderAvatar();
 }
 

@@ -594,3 +594,13 @@ $voiceBtn.addEventListener('click', function() {
   voiceNarrator.toggle();
   updateVoiceBtn();
 });
+
+// ── Achievement UI ──
+(function() {
+  var $viewBtn = document.getElementById('ach-view-btn');
+  var $closeBtn = document.getElementById('ach-close-btn');
+  if ($viewBtn) $viewBtn.addEventListener('click', function() { openAchievements(); });
+  if ($closeBtn) $closeBtn.addEventListener('click', function() { closeAchievements(); });
+  // Initial count render
+  if (typeof renderAchievementCount === 'function') renderAchievementCount();
+})();

@@ -1226,6 +1226,9 @@ registerNode('r3_epilogue', () => {
     'Ending: ' + ({dawn:'A — Dawn',compromise:'B — Compromise',lockdown:'C — Lockdown',sacrifice:'D — Sacrifice'}[ending] || '?') + '<br>' +
     'Deaths: ' + state.deathCount + '<br>'
   );
+  // Check and display achievements
+  if (typeof triggerAchievementCheck === 'function') triggerAchievementCheck();
+  if (typeof renderAchievementSummary === 'function') statsHtml += renderAchievementSummary();
   steps.push({ tag: '系統', tagColor: 'tag-system', html: statsHtml, delay: 1000 });
 
   autoExplore(steps, [

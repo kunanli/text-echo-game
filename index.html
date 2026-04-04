@@ -215,6 +215,14 @@
       <h3 id="label-loc">位置</h3>
       <div class="stat-row"><span class="stat-label" id="location-text">祭獻坑</span></div>
     </div>
+    <div class="status-section" id="ach-section">
+      <h3 id="label-ach">成就</h3>
+      <div class="stat-row">
+        <span class="stat-label" id="label-ach-count">進度</span>
+        <span class="stat-value ach-val" id="ach-count">0 / 0</span>
+      </div>
+      <button class="ach-view-btn" id="ach-view-btn">查看成就</button>
+    </div>
     <div class="status-section save-section">
       <button class="save-btn" id="save-code-btn">存檔碼</button>
       <button class="save-btn chapter-ingame-btn" id="chapter-ingame-btn">章節</button>
@@ -330,6 +338,19 @@
 </div>
 
 <div class="notification" id="notification"></div>
+<div class="ach-notif" id="ach-notification"></div>
+
+<!-- Achievement overlay -->
+<div class="save-overlay" id="ach-overlay">
+  <div class="save-dialog ach-dialog">
+    <h3 id="ach-title">成　就</h3>
+    <p class="ach-progress-label" id="ach-progress">0 / 0</p>
+    <div class="ach-list" id="ach-list"></div>
+    <div class="save-buttons" style="margin-top:14px;">
+      <button class="save-action-btn save-close-btn" id="ach-close-btn">關閉</button>
+    </div>
+  </div>
+</div>
 
 <!-- ══ Scripts (load order matters) ══ -->
 <script src="js/audio.js"></script>
@@ -344,6 +365,7 @@
 <script src="js/dice.js"></script>
 <script src="js/save.js"></script>
 <script src="js/npc.js"></script>
+<script src="js/achievements.js"></script>
 <script src="js/nodes.js"></script>
 <script src="js/patrol.js"></script>
 <script src="js/story/region0.js"></script>

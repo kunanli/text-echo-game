@@ -75,6 +75,13 @@ function applyLang() {
   if ($chapterIngame) $chapterIngame.textContent = en ? 'Chapters' : '章節';
   var $labelNpc = document.getElementById('label-npc');
   if ($labelNpc) $labelNpc.textContent = en ? 'AFFINITY' : '好感度';
+  // Achievement section
+  var $labelAch = document.getElementById('label-ach');
+  if ($labelAch) $labelAch.textContent = en ? 'ACHIEVEMENTS' : '成就';
+  var $labelAchCount = document.getElementById('label-ach-count');
+  if ($labelAchCount) $labelAchCount.textContent = en ? 'Progress' : '進度';
+  var $achViewBtn = document.getElementById('ach-view-btn');
+  if ($achViewBtn) $achViewBtn.textContent = en ? 'View Achievements' : '查看成就';
   // Level-up dialog (static labels)
   document.getElementById('levelup-str-desc').textContent = en ? 'Attack · Climb' : '攻擊·攀爬';
   document.getElementById('levelup-agi-desc').textContent = en ? 'Dodge · Stealth' : '閃避·潛行';

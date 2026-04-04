@@ -48,6 +48,8 @@ function registerNode(id, fn) { nodes[id] = fn; }
 function loadNode(id) {
   state.node = id;
   if (typeof saveGame === 'function') saveGame();
+  // Check achievements on node transitions
+  if (typeof triggerAchievementCheck === 'function') triggerAchievementCheck();
   // Update ambient audio to match current region
   ambientAudio.setRegion(state.region);
   if (nodes[id]) {
