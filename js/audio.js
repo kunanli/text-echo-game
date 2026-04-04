@@ -116,7 +116,7 @@ var ambientAudio = (function() {
       var item = list[i];
       fadeGain(item.gain.gain, 0, dur);
       (function(n) {
-        setTimeout(function() { try { n.stop(); } catch(e) {} }, (dur + 0.5) * 1000);
+        setTimeout(function() { try { n.stop(); } catch(e) { console.warn('Audio node stop failed:', e); } }, (dur + 0.5) * 1000);
       })(item.node);
     }
     list.length = 0;
@@ -324,7 +324,7 @@ var ambientAudio = (function() {
         src.buffer = silentBuf;
         src.connect(ctx.destination);
         src.start();
-      } catch (e) {}
+      } catch (e) { console.warn('Audio warmup failed:', e); }
     }
   }
 

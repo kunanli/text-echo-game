@@ -27,7 +27,12 @@ function saveGame() {
       mood: state.mood,
     };
     localStorage.setItem(SAVE_KEY, JSON.stringify(data));
-  } catch (e) { /* storage full or unavailable */ }
+  } catch (e) {
+    if (e.name === 'QuotaExceededError' || e.code === 22) {
+      if (typeof notify === 'function') notify(typeof state !== 'undefined' && state.lang === 'en' ? 'Storage full — save failed!' : '存檔空間已滿！');
+    }
+    console.warn('saveGame failed:', e);
+  }
 }
 
 function loadSave() {
@@ -408,7 +413,13 @@ function saveToSlot(n) {
     };
     localStorage.setItem(slotKey(n), JSON.stringify(data));
     return true;
-  } catch (e) { return false; }
+  } catch (e) {
+    if (e.name === 'QuotaExceededError' || e.code === 22) {
+      if (typeof notify === 'function') notify(typeof state !== 'undefined' && state.lang === 'en' ? 'Storage full — save failed!' : '存檔空間已滿！');
+    }
+    console.warn('saveToSlot failed:', e);
+    return false;
+  }
 }
 
 function loadFromSlot(n) {

@@ -94,14 +94,26 @@ var voiceNarrator = (function() {
   // Chinese text is split at clause boundaries (，、；：) and sentence
   // boundaries (。！？) so the TTS engine produces natural pauses.
   // Short fragments are merged with the next phrase to avoid choppy output.
+  // Check lookbehind support (not available in older iOS Safari < 16.4)
+  var _hasLookbehind = (function() {
+    try { new RegExp('(?<=a)b'); return true; } catch(e) { return false; }
+  })();
+
   function splitIntoPhrases(text, lang) {
     var parts;
-    if (lang === 'zh') {
-      // Split at Chinese punctuation — keep the punctuation attached
-      parts = text.split(/(?<=[。！？，、；：…～\n\.!?;,])\s*/);
+    if (_hasLookbehind) {
+      if (lang === 'zh') {
+        parts = text.split(new RegExp('(?<=[。！？，、；：…～\\n\\.!?;,])\\s*'));
+      } else {
+        parts = text.split(new RegExp('(?<=[\\.!?;])\\s+'));
+      }
     } else {
-      // English: split at sentence boundaries
-      parts = text.split(/(?<=[\.!?;])\s+/);
+      // Fallback: split at punctuation (simpler, works everywhere)
+      if (lang === 'zh') {
+        parts = text.match(/[^。！？，、；：…～\n\.!?;,]*[。！？，、；：…～\n\.!?;,]+/g) || [text];
+      } else {
+        parts = text.match(/[^.!?;]*[.!?;]+\s*/g) || [text];
+      }
     }
 
     // Merge very short fragments (< 4 chars) with the next piece so we

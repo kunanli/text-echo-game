@@ -192,11 +192,8 @@ function _doBlink() {
   var orig = _idleArt;
   // Close eyes
   var blinked = orig
-    .replace(/° /g, '- ').replace(/ °/g, ' -')
-    .replace(/\^ /g, '- ').replace(/ \^/g, ' -')
-    .replace(/> /g, '- ').replace(/ </g, ' -')
-    .replace(/x /g, '- ').replace(/ x/g, ' -')
-    .replace(/` /g, '- ');
+    .replace(/[°^>x`] /g, '- ')
+    .replace(/ [°^<x]/g, ' -');
   if (blinked === orig) return _nextIdle();
   _setText(blinked);
   _idleR = setTimeout(function() {

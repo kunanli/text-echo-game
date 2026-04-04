@@ -152,8 +152,12 @@ function showChoices(choices) {
     }, 80 * i);
   });
   currentChoices = choices;
-  // Re-scroll story after choices animate in and take space
-  setTimeout(function() { $story.scrollTop = $story.scrollHeight; }, 100 * choices.length + 80);
+  // Re-scroll story after choices animate in and focus first button for keyboard nav
+  setTimeout(function() {
+    $story.scrollTop = $story.scrollHeight;
+    var firstBtn = $choices.querySelector('.choice-btn');
+    if (firstBtn) firstBtn.focus();
+  }, 80 * choices.length + 120);
 }
 
 // ═══════════════════════════════════════════════════

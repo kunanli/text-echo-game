@@ -65,6 +65,7 @@
   #audio-toggle { right: 90px; }
   #voice-toggle { right: 12px; }
   .audio-toggle:hover { color: #8a8aa0; border-color: #3a3a5a; }
+  .audio-toggle:focus-visible { outline: 2px solid #d4a843; outline-offset: 2px; }
   .audio-toggle.on { color: #d4a843; border-color: #6a5a30; }
   .header-bar { position: relative; }
 
@@ -272,7 +273,7 @@
   .explore-bar {
     font-family: "Courier New", Courier, monospace;
     font-size: .72rem;
-    color: #3a4a3a;
+    color: #5a7a5a;
     padding: 5px 8px;
     border: 1px solid #1a1a28;
     border-left: 2px solid #2a3a2a;
@@ -354,7 +355,10 @@
     background: #1a1a2e;
     border-color: #d4a843;
     color: #e8e8f0;
-    outline: none;
+  }
+  .choice-btn:focus-visible {
+    outline: 2px solid #d4a843;
+    outline-offset: 2px;
   }
   .choice-btn .key-hint {
     display: inline-block;
@@ -644,6 +648,10 @@
   .stat-alloc-btn:hover:not(:disabled) {
     background: #2a2a40;
     border-color: #d4a843;
+  }
+  .stat-alloc-btn:focus-visible {
+    outline: 2px solid #d4a843;
+    outline-offset: 2px;
   }
   .stat-alloc-btn:disabled {
     opacity: .25;
@@ -1225,6 +1233,7 @@
     width: 100%;
   }
   .save-btn:hover { background: #222238; color: #d4a843; border-color: #d4a843; }
+  .save-btn:focus-visible { outline: 2px solid #d4a843; outline-offset: 2px; }
 
   .save-overlay {
     display: none;
@@ -1535,6 +1544,7 @@
     transition: all .2s;
   }
   .ach-view-btn:hover { border-color: #d4a843; color: #d4a843; }
+  .ach-view-btn:focus-visible { outline: 2px solid #d4a843; outline-offset: 2px; }
 
   /* Achievement overlay dialog */
   .ach-dialog { max-width: 420px; max-height: 80vh; }

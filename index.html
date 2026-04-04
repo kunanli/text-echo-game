@@ -55,8 +55,8 @@
                               /░░░░░░░░░░░░░░░░\
     </pre>
     <div class="title-version">v1.0</div>
-    <button class="start-btn" id="continue-btn" style="display:none; margin-bottom:12px;">繼 續 冒 險</button>
-    <button class="start-btn chapter-select-title-btn" id="chapter-btn" style="display:none; margin-bottom:12px;">章 節 選 擇</button>
+    <button class="start-btn" id="continue-btn" style="display:none; margin-bottom:12px;" aria-label="Continue adventure">繼 續 冒 險</button>
+    <button class="start-btn chapter-select-title-btn" id="chapter-btn" style="display:none; margin-bottom:12px;" aria-label="Chapter select">章 節 選 擇</button>
     <div class="click-prompt">— 點擊開始 · Click to Start —</div>
   </div>
 
@@ -91,8 +91,8 @@
   <div class="title-phase" id="phase-create">
     <div class="title-form">
       <div class="title-section">
-        <span class="title-label" id="label-name">角 色 命 名</span>
-        <input class="title-input" id="name-input" type="text" placeholder="輸入你的名字……" maxlength="12">
+        <label class="title-label" id="label-name" for="name-input">角 色 命 名</label>
+        <input class="title-input" id="name-input" type="text" placeholder="輸入你的名字……" maxlength="12" aria-label="Character name">
       </div>
       <div class="title-section">
         <span class="title-label" id="label-sex">性 別</span>
@@ -134,7 +134,7 @@
         </div>
         <div class="stat-alloc-remain"><span id="alloc-remain-label">剩餘點數：</span><span id="alloc-remain">6</span></div>
       </div>
-      <button class="start-btn" id="start-btn">開 始 冒 險</button>
+      <button class="start-btn" id="start-btn" aria-label="Start adventure">開 始 冒 險</button>
     </div>
   </div>
 </div>
@@ -146,9 +146,9 @@
     <span class="header-sep">·</span>
     <span class="header-subtitle" id="header-subtitle">PETRIABYSS</span>
     <span class="header-deco">◆</span>
-    <button class="audio-toggle" id="audio-toggle" title="Toggle audio">♪ OFF</button>
+    <button class="audio-toggle" id="audio-toggle" title="Toggle audio" aria-label="Toggle background music">♪ OFF</button>
     <!-- Voice narration hidden — revisit with better TTS solution later -->
-    <button class="audio-toggle" id="voice-toggle" title="Toggle voice narration" style="display:none;">🗣 OFF</button>
+    <button class="audio-toggle" id="voice-toggle" title="Toggle voice narration" aria-label="Toggle voice narration" style="display:none;">🗣 OFF</button>
   </div>
 </header>
 
@@ -221,11 +221,11 @@
         <span class="stat-label" id="label-ach-count">進度</span>
         <span class="stat-value ach-val" id="ach-count">0 / 0</span>
       </div>
-      <button class="ach-view-btn" id="ach-view-btn">查看成就</button>
+      <button class="ach-view-btn" id="ach-view-btn" aria-label="View achievements">查看成就</button>
     </div>
     <div class="status-section save-section">
-      <button class="save-btn" id="save-code-btn">存檔碼</button>
-      <button class="save-btn chapter-ingame-btn" id="chapter-ingame-btn">章節</button>
+      <button class="save-btn" id="save-code-btn" aria-label="Save/Load">存檔碼</button>
+      <button class="save-btn chapter-ingame-btn" id="chapter-ingame-btn" aria-label="Chapter select">章節</button>
     </div>
   </div>
 
@@ -264,25 +264,25 @@
         <div class="save-slot" data-slot="1">
           <div class="slot-info" id="slot-info-1">空</div>
           <div class="slot-actions">
-            <button class="slot-btn slot-save-btn" data-slot="1">存檔</button>
-            <button class="slot-btn slot-load-btn" data-slot="1" disabled>讀取</button>
-            <button class="slot-btn slot-del-btn" data-slot="1" disabled>刪除</button>
+            <button class="slot-btn slot-save-btn" data-slot="1" aria-label="Save to slot 1">存檔</button>
+            <button class="slot-btn slot-load-btn" data-slot="1" disabled aria-label="Load from slot 1">讀取</button>
+            <button class="slot-btn slot-del-btn" data-slot="1" disabled aria-label="Delete slot 1">刪除</button>
           </div>
         </div>
         <div class="save-slot" data-slot="2">
           <div class="slot-info" id="slot-info-2">空</div>
           <div class="slot-actions">
-            <button class="slot-btn slot-save-btn" data-slot="2">存檔</button>
-            <button class="slot-btn slot-load-btn" data-slot="2" disabled>讀取</button>
-            <button class="slot-btn slot-del-btn" data-slot="2" disabled>刪除</button>
+            <button class="slot-btn slot-save-btn" data-slot="2" aria-label="Save to slot 2">存檔</button>
+            <button class="slot-btn slot-load-btn" data-slot="2" disabled aria-label="Load from slot 2">讀取</button>
+            <button class="slot-btn slot-del-btn" data-slot="2" disabled aria-label="Delete slot 2">刪除</button>
           </div>
         </div>
         <div class="save-slot" data-slot="3">
           <div class="slot-info" id="slot-info-3">空</div>
           <div class="slot-actions">
-            <button class="slot-btn slot-save-btn" data-slot="3">存檔</button>
-            <button class="slot-btn slot-load-btn" data-slot="3" disabled>讀取</button>
-            <button class="slot-btn slot-del-btn" data-slot="3" disabled>刪除</button>
+            <button class="slot-btn slot-save-btn" data-slot="3" aria-label="Save to slot 3">存檔</button>
+            <button class="slot-btn slot-load-btn" data-slot="3" disabled aria-label="Load from slot 3">讀取</button>
+            <button class="slot-btn slot-del-btn" data-slot="3" disabled aria-label="Delete slot 3">刪除</button>
           </div>
         </div>
       </div>
@@ -334,7 +334,7 @@
   </pre>
   <h2 id="death-title">石 化</h2>
   <p id="death-msg">你的身體已完全化為冰冷的石頭……</p>
-  <button id="revive-btn">掙脫石殼，重新站起</button>
+  <button id="revive-btn" aria-label="Revive">掙脫石殼，重新站起</button>
 </div>
 
 <div class="notification" id="notification"></div>

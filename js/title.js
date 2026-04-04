@@ -26,7 +26,7 @@ function showPhase(id) {
           if (chapterBtn) chapterBtn.textContent = 'CHAPTER SELECT';
         }
       }
-    } catch (e) { /* ignore */ }
+    } catch (e) { console.warn('Failed to peek saved language:', e); }
   }
 })();
 

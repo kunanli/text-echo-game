@@ -241,7 +241,7 @@ function autoExplore(steps, choices, opts) {
 
     if (artContent) {
       line.innerHTML = artContent;
-      if (step.effect) { try { step.effect(); renderStatus(); } catch(e) {} }
+      if (step.effect) { try { step.effect(); renderStatus(); } catch(e) { console.warn('Step effect error:', e); } }
       $story.appendChild(line);
     } else {
       line.className = 'log-line';
@@ -262,7 +262,7 @@ function autoExplore(steps, choices, opts) {
       if (htmlContent) { contentSpan.innerHTML = htmlContent; }
       else { contentSpan.textContent = textContent || ''; }
       line.appendChild(contentSpan);
-      if (step.effect) { try { step.effect(); renderStatus(); } catch(e) {} }
+      if (step.effect) { try { step.effect(); renderStatus(); } catch(e) { console.warn('Step effect error:', e); } }
       $story.appendChild(line);
     }
     $story.scrollTop = $story.scrollHeight;
@@ -278,7 +278,7 @@ function autoExplore(steps, choices, opts) {
     if (artContent) {
       line.innerHTML = artContent;
       // Run side effect
-      if (step.effect) { try { step.effect(); renderStatus(); } catch(e) {} }
+      if (step.effect) { try { step.effect(); renderStatus(); } catch(e) { console.warn('Step effect error:', e); } }
       $story.appendChild(line);
       $story.scrollTop = $story.scrollHeight;
       _autoResume = function() { showNext(); };
@@ -308,7 +308,7 @@ function autoExplore(steps, choices, opts) {
       line.appendChild(contentSpan);
 
       // Run side effect
-      if (step.effect) { try { step.effect(); renderStatus(); } catch(e) {} }
+      if (step.effect) { try { step.effect(); renderStatus(); } catch(e) { console.warn('Step effect error:', e); } }
 
       $story.appendChild(line);
       $story.scrollTop = $story.scrollHeight;
@@ -323,6 +323,8 @@ function autoExplore(steps, choices, opts) {
       // Typewriter: for html content, extract plain text to type, then swap to html at end
       var chars = isHtml ? fullHtml.replace(/<[^>]*>/g, '') : fullText;
       var ci = 0;
+      var typeBuf = '';  // buffer chars to reduce DOM writes
+      var TYPE_BATCH = 3; // flush every N chars
       var typeSpeed = Math.round(35 * PACE);
       function typeChar() {
         if (autoSkipAll) {
@@ -342,9 +344,14 @@ function autoExplore(steps, choices, opts) {
           return;
         }
         if (ci < chars.length) {
-          contentSpan.textContent += chars[ci];
+          typeBuf += chars[ci];
           ci++;
-          $story.scrollTop = $story.scrollHeight;
+          // Flush buffer to DOM every TYPE_BATCH chars or at end
+          if (typeBuf.length >= TYPE_BATCH || ci >= chars.length) {
+            contentSpan.textContent += typeBuf;
+            typeBuf = '';
+            $story.scrollTop = $story.scrollHeight;
+          }
           // Resume = finish this line's text instantly, then continue
           _autoResume = function() {
             if (isHtml) { contentSpan.innerHTML = fullHtml; } else { contentSpan.textContent = fullText; }
