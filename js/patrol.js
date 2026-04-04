@@ -504,7 +504,7 @@ function runPatrolCycle() {
   queue.push({ tag: L('遭遇','Encounter'), color: 'tag-combat',
     html: L('一隻<b>' + monster.name + '</b>出現了！進入戰鬥！',
             'A <b>' + monster.nameEn + '</b> appears! Entering combat!'),
-    delay: 1800 });
+    delay: 1800, sfx: 'click' });
 
   // Combat rounds (with dramatic pacing — player and enemy on separate lines)
   for (var i = 0; i < combatLog.length; i++) {
@@ -513,8 +513,9 @@ function runPatrolCycle() {
     var tag = entry.who === 'enemy' ? L('反擊','Counter') : L('戰鬥','Battle');
     var color = entry.who === 'enemy' ? 'tag-warn' : 'tag-combat';
     var d = entry.who === 'enemy' ? rng(1200, 1800) : (isLast ? rng(2000, 2800) : rng(1500, 2200));
+    var entrySfx = entry.who === 'player' ? 'hit' : 'hurt';
     queue.push({ tag: tag, color: color, text: entry.text,
-      delay: d, pending: entry.who === 'player' });
+      delay: d, pending: entry.who === 'player', sfx: entrySfx });
   }
 
   // NPC Patrol Aid — roll for ally assistance
@@ -539,6 +540,7 @@ function runPatrolCycle() {
         text: L(aidName + ' 為你治療了 ' + healAmt + ' HP。',
                 aidName + ' heals you for ' + healAmt + ' HP.'),
         delay: 1400,
+        sfx: 'item',
         effect: function() { changeHp(healAmt); renderStatus(); }
       });
     }
@@ -553,9 +555,10 @@ function runPatrolCycle() {
             + (npcAid ? '  (' + L(npcAid.name, npcAid.nameEn) + L('的援助！', '\'s aid!') + ')' : '')),
     delay: 2000,
     pending: true,
+    sfx: 'pass',
     effect: function() {
       changeHp(-totalDmg);
-      changePetri(totalPetri);
+      if (totalPetri > 0) { changePetri(totalPetri); sfx.petri(); }
       gainXp(mXp);
       renderStatus();
     }
@@ -577,6 +580,10 @@ function runPatrolCycle() {
 
     function renderAndContinue() {
       if (!patrolActive) return;
+      // Play sound effect if specified
+      if (step.sfx) {
+        try { sfx[step.sfx](); } catch(e) {}
+      }
       if (step.effect) {
         try { step.effect(); } catch(e) {}
       }
