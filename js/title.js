@@ -64,6 +64,7 @@ document.getElementById('phase-splash').addEventListener('click', function(e) {
       splashWarmup();   // ensure AudioContext is alive for this gesture
       if (loadSave()) {
         applyLang();
+        if (typeof statsStartRun === 'function') statsStartRun();
         var titleScreen = document.getElementById('title-screen');
         titleScreen.classList.add('hidden');
         setTimeout(function() { titleScreen.style.display = 'none'; }, 800);
@@ -152,6 +153,7 @@ function startGame() {
   ambientAudio.start();
   setTimeout(updateAudioBtn, 200);
 
+  if (typeof statsStartRun === 'function') statsStartRun();
   renderStatus();
   loadNode('r0_start');
 }

@@ -52,6 +52,7 @@ function loadNode(id) {
   if (typeof triggerAchievementCheck === 'function') triggerAchievementCheck();
   // Update ambient audio to match current region
   ambientAudio.setRegion(state.region);
+  if (typeof statsTrackRegion === 'function') statsTrackRegion(state.region);
   if (nodes[id]) {
     nodes[id]();
   } else {

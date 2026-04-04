@@ -8,6 +8,7 @@
 function startCombat(enemy, onWin, onFlee) {
   state.mood = 'combat';
   ambientAudio.setCombat(true);
+  if (typeof statsTrackCombat === 'function') statsTrackCombat();
   let enemyHp = enemy.hp;
   const eName = enemy.name;
   let observed = false;   // next attack deals 2x

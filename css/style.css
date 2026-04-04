@@ -1617,3 +1617,93 @@
     color: #d4a843;
     margin: 2px 4px;
   }
+
+  /* ── Ending Card Overlay ── */
+  .endcard-dialog {
+    max-width: 640px;
+  }
+  .endcard-dialog h3 {
+    letter-spacing: 6px;
+  }
+  #endcard-canvas-container {
+    margin: 12px 0;
+    display: flex;
+    justify-content: center;
+  }
+  #endcard-canvas-container canvas {
+    border: 1px solid #2a2a3a;
+  }
+
+  /* ── Global Stats Summary (in epilogue) ── */
+  .stats-summary {
+    text-align: center;
+    margin: 12px 0 6px;
+  }
+  .stats-title {
+    color: #d4a843;
+    font-size: .92rem;
+    letter-spacing: 2px;
+    margin-bottom: 10px;
+    font-weight: bold;
+  }
+  .stats-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4px 16px;
+    max-width: 380px;
+    margin: 0 auto 12px;
+    text-align: left;
+  }
+  .stats-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 2px 0;
+  }
+  .stats-label {
+    color: #6a6a7a;
+    font-size: .82rem;
+  }
+  .stats-val {
+    color: #c8c8d0;
+    font-size: .82rem;
+    font-family: "Courier New", monospace;
+  }
+  .stats-section {
+    margin: 8px 0;
+  }
+  .stats-subtitle {
+    color: #8a8a9a;
+    font-size: .78rem;
+    letter-spacing: 1px;
+    margin-bottom: 6px;
+  }
+  .stats-bar-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 3px auto;
+    max-width: 320px;
+  }
+  .stats-bar-label {
+    font-size: .78rem;
+    min-width: 56px;
+    text-align: right;
+  }
+  .stats-bar-track {
+    flex: 1;
+    height: 6px;
+    background: #1a1a2a;
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .stats-bar-fill {
+    height: 100%;
+    border-radius: 3px;
+    transition: width .5s;
+  }
+  .stats-bar-count {
+    font-size: .75rem;
+    color: #6a6a7a;
+    min-width: 20px;
+    font-family: "Courier New", monospace;
+  }

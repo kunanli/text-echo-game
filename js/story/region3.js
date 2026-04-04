@@ -1209,6 +1209,9 @@ registerNode('r3_epilogue', () => {
   steps.push({ tag: '系統', tagColor: 'tag-system', text: '但在這座地底世界的角落裡，有人還在活著。還在記錄。還在希望。', textEn: 'But in corners of this underground world, people still live. Still record. Still hope.', delay: 3000 });
   steps.push({ tag: '系統', tagColor: 'tag-system', html: '<b>你的故事——被記住了。</b>', htmlEn: '<b>Your story — is remembered.</b>', delay: 3000 });
 
+  // Record ending in global stats
+  if (typeof statsRecordEnding === 'function') statsRecordEnding(ending);
+
   // Stats summary
   var statsHtml = L(
     '<br>═══ 冒險紀錄 ═══<br>' +
@@ -1231,7 +1234,15 @@ registerNode('r3_epilogue', () => {
   if (typeof renderAchievementSummary === 'function') statsHtml += renderAchievementSummary();
   steps.push({ tag: '系統', tagColor: 'tag-system', html: statsHtml, delay: 1000 });
 
+  // Global statistics
+  if (typeof renderStatsSummary === 'function') {
+    steps.push({ tag: '系統', tagColor: 'tag-system', html: renderStatsSummary(), delay: 800 });
+  }
+
   autoExplore(steps, [
+    { text: '分享結局卡', textEn: 'Share Ending Card', action: function() {
+      if (typeof showEndCard === 'function') showEndCard();
+    }},
     { text: '回到標題畫面', textEn: 'Return to title screen', action: () => {
       deleteSave();
       location.reload();

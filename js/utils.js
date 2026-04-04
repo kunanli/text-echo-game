@@ -47,6 +47,7 @@ function gainXp(amount) {
     state.hp = Math.min(state.hp + 5, state.maxHp);
     pendingLevelUps++;
     sfx.levelUp();
+    if (typeof statsTrackLevel === 'function') statsTrackLevel();
     notify(L('等級提升！ Lv.' + state.level + '  HP上限 +5',
              'Level Up! Lv.' + state.level + '  Max HP +5'));
   }
@@ -103,7 +104,10 @@ function changeHp(delta) {
 
 function changePetri(delta) {
   state.petri = clamp(state.petri + delta, 0, 100);
-  if (delta > 0) sfx.petri();
+  if (delta > 0) {
+    sfx.petri();
+    if (typeof statsTrackPetriEvent === 'function') statsTrackPetriEvent();
+  }
   if (state.petri >= 100) {
     die(L('你的身體已完全化為冰冷的石頭……', 'Your body has completely turned to cold stone...'));
     return true; // dead
