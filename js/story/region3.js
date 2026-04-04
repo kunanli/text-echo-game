@@ -279,7 +279,11 @@ registerNode('r3_council', () => {
       }});
     }
     if (state.flags.r3CouncilEntry) {
-      c.push({ text: '去找銅鐘', textEn: 'Find Bronze Bell', action: () => loadNode('r3_bell') });
+      if (state.flags.r3BellQuest) {
+        c.push({ text: '回報銅鐘（任務進度）', textEn: 'Report to Bronze Bell (quest progress)', action: () => loadNode('r3_quest_check') });
+      } else {
+        c.push({ text: '去找銅鐘', textEn: 'Find Bronze Bell', action: () => loadNode('r3_bell') });
+      }
     }
     c.push({ text: '返回', textEn: 'Return', action: () => loadNode('r3_look') });
     return c;
@@ -361,7 +365,30 @@ registerNode('r3_bell', () => {
             state.flags.r3BellAlliance = true;
             gainXp(15);
             notify(L('經驗 +15（與銅鐘建立同盟）', 'XP +15 (Allied with Bronze Bell)'));
-            loadNode('r3_bell');
+            autoExplore([
+              { tag: '感知', tagColor: 'tag-sense', text: '銅鐘看著你，眼中閃過一絲久違的光芒。', textEn: 'Bronze Bell looks at you, a long-absent gleam in her eyes.', delay: 2000 },
+              { tag: '情報', tagColor: 'tag-info', text: '「……謝謝你。」她的聲音很輕，但很堅定。', textEn: '"...Thank you." Her voice is soft but resolute.', delay: 2200 },
+            ], [
+              { text: '下一步怎麼做？', textEn: 'What\'s next?', action: () => {
+                state.flags.r3BellQuest = true;
+                autoExplore([
+                  { tag: '情報', tagColor: 'tag-info', text: '銅鐘攤開一張渡口的地圖，指著幾個位置。', textEn: 'Bronze Bell spreads a map of the docks, pointing to several locations.', delay: 2200 },
+                  { tag: '情報', tagColor: 'tag-info', html: '「議會投票還有三天。在那之前，你需要做三件事——」', htmlEn: '"The Council vote is in three days. Before then, you need three things —"', delay: 2500 },
+                  { tag: '情報', tagColor: 'tag-info', html: '「第一：去<b>河岸隧道</b>清除那裡的變異生物。鏽刃說封鎖通道是因為怪物從下面上來——如果你能證明怪物不是來自下層，他就沒藉口了。」', htmlEn: '"First: clear the <b>river tunnels</b> of mutants. Rust Blade claims sealing is needed because monsters come from below — if you prove the creatures aren\'t from the lower levels, his excuse crumbles."', delay: 3800 },
+                  { tag: '情報', tagColor: 'tag-info', html: '「第二：在市場找到<b>灰鶴</b>。他是唯一在上下層之間跑商路的人，他的證詞能動搖商會的玉秤。」', htmlEn: '"Second: find <b>Grey Crane</b> in the market. He\'s the only trader running routes between levels — his testimony can sway Jade Scale of the Merchants."', delay: 3200 },
+                  { tag: '情報', tagColor: 'tag-info', html: '「第三：找到能證明<b>石化瘟疫起源</b>的證據。如果能證明瘟疫不是因為下層通道——而是因為古代封印——那封鎖通道就毫無意義。」', htmlEn: '"Third: find evidence of the <b>plague\'s true origin</b>. If you can prove it came from the ancient seal, not the lower passages — sealing is pointless."', delay: 3800 },
+                  { tag: '感知', tagColor: 'tag-sense', text: '銅鐘看著你。她石化的右手不自覺地握緊了筆。', textEn: 'Bronze Bell looks at you. Her petrified hand unconsciously grips the pen tighter.', delay: 2500 },
+                  { tag: '情報', tagColor: 'tag-info', text: '「……拜託你了。這不只是我一個人的戰鬥。」', textEn: '"...I\'m counting on you. This isn\'t just my fight."', delay: 2500 },
+                ], [
+                  { text: '我會完成的', textEn: 'I\'ll get it done', action: () => {
+                    changeStat('wil', 1);
+                    notify(L('意志 +1（肩負重任）', 'WIL +1 (Shouldering responsibility)'));
+                    loadNode('r3_look');
+                  }},
+                ], { label: L('銅鐘的任務', 'Bronze Bell\'s mission') });
+              }},
+              { text: '先離開', textEn: 'Leave for now', action: () => loadNode('r3_council') },
+            ], { label: L('銅鐘的信任', 'Bronze Bell\'s trust') });
           }},
           { text: '讓我想想', textEn: 'Let me think', action: () => loadNode('r3_council') },
         ], { label: L('銅鐘的請求', 'Bronze Bell\'s request') });
@@ -382,12 +409,15 @@ registerNode('r3_bell', () => {
           { text: '我會完成的', textEn: 'I\'ll get it done', action: () => {
             changeStat('wil', 1);
             notify(L('意志 +1（肩負重任）', 'WIL +1 (Shouldering responsibility)'));
-            loadNode('r3_council');
+            loadNode('r3_look');
           }},
         ], { label: L('銅鐘的任務', 'Bronze Bell\'s mission') });
       }});
     }
-    c.push({ text: '離開', textEn: 'Leave', action: () => loadNode('r3_council') });
+    if (state.flags.r3BellQuest) {
+      c.push({ text: '回報任務進度', textEn: 'Report quest progress', action: () => loadNode('r3_quest_check') });
+    }
+    c.push({ text: '離開', textEn: 'Leave', action: () => loadNode(state.flags.r3BellQuest ? 'r3_look' : 'r3_council') });
     return c;
   })(), { label: L('銅鐘', 'Bronze Bell') });
 });
@@ -708,7 +738,7 @@ registerNode('r3_quest_check', () => {
     if (questsDone >= 3) {
       c.push({ text: '直接進入議會大廳', textEn: 'Go straight to the Council chamber', action: () => loadNode('r3_vote') });
     }
-    c.push({ text: '返回', textEn: 'Return', action: () => loadNode('r3_council') });
+    c.push({ text: '返回', textEn: 'Return', action: () => loadNode('r3_look') });
     return c;
   })(), { label: L('任務進度', 'Quest progress') });
 });
