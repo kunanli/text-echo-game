@@ -211,13 +211,15 @@
       <h3 id="label-npc">好感度</h3>
       <div id="npc-affinity-list"></div>
     </div>
-    <div class="status-section">
-      <h3 id="label-inv">物品欄</h3>
-      <div class="stat-row" id="gold-row" style="display:none;">
-        <span class="stat-label gold-label" id="label-gold">金幣</span>
-        <span class="stat-value gold-val" id="stat-gold">0</span>
+    <div class="status-section inv-section">
+      <h3 id="label-inv" class="inv-toggle">物品欄 <span class="inv-count" id="inv-count"></span> <span class="inv-arrow">▸</span></h3>
+      <div class="inv-body" id="inv-body">
+        <div class="stat-row" id="gold-row" style="display:none;">
+          <span class="stat-label gold-label" id="label-gold">金幣</span>
+          <span class="stat-value gold-val" id="stat-gold">0</span>
+        </div>
+        <ul class="inventory-list" id="inventory"></ul>
       </div>
-      <ul class="inventory-list" id="inventory"></ul>
     </div>
     <div class="status-section">
       <h3 id="label-loc">位置</h3>

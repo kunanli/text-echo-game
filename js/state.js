@@ -135,3 +135,12 @@ $mobileToggle.addEventListener('click', function() {
   $statusPanel.classList.toggle('open');
   $mobileToggle.classList.toggle('open');
 });
+
+// ── Inventory collapse toggle (mobile) ──
+var $invToggle = document.getElementById('label-inv');
+var $invSection = $invToggle ? $invToggle.closest('.inv-section') : null;
+if ($invToggle && $invSection) {
+  $invToggle.addEventListener('click', function() {
+    $invSection.classList.toggle('open');
+  });
+}

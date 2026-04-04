@@ -452,6 +452,39 @@
   .dice-bet { color: #d4a843; }
 
   /* Inventory */
+  .inv-toggle {
+    cursor: pointer;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .inv-count {
+    font-weight: normal;
+    font-size: .7rem;
+    color: #5a5a6a;
+  }
+  .inv-arrow {
+    font-size: .6rem;
+    color: #4a4a5a;
+    transition: transform .2s;
+    display: inline-block;
+  }
+  .inv-section.open .inv-arrow {
+    transform: rotate(90deg);
+  }
+  .inv-body {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height .25s ease;
+  }
+  .inv-section.open .inv-body {
+    max-height: 500px;
+  }
+  /* Desktop: always open */
+  @media (min-width: 761px) {
+    .inv-body { max-height: none !important; overflow: visible; }
+    .inv-arrow { display: none; }
+    .inv-count { display: none; }
+  }
   .inventory-list {
     list-style: none;
     font-size: .88rem;
@@ -470,6 +503,7 @@
     color: #4a4a5a;
     font-style: italic;
     font-size: .85rem;
+    border-bottom: none;
   }
 
   /* ── Death Overlay ── */
@@ -1162,6 +1196,26 @@
     .status-section h3 {
       font-size: .7rem;
       margin-bottom: 4px;
+    }
+    /* Mobile inventory: horizontal tags */
+    .inventory-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      font-size: .75rem;
+    }
+    .inventory-list li {
+      padding: 2px 8px;
+      border-bottom: none;
+      background: #141420;
+      border-radius: 4px;
+      white-space: nowrap;
+    }
+    .inventory-list li::before {
+      font-size: .55rem;
+    }
+    .inv-section {
+      flex-basis: 100% !important;
     }
     .mobile-status-toggle {
       display: flex;

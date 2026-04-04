@@ -34,6 +34,12 @@ function renderStatus() {
     $goldRow.style.display = 'none';
   }
 
+  // Inventory count badge
+  var $invCount = document.getElementById('inv-count');
+  if ($invCount) {
+    $invCount.textContent = state.inventory.length > 0 ? '(' + state.inventory.length + ')' : '';
+  }
+
   if (state.inventory.length === 0) {
     $inv.innerHTML = '<li class="inventory-empty">' + L('空', 'Empty') + '</li>';
   } else {
