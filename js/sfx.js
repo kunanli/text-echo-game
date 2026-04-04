@@ -5,7 +5,7 @@
 var sfx = (function() {
   var ctx = null;
   var enabled = true;
-  var volume = 0.4;
+  var volume = 0.7;
 
   function getCtx() {
     if (ctx) return ctx;
@@ -62,7 +62,7 @@ var sfx = (function() {
     lp.type = 'lowpass';
     lp.frequency.setValueAtTime(2000, t);
     lp.frequency.exponentialRampToValueAtTime(200, t + 0.1);
-    var g = makeGain(c, 0.35, t);
+    var g = makeGain(c, 0.6, t);
     g.gain.exponentialRampToValueAtTime(0.001, t + 0.12);
     src.connect(lp);
     lp.connect(g);
@@ -76,7 +76,7 @@ var sfx = (function() {
     var c = ensureCtx(); if (!c) return;
     var t = c.currentTime;
     var osc = c.createOscillator();
-    var g = makeGain(c, 0.3, t);
+    var g = makeGain(c, 0.55, t);
     osc.type = 'sine';
     osc.frequency.setValueAtTime(120, t);
     osc.frequency.exponentialRampToValueAtTime(40, t + 0.15);
@@ -136,7 +136,7 @@ var sfx = (function() {
     var c = ensureCtx(); if (!c) return;
     var t = c.currentTime;
     var osc = c.createOscillator();
-    var g = makeGain(c, 0.3, t);
+    var g = makeGain(c, 0.5, t);
     osc.type = 'sawtooth';
     osc.frequency.setValueAtTime(200, t);
     osc.frequency.exponentialRampToValueAtTime(40, t + 0.8);
