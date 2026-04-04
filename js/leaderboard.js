@@ -4,8 +4,8 @@
 
 var LEADERBOARD = {
   // ── Dreamlo keys (REPLACE THESE) ──
-  privateKey: 'YOUR_PRIVATE_KEY',   // for submitting scores
-  publicKey:  'YOUR_PUBLIC_KEY',    // for reading scores
+  privateKey: 'cewmb78CnUmsLIJuKmd6GQgL6TlyH9LkCyWxwfHbqkRQ',
+  publicKey:  '69d1277e8f40bc2f60f2d6f8',
   baseUrl: 'https://dreamlo.com/lb',
 
   // Is leaderboard configured?
