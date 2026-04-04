@@ -1,23 +1,41 @@
-// ══ Ending Card Generator — Identity Card Style ══
-// Generates a collectible 3:4 canvas card at the end of the game
+// ══ Ending Card Generator — Collectible Card (buddy style) ══
 
 var ENDCARD_W = 450;
-var ENDCARD_H = 600;
+var ENDCARD_H = 680;
 
 var ENDING_META = {
-  dawn:       { zh: '結局 A — 黎明',   en: 'Ending A — Dawn',       color: '#60c8e0', icon: '☀' },
-  compromise: { zh: '結局 B — 妥協',   en: 'Ending B — Compromise', color: '#d4a843', icon: '⚖' },
-  lockdown:   { zh: '結局 C — 封鎖',   en: 'Ending C — Lockdown',   color: '#c06060', icon: '🔒' },
-  sacrifice:  { zh: '結局 D — 犧牲',   en: 'Ending D — Sacrifice',  color: '#9a8ac8', icon: '✦' },
+  dawn:       { zh: '黎明', en: 'DAWN',       type: '☀ 曙光者',  typeEn: 'DAWNBRINGER', color: '#60c8e0' },
+  sacrifice:  { zh: '犧牲', en: 'SACRIFICE',  type: '✦ 獻身者',  typeEn: 'MARTYR',      color: '#9a8ac8' },
+  compromise: { zh: '妥協', en: 'COMPROMISE', type: '⚖ 斡旋者',  typeEn: 'MEDIATOR',    color: '#d4a843' },
+  lockdown:   { zh: '封鎖', en: 'LOCKDOWN',   type: '▣ 守門者',  typeEn: 'WARDEN',      color: '#c06060' },
 };
 
-// ── Rarity Tiers ──
+var ENDING_FLAVOR = {
+  dawn: {
+    zh: '你帶著真相穿越了深淵的黑暗，\n將光明重新引入這被遺忘的地底世界。\n石化的詛咒終將褪去，而你的名字\n會被銘刻在新時代的起點。',
+    en: 'You carried the truth through the\ndarkness of the abyss, bringing light\nback to this forgotten underworld.\nThe curse of petrification shall fade,\nand your name marks a new dawn.',
+  },
+  sacrifice: {
+    zh: '你選擇了以自身為代價換取眾人的\n安全。石化的命運並未消失，只是由\n你一人承擔。深淵會記住這份犧牲。',
+    en: 'You chose to bear the cost so others\nmight live. The curse did not vanish —\nyou simply took it upon yourself.\nThe abyss remembers your sacrifice.',
+  },
+  compromise: {
+    zh: '在對立的勢力之間，你找到了一條\n脆弱但可行的中間道路。沒有英雄式\n的結局，但每個人都活了下來。',
+    en: 'Between opposing forces, you found\na fragile but viable middle path.\nNo heroic ending — but everyone\nlived to see another day.',
+  },
+  lockdown: {
+    zh: '深淵的入口被永遠封閉。地底的一切\n——包括真相——都被埋葬在石壁之下。\n安全，但代價是永遠的沉默。',
+    en: 'The abyss was sealed forever. All that\nlay beneath — including the truth —\nburied under stone. Safe, yes.\nBut at the cost of eternal silence.',
+  },
+};
+
+// ── Rarity ──
 var RARITY_TIERS = [
-  { min: 85, zh: '傳說', en: 'Legendary', color: '#d4a843' },
-  { min: 70, zh: '史詩', en: 'Epic',      color: '#9a5ac8' },
-  { min: 50, zh: '稀有', en: 'Rare',      color: '#4a8ac8' },
-  { min: 30, zh: '精良', en: 'Uncommon',   color: '#4a9e4a' },
-  { min: 0,  zh: '普通', en: 'Common',     color: '#8a8a8a' },
+  { min: 85, zh: '傳說', en: 'LEGENDARY', color: '#d4a843', stars: 5 },
+  { min: 70, zh: '史詩', en: 'EPIC',      color: '#9a5ac8', stars: 4 },
+  { min: 50, zh: '稀有', en: 'RARE',      color: '#4a8ac8', stars: 3 },
+  { min: 30, zh: '精良', en: 'UNCOMMON',   color: '#4a9e4a', stars: 2 },
+  { min: 0,  zh: '普通', en: 'COMMON',     color: '#6a6a7a', stars: 1 },
 ];
 
 function getRarity(score) {
@@ -27,239 +45,217 @@ function getRarity(score) {
   return RARITY_TIERS[RARITY_TIERS.length - 1];
 }
 
-// ── Scoring System ──
+// ── Scoring ──
 function calculateEndScore() {
-  var score = 0;
-
-  // Stats total: (STR+AGI+WIL) × 2
-  score += (state.str + state.agi + state.wil) * 2;
-
-  // Level: level × 2
-  score += state.level * 2;
-
-  // Items: inventory.length × 2, cap 20
-  score += Math.min(state.inventory.length * 2, 20);
-
-  // NPC relations
-  if (state.flags.r1YingCompanion) score += 5;
-  if (state.flags.r3ZhouMet) score += 3;
-  if (state.flags.r3BellMet) score += 3;
-  if (state.flags.r3CraneMet3 || state.flags.r2CraneMet) score += 3;
-
-  // Key progress
-  if (state.flags.r3PlagueProof) score += 4;
-  if (state.flags.r3CraneTestimony) score += 4;
-  if (state.flags.r3BellAlliance) score += 3;
-  if (state.flags.r3CouncilEntry) score += 2;
-
-  // Zero death bonus
-  if (state.deathCount === 0) score += 8;
-
-  // Low petrification
-  if (state.petri <= 10) score += 5;
-  else if (state.petri <= 30) score += 3;
-
-  // Ending bonus
+  var s = 0;
+  s += (state.str + state.agi + state.wil) * 2;
+  s += state.level * 2;
+  s += Math.min(state.inventory.length * 2, 20);
+  if (state.flags.r1YingCompanion) s += 5;
+  if (state.flags.r3ZhouMet) s += 3;
+  if (state.flags.r3BellMet) s += 3;
+  if (state.flags.r3CraneMet3 || state.flags.r2CraneMet) s += 3;
+  if (state.flags.r3PlagueProof) s += 4;
+  if (state.flags.r3CraneTestimony) s += 4;
+  if (state.flags.r3BellAlliance) s += 3;
+  if (state.flags.r3CouncilEntry) s += 2;
+  if (state.deathCount === 0) s += 8;
+  if (state.petri <= 10) s += 5;
+  else if (state.petri <= 30) s += 3;
   var ending = state.flags.r3Ending || 'lockdown';
-  if (ending === 'dawn') score += 5;
-  else if (ending === 'sacrifice') score += 4;
-  else if (ending === 'compromise') score += 2;
-
-  return score;
+  if (ending === 'dawn') s += 5;
+  else if (ending === 'sacrifice') s += 4;
+  else if (ending === 'compromise') s += 2;
+  return s;
 }
 
-// ── Derived sub-scores for bar display ──
-function getSubScores() {
-  var ending = state.flags.r3Ending || 'lockdown';
-
-  // Exploration (max ~20): level + items
-  var explore = state.level * 2 + Math.min(state.inventory.length * 2, 20);
-  explore = Math.min(explore, 40);
-
-  // Social (max ~14): NPC relations
-  var social = 0;
-  if (state.flags.r1YingCompanion) social += 5;
-  if (state.flags.r3ZhouMet) social += 3;
-  if (state.flags.r3BellMet) social += 3;
-  if (state.flags.r3CraneMet3 || state.flags.r2CraneMet) social += 3;
-
-  // Survival (max ~13): death/petri
-  var survival = 0;
-  if (state.deathCount === 0) survival += 8;
-  if (state.petri <= 10) survival += 5;
-  else if (state.petri <= 30) survival += 3;
-
-  return {
-    str: state.str,
-    agi: state.agi,
-    wil: state.wil,
-    explore: Math.round(explore / 40 * 15), // normalize to ~15 max for bar
-    social: Math.round(social / 14 * 15),
-    survival: Math.round(survival / 13 * 15),
-  };
-}
-
-// ── Full-body ASCII Art (4 endings × 2 genders) ──
-// Each: ~16 lines × ~24 chars wide
+// ── ASCII Art — larger, atmospheric ──
 
 var ENDCARD_ART = {
   dawn: {
     male: [
-      "        _,,,,_          ",
-      "      .:::::::::.       ",
-      "     ::: _____ ::::     ",
-      "     :: | o o | :::     ",
-      "     :: |  <  | :::     ",
-      "     :: | ___ | :::     ",
-      "     :::|_____|:::      ",
-      "      .:::||:::.        ",
-      "     /::/ || \\::\\      ",
-      "    |::|  ||  |::|      ",
-      "    |::|_/||  |::|      ",
-      "    |::| (||) |::|      ",
-      "     \\:|  ||  |:/      ",
-      "      |  /  \\  |       ",
-      "     /| /    \\ |\\     ",
-      "    /_|/  ()  \\|_\\    ",
+      "            .  ✦  .       ",
+      "         _,,,,,,,,,,_     ",
+      "       .::::::::::::::::. ",
+      "      ::: _________  :::::",
+      "      :: |  °     °  | :::",
+      "      :: |     <     | :::",
+      "      :: |    \\__/   | :::",
+      "      :::|___________|:::'",
+      "       '::::.    .::::'  ",
+      "       /::/ |    | \\::\\ ",
+      "      |::|  |____|  |::| ",
+      "      |::|  / || \\  |::| ",
+      "      |::| (  ||  ) |::| ",
+      "       \\:|   /  \\   |:/ ",
+      "        |   / ◊◊ \\   |  ",
+      "       /|  / ◊◊◊◊ \\  |\\ ",
+      "      /_| /________\\ |_\\",
     ],
     female: [
-      "      .*·*·*·*·*.       ",
-      "     *·::::::::::·*     ",
-      "     :: | o o | :::     ",
-      "     :: |  v  | :::     ",
-      "     :: | ___ | :::     ",
-      "    '::|_____|:::'      ",
-      "      .:::||:::.        ",
-      "     /::/ || \\::\\      ",
-      "    |::|  ||  |::|      ",
-      "    |::|_/||  |::|      ",
-      "    |::| (||) |::|      ",
-      "     \\:| _||_ |:/      ",
-      "      |/ /  \\ \\|      ",
-      "     /| /    \\ |\\     ",
-      "    /_|/ \\()/ \\|_\\   ",
-      "       ~*·*·*~          ",
+      "            .  ✦  .       ",
+      "        .*·*·*·*·*·*·*.  ",
+      "       *·::::::::::::::::·",
+      "      ::: _________  :::::",
+      "     '::  | °     ° |:::' ",
+      "      '·  |    v    | ·'  ",
+      "      '·  |   \\__/  | ·'  ",
+      "     '::: |___________|:' ",
+      "       '::::.    .::::'  ",
+      "       /::/ |    | \\::\\ ",
+      "      |::|  |____|  |::| ",
+      "      |::|  / || \\  |::| ",
+      "      |::| (  ||  ) |::| ",
+      "       \\:|   /  \\   |:/ ",
+      "        |   / ◊◊ \\   |  ",
+      "       /|  / ◊◊◊◊ \\  |\\ ",
+      "      /_| /________\\ |_\\",
     ],
   },
   sacrifice: {
     male: [
-      "        _,,,,_          ",
-      "      .:::::::::.       ",
-      "     ::: _____ ::::     ",
-      "     :: | o o | :::     ",
-      "     :: |  <  | :::     ",
-      "     :: | ___ | :::     ",
-      "     :::|_____|:::      ",
-      "      .:::||:::.        ",
-      "   __/::/    \\::\\__   ",
-      "  /  |::|    |::|  \\  ",
-      "  \\  |::|    |::|  /  ",
-      "   \\_|::|    |::|_/   ",
-      "      \\:|    |:/      ",
-      "       |  /\\  |       ",
-      "      /| /  \\ |\\     ",
-      "     /_|/    \\|_\\    ",
+      "         ·  ✦  ·  ✦  ·   ",
+      "         _,,,,,,,,,,_     ",
+      "       .::::::::::::::::. ",
+      "      ::: _________  :::::",
+      "      :: |  °     °  | :::",
+      "      :: |     <     | :::",
+      "      :: |    ___    | :::",
+      "      :::|___________|:::'",
+      "       '::::.    .::::'  ",
+      "    __/::/  |    |  \\::\\__",
+      "   /  |::|  |____|  |::|  \\",
+      "  ◊   |::|  /    \\  |::|  ◊",
+      "   \\  |::| /      \\ |::|  /",
+      "    \\_\\::|/        \\|::/_/ ",
+      "       |    / /\\ \\   |   ",
+      "      /|   / /  \\ \\  |\\  ",
+      "     /_|  /_/____\\_\\ |_\\ ",
     ],
     female: [
-      "      .*·*·*·*·*.       ",
-      "     *·::::::::::·*     ",
-      "     :: | o o | :::     ",
-      "     :: |  v  | :::     ",
-      "     :: | ___ | :::     ",
-      "    '::|_____|:::'      ",
-      "      .:::||:::.        ",
-      "   __/::/    \\::\\__   ",
-      "  /  |::|    |::|  \\  ",
-      "  \\  |::|    |::|  /  ",
-      "   \\_|::|    |::|_/   ",
-      "      \\:|    |:/      ",
-      "       | _/\\_ |       ",
-      "      /| /  \\ |\\     ",
-      "     /_|/    \\|_\\    ",
-      "       ~*·*·*~          ",
+      "         ·  ✦  ·  ✦  ·   ",
+      "        .*·*·*·*·*·*·*.  ",
+      "       *·::::::::::::::::·",
+      "      ::: _________  :::::",
+      "     '::  | °     ° |:::' ",
+      "      '·  |    v    | ·'  ",
+      "      '·  |   ___   | ·'  ",
+      "     '::: |___________|:' ",
+      "       '::::.    .::::'  ",
+      "    __/::/  |    |  \\::\\__",
+      "   /  |::|  |____|  |::|  \\",
+      "  ◊   |::|  /    \\  |::|  ◊",
+      "   \\  |::| /      \\ |::|  /",
+      "    \\_\\::|/        \\|::/_/ ",
+      "       |    / /\\ \\   |   ",
+      "      /|   / /  \\ \\  |\\  ",
+      "     /_|  /_/____\\_\\ |_\\ ",
     ],
   },
   compromise: {
     male: [
-      "        _,,,,_          ",
-      "      .:::::::::.       ",
-      "     ::: _____ ::::     ",
-      "     :: | o o | :::     ",
-      "     :: |  <  | :::     ",
-      "     :: | ___ | :::     ",
-      "     :::|_____|:::      ",
-      "      .:::||:::.        ",
-      "     /::/ || \\::\\      ",
-      "    |::|  ||  |::|__    ",
-      "    |::|  ||  |::|--)   ",
-      "    |::|  ||  |::|--'   ",
-      "     \\:|  ||  |:/      ",
-      "      |  /  \\  |       ",
-      "     /| /    \\ |\\     ",
-      "    /_|/      \\|_\\    ",
+      "                          ",
+      "         _,,,,,,,,,,_     ",
+      "       .::::::::::::::::. ",
+      "      ::: _________  :::::",
+      "      :: |  °     °  | :::",
+      "      :: |     <     | :::",
+      "      :: |    \\_/    | :::",
+      "      :::|___________|:::'",
+      "       '::::.    .::::'  ",
+      "       /::/ |    | \\::\\ ",
+      "      |::|  |____|  |::|__",
+      "      |::|  / || \\  |::|-⇌",
+      "      |::|    ||    |::|‾‾",
+      "       \\:|    ||    |:/ ",
+      "        |    /  \\    |  ",
+      "       /|   /    \\   |\\ ",
+      "      /_|  /______\\  |_\\",
     ],
     female: [
-      "      .*·*·*·*·*.       ",
-      "     *·::::::::::·*     ",
-      "     :: | o o | :::     ",
-      "     :: |  v  | :::     ",
-      "     :: | ___ | :::     ",
-      "    '::|_____|:::'      ",
-      "      .:::||:::.        ",
-      "     /::/ || \\::\\      ",
-      "    |::|  ||  |::|__    ",
-      "    |::|  ||  |::|--)   ",
-      "    |::|  ||  |::|--'   ",
-      "     \\:| _||_ |:/      ",
-      "      |/ /  \\ \\|      ",
-      "     /| /    \\ |\\     ",
-      "    /_|/      \\|_\\    ",
-      "       ~*·*·*~          ",
+      "                          ",
+      "        .*·*·*·*·*·*·*.  ",
+      "       *·::::::::::::::::·",
+      "      ::: _________  :::::",
+      "     '::  | °     ° |:::' ",
+      "      '·  |    v    | ·'  ",
+      "      '·  |   \\_/   | ·'  ",
+      "     '::: |___________|:' ",
+      "       '::::.    .::::'  ",
+      "       /::/ |    | \\::\\ ",
+      "      |::|  |____|  |::|__",
+      "      |::|  / || \\  |::|-⇌",
+      "      |::|    ||    |::|‾‾",
+      "       \\:|    ||    |:/ ",
+      "        |    /  \\    |  ",
+      "       /|   /    \\   |\\ ",
+      "      /_|  /______\\  |_\\",
     ],
   },
   lockdown: {
     male: [
-      "        _,,,,_          ",
-      "      .:::::::::.       ",
-      "     ::: _____ ::::     ",
-      "     :: | o o | :::     ",
-      "     :: |  <  | :::     ",
-      "     :: | === | :::     ",
-      "     :::|_____|:::      ",
-      "      .:::||:::.        ",
-      "     /::/ || \\::\\      ",
-      "    |::|__||__|::|      ",
-      "    |::|######|::|      ",
-      "    |::|######|::|      ",
-      "     \\:|######|:/      ",
-      "      | /####\\ |      ",
-      "     /|/ #/\\# \\|\\    ",
-      "    /_|/ #/  \\# \\|_\\ ",
+      "        ░░░░░░░░░░░░░    ",
+      "       ░ _,,,,,,,,,,_ ░  ",
+      "      ░.::::::::::::::::░",
+      "      ░:: _________  :::░",
+      "      ░:: | °    °  | ::░",
+      "      ░:: |    <    | ::░",
+      "      ░:: |  =====  | ::░",
+      "      ░:::|__________|::░",
+      "       ░::::.    .::::░  ",
+      "       /::/ |    | \\::\\ ",
+      "      |::|░░|____|░░|::| ",
+      "      |::|░░/####\\░░|::| ",
+      "      |::|░/######\\░|::| ",
+      "       \\:|░/######\\░|:/ ",
+      "        | / /####\\ \\ |  ",
+      "       /| / #/  \\# \\ |\\ ",
+      "      /_|/ _/____\\_ \\|_\\",
     ],
     female: [
-      "      .*·*·*·*·*.       ",
-      "     *·::::::::::·*     ",
-      "     :: | o o | :::     ",
-      "     :: |  v  | :::     ",
-      "     :: | === | :::     ",
-      "    '::|_____|:::'      ",
-      "      .:::||:::.        ",
-      "     /::/ || \\::\\      ",
-      "    |::|__||__|::|      ",
-      "    |::|######|::|      ",
-      "    |::|######|::|      ",
-      "     \\:|######|:/      ",
-      "      |/ #### \\|      ",
-      "     /|/ #/\\# \\|\\    ",
-      "    /_|/ #/  \\# \\|_\\ ",
-      "       ~*·*·*~          ",
+      "        ░░░░░░░░░░░░░    ",
+      "      ░.*·*·*·*·*·*·*.░  ",
+      "      ░·::::::::::::::::░",
+      "      ░:: _________  :::░",
+      "      ░':: | °   ° |::'░ ",
+      "      ░ '· |   v   | ·'░ ",
+      "      ░ '· | ===== | ·'░ ",
+      "      ░'::|__________|:░ ",
+      "       ░::::.    .::::░  ",
+      "       /::/ |    | \\::\\ ",
+      "      |::|░░|____|░░|::| ",
+      "      |::|░░/####\\░░|::| ",
+      "      |::|░/######\\░|::| ",
+      "       \\:|░/######\\░|:/ ",
+      "        | / /####\\ \\ |  ",
+      "       /| / #/  \\# \\ |\\ ",
+      "      /_|/ _/____\\_ \\|_\\",
     ],
   },
 };
 
-// ── Canvas Drawing Helpers ──
+// ── Pixel block bar renderer ──
+function _drawBlockBar(ctx, x, y, val, max, color, blockSize) {
+  var bs = blockSize || 8;
+  var gap = 2;
+  var totalBlocks = max;
+  var filledBlocks = Math.round((val / max) * totalBlocks);
 
-function _drawRoundRect(ctx, x, y, w, h, r) {
+  for (var i = 0; i < totalBlocks; i++) {
+    if (i < filledBlocks) {
+      ctx.fillStyle = color;
+      ctx.globalAlpha = 0.9;
+    } else {
+      ctx.fillStyle = '#1a1a24';
+      ctx.globalAlpha = 0.6;
+    }
+    ctx.fillRect(x + i * (bs + gap), y, bs, bs);
+  }
+  ctx.globalAlpha = 1;
+}
+
+// ── Rounded rect helper ──
+function _roundRect(ctx, x, y, w, h, r) {
   ctx.beginPath();
   ctx.moveTo(x + r, y);
   ctx.lineTo(x + w - r, y);
@@ -271,16 +267,6 @@ function _drawRoundRect(ctx, x, y, w, h, r) {
   ctx.lineTo(x, y + r);
   ctx.quadraticCurveTo(x, y, x + r, y);
   ctx.closePath();
-}
-
-function _drawMiniBar(ctx, x, y, w, h, val, max, fillColor) {
-  // Background
-  ctx.fillStyle = '#1a1a2a';
-  ctx.fillRect(x, y, w, h);
-  // Fill
-  var ratio = Math.min(val / max, 1);
-  ctx.fillStyle = fillColor;
-  ctx.fillRect(x, y, w * ratio, h);
 }
 
 // ── Main Generator ──
@@ -295,177 +281,171 @@ function generateEndCard() {
   var meta = ENDING_META[ending] || ENDING_META.lockdown;
   var totalScore = calculateEndScore();
   var rarity = getRarity(totalScore);
-  var sub = getSubScores();
+  var cx = ENDCARD_W / 2;
+  var pad = 32; // left padding
 
   // ── Background ──
-  ctx.fillStyle = '#08080e';
+  ctx.fillStyle = '#0e0e16';
   ctx.fillRect(0, 0, ENDCARD_W, ENDCARD_H);
 
-  // Subtle radial vignette
-  var vg = ctx.createRadialGradient(ENDCARD_W / 2, ENDCARD_H / 3, 50, ENDCARD_W / 2, ENDCARD_H / 3, 350);
-  vg.addColorStop(0, 'rgba(255,255,255,0.03)');
-  vg.addColorStop(1, 'rgba(0,0,0,0)');
-  ctx.fillStyle = vg;
-  ctx.fillRect(0, 0, ENDCARD_W, ENDCARD_H);
-
-  // ── Double Border (rarity color) ──
-  // Outer border
+  // ── Rounded border ──
+  _roundRect(ctx, 10, 10, ENDCARD_W - 20, ENDCARD_H - 20, 16);
   ctx.strokeStyle = rarity.color;
-  ctx.lineWidth = 3;
-  ctx.strokeRect(8, 8, ENDCARD_W - 16, ENDCARD_H - 16);
-  // Inner border
-  ctx.strokeStyle = rarity.color;
-  ctx.globalAlpha = 0.35;
-  ctx.lineWidth = 1;
-  ctx.strokeRect(14, 14, ENDCARD_W - 28, ENDCARD_H - 28);
+  ctx.globalAlpha = 0.5;
+  ctx.lineWidth = 2;
+  ctx.stroke();
   ctx.globalAlpha = 1;
 
-  // Corner accents (small L-shapes in rarity color)
+  // Inner fill (slightly lighter)
+  _roundRect(ctx, 12, 12, ENDCARD_W - 24, ENDCARD_H - 24, 14);
+  ctx.fillStyle = '#111119';
+  ctx.fill();
+
+  // Subtle glow at top from rarity color
+  var topGlow = ctx.createRadialGradient(cx, 0, 10, cx, 0, 250);
+  topGlow.addColorStop(0, rarity.color);
+  topGlow.addColorStop(1, 'transparent');
+  ctx.globalAlpha = 0.04;
+  ctx.fillStyle = topGlow;
+  ctx.fillRect(12, 12, ENDCARD_W - 24, 300);
+  ctx.globalAlpha = 1;
+
+  // ── Top bar: stars + rarity (left) / type (right) ──
+  var curY = 40;
+  var stars = '';
+  for (var si = 0; si < rarity.stars; si++) stars += '★';
+  ctx.font = 'bold 14px "Courier New", monospace';
+  ctx.textAlign = 'left';
   ctx.fillStyle = rarity.color;
-  var cLen = 18, cW = 2;
-  // top-left
-  ctx.fillRect(8, 8, cLen, cW); ctx.fillRect(8, 8, cW, cLen);
-  // top-right
-  ctx.fillRect(ENDCARD_W - 8 - cLen, 8, cLen, cW); ctx.fillRect(ENDCARD_W - 10, 8, cW, cLen);
-  // bottom-left
-  ctx.fillRect(8, ENDCARD_H - 10, cLen, cW); ctx.fillRect(8, ENDCARD_H - 8 - cLen, cW, cLen);
-  // bottom-right
-  ctx.fillRect(ENDCARD_W - 8 - cLen, ENDCARD_H - 10, cLen, cW); ctx.fillRect(ENDCARD_W - 10, ENDCARD_H - 8 - cLen, cW, cLen);
+  ctx.fillText(stars + ' ' + (en ? rarity.en : rarity.zh), pad, curY);
 
-  // ── Title: P E T R I A B Y S S ──
-  var curY = 38;
-  ctx.font = '600 12px "Courier New", monospace';
-  ctx.fillStyle = '#5a5a6a';
-  ctx.textAlign = 'center';
-  ctx.fillText('P E T R I A B Y S S', ENDCARD_W / 2, curY);
+  ctx.textAlign = 'right';
+  ctx.fillStyle = meta.color;
+  ctx.font = '12px "Courier New", monospace';
+  ctx.fillText(en ? meta.typeEn : meta.type, ENDCARD_W - pad, curY);
 
-  // ── Ending Name ──
+  // ── ASCII Art ──
   curY += 24;
-  ctx.font = 'bold 20px "Courier New", monospace';
-  ctx.fillStyle = meta.color;
-  ctx.fillText(en ? meta.en : meta.zh, ENDCARD_W / 2, curY);
-
-  // Decorative line
-  curY += 10;
-  ctx.fillStyle = meta.color;
-  ctx.globalAlpha = 0.3;
-  ctx.fillRect(60, curY, ENDCARD_W - 120, 1);
-  ctx.globalAlpha = 1;
-
-  // ── ASCII Full Body Art ──
-  curY += 14;
   var artSet = ENDCARD_ART[ending] || ENDCARD_ART.lockdown;
   var art = artSet[state.sex] || artSet.male;
-  ctx.font = '13px "Courier New", monospace';
-  ctx.fillStyle = '#a0a0b0';
-  ctx.textAlign = 'center';
+  ctx.font = '12px "Courier New", monospace';
+  ctx.fillStyle = '#9898a8';
+  ctx.textAlign = 'left';
   for (var i = 0; i < art.length; i++) {
-    ctx.fillText(art[i], ENDCARD_W / 2, curY + i * 16);
+    ctx.fillText(art[i], pad + 16, curY + i * 15);
   }
-  curY += art.length * 16 + 8;
+  curY += art.length * 15 + 16;
 
-  // ── Character Name + Gender ──
-  var sexLabel = state.sex === 'female' ? ' ♀' : ' ♂';
-  ctx.font = '16px sans-serif';
-  ctx.fillStyle = '#d0d0d8';
-  ctx.textAlign = 'center';
-  ctx.fillText(state.name + sexLabel, ENDCARD_W / 2, curY);
+  // ── Character name ──
+  var sexSymbol = state.sex === 'female' ? ' ♀' : ' ♂';
+  ctx.font = 'bold 20px "Courier New", monospace';
+  ctx.fillStyle = '#e0e0e8';
+  ctx.textAlign = 'left';
+  ctx.fillText(state.name + sexSymbol, pad, curY);
 
-  // Thin line
-  curY += 10;
-  ctx.fillStyle = 'rgba(255,255,255,0.08)';
-  ctx.fillRect(40, curY, ENDCARD_W - 80, 1);
+  // ── Flavor text ──
+  curY += 20;
+  var flavor = ENDING_FLAVOR[ending] || ENDING_FLAVOR.lockdown;
+  var flavorText = en ? flavor.en : flavor.zh;
+  var flavorLines = flavorText.split('\n');
+  ctx.font = 'italic 12px "Courier New", monospace';
+  ctx.fillStyle = '#6a6a7a';
+  ctx.textAlign = 'left';
+  for (var fi = 0; fi < flavorLines.length; fi++) {
+    ctx.fillText(flavorLines[fi], pad, curY + fi * 16);
+  }
+  curY += flavorLines.length * 16 + 16;
 
-  // ── Score Bars (6 stats) ──
-  curY += 14;
-  var barLabels = en
-    ? ['STR', 'AGI', 'WIL', 'EXPLORE', 'SOCIAL', 'SURVIVAL']
-    : ['力量', '敏捷', '意志', '探索', '交際', '生存'];
-  var barValues = [sub.str, sub.agi, sub.wil, sub.explore, sub.social, sub.survival];
-  var barMaxes  = [15, 15, 15, 15, 15, 15];
-  var barColors = ['#c06060', '#60c060', '#6080c0', '#c0a040', '#c060a0', '#40c0c0'];
+  // ── Stats with pixel block bars ──
+  var statLabels = en
+    ? ['STR', 'AGI', 'WIL', 'PETRI', 'DEPTH']
+    : ['力  量', '敏  捷', '意  志', '石化度', '深  度'];
+  var statValues = [state.str, state.agi, state.wil, state.petri, state.level];
+  var statMaxes  = [15, 15, 15, 100, 10];
+  var statDisplayBlocks = [10, 10, 10, 10, 10]; // all normalized to 10 blocks
+  var statColors = ['#c06060', '#60c060', '#6080c0', '#9a6ac8', '#c0a040'];
 
-  var barW = 120, barH = 7;
-  var barLeftLabel = 80;
-  var barLeftBar = ENDCARD_W / 2 + 10;
+  var labelW = 90;
+  var barX = pad + labelW + 8;
+  var numX = ENDCARD_W - pad;
 
-  for (var b = 0; b < barLabels.length; b++) {
-    var by = curY + b * 18;
+  for (var si2 = 0; si2 < statLabels.length; si2++) {
+    var sy = curY + si2 * 22;
     // Label
-    ctx.font = '11px "Courier New", monospace';
-    ctx.textAlign = 'right';
-    ctx.fillStyle = '#6a6a7a';
-    ctx.fillText(barLabels[b], barLeftBar - 10, by + 6);
-    // Bar
-    _drawMiniBar(ctx, barLeftBar, by, barW, barH, barValues[b], barMaxes[b], barColors[b]);
-    // Value
+    ctx.font = '12px "Courier New", monospace';
     ctx.textAlign = 'left';
-    ctx.fillStyle = '#8a8a9a';
-    ctx.font = '10px "Courier New", monospace';
-    ctx.fillText('' + barValues[b], barLeftBar + barW + 6, by + 6);
+    ctx.fillStyle = '#5a5a6a';
+    ctx.fillText(statLabels[si2], pad, sy + 8);
+    // Block bar
+    _drawBlockBar(ctx, barX, sy, statValues[si2], statMaxes[si2], statColors[si2], 8);
+    // Number
+    ctx.textAlign = 'right';
+    ctx.fillStyle = '#7a7a8a';
+    ctx.font = '12px "Courier New", monospace';
+    ctx.fillText('' + statValues[si2], numX, sy + 8);
   }
-  curY += barLabels.length * 18 + 8;
+  curY += statLabels.length * 22 + 16;
 
-  // ── Total Score + Rarity Badge ──
-  // Score number
-  ctx.font = 'bold 28px "Courier New", monospace';
-  ctx.textAlign = 'center';
+  // ── Highlights box ──
+  var hlItems = [];
+  if (state.deathCount === 0) hlItems.push(en ? 'Deathless Run' : '零死亡通關');
+  if (state.petri <= 10) hlItems.push(en ? 'Stone Resistant' : '抗石化體質');
+  if (state.flags.r1YingCompanion) hlItems.push(en ? 'Ying\'s Companion' : '螢的同伴');
+  if (state.flags.r3PlagueProof) hlItems.push(en ? 'Plague Proof' : '瘟疫證據');
+  if (state.flags.r3CraneTestimony) hlItems.push(en ? 'Crane Testified' : '灰鶴作證');
+
+  if (hlItems.length > 0) {
+    // Box background
+    _roundRect(ctx, pad - 4, curY - 4, ENDCARD_W - pad * 2 + 8, hlItems.length * 16 + 16, 6);
+    ctx.fillStyle = '#14141e';
+    ctx.fill();
+    ctx.strokeStyle = '#2a2a3a';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+
+    // Label
+    ctx.font = '10px "Courier New", monospace';
+    ctx.fillStyle = '#4a4a5a';
+    ctx.textAlign = 'left';
+    ctx.fillText(en ? 'highlights' : '成就', pad + 4, curY + 10);
+
+    // Items
+    ctx.font = '11px "Courier New", monospace';
+    ctx.fillStyle = '#8a8a9a';
+    for (var hi = 0; hi < hlItems.length; hi++) {
+      ctx.fillText('· ' + hlItems[hi], pad + 12, curY + 26 + hi * 16);
+    }
+    curY += hlItems.length * 16 + 24;
+  }
+
+  // ── Score at bottom ──
+  curY = ENDCARD_H - 52;
+  ctx.font = 'bold 11px "Courier New", monospace';
+  ctx.textAlign = 'left';
+  ctx.fillStyle = '#3a3a4a';
+  ctx.fillText(en ? 'SCORE' : '評分', pad, curY);
+  ctx.font = 'bold 22px "Courier New", monospace';
   ctx.fillStyle = rarity.color;
-
-  // Glow effect
   ctx.shadowColor = rarity.color;
-  ctx.shadowBlur = 16;
-  ctx.fillText('' + totalScore, ENDCARD_W / 2, curY);
+  ctx.shadowBlur = rarity.stars >= 4 ? 12 : 0;
+  ctx.fillText('' + totalScore, pad + (en ? 60 : 48), curY);
   ctx.shadowBlur = 0;
 
-  // Rarity label
-  curY += 18;
-  ctx.font = 'bold 13px "Courier New", monospace';
-  ctx.fillStyle = rarity.color;
-  ctx.globalAlpha = 0.85;
-  ctx.fillText('[ ' + (en ? rarity.en : rarity.zh) + ' ]', ENDCARD_W / 2, curY);
-  ctx.globalAlpha = 1;
-
-  // ── Petrification Bar ──
-  curY += 18;
-  var pBarX = 50, pBarW = ENDCARD_W - 100, pBarH = 6;
-  ctx.font = '9px "Courier New", monospace';
-  ctx.textAlign = 'left';
-  ctx.fillStyle = '#4a4a5a';
-  ctx.fillText(en ? 'Petrification' : '石化度', pBarX, curY - 3);
+  // Time + URL on right
   ctx.textAlign = 'right';
-  ctx.fillText(state.petri + '%', pBarX + pBarW, curY - 3);
-  // Bar bg
-  ctx.fillStyle = '#1a1a2a';
-  ctx.fillRect(pBarX, curY, pBarW, pBarH);
-  // Bar fill
-  var petriRatio = state.petri / 100;
-  var petriGrad = ctx.createLinearGradient(pBarX, 0, pBarX + pBarW * petriRatio, 0);
-  petriGrad.addColorStop(0, '#4a3a6a');
-  petriGrad.addColorStop(1, '#9a6ac8');
-  ctx.fillStyle = petriGrad;
-  ctx.fillRect(pBarX, curY, pBarW * petriRatio, pBarH);
-
-  // ── Play Time ──
-  curY += 18;
+  ctx.font = '9px "Courier New", monospace';
+  ctx.fillStyle = '#2a2a3a';
   if (typeof globalStats !== 'undefined' && globalStats.currentRunStartMs > 0) {
     var runTime = Date.now() - globalStats.currentRunStartMs;
-    ctx.font = '9px "Courier New", monospace';
-    ctx.textAlign = 'center';
-    ctx.fillStyle = '#3a3a4a';
-    ctx.fillText((en ? 'Time: ' : '時間：') + formatTime(runTime), ENDCARD_W / 2, curY);
+    ctx.fillText((en ? 'time ' : '時間 ') + formatTime(runTime), ENDCARD_W - pad, curY - 10);
   }
-
-  // ── Footer ──
-  ctx.font = '9px "Courier New", monospace';
-  ctx.textAlign = 'center';
-  ctx.fillStyle = '#3a3a4a';
-  ctx.fillText('petriabyss.itch.io', ENDCARD_W / 2, ENDCARD_H - 18);
+  ctx.fillText('petriabyss.itch.io', ENDCARD_W - pad, curY);
 
   return canvas;
 }
 
-// Show the ending card overlay
+// ── Show / Share / Download ──
+
 function showEndCard() {
   var canvas = generateEndCard();
   var $overlay = document.getElementById('endcard-overlay');
@@ -480,7 +460,6 @@ function showEndCard() {
   canvas.style.borderRadius = '6px';
   $container.appendChild(canvas);
 
-  // Download
   $dlBtn.onclick = function() {
     var link = document.createElement('a');
     link.download = 'petriabyss-' + (state.flags.r3Ending || 'ending') + '.png';
@@ -488,7 +467,6 @@ function showEndCard() {
     link.click();
   };
 
-  // Share (Web Share API or copy to clipboard)
   if (navigator.share && navigator.canShare) {
     $shareBtn.style.display = '';
     $shareBtn.onclick = function() {
