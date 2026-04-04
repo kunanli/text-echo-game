@@ -1,31 +1,31 @@
-// ══ Ending Card Generator — Collectible Card (buddy style) ══
+// ══ Ending Card Generator — Collectible Card ══
 
 var ENDCARD_W = 450;
-var ENDCARD_H = 680;
+var ENDCARD_H = 700;
 
 var ENDING_META = {
-  dawn:       { zh: '黎明', en: 'DAWN',       type: '☀ 曙光者',  typeEn: 'DAWNBRINGER', color: '#60c8e0' },
-  sacrifice:  { zh: '犧牲', en: 'SACRIFICE',  type: '✦ 獻身者',  typeEn: 'MARTYR',      color: '#9a8ac8' },
-  compromise: { zh: '妥協', en: 'COMPROMISE', type: '⚖ 斡旋者',  typeEn: 'MEDIATOR',    color: '#d4a843' },
-  lockdown:   { zh: '封鎖', en: 'LOCKDOWN',   type: '▣ 守門者',  typeEn: 'WARDEN',      color: '#c06060' },
+  dawn:       { zh: '黎明', en: 'DAWN',       type: '曙光者',  typeEn: 'DAWNBRINGER', color: '#60c8e0' },
+  sacrifice:  { zh: '犧牲', en: 'SACRIFICE',  type: '獻身者',  typeEn: 'MARTYR',      color: '#9a8ac8' },
+  compromise: { zh: '妥協', en: 'COMPROMISE', type: '斡旋者',  typeEn: 'MEDIATOR',    color: '#d4a843' },
+  lockdown:   { zh: '封鎖', en: 'LOCKDOWN',   type: '守門者',  typeEn: 'WARDEN',      color: '#c06060' },
 };
 
 var ENDING_FLAVOR = {
   dawn: {
-    zh: '你帶著真相穿越了深淵的黑暗，\n將光明重新引入這被遺忘的地底世界。\n石化的詛咒終將褪去，而你的名字\n會被銘刻在新時代的起點。',
-    en: 'You carried the truth through the\ndarkness of the abyss, bringing light\nback to this forgotten underworld.\nThe curse of petrification shall fade,\nand your name marks a new dawn.',
+    zh: '"帶著真相穿越了深淵的黑暗，將光明\n重新引入這被遺忘的地底世界。石化的\n詛咒終將褪去，而這個名字會被銘刻在\n新時代的起點。"',
+    en: '"Carried the truth through darkness,\nbringing light back to the forgotten\nunderworld. The curse shall fade, and\nthis name marks a new dawn."',
   },
   sacrifice: {
-    zh: '你選擇了以自身為代價換取眾人的\n安全。石化的命運並未消失，只是由\n你一人承擔。深淵會記住這份犧牲。',
-    en: 'You chose to bear the cost so others\nmight live. The curse did not vanish —\nyou simply took it upon yourself.\nThe abyss remembers your sacrifice.',
+    zh: '"選擇了以自身為代價換取眾人的安全。\n石化的命運並未消失，只是由一人承擔。\n深淵會記住這份犧牲。"',
+    en: '"Chose to bear the cost so others\nmight live. The curse did not vanish\n— simply taken upon oneself.\nThe abyss remembers."',
   },
   compromise: {
-    zh: '在對立的勢力之間，你找到了一條\n脆弱但可行的中間道路。沒有英雄式\n的結局，但每個人都活了下來。',
-    en: 'Between opposing forces, you found\na fragile but viable middle path.\nNo heroic ending — but everyone\nlived to see another day.',
+    zh: '"在對立的勢力之間找到了一條脆弱但\n可行的中間道路。沒有英雄式的結局，\n但每個人都活了下來。"',
+    en: '"Found a fragile but viable path\nbetween opposing forces. No heroic\nending — but everyone lived to see\nanother day."',
   },
   lockdown: {
-    zh: '深淵的入口被永遠封閉。地底的一切\n——包括真相——都被埋葬在石壁之下。\n安全，但代價是永遠的沉默。',
-    en: 'The abyss was sealed forever. All that\nlay beneath — including the truth —\nburied under stone. Safe, yes.\nBut at the cost of eternal silence.',
+    zh: '"深淵的入口被永遠封閉。地底的一切\n——包括真相——都被埋葬在石壁之下。\n安全，但代價是永遠的沉默。"',
+    en: '"The abyss was sealed forever.\nAll beneath — truth included —\nburied under stone. Safe, yes.\nBut at the cost of eternal silence."',
   },
 };
 
@@ -69,192 +69,159 @@ function calculateEndScore() {
   return s;
 }
 
-// ── ASCII Art — larger, atmospheric ──
+// ── Half-body ASCII Art — simple, iconic, cute ──
 
 var ENDCARD_ART = {
   dawn: {
     male: [
-      "            .  ✦  .       ",
-      "         _,,,,,,,,,,_     ",
-      "       .::::::::::::::::. ",
-      "      ::: _________  :::::",
-      "      :: |  °     °  | :::",
-      "      :: |     <     | :::",
-      "      :: |    \\__/   | :::",
-      "      :::|___________|:::'",
-      "       '::::.    .::::'  ",
-      "       /::/ |    | \\::\\ ",
-      "      |::|  |____|  |::| ",
-      "      |::|  / || \\  |::| ",
-      "      |::| (  ||  ) |::| ",
-      "       \\:|   /  \\   |:/ ",
-      "        |   / ◊◊ \\   |  ",
-      "       /|  / ◊◊◊◊ \\  |\\ ",
-      "      /_| /________\\ |_\\",
+      "        .  *  .        ",
+      "       · \\|/ ·        ",
+      "        _____          ",
+      "      .::::::::.       ",
+      "     :: | °  ° | ::    ",
+      "     :: |   <  | ::    ",
+      "     :: |  \\_/  | ::   ",
+      "     :::|_______|::    ",
+      "      '::| || |::'     ",
+      "       /:| || |:\\     ",
+      "      |::|_||_|::|     ",
+      "      |:::(  ):::|     ",
     ],
     female: [
-      "            .  ✦  .       ",
-      "        .*·*·*·*·*·*·*.  ",
-      "       *·::::::::::::::::·",
-      "      ::: _________  :::::",
-      "     '::  | °     ° |:::' ",
-      "      '·  |    v    | ·'  ",
-      "      '·  |   \\__/  | ·'  ",
-      "     '::: |___________|:' ",
-      "       '::::.    .::::'  ",
-      "       /::/ |    | \\::\\ ",
-      "      |::|  |____|  |::| ",
-      "      |::|  / || \\  |::| ",
-      "      |::| (  ||  ) |::| ",
-      "       \\:|   /  \\   |:/ ",
-      "        |   / ◊◊ \\   |  ",
-      "       /|  / ◊◊◊◊ \\  |\\ ",
-      "      /_| /________\\ |_\\",
+      "        .  *  .        ",
+      "       · \\|/ ·        ",
+      "      *·*·*·*·*·*      ",
+      "     ·:::::::::::·     ",
+      "     :: | °  ° | ::    ",
+      "     :: |   v  | ::    ",
+      "     :: |  \\_/  | ::   ",
+      "    '::|_______|::'    ",
+      "      '::| || |::'     ",
+      "       /:| || |:\\     ",
+      "      |::|_||_|::|     ",
+      "      |:::(  ):::|     ",
     ],
   },
   sacrifice: {
     male: [
-      "         ·  ✦  ·  ✦  ·   ",
-      "         _,,,,,,,,,,_     ",
-      "       .::::::::::::::::. ",
-      "      ::: _________  :::::",
-      "      :: |  °     °  | :::",
-      "      :: |     <     | :::",
-      "      :: |    ___    | :::",
-      "      :::|___________|:::'",
-      "       '::::.    .::::'  ",
-      "    __/::/  |    |  \\::\\__",
-      "   /  |::|  |____|  |::|  \\",
-      "  ◊   |::|  /    \\  |::|  ◊",
-      "   \\  |::| /      \\ |::|  /",
-      "    \\_\\::|/        \\|::/_/ ",
-      "       |    / /\\ \\   |   ",
-      "      /|   / /  \\ \\  |\\  ",
-      "     /_|  /_/____\\_\\ |_\\ ",
+      "       ·  ✦  ·         ",
+      "                       ",
+      "        _____          ",
+      "      .::::::::.       ",
+      "     :: | °  ° | ::    ",
+      "     :: |   <  | ::    ",
+      "     :: |  ___  | ::   ",
+      "     :::|_______|::    ",
+      "    _/::| || |::\\_    ",
+      "   / /:| || |:\\ \\   ",
+      "  ◊ |::|_||_|::| ◊    ",
+      "   \\_:::(  )::_/     ",
     ],
     female: [
-      "         ·  ✦  ·  ✦  ·   ",
-      "        .*·*·*·*·*·*·*.  ",
-      "       *·::::::::::::::::·",
-      "      ::: _________  :::::",
-      "     '::  | °     ° |:::' ",
-      "      '·  |    v    | ·'  ",
-      "      '·  |   ___   | ·'  ",
-      "     '::: |___________|:' ",
-      "       '::::.    .::::'  ",
-      "    __/::/  |    |  \\::\\__",
-      "   /  |::|  |____|  |::|  \\",
-      "  ◊   |::|  /    \\  |::|  ◊",
-      "   \\  |::| /      \\ |::|  /",
-      "    \\_\\::|/        \\|::/_/ ",
-      "       |    / /\\ \\   |   ",
-      "      /|   / /  \\ \\  |\\  ",
-      "     /_|  /_/____\\_\\ |_\\ ",
+      "       ·  ✦  ·         ",
+      "                       ",
+      "      *·*·*·*·*·*      ",
+      "     ·:::::::::::·     ",
+      "     :: | °  ° | ::    ",
+      "     :: |   v  | ::    ",
+      "     :: |  ___  | ::   ",
+      "    '::|_______|::'    ",
+      "    _/::| || |::\\_    ",
+      "   / /:| || |:\\ \\   ",
+      "  ◊ |::|_||_|::| ◊    ",
+      "   \\_:::(  )::_/     ",
     ],
   },
   compromise: {
     male: [
-      "                          ",
-      "         _,,,,,,,,,,_     ",
-      "       .::::::::::::::::. ",
-      "      ::: _________  :::::",
-      "      :: |  °     °  | :::",
-      "      :: |     <     | :::",
-      "      :: |    \\_/    | :::",
-      "      :::|___________|:::'",
-      "       '::::.    .::::'  ",
-      "       /::/ |    | \\::\\ ",
-      "      |::|  |____|  |::|__",
-      "      |::|  / || \\  |::|-⇌",
-      "      |::|    ||    |::|‾‾",
-      "       \\:|    ||    |:/ ",
-      "        |    /  \\    |  ",
-      "       /|   /    \\   |\\ ",
-      "      /_|  /______\\  |_\\",
+      "                       ",
+      "                       ",
+      "        _____          ",
+      "      .::::::::.       ",
+      "     :: | °  ° | ::    ",
+      "     :: |   <  | ::    ",
+      "     :: |  \\_/  | ::   ",
+      "     :::|_______|::    ",
+      "      '::| || |::'__   ",
+      "       /:| || |:\\_⇌)  ",
+      "      |::|_||_|::|‾‾   ",
+      "      |:::(  ):::|     ",
     ],
     female: [
-      "                          ",
-      "        .*·*·*·*·*·*·*.  ",
-      "       *·::::::::::::::::·",
-      "      ::: _________  :::::",
-      "     '::  | °     ° |:::' ",
-      "      '·  |    v    | ·'  ",
-      "      '·  |   \\_/   | ·'  ",
-      "     '::: |___________|:' ",
-      "       '::::.    .::::'  ",
-      "       /::/ |    | \\::\\ ",
-      "      |::|  |____|  |::|__",
-      "      |::|  / || \\  |::|-⇌",
-      "      |::|    ||    |::|‾‾",
-      "       \\:|    ||    |:/ ",
-      "        |    /  \\    |  ",
-      "       /|   /    \\   |\\ ",
-      "      /_|  /______\\  |_\\",
+      "                       ",
+      "                       ",
+      "      *·*·*·*·*·*      ",
+      "     ·:::::::::::·     ",
+      "     :: | °  ° | ::    ",
+      "     :: |   v  | ::    ",
+      "     :: |  \\_/  | ::   ",
+      "    '::|_______|::'    ",
+      "      '::| || |::'__   ",
+      "       /:| || |:\\_⇌)  ",
+      "      |::|_||_|::|‾‾   ",
+      "      |:::(  ):::|     ",
     ],
   },
   lockdown: {
     male: [
-      "        ░░░░░░░░░░░░░    ",
-      "       ░ _,,,,,,,,,,_ ░  ",
-      "      ░.::::::::::::::::░",
-      "      ░:: _________  :::░",
-      "      ░:: | °    °  | ::░",
-      "      ░:: |    <    | ::░",
-      "      ░:: |  =====  | ::░",
-      "      ░:::|__________|::░",
-      "       ░::::.    .::::░  ",
-      "       /::/ |    | \\::\\ ",
-      "      |::|░░|____|░░|::| ",
-      "      |::|░░/####\\░░|::| ",
-      "      |::|░/######\\░|::| ",
-      "       \\:|░/######\\░|:/ ",
-      "        | / /####\\ \\ |  ",
-      "       /| / #/  \\# \\ |\\ ",
-      "      /_|/ _/____\\_ \\|_\\",
+      "       ░░░░░░░░░       ",
+      "      ░         ░      ",
+      "     ░  _____    ░     ",
+      "     ░.::::::::.  ░    ",
+      "     ░: | °  ° | :░    ",
+      "     ░: |   <  | :░    ",
+      "     ░: | ===  | :░    ",
+      "     ░::|_______|:░    ",
+      "      ░::| || |::░     ",
+      "       /:| || |:\\     ",
+      "      |::|_||_|::|     ",
+      "      |::#(##)#::|     ",
     ],
     female: [
-      "        ░░░░░░░░░░░░░    ",
-      "      ░.*·*·*·*·*·*·*.░  ",
-      "      ░·::::::::::::::::░",
-      "      ░:: _________  :::░",
-      "      ░':: | °   ° |::'░ ",
-      "      ░ '· |   v   | ·'░ ",
-      "      ░ '· | ===== | ·'░ ",
-      "      ░'::|__________|:░ ",
-      "       ░::::.    .::::░  ",
-      "       /::/ |    | \\::\\ ",
-      "      |::|░░|____|░░|::| ",
-      "      |::|░░/####\\░░|::| ",
-      "      |::|░/######\\░|::| ",
-      "       \\:|░/######\\░|:/ ",
-      "        | / /####\\ \\ |  ",
-      "       /| / #/  \\# \\ |\\ ",
-      "      /_|/ _/____\\_ \\|_\\",
+      "       ░░░░░░░░░       ",
+      "      ░         ░      ",
+      "     ░*·*·*·*·*·*░     ",
+      "     ░:::::::::::·░    ",
+      "     ░: | °  ° | :░    ",
+      "     ░: |   v  | :░    ",
+      "     ░: | ===  | :░    ",
+      "    '░:|_______|:░'    ",
+      "      ░::| || |::░     ",
+      "       /:| || |:\\     ",
+      "      |::|_||_|::|     ",
+      "      |::#(##)#::|     ",
     ],
   },
 };
 
-// ── Pixel block bar renderer ──
-function _drawBlockBar(ctx, x, y, val, max, color, blockSize) {
-  var bs = blockSize || 8;
+// ── Pixel block bar (2-row thick, like reference) ──
+function _drawBlockBar(ctx, x, y, val, maxVal, numBlocks, color) {
+  var bs = 10;   // block width
+  var bh = 8;    // block height
   var gap = 2;
-  var totalBlocks = max;
-  var filledBlocks = Math.round((val / max) * totalBlocks);
+  var filled = Math.round((val / maxVal) * numBlocks);
 
-  for (var i = 0; i < totalBlocks; i++) {
-    if (i < filledBlocks) {
+  for (var i = 0; i < numBlocks; i++) {
+    var bx = x + i * (bs + gap);
+    if (i < filled) {
+      // filled: 2×2 block pattern for pixel look
       ctx.fillStyle = color;
-      ctx.globalAlpha = 0.9;
+      ctx.globalAlpha = 0.85;
+      ctx.fillRect(bx, y, bs, bh);
+      // inner shadow for pixel depth
+      ctx.fillStyle = '#000';
+      ctx.globalAlpha = 0.15;
+      ctx.fillRect(bx, y + bh - 2, bs, 2);
     } else {
       ctx.fillStyle = '#1a1a24';
-      ctx.globalAlpha = 0.6;
+      ctx.globalAlpha = 0.5;
+      ctx.fillRect(bx, y, bs, bh);
     }
-    ctx.fillRect(x + i * (bs + gap), y, bs, bs);
   }
   ctx.globalAlpha = 1;
 }
 
-// ── Rounded rect helper ──
+// ── Rounded rect ──
 function _roundRect(ctx, x, y, w, h, r) {
   ctx.beginPath();
   ctx.moveTo(x + r, y);
@@ -281,112 +248,138 @@ function generateEndCard() {
   var meta = ENDING_META[ending] || ENDING_META.lockdown;
   var totalScore = calculateEndScore();
   var rarity = getRarity(totalScore);
-  var cx = ENDCARD_W / 2;
-  var pad = 32; // left padding
+  var pad = 36;
 
   // ── Background ──
-  ctx.fillStyle = '#0e0e16';
+  ctx.fillStyle = '#0d0d15';
   ctx.fillRect(0, 0, ENDCARD_W, ENDCARD_H);
 
   // ── Rounded border ──
-  _roundRect(ctx, 10, 10, ENDCARD_W - 20, ENDCARD_H - 20, 16);
+  _roundRect(ctx, 10, 10, ENDCARD_W - 20, ENDCARD_H - 20, 18);
   ctx.strokeStyle = rarity.color;
-  ctx.globalAlpha = 0.5;
-  ctx.lineWidth = 2;
+  ctx.globalAlpha = 0.45;
+  ctx.lineWidth = 2.5;
   ctx.stroke();
   ctx.globalAlpha = 1;
 
-  // Inner fill (slightly lighter)
-  _roundRect(ctx, 12, 12, ENDCARD_W - 24, ENDCARD_H - 24, 14);
-  ctx.fillStyle = '#111119';
+  // Inner card background
+  _roundRect(ctx, 12, 12, ENDCARD_W - 24, ENDCARD_H - 24, 16);
+  ctx.fillStyle = '#101018';
   ctx.fill();
 
-  // Subtle glow at top from rarity color
-  var topGlow = ctx.createRadialGradient(cx, 0, 10, cx, 0, 250);
-  topGlow.addColorStop(0, rarity.color);
-  topGlow.addColorStop(1, 'transparent');
-  ctx.globalAlpha = 0.04;
-  ctx.fillStyle = topGlow;
-  ctx.fillRect(12, 12, ENDCARD_W - 24, 300);
+  // Subtle top glow
+  var glow = ctx.createLinearGradient(0, 10, 0, 120);
+  glow.addColorStop(0, rarity.color);
+  glow.addColorStop(1, 'rgba(0,0,0,0)');
+  ctx.globalAlpha = 0.035;
+  ctx.fillStyle = glow;
+  _roundRect(ctx, 12, 12, ENDCARD_W - 24, 120, 16);
+  ctx.fill();
   ctx.globalAlpha = 1;
 
-  // ── Top bar: stars + rarity (left) / type (right) ──
-  var curY = 40;
+  // ═════════════════════════════════
+  //  TOP BAR: stars + rarity / type
+  // ═════════════════════════════════
+  var curY = 44;
+
+  // Stars + rarity label
   var stars = '';
-  for (var si = 0; si < rarity.stars; si++) stars += '★';
-  ctx.font = 'bold 14px "Courier New", monospace';
+  for (var i = 0; i < rarity.stars; i++) stars += '★';
+  ctx.font = 'bold 15px "Courier New", monospace';
   ctx.textAlign = 'left';
   ctx.fillStyle = rarity.color;
-  ctx.fillText(stars + ' ' + (en ? rarity.en : rarity.zh), pad, curY);
+  ctx.fillText(stars + '  ' + (en ? rarity.en : rarity.zh), pad, curY);
 
+  // Type label (right)
   ctx.textAlign = 'right';
+  ctx.font = '13px "Courier New", monospace';
   ctx.fillStyle = meta.color;
-  ctx.font = '12px "Courier New", monospace';
   ctx.fillText(en ? meta.typeEn : meta.type, ENDCARD_W - pad, curY);
 
-  // ── ASCII Art ──
-  curY += 24;
+  // ═════════════════════════════════
+  //  ASCII ART
+  // ═════════════════════════════════
+  curY += 28;
   var artSet = ENDCARD_ART[ending] || ENDCARD_ART.lockdown;
   var art = artSet[state.sex] || artSet.male;
-  ctx.font = '12px "Courier New", monospace';
+  ctx.font = '14px "Courier New", monospace';
   ctx.fillStyle = '#9898a8';
   ctx.textAlign = 'left';
-  for (var i = 0; i < art.length; i++) {
-    ctx.fillText(art[i], pad + 16, curY + i * 15);
+  for (var ai = 0; ai < art.length; ai++) {
+    ctx.fillText(art[ai], pad + 24, curY + ai * 17);
   }
-  curY += art.length * 15 + 16;
+  curY += art.length * 17 + 20;
 
-  // ── Character name ──
-  var sexSymbol = state.sex === 'female' ? ' ♀' : ' ♂';
-  ctx.font = 'bold 20px "Courier New", monospace';
+  // ═════════════════════════════════
+  //  CHARACTER NAME
+  // ═════════════════════════════════
+  ctx.font = 'bold 22px "Courier New", monospace';
   ctx.fillStyle = '#e0e0e8';
   ctx.textAlign = 'left';
-  ctx.fillText(state.name + sexSymbol, pad, curY);
+  ctx.fillText(state.name, pad, curY);
 
-  // ── Flavor text ──
-  curY += 20;
+  // Sex symbol next to name
+  var nameW = ctx.measureText(state.name).width;
+  ctx.font = '14px sans-serif';
+  ctx.fillStyle = '#5a5a6a';
+  ctx.fillText(state.sex === 'female' ? '♀' : '♂', pad + nameW + 8, curY);
+
+  // ═════════════════════════════════
+  //  FLAVOR TEXT
+  // ═════════════════════════════════
+  curY += 24;
   var flavor = ENDING_FLAVOR[ending] || ENDING_FLAVOR.lockdown;
-  var flavorText = en ? flavor.en : flavor.zh;
-  var flavorLines = flavorText.split('\n');
-  ctx.font = 'italic 12px "Courier New", monospace';
-  ctx.fillStyle = '#6a6a7a';
+  var flavorLines = (en ? flavor.en : flavor.zh).split('\n');
+  ctx.font = '12px "Courier New", monospace';
+  ctx.fillStyle = '#5a5a6a';
   ctx.textAlign = 'left';
   for (var fi = 0; fi < flavorLines.length; fi++) {
-    ctx.fillText(flavorLines[fi], pad, curY + fi * 16);
+    ctx.fillText(flavorLines[fi], pad, curY + fi * 18);
   }
-  curY += flavorLines.length * 16 + 16;
+  curY += flavorLines.length * 18 + 22;
 
-  // ── Stats with pixel block bars ──
-  var statLabels = en
-    ? ['STR', 'AGI', 'WIL', 'PETRI', 'DEPTH']
-    : ['力  量', '敏  捷', '意  志', '石化度', '深  度'];
-  var statValues = [state.str, state.agi, state.wil, state.petri, state.level];
-  var statMaxes  = [15, 15, 15, 100, 10];
-  var statDisplayBlocks = [10, 10, 10, 10, 10]; // all normalized to 10 blocks
-  var statColors = ['#c06060', '#60c060', '#6080c0', '#9a6ac8', '#c0a040'];
+  // ═════════════════════════════════
+  //  STATS — pixel block bars
+  // ═════════════════════════════════
+  var statDefs = [
+    { zh: '力量',   en: 'STR',   val: state.str, max: 15, color: '#c06060' },
+    { zh: '敏捷',   en: 'AGI',   val: state.agi, max: 15, color: '#60c060' },
+    { zh: '意志',   en: 'WIL',   val: state.wil, max: 15, color: '#6080c0' },
+    { zh: '石化度', en: 'PETRI', val: state.petri, max: 100, color: '#9a6ac8' },
+    { zh: '深度',   en: 'DEPTH', val: state.level, max: 10, color: '#c0a040' },
+  ];
 
-  var labelW = 90;
-  var barX = pad + labelW + 8;
-  var numX = ENDCARD_W - pad;
+  var labelColW = en ? 80 : 70;
+  var barX = pad + labelColW;
+  var numBlocks = 10;
+  var barTotalW = numBlocks * 12; // (10+2) per block
+  var numX = barX + barTotalW + 12;
+  var rowH = 26;
 
-  for (var si2 = 0; si2 < statLabels.length; si2++) {
-    var sy = curY + si2 * 22;
+  for (var si = 0; si < statDefs.length; si++) {
+    var sd = statDefs[si];
+    var sy = curY + si * rowH;
+
     // Label
-    ctx.font = '12px "Courier New", monospace';
+    ctx.font = '13px "Courier New", monospace';
     ctx.textAlign = 'left';
     ctx.fillStyle = '#5a5a6a';
-    ctx.fillText(statLabels[si2], pad, sy + 8);
+    ctx.fillText(en ? sd.en : sd.zh, pad, sy + 8);
+
     // Block bar
-    _drawBlockBar(ctx, barX, sy, statValues[si2], statMaxes[si2], statColors[si2], 8);
+    _drawBlockBar(ctx, barX, sy, sd.val, sd.max, numBlocks, sd.color);
+
     // Number
     ctx.textAlign = 'right';
-    ctx.fillStyle = '#7a7a8a';
-    ctx.font = '12px "Courier New", monospace';
-    ctx.fillText('' + statValues[si2], numX, sy + 8);
+    ctx.fillStyle = '#6a6a7a';
+    ctx.font = '13px "Courier New", monospace';
+    ctx.fillText('' + sd.val, ENDCARD_W - pad, sy + 8);
   }
-  curY += statLabels.length * 22 + 16;
+  curY += statDefs.length * rowH + 16;
 
-  // ── Highlights box ──
+  // ═════════════════════════════════
+  //  HIGHLIGHTS BOX (like "last said")
+  // ═════════════════════════════════
   var hlItems = [];
   if (state.deathCount === 0) hlItems.push(en ? 'Deathless Run' : '零死亡通關');
   if (state.petri <= 10) hlItems.push(en ? 'Stone Resistant' : '抗石化體質');
@@ -395,49 +388,55 @@ function generateEndCard() {
   if (state.flags.r3CraneTestimony) hlItems.push(en ? 'Crane Testified' : '灰鶴作證');
 
   if (hlItems.length > 0) {
-    // Box background
-    _roundRect(ctx, pad - 4, curY - 4, ENDCARD_W - pad * 2 + 8, hlItems.length * 16 + 16, 6);
-    ctx.fillStyle = '#14141e';
-    ctx.fill();
-    ctx.strokeStyle = '#2a2a3a';
-    ctx.lineWidth = 1;
+    var boxH = 14 + hlItems.length * 18 + 10;
+    // Box
+    _roundRect(ctx, pad - 2, curY, ENDCARD_W - pad * 2 + 4, boxH, 8);
+    ctx.strokeStyle = '#252530';
+    ctx.lineWidth = 1.5;
     ctx.stroke();
 
-    // Label
+    // Header
     ctx.font = '10px "Courier New", monospace';
-    ctx.fillStyle = '#4a4a5a';
     ctx.textAlign = 'left';
-    ctx.fillText(en ? 'highlights' : '成就', pad + 4, curY + 10);
+    ctx.fillStyle = '#3a3a4a';
+    ctx.fillText(en ? 'highlights' : '成就亮點', pad + 10, curY + 14);
 
     // Items
-    ctx.font = '11px "Courier New", monospace';
-    ctx.fillStyle = '#8a8a9a';
+    ctx.font = '12px "Courier New", monospace';
+    ctx.fillStyle = '#7a7a8a';
     for (var hi = 0; hi < hlItems.length; hi++) {
-      ctx.fillText('· ' + hlItems[hi], pad + 12, curY + 26 + hi * 16);
+      ctx.fillText('  · ' + hlItems[hi], pad + 10, curY + 32 + hi * 18);
     }
-    curY += hlItems.length * 16 + 24;
+    curY += boxH + 12;
   }
 
-  // ── Score at bottom ──
-  curY = ENDCARD_H - 52;
-  ctx.font = 'bold 11px "Courier New", monospace';
+  // ═════════════════════════════════
+  //  BOTTOM: score + time + url
+  // ═════════════════════════════════
+  curY = ENDCARD_H - 56;
+
+  // Score label + number
+  ctx.font = '11px "Courier New", monospace';
   ctx.textAlign = 'left';
   ctx.fillStyle = '#3a3a4a';
-  ctx.fillText(en ? 'SCORE' : '評分', pad, curY);
-  ctx.font = 'bold 22px "Courier New", monospace';
+  ctx.fillText(en ? 'score' : '評分', pad, curY);
+
+  ctx.font = 'bold 24px "Courier New", monospace';
   ctx.fillStyle = rarity.color;
-  ctx.shadowColor = rarity.color;
-  ctx.shadowBlur = rarity.stars >= 4 ? 12 : 0;
-  ctx.fillText('' + totalScore, pad + (en ? 60 : 48), curY);
+  if (rarity.stars >= 4) {
+    ctx.shadowColor = rarity.color;
+    ctx.shadowBlur = 12;
+  }
+  ctx.fillText('' + totalScore, pad + (en ? 56 : 44), curY);
   ctx.shadowBlur = 0;
 
-  // Time + URL on right
+  // Time + URL (right side)
   ctx.textAlign = 'right';
   ctx.font = '9px "Courier New", monospace';
   ctx.fillStyle = '#2a2a3a';
   if (typeof globalStats !== 'undefined' && globalStats.currentRunStartMs > 0) {
     var runTime = Date.now() - globalStats.currentRunStartMs;
-    ctx.fillText((en ? 'time ' : '時間 ') + formatTime(runTime), ENDCARD_W - pad, curY - 10);
+    ctx.fillText((en ? 'time ' : '時間 ') + formatTime(runTime), ENDCARD_W - pad, curY - 12);
   }
   ctx.fillText('petriabyss.itch.io', ENDCARD_W - pad, curY);
 
