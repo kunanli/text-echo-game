@@ -215,7 +215,19 @@ function autoExplore(steps, choices, opts) {
     // Show pending indicator, then render the actual step after a short pause
     showPending();
     var pendingDelay = (step.art ? 400 : 600) * PACE;
-    _autoResume = function() { removePending(); renderStepInstant(step); showNext(); };
+    _autoResume = function() {
+      removePending();
+      // Speak the line — renderStepInstant doesn't trigger voice, so we
+      // must do it here when the user taps through the pending phase.
+      var artC = (state.lang === 'en' && step.artEn) ? step.artEn : step.art;
+      if (!artC) {
+        var tc = (state.lang === 'en' && step.textEn) ? step.textEn : step.text;
+        var hc = (state.lang === 'en' && step.htmlEn) ? step.htmlEn : step.html;
+        voiceNarrator.speak(tc || hc, state.lang);
+      }
+      renderStepInstant(step);
+      showNext();
+    };
     autoTimer = setTimeout(function() {
       removePending();
       renderStep(step);
