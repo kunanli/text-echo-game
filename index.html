@@ -447,6 +447,10 @@
                 flags:{}},
   };
   document.getElementById('dev-show-card').addEventListener('click', function() {
+    // Close any existing overlay first
+    var ov = document.getElementById('endcard-overlay');
+    if (ov) ov.classList.remove('active');
+
     var ending = document.getElementById('dev-ending').value;
     var sex = document.getElementById('dev-sex').value;
     var tier = document.getElementById('dev-score').value;
@@ -463,7 +467,9 @@
     state.flags = {};
     for (var k in p.flags) state.flags[k] = p.flags[k];
     state.flags.r3Ending = ending;
-    showEndCard();
+
+    // Small delay to ensure overlay is closed before reopening
+    setTimeout(function() { showEndCard(); }, 50);
   });
 })();
 </script>
