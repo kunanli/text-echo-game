@@ -455,7 +455,7 @@
     var sex = document.getElementById('dev-sex').value;
     var tier = document.getElementById('dev-score').value;
     var p = presets[tier];
-    var names = { dawn: ['破曉行者','黎明先驅'], sacrifice: ['殉道烈士','獻祭聖女'], compromise: ['折衝使者','居間調人'], lockdown: ['封門守衛','鎖淵看守'] };
+    var names = { dawn: ['引光者','破曉人'], sacrifice: ['殉火者','獻身人'], compromise: ['執秤者','斡旋人'], lockdown: ['封石者','守門人'] };
     state.name = (names[ending] || ['旅者','旅者'])[sex === 'female' ? 1 : 0];
     state.sex = sex;
     state.deathCount = p.deathCount;
