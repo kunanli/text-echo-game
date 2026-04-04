@@ -65,7 +65,7 @@ function startCombat(enemy, onWin, onFlee) {
       { text: L('感應 [意志]', 'Commune [WIL]'), action: function() { doCommune(); } },
     ];
     if (onFlee) {
-      choices.push({ text: L('逃跑', 'Flee'), action: function() { state.mood = 'normal'; ambientAudio.setCombat(false); onFlee(); } });
+      choices.push({ text: L('逃跑', 'Flee'), action: function() { sfx.click(); state.mood = 'normal'; ambientAudio.setCombat(false); onFlee(); } });
     }
     renderScene(text, choices);
   }
@@ -89,6 +89,7 @@ function startCombat(enemy, onWin, onFlee) {
       + '</div>';
 
     if (enemyHp <= 0) {
+      sfx.pass();
       log += '<div class="combat-log combat-log-enemy">'
         + '<span class="cl-tag cl-enemy">' + L('【' + eName + '】', '[' + eName + ']') + '</span> '
         + L('被擊敗了！', 'has been defeated!')
@@ -103,6 +104,8 @@ function startCombat(enemy, onWin, onFlee) {
 
     var dead = changeHp(-enemyDmg);
     if (!dead && enemy.petriDmg) dead = changePetri(enemy.petriDmg);
+    sfx.hurt();
+    if (enemy.petriDmg) sfx.petri();
     log += '<div class="combat-log combat-log-enemy">'
       + '<span class="cl-tag cl-enemy">' + L('【' + eName + '】', '[' + eName + ']') + '</span> '
       + L('反擊，造成 ' + enemyDmg + ' 點傷害。', 'Strikes back! ' + enemyDmg + ' damage.')
@@ -121,6 +124,7 @@ function startCombat(enemy, onWin, onFlee) {
 
     if (roll >= dc) {
       observed = true;
+      sfx.pass();
       log = '<div class="combat-log combat-log-player">'
         + '<span class="cl-tag cl-you">' + L('【你】', '[YOU]') + '</span> '
         + L('仔細觀察了 ' + eName + ' 的動作模式，發現了破綻！', 'Carefully studied ' + eName + '\'s patterns — found an opening!')
@@ -133,6 +137,8 @@ function startCombat(enemy, onWin, onFlee) {
     } else {
       var enemyDmg = Math.max(1, rng(enemy.atkMin, enemy.atkMax));
       changeHp(-enemyDmg);
+      sfx.fail();
+      sfx.hurt();
       log = '<div class="combat-log combat-log-player">'
         + '<span class="cl-tag cl-you">' + L('【你】', '[YOU]') + '</span> '
         + L('嘗試觀察，但沒能看出端倪……', 'Tried to observe, but couldn\'t find an opening...')
@@ -154,6 +160,7 @@ function startCombat(enemy, onWin, onFlee) {
 
     if (roll >= dc) {
       empathy++;
+      sfx.pass();
       var txt = communeTexts[Math.min(empathy - 1, communeTexts.length - 1)];
       log = '<div class="combat-log combat-log-commune">'
         + '<span class="cl-tag cl-commune">' + L('【感應】', '[COMMUNE]') + '</span> '
@@ -163,6 +170,7 @@ function startCombat(enemy, onWin, onFlee) {
 
       if (empathy >= empathyGoal) {
         // Spare the enemy — peaceful resolution
+        sfx.item();
         var spareText = enemy.spareText
           || { zh: eName + ' 的眼中閃過一絲清明，它緩緩後退，消失在陰影中……', en: eName + '\'s eyes flicker with clarity. It slowly backs away into the shadows...' };
         log += '<div class="combat-log combat-log-commune">'
@@ -183,9 +191,11 @@ function startCombat(enemy, onWin, onFlee) {
         return;
       }
     } else {
+      sfx.fail();
       var txt = communeFail[rng(0, communeFail.length - 1)];
       var petriPenalty = Math.max(1, Math.floor((enemy.petriDmg || 1) * 1.5));
       changePetri(petriPenalty);
+      sfx.petri();
       log = '<div class="combat-log combat-log-commune">'
         + '<span class="cl-tag cl-commune">' + L('【感應】', '[COMMUNE]') + '</span> '
         + L(txt.zh, txt.en)
@@ -198,6 +208,7 @@ function startCombat(enemy, onWin, onFlee) {
     var enemyDmg = Math.max(0, rng(enemy.atkMin, enemy.atkMax) - atkReduction);
     if (enemyDmg > 0) {
       changeHp(-enemyDmg);
+      sfx.hurt();
       log += '<div class="combat-log combat-log-enemy">'
         + '<span class="cl-tag cl-enemy">' + L('【' + eName + '】', '[' + eName + ']') + '</span> '
         + (empathy > 0
