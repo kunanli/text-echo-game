@@ -27,9 +27,12 @@ var LEADERBOARD = {
     // Dreamlo add: /lb/{privateKey}/add/{name}/{score}/{seconds}/{ending}
     var safeName = encodeURIComponent(name.replace(/[\/\\\?&]/g, '_'));
     var url = this.baseUrl + '/' + this.privateKey + '/add/' + safeName + '/' + score + '/' + seconds + '/' + ending;
+    console.log('[Leaderboard] submit →', url);
     fetch(url).then(function(r) {
+      console.log('[Leaderboard] submit status:', r.status);
       if (callback) callback(r.ok);
-    }).catch(function() {
+    }).catch(function(err) {
+      console.error('[Leaderboard] submit error:', err);
       if (callback) callback(false);
     });
   },
@@ -42,7 +45,9 @@ var LEADERBOARD = {
     }
     var count = limit || 20;
     var url = this.baseUrl + '/' + this.publicKey + '/json/' + count;
-    fetch(url).then(function(r) { return r.json(); }).then(function(data) {
+    console.log('[Leaderboard] fetch →', url);
+    fetch(url).then(function(r) { console.log('[Leaderboard] fetch status:', r.status); return r.json(); }).then(function(data) {
+      console.log('[Leaderboard] data:', JSON.stringify(data));
       var entries = [];
       if (data && data.dreamlo && data.dreamlo.leaderboard) {
         var board = data.dreamlo.leaderboard.entry;
@@ -59,7 +64,8 @@ var LEADERBOARD = {
         }
       }
       callback(entries);
-    }).catch(function() {
+    }).catch(function(err) {
+      console.error('[Leaderboard] fetch error:', err);
       callback([]);
     });
   }
@@ -74,6 +80,9 @@ function submitToLeaderboard() {
   LEADERBOARD.submit(state.name, score, ending, function(ok) {
     if (ok) {
       notify(L('分數已提交到排行榜！', 'Score submitted to leaderboard!'));
+    } else {
+      console.warn('[Leaderboard] submit failed — score:', score, 'ending:', ending);
+      notify(L('排行榜提交失敗，請檢查網路連線', 'Leaderboard submit failed, check connection'));
     }
   });
 }
