@@ -595,6 +595,48 @@ registerNode('r3_crane', () => {
         ], { label: L('灰鶴的新貨', 'Grey Crane\'s new goods') });
       }});
     }
+    // Gambling — always available
+    c.push({ text: L('來一把吹牛骰？', 'Fancy a game of Liar\'s Dice?'), action: () => {
+      var gold = state.flags.gold || 0;
+      // R3 bets are higher
+      var bet = Math.max(10, Math.min(40, Math.floor(gold / 3) + 10));
+      if (gold < bet) {
+        if (gold < 10) {
+          state.flags.gold = 15;
+          gold = 15;
+          notify(L('灰鶴借了你 15 金幣：「河城的賭注可比營地大。」', 'Grey Crane lends you 15 gold: "Stakes are higher in River City."'));
+          renderStatus();
+        }
+        bet = 10;
+      }
+      var introSteps = [];
+      if (!state.flags.r3DicePlayed) {
+        state.flags.r3DicePlayed = true;
+        introSteps.push({ tag: L('骰子', 'DICE'), tagColor: 'tag-npc',
+          text: L('灰鶴嘿嘿一笑：「河城這地方，什麼都貴——包括賭注。」',
+                 'Grey Crane grins: "Everything costs more in River City — including bets."'),
+          delay: 2500 });
+      }
+      introSteps.push({ tag: L('骰子', 'DICE'), tagColor: 'tag-info',
+        text: L('「' + bet + ' 金幣一局。敢不敢？」', '"' + bet + ' gold a round. You in?"'),
+        delay: 1500 });
+      autoExplore(introSteps, [
+        { text: L('開賭 (' + bet + '金幣)', 'Play (' + bet + ' gold)'), action: function() {
+          diceGame.start(bet, function(won, walkAway) {
+            if (walkAway) { loadNode('r3_crane'); return; }
+            var wins = state.flags.diceWins || 0;
+            if (wins >= 3 && !state.flags.craneSwordOffered) {
+              state.flags.craneSwordOffered = true;
+              offerCraneSword(function() { loadNode('r3_crane'); });
+            } else {
+              loadNode('r3_crane');
+            }
+          });
+        }},
+        { text: L('算了', 'No thanks'), action: () => loadNode('r3_crane') },
+      ], { label: L('吹牛骰', 'Liar\'s Dice') });
+    }});
+
     c.push({ text: '離開', textEn: 'Leave', action: () => loadNode('r3_market') });
     return c;
   })(), { label: L('灰鶴', 'Grey Crane') });

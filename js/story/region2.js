@@ -1077,10 +1077,93 @@ registerNode('r2_crane', () => {
         ], { label: L('灰鶴的貨物', 'Grey Crane\'s wares') });
       }});
     }
+    // Gambling — always available after first meeting
+    c.push({ text: L('來一把吹牛骰？', 'Fancy a game of Liar\'s Dice?'), action: () => {
+      var gold = state.flags.gold || 0;
+      var bet = Math.max(5, Math.min(20, Math.floor(gold / 3) + 5));
+      if (gold < bet) {
+        // Give starting gold if broke
+        if (gold < 5) {
+          state.flags.gold = 10;
+          gold = 10;
+          notify(L('灰鶴借了你 10 金幣：「沒錢怎麼賭？先借你。」', 'Grey Crane lends you 10 gold: "Can\'t gamble with nothing. I\'ll spot you."'));
+          renderStatus();
+        }
+        bet = 5;
+      }
+      var introSteps = [
+        { tag: L('骰子', 'DICE'), tagColor: 'tag-npc',
+          text: L('灰鶴從包裹裡掏出兩個皮杯和十顆骰子，眼睛亮了起來。',
+                 'Grey Crane pulls two leather cups and ten dice from his pack, eyes lighting up.'),
+          delay: 2000 },
+        { tag: L('骰子', 'DICE'), tagColor: 'tag-npc',
+          text: L('「吹牛骰——地底商路上最受歡迎的賭法。各搖五顆，輪流喊場上有幾個某點數。喊不下去就叫開，看誰在吹牛。」',
+                 '"Liar\'s Dice — most popular game on underground trade routes. Five dice each, take turns bidding how many of a face exist total. Can\'t raise? Call liar and reveal."'),
+          delay: 3500 },
+        { tag: L('骰子', 'DICE'), tagColor: 'tag-info',
+          text: L('「來吧，' + bet + ' 金幣一局。」', '"Let\'s go, ' + bet + ' gold a round."'),
+          delay: 1500 },
+      ];
+      autoExplore(introSteps, [
+        { text: L('開賭 (' + bet + '金幣)', 'Play (' + bet + ' gold)'), action: function() {
+          diceGame.start(bet, function(won, walkAway) {
+            if (walkAway) { loadNode('r2_crane'); return; }
+            // Check for weapon reward
+            var wins = state.flags.diceWins || 0;
+            if (wins >= 3 && !state.flags.craneSwordOffered) {
+              state.flags.craneSwordOffered = true;
+              offerCraneSword(function() { loadNode('r2_crane'); });
+            } else {
+              loadNode('r2_crane');
+            }
+          });
+        }},
+        { text: L('算了', 'No thanks'), action: () => loadNode('r2_crane') },
+      ], { label: L('吹牛骰', 'Liar\'s Dice') });
+    }});
+
     c.push({ text: '返回營地', textEn: 'Return to camp', action: () => loadNode('r2_camp') });
     return c;
   })(), { label: L('灰鶴的攤位', 'Grey Crane\'s stall') });
 });
+
+// ── Crane's Sword Reward ──
+function offerCraneSword(onDone) {
+  var en = state.lang === 'en';
+  var earnings = state.flags.diceEarnings || 0;
+  // Weapon damage scales with total winnings: 3~8 bonus damage
+  var dmgBonus = Math.min(8, Math.max(3, Math.floor(earnings / 15)));
+  var swordNameZh = '灰鶴的' + (dmgBonus >= 6 ? '精鍛商路刀' : '商路短刀');
+  var swordNameEn = 'Grey Crane\'s ' + (dmgBonus >= 6 ? 'Masterwork Trade Blade' : 'Trade Blade');
+  var swordName = en ? swordNameEn : swordNameZh;
+
+  var steps = [
+    { tag: en ? 'NPC' : '灰鶴', tagColor: 'tag-npc',
+      text: L('灰鶴看了你一眼，從包裹最底層翻出一個布包。',
+             'Grey Crane eyes you, then rummages to the bottom of his pack and pulls out a cloth bundle.'),
+      delay: 2500 },
+    { tag: en ? 'NPC' : '灰鶴', tagColor: 'tag-npc',
+      html: L('「贏了我 ' + (state.flags.diceWins || 3) + ' 把的人不多。」他把布包打開——裡面是一把<b>泛著冷光的短刀</b>。',
+             '"Not many win ' + (state.flags.diceWins || 3) + ' rounds from me." He unfolds the bundle — inside, a <b>cold-gleaming blade</b>.'),
+      delay: 3000 },
+    { tag: en ? 'ITEM' : '物品', tagColor: 'tag-item',
+      html: L('「<b>' + swordNameZh + '</b>——商路上最好的武器，用石化結晶鍛的邊。送你了，算我認輸的代價。」',
+             '"<b>' + swordNameEn + '</b> — finest weapon on the trade routes, petrification crystal edge. It\'s yours — the price of my defeat."'),
+      delay: 3000 },
+    { tag: en ? 'SYSTEM' : '系統', tagColor: 'tag-system',
+      text: L('獲得武器：' + swordNameZh + '（攻擊 +' + dmgBonus + '）',
+             'Acquired weapon: ' + swordNameEn + ' (ATK +' + dmgBonus + ')'),
+      delay: 2000, effect: function() {
+        addItem(swordName);
+        state.flags.weaponDmg = dmgBonus;
+        state.flags.craneSwordName = swordName;
+      }},
+  ];
+
+  autoExplore(steps, [
+    { text: L('收下', 'Accept'), action: onDone },
+  ], { label: L('灰鶴的餽贈', 'Grey Crane\'s gift') });
+}
 
 // ═══════════════════════════════════════════════════
 //  NPC Continuation — 老周 (Old Zhou) traces

@@ -132,6 +132,7 @@ var SEED_FLAGS = [
   'r3ZhouMet','r3ZhouUpgrade',
   'r3CraneMet3','r3CraneTestimony','r3CraneTrade3',
   'r3PlagueProof','r3BossDefeated','r3Ending',
+  'craneSwordOffered','r3DicePlayed',
 ];
 
 var B36 = '0123456789abcdefghijklmnopqrstuvwxyz';

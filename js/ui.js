@@ -21,6 +21,19 @@ function renderStatus() {
     $region.textContent = '第' + '一二三四'[state.region] + '層 — ' + getRegion(state.region);
   }
 
+  // Gold display
+  var $goldRow = document.getElementById('gold-row');
+  var $goldVal = document.getElementById('stat-gold');
+  var $goldLabel = document.getElementById('label-gold');
+  var gold = state.flags.gold || 0;
+  if (gold > 0) {
+    $goldRow.style.display = '';
+    $goldLabel.textContent = state.lang === 'en' ? 'Gold' : '金幣';
+    $goldVal.textContent = gold;
+  } else {
+    $goldRow.style.display = 'none';
+  }
+
   if (state.inventory.length === 0) {
     $inv.innerHTML = '<li class="inventory-empty">' + L('空', 'Empty') + '</li>';
   } else {

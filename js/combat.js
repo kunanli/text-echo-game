@@ -71,7 +71,8 @@ function startCombat(enemy, onWin, onFlee) {
 
   // ── Attack ──
   function doAttack() {
-    var baseDmg = rng(3, 6) + Math.floor(state.str * 1.2);
+    var weaponBonus = state.flags.weaponDmg || 0;
+    var baseDmg = rng(3, 6) + Math.floor(state.str * 1.2) + weaponBonus;
     var dmg = observed ? baseDmg * 2 : baseDmg;
     var wasObserved = observed;
     observed = false;

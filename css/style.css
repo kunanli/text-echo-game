@@ -427,6 +427,25 @@
   .xp-level { color: #50c850; font-weight: bold; }
   .xp-val { color: #6aba6a; }
 
+  /* Gold */
+  .gold-label { color: #d4a843; }
+  .gold-val { color: #d4a843; font-weight: bold; }
+
+  /* Dice Game */
+  .dice-status {
+    background: #0e0e1a;
+    border: 1px solid #2a2a3a;
+    border-radius: 6px;
+    padding: 10px 14px;
+    margin: 6px 0;
+    font-size: .9rem;
+  }
+  .dice-row { padding: 3px 0; }
+  .dice-label { color: #6a6a7a; }
+  .dice-vals { font-size: 1.2rem; letter-spacing: 2px; }
+  .dice-bid { color: #d4a843; font-weight: bold; font-size: 1.1rem; }
+  .dice-bet { color: #d4a843; }
+
   /* Inventory */
   .inventory-list {
     list-style: none;
