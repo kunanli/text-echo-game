@@ -374,11 +374,11 @@ function generateEndCard() {
     // Progress bar
     _drawStatBar(ctx, barX, sy, sd.val, sd.max, barW, barH);
 
-    // Number
-    ctx.textAlign = 'right';
+    // Number (left-aligned after bar)
+    ctx.textAlign = 'left';
     ctx.fillStyle = '#6a6a7a';
     ctx.font = '11px "Courier New", monospace';
-    ctx.fillText('' + sd.val, ENDCARD_W - pad, sy + barH / 2 + 4);
+    ctx.fillText('' + sd.val, barX + barW + 10, sy + barH / 2 + 4);
   }
   curY += statDefs.length * rowH + 12;
 
