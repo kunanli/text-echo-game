@@ -559,11 +559,23 @@ function showEndCard() {
     };
   }
 
+  // Leaderboard button
+  var $lbBtn = document.getElementById('endcard-leaderboard-btn');
+  if ($lbBtn) {
+    $lbBtn.textContent = L('排行榜', 'Leaderboard');
+    $lbBtn.onclick = function() {
+      if (typeof showLeaderboard === 'function') showLeaderboard();
+    };
+  }
+
   $closeBtn.onclick = function() {
     $overlay.classList.remove('active');
   };
 
   $overlay.classList.add('active');
+
+  // Auto-submit score to leaderboard
+  if (typeof submitToLeaderboard === 'function') submitToLeaderboard();
 }
 
 function fallbackCopyImage(canvas) {

@@ -370,7 +370,20 @@
     <div class="save-buttons" style="margin-top:14px;">
       <button class="save-action-btn" id="endcard-download-btn">下載圖片</button>
       <button class="save-action-btn" id="endcard-share-btn">複製圖片</button>
+      <button class="save-action-btn" id="endcard-leaderboard-btn">排行榜</button>
       <button class="save-action-btn save-close-btn" id="endcard-close-btn">關閉</button>
+    </div>
+  </div>
+</div>
+
+<!-- Leaderboard overlay -->
+<div class="save-overlay" id="leaderboard-overlay">
+  <div class="save-dialog leaderboard-dialog">
+    <h3 id="leaderboard-title">排 行 榜</h3>
+    <div class="lb-loading" id="leaderboard-loading">載入中...</div>
+    <div id="leaderboard-list"></div>
+    <div class="save-buttons" style="margin-top:14px;">
+      <button class="save-action-btn save-close-btn" id="leaderboard-close-btn">關閉</button>
     </div>
   </div>
 </div>
@@ -391,6 +404,7 @@
 <script src="js/achievements.js"></script>
 <script src="js/stats.js"></script>
 <script src="js/endcard.js"></script>
+<script src="js/leaderboard.js"></script>
 <script src="js/nodes.js"></script>
 <script src="js/patrol.js"></script>
 <script src="js/story/region0.js"></script>

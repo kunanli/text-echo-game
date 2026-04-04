@@ -1688,6 +1688,61 @@
     border: 1px solid #2a2a3a;
   }
 
+  /* ── Leaderboard ── */
+  .leaderboard-dialog {
+    max-width: 520px;
+    width: 95%;
+  }
+  .lb-loading {
+    text-align: center;
+    color: #5a5a6a;
+    padding: 20px 0;
+    font-size: .9rem;
+  }
+  .lb-empty {
+    text-align: center;
+    color: #4a4a5a;
+    padding: 20px 0;
+    font-style: italic;
+  }
+  .lb-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: .82rem;
+    font-family: "Courier New", Courier, monospace;
+  }
+  .lb-header th {
+    color: #5a5a6a;
+    font-weight: normal;
+    font-size: .7rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: 4px 6px 8px;
+    border-bottom: 1px solid #1e1e2e;
+    text-align: left;
+  }
+  .lb-row td {
+    padding: 7px 6px;
+    border-bottom: 1px solid #111118;
+    color: #8a8a9a;
+  }
+  .lb-rank { width: 32px; text-align: center; }
+  .lb-name { color: #c8c8d8; font-weight: bold; }
+  .lb-score { font-weight: bold; }
+  .lb-ending { font-size: .75rem; color: #6a6a7a; }
+  .lb-time { font-size: .75rem; color: #4a4a5a; }
+  .lb-top1 td { background: rgba(212,168,67,.06); }
+  .lb-top2 td { background: rgba(180,180,200,.04); }
+  .lb-top3 td { background: rgba(180,140,80,.03); }
+  .lb-top1 .lb-name { color: #d4a843; }
+  .lb-top2 .lb-name { color: #b0b0c0; }
+  .lb-top3 .lb-name { color: #c09060; }
+  @media (max-width: 760px) {
+    .lb-table { font-size: .72rem; }
+    .lb-row td { padding: 6px 4px; }
+    .lb-ending { display: none; }
+  }
+
   /* ── Global Stats Summary (in epilogue) ── */
   .stats-summary {
     text-align: center;
