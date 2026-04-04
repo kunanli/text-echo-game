@@ -1620,7 +1620,7 @@
 
   /* ── Ending Card Overlay ── */
   .endcard-dialog {
-    max-width: 640px;
+    max-width: 480px;
   }
   .endcard-dialog h3 {
     letter-spacing: 6px;
