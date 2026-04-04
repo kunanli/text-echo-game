@@ -1,17 +1,24 @@
 // ══ Voice Narration Engine (Web Speech API TTS) ══
 // Reads story text aloud using the browser's built-in speech synthesis.
-// Supports Chinese (zh-TW / zh-CN) and English voices based on game language.
+// Uses a self-managed queue instead of the browser's native queue to avoid
+// iOS Safari dropping or overlapping queued utterances.
 
 var voiceNarrator = (function() {
   var enabled = false;
   var synth = window.speechSynthesis || null;
   // Storytelling pace — slower and deeper for an adventure narrator feel
   var rate = 0.82;
-  var pitch = 0.92;
+  var pitch = 0.9;
   var volume = 1.0;
   var cachedVoices = [];
-  var queueDepth = 0;       // track how many utterances are pending
-  var MAX_QUEUE = 4;        // max queued utterances before we start cancelling old ones
+
+  // ── Self-managed utterance queue ──
+  // iOS Safari's native speechSynthesis queue is unreliable — it silently
+  // drops queued utterances or overlaps them.  We manage our own queue and
+  // only feed one utterance at a time, advancing on the `onend` callback.
+  var queue = [];         // array of { text, lang }
+  var speaking = false;   // true while an utterance is active
+  var MAX_QUEUE = 6;      // max pending phrases (not lines — lines are split)
 
   // ── Voice selection ──
   function loadVoices() {
@@ -19,13 +26,11 @@ var voiceNarrator = (function() {
     cachedVoices = synth.getVoices();
   }
 
-  // Some browsers fire onvoiceschanged async
   if (synth && synth.onvoiceschanged !== undefined) {
     synth.onvoiceschanged = loadVoices;
   }
 
   // Preferred high-quality voices (in priority order).
-  // iOS/macOS have premium voices; Android & desktop Chrome use different names.
   var PREFERRED_ZH = [
     /mei-?jia/i,        // iOS zh-TW premium
     /yu-?shu/i,         // iOS zh-TW
@@ -44,17 +49,20 @@ var voiceNarrator = (function() {
   function pickVoice(lang) {
     if (cachedVoices.length === 0) loadVoices();
     var voices = cachedVoices;
+    var preferred = lang === 'zh' ? PREFERRED_ZH : PREFERRED_EN;
+    var langRe = lang === 'zh' ? /zh/i : /en/i;
 
-    if (lang === 'zh') {
-      // Try preferred voices first
-      for (var p = 0; p < PREFERRED_ZH.length; p++) {
-        for (var v = 0; v < voices.length; v++) {
-          if (PREFERRED_ZH[p].test(voices[v].name) && /zh/i.test(voices[v].lang)) {
-            return voices[v];
-          }
+    // Try preferred voices first
+    for (var p = 0; p < preferred.length; p++) {
+      for (var v = 0; v < voices.length; v++) {
+        if (preferred[p].test(voices[v].name) && langRe.test(voices[v].lang)) {
+          return voices[v];
         }
       }
-      // Fallback: zh-TW → zh-CN → any zh
+    }
+
+    // Fallback chain
+    if (lang === 'zh') {
       var zhTW = voices.filter(function(v) { return /zh[-_]TW/i.test(v.lang); });
       if (zhTW.length) return zhTW[0];
       var zhCN = voices.filter(function(v) { return /zh[-_]CN/i.test(v.lang); });
@@ -62,15 +70,6 @@ var voiceNarrator = (function() {
       var zhAny = voices.filter(function(v) { return /zh/i.test(v.lang); });
       if (zhAny.length) return zhAny[0];
     } else {
-      // Try preferred voices first
-      for (var p = 0; p < PREFERRED_EN.length; p++) {
-        for (var v = 0; v < voices.length; v++) {
-          if (PREFERRED_EN[p].test(voices[v].name) && /en/i.test(voices[v].lang)) {
-            return voices[v];
-          }
-        }
-      }
-      // Fallback: en-US → en-GB → any en
       var enUS = voices.filter(function(v) { return /en[-_]US/i.test(v.lang); });
       if (enUS.length) return enUS[0];
       var enGB = voices.filter(function(v) { return /en[-_]GB/i.test(v.lang); });
@@ -78,77 +77,131 @@ var voiceNarrator = (function() {
       var enAny = voices.filter(function(v) { return /en/i.test(v.lang); });
       if (enAny.length) return enAny[0];
     }
-    return null; // fallback: browser default
+    return null;
   }
 
   // ── Strip tags and clean text for speech ──
   function cleanText(text) {
     if (!text) return '';
-    // Remove HTML tags
     var clean = text.replace(/<[^>]*>/g, '');
-    // Remove ASCII art characters that shouldn't be spoken
     clean = clean.replace(/[═╔╗╚╝║░▒▓█─│┌┐└┘├┤┬┴┼◆·✦˚\[\]]/g, '');
-    // Collapse whitespace
     clean = clean.replace(/\s+/g, ' ').trim();
     return clean;
   }
 
-  // ── Create a configured utterance ──
-  function makeUtterance(text, lang) {
-    var utter = new SpeechSynthesisUtterance(text);
-    var voice = pickVoice(lang || 'zh');
+  // ── Split text into natural phrases for more human-like delivery ──
+  // Chinese text is split at clause boundaries (，、；：) and sentence
+  // boundaries (。！？) so the TTS engine produces natural pauses.
+  // Short fragments are merged with the next phrase to avoid choppy output.
+  function splitIntoPhrases(text, lang) {
+    var parts;
+    if (lang === 'zh') {
+      // Split at Chinese punctuation — keep the punctuation attached
+      parts = text.split(/(?<=[。！？，、；：…～\n\.!?;,])\s*/);
+    } else {
+      // English: split at sentence boundaries
+      parts = text.split(/(?<=[\.!?;])\s+/);
+    }
+
+    // Merge very short fragments (< 4 chars) with the next piece so we
+    // don't get awkward micro-utterances like "你" or "了。"
+    var merged = [];
+    var buf = '';
+    for (var i = 0; i < parts.length; i++) {
+      buf += parts[i];
+      if (buf.length >= 4 || i === parts.length - 1) {
+        merged.push(buf);
+        buf = '';
+      }
+    }
+    if (buf) {
+      if (merged.length) merged[merged.length - 1] += buf;
+      else merged.push(buf);
+    }
+    return merged.filter(function(s) { return s.trim().length > 0; });
+  }
+
+  // ── Drain the queue: speak one item, wait for onend, then next ──
+  function drain() {
+    if (speaking || queue.length === 0) return;
+
+    var item = queue.shift();
+    speaking = true;
+
+    var utter = new SpeechSynthesisUtterance(item.text);
+    var voice = pickVoice(item.lang || 'zh');
     if (voice) utter.voice = voice;
-    utter.lang = lang === 'en' ? 'en-US' : 'zh-TW';
+    utter.lang = item.lang === 'en' ? 'en-US' : 'zh-TW';
     utter.rate = rate;
     utter.pitch = pitch;
     utter.volume = volume;
-    utter.onend = function() { queueDepth = Math.max(0, queueDepth - 1); };
-    utter.onerror = function() { queueDepth = Math.max(0, queueDepth - 1); };
-    return utter;
+
+    utter.onend = function() {
+      speaking = false;
+      // Small pause between phrases for natural rhythm
+      if (queue.length > 0) {
+        setTimeout(drain, 80);
+      }
+    };
+    utter.onerror = function() {
+      speaking = false;
+      drain();
+    };
+
+    // iOS Safari safety: if synth gets stuck in a "speaking" state without
+    // firing onend (known iOS bug), set a watchdog to unstick it.
+    var maxDuration = Math.max(item.text.length * 250, 3000);
+    var watchdog = setTimeout(function() {
+      if (speaking) {
+        speaking = false;
+        synth.cancel();
+        drain();
+      }
+    }, maxDuration);
+
+    var origOnEnd = utter.onend;
+    utter.onend = function() {
+      clearTimeout(watchdog);
+      origOnEnd();
+    };
+    var origOnError = utter.onerror;
+    utter.onerror = function() {
+      clearTimeout(watchdog);
+      origOnError();
+    };
+
+    synth.speak(utter);
   }
 
-  // ── Speak text ──
-  // Does NOT cancel ongoing speech by default — new text is queued so the
-  // narrator finishes the current sentence before moving on.  This prevents
-  // the "skipping" feel when the user taps to advance text.
+  // ── Public: enqueue text for narration ──
   function speak(text, lang) {
     if (!enabled || !synth) return;
     var clean = cleanText(text);
-    if (!clean || clean.length < 2) return; // skip very short / empty
+    if (!clean || clean.length < 2) return;
 
-    // If the queue is getting too long (user skipping fast), flush old speech
-    if (queueDepth >= MAX_QUEUE) {
-      synth.cancel();
-      queueDepth = 0;
+    // Split into natural phrases
+    var phrases = splitIntoPhrases(clean, lang || 'zh');
+
+    // If queue is getting too long (user advancing fast), trim old entries
+    // but keep the currently-speaking utterance alive
+    if (queue.length + phrases.length > MAX_QUEUE) {
+      queue = [];
+      // Don't cancel the active utterance — let it finish naturally so
+      // the listener doesn't hear an abrupt cut.
     }
 
-    // Chrome bug: long utterances pause after ~15s. Work around by chunking.
-    if (clean.length > 200) {
-      speakChunked(clean, lang);
-      return;
+    for (var i = 0; i < phrases.length; i++) {
+      queue.push({ text: phrases[i], lang: lang || 'zh' });
     }
 
-    queueDepth++;
-    synth.speak(makeUtterance(clean, lang));
+    drain();
   }
 
-  // Chrome workaround: split long text into sentences and queue them
-  function speakChunked(text, lang) {
-    // Split on sentence-ending punctuation (Chinese & English)
-    var sentences = text.split(/(?<=[。！？\.!?；;])\s*/);
-
-    sentences.forEach(function(s) {
-      s = s.trim();
-      if (!s || s.length < 2) return;
-      queueDepth++;
-      synth.speak(makeUtterance(s, lang));
-    });
-  }
-
-  // ── Cancel ongoing speech ──
+  // ── Cancel everything ──
   function cancel() {
+    queue = [];
+    speaking = false;
     if (synth) synth.cancel();
-    queueDepth = 0;
   }
 
   // ── Toggle ──
@@ -164,13 +217,10 @@ var voiceNarrator = (function() {
   }
 
   function isEnabled() { return enabled; }
-
   function setRate(r) { rate = Math.max(0.5, Math.min(2.0, r)); }
   function getRate() { return rate; }
   function setVolume(v) { volume = Math.max(0, Math.min(1, v)); }
   function getVolume() { return volume; }
-
-  // ── Check if TTS is supported ──
   function isSupported() { return !!synth; }
 
   return {
