@@ -841,39 +841,35 @@ registerNode('r1_survivor', () => {
   state.flags.r1SurvivorMet = true;
   autoExplore([
     { art: `<pre class="ascii-art">
-      ╔═══════════════════════════════════╗
-      ║                                   ║
-      ║         ╱▔▔▔▔▔╲                 ║
-      ║        │ ─   ─ │                 ║
-      ║        │  ╲_╱  │                 ║
-      ║         ╲_____╱                  ║
-      ║    ░░░░░░│   │░░░░░░             ║
-      ║   ░░░░░──┤   ├──░░░░░            ║
-      ║  ░░░░░╱  │   │  ╲░░░░░           ║
-      ║ ░░░░░╱   │   │   ╲░░░░░          ║
-      ║  ░░░░    │   │    ░░░░           ║
-      ║          ╱   ╲                   ║
-      ║         ╱     ╲                  ║
-      ║        ═══════════                ║
-      ║     老 周  ——  倖 存 者           ║
-      ╚═══════════════════════════════════╝
+       ╭──╮
+       │⊙ │  ╭━━━━━━╮
+       ╰┬─╯ ╱░░▔▔▔▔▔╲
+        │  ╱░░│ ─   ● │
+        │ │░░░│  ═══  │
+        ╰─│░░░ ╲▄▄▄▄╱
+     ╱━━━━┿━━░░│    │
+    ╱  ╱╲ │░░░░│    ├━━╲
+   ╱  ╱  ╲│░░░░│    │   ╲
+  ⌐──╯    ░░░░░│    │    ╲
+          ░░░░╱ ╲╱  ╲
+         ░░░╱╱    ╲  ╲╲
+         ░░═════════════
+       老 周  ——  倖 存 者
 </pre>`, artEn: `<pre class="ascii-art">
-      ╔═══════════════════════════════════╗
-      ║                                   ║
-      ║         ╱▔▔▔▔▔╲                 ║
-      ║        │ ─   ─ │                 ║
-      ║        │  ╲_╱  │                 ║
-      ║         ╲_____╱                  ║
-      ║    ░░░░░░│   │░░░░░░             ║
-      ║   ░░░░░──┤   ├──░░░░░            ║
-      ║  ░░░░░╱  │   │  ╲░░░░░           ║
-      ║ ░░░░░╱   │   │   ╲░░░░░          ║
-      ║  ░░░░    │   │    ░░░░           ║
-      ║          ╱   ╲                   ║
-      ║         ╱     ╲                  ║
-      ║        ═══════════                ║
-      ║   Old Zhou  ——  Survivor          ║
-      ╚═══════════════════════════════════╝
+       ╭──╮
+       │⊙ │  ╭━━━━━━╮
+       ╰┬─╯ ╱░░▔▔▔▔▔╲
+        │  ╱░░│ ─   ● │
+        │ │░░░│  ═══  │
+        ╰─│░░░ ╲▄▄▄▄╱
+     ╱━━━━┿━━░░│    │
+    ╱  ╱╲ │░░░░│    ├━━╲
+   ╱  ╱  ╲│░░░░│    │   ╲
+  ⌐──╯    ░░░░░│    │    ╲
+          ░░░░╱ ╲╱  ╲
+         ░░░╱╱    ╲  ╲╲
+         ░░═════════════
+     Old Zhou  ——  Survivor
 </pre>`, delay: 800 },
     { tag: '遭遇', tagColor: 'tag-combat', text: '你走向最裡面的床鋪——突然，一隻佈滿灰紋的手從毯子底下伸了出來！', textEn: 'You approach the farthest bunk — suddenly, a grey-veined hand shoots out from under the blanket!', delay: 2000 },
     { tag: '感知', tagColor: 'tag-sense', text: '「別過來！我……我還沒完全變成那種東西！」', textEn: '"Stay back! I... I haven\'t completely turned into one of those things yet!"', delay: 2500 },
@@ -898,25 +894,25 @@ registerNode('r1_survivor_bread', () => {
   removeItem(L('黑麵包', 'Black Bread'));
   autoExplore([
     { art: `<pre class="ascii-art">
-        ╱▔▔▔▔▔╲
-       │ ─   ─ │
-       │  ╲_╱  │
-        ╲_____╱
-   ░░░░░░│   │░░░░░░
-  ░░░░░──┤   ├──░░░░░
- ░░░░░╱  │   │  ╲░░░░░
-       ══╧═══╧══
-    老 周 · 倖 存 者
+      ╭──╮ ╭━━━━━╮
+      │⊙ │╱░░▔▔▔▔╲
+      ╰┬─╱░│ ─  ● │
+       │░░░│ ═══  │
+    ╱━━┿━░░╲▄▄▄▄╱
+   ╱ ╱╲│░░░│   ├━╲
+  ⌐─╯  ░░░░│   │  ╲
+       ░░═══════════
+     老 周 · 倖 存 者
 </pre>`, artEn: `<pre class="ascii-art">
-        ╱▔▔▔▔▔╲
-       │ ─   ─ │
-       │  ╲_╱  │
-        ╲_____╱
-   ░░░░░░│   │░░░░░░
-  ░░░░░──┤   ├──░░░░░
- ░░░░░╱  │   │  ╲░░░░░
-       ══╧═══╧══
-  Old Zhou · Survivor
+      ╭──╮ ╭━━━━━╮
+      │⊙ │╱░░▔▔▔▔╲
+      ╰┬─╱░│ ─  ● │
+       │░░░│ ═══  │
+    ╱━━┿━░░╲▄▄▄▄╱
+   ╱ ╱╲│░░░│   ├━╲
+  ⌐─╯  ░░░░│   │  ╲
+       ░░═══════════
+   Old Zhou · Survivor
 </pre>`, delay: 800 },
     { tag: '行動', tagColor: 'tag-move', text: '你從包裡掏出那塊乾硬的黑麵包，遞了過去。', textEn: 'You pull out the stale black bread and offer it to him.', delay: 1800 },
     { tag: '感知', tagColor: 'tag-sense', text: '老周愣了一下——然後他的眼眶紅了。', textEn: 'Old Zhou freezes — then his eyes redden.', delay: 2500 },
@@ -933,25 +929,25 @@ registerNode('r1_survivor_bread', () => {
 registerNode('r1_survivor_reward', () => {
   autoExplore([
     { art: `<pre class="ascii-art">
-        ╱▔▔▔▔▔╲
-       │ ─   ─ │
-       │  ╲_╱  │
-        ╲_____╱
-   ░░░░░░│   │░░░░░░
-  ░░░░░──┤   ├──░░░░░
- ░░░░░╱  │   │  ╲░░░░░
-       ══╧═══╧══
-    老 周 · 倖 存 者
+      ╭──╮ ╭━━━━━╮
+      │⊙ │╱░░▔▔▔▔╲
+      ╰┬─╱░│ ─  ● │
+       │░░░│ ═══  │
+    ╱━━┿━░░╲▄▄▄▄╱
+   ╱ ╱╲│░░░│   ├━╲
+  ⌐─╯  ░░░░│   │  ╲
+       ░░═══════════
+     老 周 · 倖 存 者
 </pre>`, artEn: `<pre class="ascii-art">
-        ╱▔▔▔▔▔╲
-       │ ─   ─ │
-       │  ╲_╱  │
-        ╲_____╱
-   ░░░░░░│   │░░░░░░
-  ░░░░░──┤   ├──░░░░░
- ░░░░░╱  │   │  ╲░░░░░
-       ══╧═══╧══
-  Old Zhou · Survivor
+      ╭──╮ ╭━━━━━╮
+      │⊙ │╱░░▔▔▔▔╲
+      ╰┬─╱░│ ─  ● │
+       │░░░│ ═══  │
+    ╱━━┿━░░╲▄▄▄▄╱
+   ╱ ╱╲│░░░│   ├━╲
+  ⌐─╯  ░░░░│   │  ╲
+       ░░═══════════
+   Old Zhou · Survivor
 </pre>`, delay: 800 },
     { tag: '情報', tagColor: 'tag-info', text: '老周從床墊底下摸出一個油紙包。', textEn: 'Old Zhou pulls an oilskin pouch from under the mattress.', delay: 1800 },
     { tag: '物品', tagColor: 'tag-item', html: '裡面是一塊包裹完好的<b>礦工口糧</b>——壓縮的堅果和蜂蜜混合物。', htmlEn: 'Inside — a well-preserved <b>Miner\'s Ration</b>, compressed nuts and honey.', delay: 2200, effect: () => addItem(L('礦工口糧', 'Miner\'s Ration')) },
@@ -975,25 +971,25 @@ registerNode('r1_survivor_reward', () => {
 registerNode('r1_survivor_info', () => {
   autoExplore([
     { art: `<pre class="ascii-art">
-        ╱▔▔▔▔▔╲
-       │ ─   ─ │
-       │  ╲_╱  │
-        ╲_____╱
-   ░░░░░░│   │░░░░░░
-  ░░░░░──┤   ├──░░░░░
- ░░░░░╱  │   │  ╲░░░░░
-       ══╧═══╧══
-    老 周 · 倖 存 者
+      ╭──╮ ╭━━━━━╮
+      │⊙ │╱░░▔▔▔▔╲
+      ╰┬─╱░│ ─  ● │
+       │░░░│ ═══  │
+    ╱━━┿━░░╲▄▄▄▄╱
+   ╱ ╱╲│░░░│   ├━╲
+  ⌐─╯  ░░░░│   │  ╲
+       ░░═══════════
+     老 周 · 倖 存 者
 </pre>`, artEn: `<pre class="ascii-art">
-        ╱▔▔▔▔▔╲
-       │ ─   ─ │
-       │  ╲_╱  │
-        ╲_____╱
-   ░░░░░░│   │░░░░░░
-  ░░░░░──┤   ├──░░░░░
- ░░░░░╱  │   │  ╲░░░░░
-       ══╧═══╧══
-  Old Zhou · Survivor
+      ╭──╮ ╭━━━━━╮
+      │⊙ │╱░░▔▔▔▔╲
+      ╰┬─╱░│ ─  ● │
+       │░░░│ ═══  │
+    ╱━━┿━░░╲▄▄▄▄╱
+   ╱ ╱╲│░░░│   ├━╲
+  ⌐─╯  ░░░░│   │  ╲
+       ░░═══════════
+   Old Zhou · Survivor
 </pre>`, delay: 800 },
     { tag: '情報', tagColor: 'tag-info', text: '老周警惕地看著你，但還是開口了。', textEn: 'Old Zhou watches you warily, but speaks.', delay: 1800 },
     { tag: '情報', tagColor: 'tag-info', text: '「迴廊裡的守衛……那東西以前是人。是監工 K 造出來的戰爭機械。」', textEn: '"The guardian in the corridor... that thing used to be human. A war machine built by Overseer K."', delay: 2800 },
@@ -1029,25 +1025,25 @@ registerNode('r1_survivor_talk', () => {
   var trust = fed || helped || state.flags.r1SurvivorFullTrust;
   var steps = [];
   steps.push({ art: `<pre class="ascii-art">
-        ╱▔▔▔▔▔╲
-       │ ─   ─ │
-       │  ╲_╱  │
-        ╲_____╱
-   ░░░░░░│   │░░░░░░
-  ░░░░░──┤   ├──░░░░░
- ░░░░░╱  │   │  ╲░░░░░
-       ══╧═══╧══
-    老 周 · 倖 存 者
+      ╭──╮ ╭━━━━━╮
+      │⊙ │╱░░▔▔▔▔╲
+      ╰┬─╱░│ ─  ● │
+       │░░░│ ═══  │
+    ╱━━┿━░░╲▄▄▄▄╱
+   ╱ ╱╲│░░░│   ├━╲
+  ⌐─╯  ░░░░│   │  ╲
+       ░░═══════════
+     老 周 · 倖 存 者
 </pre>`, artEn: `<pre class="ascii-art">
-        ╱▔▔▔▔▔╲
-       │ ─   ─ │
-       │  ╲_╱  │
-        ╲_____╱
-   ░░░░░░│   │░░░░░░
-  ░░░░░──┤   ├──░░░░░
- ░░░░░╱  │   │  ╲░░░░░
-       ══╧═══╧══
-  Old Zhou · Survivor
+      ╭──╮ ╭━━━━━╮
+      │⊙ │╱░░▔▔▔▔╲
+      ╰┬─╱░│ ─  ● │
+       │░░░│ ═══  │
+    ╱━━┿━░░╲▄▄▄▄╱
+   ╱ ╱╲│░░░│   ├━╲
+  ⌐─╯  ░░░░│   │  ╲
+       ░░═══════════
+   Old Zhou · Survivor
 </pre>`, delay: 800 });
   if (trust) {
     steps.push({ tag: '遭遇', tagColor: 'tag-explore', text: '老周看到你回來，露出了笑容。', textEn: 'Old Zhou sees you return and smiles.', delay: 1500 });
@@ -1101,35 +1097,37 @@ registerNode('r1_wanderer', () => {
     { tag: '感知', tagColor: 'tag-sense', text: '鐵軌旁傳來輕微的腳步聲——不是石化生物那種僵硬的步伐。', textEn: 'Light footsteps by the rails — not the rigid gait of a petrified creature.', delay: 2000 },
     { tag: '遭遇', tagColor: 'tag-combat', text: '你立刻壓低身體，握緊武器——', textEn: 'You crouch immediately, weapon ready —', delay: 1500 },
     { art: `<pre class="ascii-art gold">
-           .  ·  .  ·  .  ·  .
-        .                       .
-      .    ╱▔▔▔▔╲                .
-     .    │ ─  ─ │  ⌒             .
-    .     │  △   │╱                .
-     .     ╲___╱╱                 .
-      .   ╱│   │╲   ╭────╮      .
-       . ╱ │   │ ╲  │行囊│     .
-        ╱  │   │  ╲ ╰──┬─╯    .
-       │   │   │   ╲   │     .
-       │  ╱ ╲ ╱ ╲   ╲──╯    .
-       │ ╱   V   ╲        .
-        ═══════════════
+      ·  .  ·  .  ·  .  ·  .  ·
+          ╭━━━━━━━━━╮
+         ╱           ╲
+        ╱  ╭━━━━━━━╮  ╲
+       │   │ ─   ─ │   │
+       │   │  ╰△╯  │   │
+        ╲  ╰━━━┯━━━╯  ╱
+    ╭╮   ╲╲    │    ╱╱   ╭────╮
+    ││  ╱╱ ╲───┤───╱ ╲╲  │行囊│
+    ╰┤ ╱╱   ╲  │  ╱   ╲╲ ├────┤
+     │╱╱     ╲ │ ╱     ╲╰┤ ◆◇ │
+     ╱╱       ╲│╱       ╲╰┬───╯
+    ╱╱        ╱ ╲        │╯
+             ╱   ╲
       灰 鶴  ——  流 浪 者
 </pre>`, artEn: `<pre class="ascii-art gold">
-           .  ·  .  ·  .  ·  .
-        .                       .
-      .    ╱▔▔▔▔╲                .
-     .    │ ─  ─ │  ⌒             .
-    .     │  △   │╱                .
-     .     ╲___╱╱                 .
-      .   ╱│   │╲   ╭────╮      .
-       . ╱ │   │ ╲  │Pack │     .
-        ╱  │   │  ╲ ╰──┬─╯    .
-       │   │   │   ╲   │     .
-       │  ╱ ╲ ╱ ╲   ╲──╯    .
-       │ ╱   V   ╲        .
-        ═══════════════
-    Grey Crane  ——  Wanderer
+      ·  .  ·  .  ·  .  ·  .  ·
+          ╭━━━━━━━━━╮
+         ╱           ╲
+        ╱  ╭━━━━━━━╮  ╲
+       │   │ ─   ─ │   │
+       │   │  ╰△╯  │   │
+        ╲  ╰━━━┯━━━╯  ╱
+    ╭╮   ╲╲    │    ╱╱   ╭────╮
+    ││  ╱╱ ╲───┤───╱ ╲╲  │Pack│
+    ╰┤ ╱╱   ╲  │  ╱   ╲╲ ├────┤
+     │╱╱     ╲ │ ╱     ╲╰┤ ◆◇ │
+     ╱╱       ╲│╱       ╲╰┬───╯
+    ╱╱        ╱ ╲        │╯
+             ╱   ╲
+    Grey Crane — Wanderer
 </pre>`, delay: 800 },
     { tag: '遭遇', tagColor: 'tag-explore', html: '暗處走出一個人影——一個穿著打滿補丁斗篷的<b>女人</b>。', htmlEn: 'A figure emerges from the shadows — a <b>woman</b> in a heavily-patched cloak.', delay: 2200 },
     { tag: '感知', tagColor: 'tag-sense', text: '她的皮膚幾乎沒有石化紋路——在這個深度，這幾乎不可能。', textEn: 'Her skin shows almost no petrification — at this depth, that should be impossible.', delay: 2500 },
@@ -1313,37 +1311,35 @@ registerNode('r1_ying_encounter', () => {
     { tag: '遭遇', tagColor: 'tag-combat', text: '「別再跟了——」', textEn: '"Stop following me—"', delay: 1800 },
     { tag: '感知', tagColor: 'tag-sense', text: '一道清亮但帶著緊張的聲音從前方傳來。', textEn: 'A clear but tense voice rings out from ahead.', delay: 2000 },
     { art: `<pre class="ascii-art cyan">
-      ╔═══════════════════════════════════╗
-      ║         ╱▔▔▔▔▔╲                 ║
-      ║        │ °   ° │                 ║
-      ║        │  ‿‿‿  │                 ║
-      ║         ╲_____╱                  ║
-      ║           │ │                    ║
-      ║      ─────┤ ├─────               ║
-      ║     ╱     │ │     ╲ ╭────╮      ║
-      ║    ╱      │ │      ╲│手冊│      ║
-      ║           │ │       ╰─┬──╯      ║
-      ║          ╱   ╲        │          ║
-      ║         ╱     ╲                  ║
-      ║        ═════════                  ║
-      ║      螢  ——  記 錄 員            ║
-      ╚═══════════════════════════════════╝
+          ·  ✦  ·
+       ╲ ╲│╱ ╱
+        ╲ ╭─╮ ╱      ～～╮
+         ╭╯ ╰╮        ╭─╯
+        ╱ ◉ ◉ ╲      ╱
+        │ ╰▽╯ │    ╭╯
+         ╲ ── ╱───╮│
+    ✦·  ╱╭┤  ├╮╲  ╰┤  ·✦
+       ╱ │╰──╯│ ╲╭─┴─╮
+      ╱ ✦│    │  ││冊 │
+     ✦·  │    │  ╰┴───╯
+         ╱    ╲
+       ╱╱      ╲╲
+      螢  ——  記 錄 員
 </pre>`, artEn: `<pre class="ascii-art cyan">
-      ╔═══════════════════════════════════╗
-      ║         ╱▔▔▔▔▔╲                 ║
-      ║        │ °   ° │                 ║
-      ║        │  ‿‿‿  │                 ║
-      ║         ╲_____╱                  ║
-      ║           │ │                    ║
-      ║      ─────┤ ├─────               ║
-      ║     ╱     │ │     ╲ ╭────╮      ║
-      ║    ╱      │ │      ╲│Note│      ║
-      ║           │ │       ╰─┬──╯      ║
-      ║          ╱   ╲        │          ║
-      ║         ╱     ╲                  ║
-      ║        ═════════                  ║
-      ║    Ying  ——  Chronicler          ║
-      ╚═══════════════════════════════════╝
+          ·  ✦  ·
+       ╲ ╲│╱ ╱
+        ╲ ╭─╮ ╱      ～～╮
+         ╭╯ ╰╮        ╭─╯
+        ╱ ◉ ◉ ╲      ╱
+        │ ╰▽╯ │    ╭╯
+         ╲ ── ╱───╮│
+    ✦·  ╱╭┤  ├╮╲  ╰┤  ·✦
+       ╱ │╰──╯│ ╲╭─┴─╮
+      ╱ ✦│    │  ││Note│
+     ✦·  │    │  ╰┴───╯
+         ╱    ╲
+       ╱╱      ╲╲
+    Ying  ——  Chronicler
 </pre>`, delay: 800 },
     { tag: '遭遇', tagColor: 'tag-explore', html: '隧道盡頭的小洞室裡，一個年輕的<b>' + yingGender + '</b>背靠岩壁站著，雙手護住胸前的一本破舊手冊。', htmlEn: 'In a small chamber at the tunnel\'s end, a young <b>' + (isMale ? 'girl' : 'man') + '</b> stands backed against the rock wall, clutching a worn notebook to ' + (isMale ? 'her' : 'his') + ' chest.', delay: 3000 },
     { tag: '感知', tagColor: 'tag-sense', text: yingPronoun + '的手指沾滿墨漬，指節纖細但佈滿老繭——是長年書寫留下的痕跡。', textEn: (isMale ? 'Her' : 'His') + ' fingers are stained with ink, slender but callused — marks of years of writing.', delay: 2800 },
@@ -1368,28 +1364,28 @@ registerNode('r1_ying_truth', () => {
   state.flags.r1YingTrustUp = true;
   autoExplore([
     { art: `<pre class="ascii-art cyan">
-        ╱▔▔▔▔▔╲
-       │ °   ° │
-       │  ‿‿‿  │
-        ╲_____╱
-     ─────┤ ├─────
-    ╱     │ │     ╲  ╭──╮
-   ╱      │ │      ╲ │冊│
-          │ │       ╰┬─╯
-         ╱   ╲       │
-        ═══════
-       螢  ·  記錄員
+         ·  ✦  ·
+      ╲ ╲│╱ ╱     ～╮
+       ╲ ╭─╮ ╱   ╭─╯
+        ╱◉ ◉╲   ╱
+        │╰▽╯│ ╭╯
+    ✦·╱╭┤  ├╮╲╰┤·✦
+      ╱✦│  │ ╭┴─╮
+     ✦· │  │ │冊│
+        ╱  ╲ ╰──╯
+      ╱╱    ╲╲
+      螢  ·  記錄員
 </pre>`, artEn: `<pre class="ascii-art cyan">
-        ╱▔▔▔▔▔╲
-       │ °   ° │
-       │  ‿‿‿  │
-        ╲_____╱
-     ─────┤ ├─────
-    ╱     │ │     ╲  ╭──╮
-   ╱      │ │      ╲ │冊│
-          │ │       ╰┬─╯
-         ╱   ╲       │
-        ═══════
+         ·  ✦  ·
+      ╲ ╲│╱ ╱     ～╮
+       ╲ ╭─╮ ╱   ╭─╯
+        ╱◉ ◉╲   ╱
+        │╰▽╯│ ╭╯
+    ✦·╱╭┤  ├╮╲╰┤·✦
+      ╱✦│  │ ╭┴──╮
+     ✦· │  │ │Note│
+        ╱  ╲ ╰───╯
+      ╱╱    ╲╲
      Ying · Chronicler
 </pre>`, delay: 800 },
     { tag: '情報', tagColor: 'tag-info', text: '你把自己的名字和來歷簡單說了。螢聽到「爐灶少女」四個字時，手微微一顫。', textEn: 'You briefly share your name and background. When Ying hears "Hearth-Maiden," ' + (isMale ? 'her' : 'his') + ' hand trembles.', delay: 3000 },
@@ -1412,28 +1408,28 @@ registerNode('r1_ying_alone', () => {
   var yingPronounCap = isMale ? 'She' : 'He';
   autoExplore([
     { art: `<pre class="ascii-art cyan">
-        ╱▔▔▔▔▔╲
-       │ °   ° │
-       │  ‿‿‿  │
-        ╲_____╱
-     ─────┤ ├─────
-    ╱     │ │     ╲  ╭──╮
-   ╱      │ │      ╲ │冊│
-          │ │       ╰┬─╯
-         ╱   ╲       │
-        ═══════
-       螢  ·  記錄員
+         ·  ✦  ·
+      ╲ ╲│╱ ╱     ～╮
+       ╲ ╭─╮ ╱   ╭─╯
+        ╱◉ ◉╲   ╱
+        │╰▽╯│ ╭╯
+    ✦·╱╭┤  ├╮╲╰┤·✦
+      ╱✦│  │ ╭┴─╮
+     ✦· │  │ │冊│
+        ╱  ╲ ╰──╯
+      ╱╱    ╲╲
+      螢  ·  記錄員
 </pre>`, artEn: `<pre class="ascii-art cyan">
-        ╱▔▔▔▔▔╲
-       │ °   ° │
-       │  ‿‿‿  │
-        ╲_____╱
-     ─────┤ ├─────
-    ╱     │ │     ╲  ╭──╮
-   ╱      │ │      ╲ │冊│
-          │ │       ╰┬─╯
-         ╱   ╲       │
-        ═══════
+         ·  ✦  ·
+      ╲ ╲│╱ ╱     ～╮
+       ╲ ╭─╮ ╱   ╭─╯
+        ╱◉ ◉╲   ╱
+        │╰▽╯│ ╭╯
+    ✦·╱╭┤  ├╮╲╰┤·✦
+      ╱✦│  │ ╭┴──╮
+     ✦· │  │ │Note│
+        ╱  ╲ ╰───╯
+      ╱╱    ╲╲
      Ying · Chronicler
 </pre>`, delay: 800 },
     { tag: '情報', tagColor: 'tag-info', text: '螢苦笑了一下：「一個人？習慣了。」', textEn: 'Ying smiles bitterly: "Alone? I\'m used to it."', delay: 2200 },
@@ -1454,28 +1450,28 @@ registerNode('r1_ying_silent', () => {
   var yingPronoun = isMale ? L('她', 'she') : L('他', 'he');
   autoExplore([
     { art: `<pre class="ascii-art cyan">
-        ╱▔▔▔▔▔╲
-       │ °   ° │
-       │  ‿‿‿  │
-        ╲_____╱
-     ─────┤ ├─────
-    ╱     │ │     ╲  ╭──╮
-   ╱      │ │      ╲ │冊│
-          │ │       ╰┬─╯
-         ╱   ╲       │
-        ═══════
-       螢  ·  記錄員
+         ·  ✦  ·
+      ╲ ╲│╱ ╱     ～╮
+       ╲ ╭─╮ ╱   ╭─╯
+        ╱◉ ◉╲   ╱
+        │╰▽╯│ ╭╯
+    ✦·╱╭┤  ├╮╲╰┤·✦
+      ╱✦│  │ ╭┴─╮
+     ✦· │  │ │冊│
+        ╱  ╲ ╰──╯
+      ╱╱    ╲╲
+      螢  ·  記錄員
 </pre>`, artEn: `<pre class="ascii-art cyan">
-        ╱▔▔▔▔▔╲
-       │ °   ° │
-       │  ‿‿‿  │
-        ╲_____╱
-     ─────┤ ├─────
-    ╱     │ │     ╲  ╭──╮
-   ╱      │ │      ╲ │冊│
-          │ │       ╰┬─╯
-         ╱   ╲       │
-        ═══════
+         ·  ✦  ·
+      ╲ ╲│╱ ╱     ～╮
+       ╲ ╭─╮ ╱   ╭─╯
+        ╱◉ ◉╲   ╱
+        │╰▽╯│ ╭╯
+    ✦·╱╭┤  ├╮╲╰┤·✦
+      ╱✦│  │ ╭┴──╮
+     ✦· │  │ │Note│
+        ╱  ╲ ╰───╯
+      ╱╱    ╲╲
      Ying · Chronicler
 </pre>`, delay: 800 },
     { tag: '行動', tagColor: 'tag-move', text: '你沒有說話，只是點了點頭，表示自己沒有敵意。', textEn: 'You say nothing, just nod to show you mean no harm.', delay: 2000 },
@@ -1495,28 +1491,28 @@ registerNode('r1_ying_share', () => {
   var yingPronounCap = isMale ? 'She' : 'He';
   autoExplore([
     { art: `<pre class="ascii-art cyan">
-        ╱▔▔▔▔▔╲
-       │ °   ° │
-       │  ‿‿‿  │
-        ╲_____╱
-     ─────┤ ├─────
-    ╱     │ │     ╲  ╭──╮
-   ╱      │ │      ╲ │冊│
-          │ │       ╰┬─╯
-         ╱   ╲       │
-        ═══════
-       螢  ·  記錄員
+         ·  ✦  ·
+      ╲ ╲│╱ ╱     ～╮
+       ╲ ╭─╮ ╱   ╭─╯
+        ╱◉ ◉╲   ╱
+        │╰▽╯│ ╭╯
+    ✦·╱╭┤  ├╮╲╰┤·✦
+      ╱✦│  │ ╭┴─╮
+     ✦· │  │ │冊│
+        ╱  ╲ ╰──╯
+      ╱╱    ╲╲
+      螢  ·  記錄員
 </pre>`, artEn: `<pre class="ascii-art cyan">
-        ╱▔▔▔▔▔╲
-       │ °   ° │
-       │  ‿‿‿  │
-        ╲_____╱
-     ─────┤ ├─────
-    ╱     │ │     ╲  ╭──╮
-   ╱      │ │      ╲ │冊│
-          │ │       ╰┬─╯
-         ╱   ╲       │
-        ═══════
+         ·  ✦  ·
+      ╲ ╲│╱ ╱     ～╮
+       ╲ ╭─╮ ╱   ╭─╯
+        ╱◉ ◉╲   ╱
+        │╰▽╯│ ╭╯
+    ✦·╱╭┤  ├╮╲╰┤·✦
+      ╱✦│  │ ╭┴──╮
+     ✦· │  │ │Note│
+        ╱  ╲ ╰───╯
+      ╱╱    ╲╲
      Ying · Chronicler
 </pre>`, delay: 800 },
     { tag: '情報', tagColor: 'tag-info', text: '螢在洞室的地面上攤開手冊。你湊近一看——上面密密麻麻寫滿了文字和圖表。', textEn: 'Ying spreads the notebook on the chamber floor. You lean in — it\'s packed with text and diagrams.', delay: 2800 },
@@ -1563,28 +1559,28 @@ registerNode('r1_ying_talk', () => {
 
   var steps = [];
   steps.push({ art: `<pre class="ascii-art cyan">
-        ╱▔▔▔▔▔╲
-       │ °   ° │
-       │  ‿‿‿  │
-        ╲_____╱
-     ─────┤ ├─────
-    ╱     │ │     ╲  ╭──╮
-   ╱      │ │      ╲ │冊│
-          │ │       ╰┬─╯
-         ╱   ╲       │
-        ═══════
-       螢  ·  記錄員
+         ·  ✦  ·
+      ╲ ╲│╱ ╱     ～╮
+       ╲ ╭─╮ ╱   ╭─╯
+        ╱◉ ◉╲   ╱
+        │╰▽╯│ ╭╯
+    ✦·╱╭┤  ├╮╲╰┤·✦
+      ╱✦│  │ ╭┴─╮
+     ✦· │  │ │冊│
+        ╱  ╲ ╰──╯
+      ╱╱    ╲╲
+      螢  ·  記錄員
 </pre>`, artEn: `<pre class="ascii-art cyan">
-        ╱▔▔▔▔▔╲
-       │ °   ° │
-       │  ‿‿‿  │
-        ╲_____╱
-     ─────┤ ├─────
-    ╱     │ │     ╲  ╭──╮
-   ╱      │ │      ╲ │冊│
-          │ │       ╰┬─╯
-         ╱   ╲       │
-        ═══════
+         ·  ✦  ·
+      ╲ ╲│╱ ╱     ～╮
+       ╲ ╭─╮ ╱   ╭─╯
+        ╱◉ ◉╲   ╱
+        │╰▽╯│ ╭╯
+    ✦·╱╭┤  ├╮╲╰┤·✦
+      ╱✦│  │ ╭┴──╮
+     ✦· │  │ │Note│
+        ╱  ╲ ╰───╯
+      ╱╱    ╲╲
      Ying · Chronicler
 </pre>`, delay: 800 });
   steps.push({ tag: '移動', tagColor: 'tag-move', text: '你走進螢藏身的窄隧道。', textEn: 'You enter the narrow tunnel where Ying hides.', delay: 1500 });
@@ -1647,28 +1643,28 @@ registerNode('r1_ying_herb', () => {
   removeItem(L('乾燥草藥', 'Dried Herbs'));
   autoExplore([
     { art: `<pre class="ascii-art cyan">
-        ╱▔▔▔▔▔╲
-       │ °   ° │
-       │  ‿‿‿  │
-        ╲_____╱
-     ─────┤ ├─────
-    ╱     │ │     ╲  ╭──╮
-   ╱      │ │      ╲ │冊│
-          │ │       ╰┬─╯
-         ╱   ╲       │
-        ═══════
-       螢  ·  記錄員
+         ·  ✦  ·
+      ╲ ╲│╱ ╱     ～╮
+       ╲ ╭─╮ ╱   ╭─╯
+        ╱◉ ◉╲   ╱
+        │╰▽╯│ ╭╯
+    ✦·╱╭┤  ├╮╲╰┤·✦
+      ╱✦│  │ ╭┴─╮
+     ✦· │  │ │冊│
+        ╱  ╲ ╰──╯
+      ╱╱    ╲╲
+      螢  ·  記錄員
 </pre>`, artEn: `<pre class="ascii-art cyan">
-        ╱▔▔▔▔▔╲
-       │ °   ° │
-       │  ‿‿‿  │
-        ╲_____╱
-     ─────┤ ├─────
-    ╱     │ │     ╲  ╭──╮
-   ╱      │ │      ╲ │冊│
-          │ │       ╰┬─╯
-         ╱   ╲       │
-        ═══════
+         ·  ✦  ·
+      ╲ ╲│╱ ╱     ～╮
+       ╲ ╭─╮ ╱   ╭─╯
+        ╱◉ ◉╲   ╱
+        │╰▽╯│ ╭╯
+    ✦·╱╭┤  ├╮╲╰┤·✦
+      ╱✦│  │ ╭┴──╮
+     ✦· │  │ │Note│
+        ╱  ╲ ╰───╯
+      ╱╱    ╲╲
      Ying · Chronicler
 </pre>`, delay: 800 },
     { tag: '行動', tagColor: 'tag-move', text: '「讓我看看。」你拿出乾燥草藥，走到螢身邊。', textEn: '"Let me see." You take out the dried herbs and step closer to Ying.', delay: 2000 },
@@ -1704,28 +1700,28 @@ registerNode('r1_ying_chat', () => {
   var yingPronounCap = isMale ? 'She' : 'He';
 
   var yingArt = { art: `<pre class="ascii-art cyan">
-        ╱▔▔▔▔▔╲
-       │ °   ° │
-       │  ‿‿‿  │
-        ╲_____╱
-     ─────┤ ├─────
-    ╱     │ │     ╲  ╭──╮
-   ╱      │ │      ╲ │冊│
-          │ │       ╰┬─╯
-         ╱   ╲       │
-        ═══════
-       螢  ·  記錄員
+         ·  ✦  ·
+      ╲ ╲│╱ ╱     ～╮
+       ╲ ╭─╮ ╱   ╭─╯
+        ╱◉ ◉╲   ╱
+        │╰▽╯│ ╭╯
+    ✦·╱╭┤  ├╮╲╰┤·✦
+      ╱✦│  │ ╭┴─╮
+     ✦· │  │ │冊│
+        ╱  ╲ ╰──╯
+      ╱╱    ╲╲
+      螢  ·  記錄員
 </pre>`, artEn: `<pre class="ascii-art cyan">
-        ╱▔▔▔▔▔╲
-       │ °   ° │
-       │  ‿‿‿  │
-        ╲_____╱
-     ─────┤ ├─────
-    ╱     │ │     ╲  ╭──╮
-   ╱      │ │      ╲ │冊│
-          │ │       ╰┬─╯
-         ╱   ╲       │
-        ═══════
+         ·  ✦  ·
+      ╲ ╲│╱ ╱     ～╮
+       ╲ ╭─╮ ╱   ╭─╯
+        ╱◉ ◉╲   ╱
+        │╰▽╯│ ╭╯
+    ✦·╱╭┤  ├╮╲╰┤·✦
+      ╱✦│  │ ╭┴──╮
+     ✦· │  │ │Note│
+        ╱  ╲ ╰───╯
+      ╱╱    ╲╲
      Ying · Chronicler
 </pre>`, delay: 800 };
 
