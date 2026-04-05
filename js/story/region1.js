@@ -1622,6 +1622,9 @@ registerNode('r1_ying_talk', () => {
         ], [{ text: '繼續', textEn: 'Continue', action: () => loadNode('r1_ying_talk') }]);
       }});
     }
+    if (companion && !state.flags.r1YingWarmth) {
+      c.push({ text: '這裡好冷……要不要靠近一點？', textEn: 'It\'s so cold... want to huddle closer?', action: () => loadNode('r1_ying_warmth') });
+    }
     if (companion) {
       c.push({ text: '聊聊天', textEn: 'Chat a while', action: () => loadNode('r1_ying_chat') });
     }
@@ -1784,6 +1787,44 @@ registerNode('r1_ying_chat', () => {
       }},
     ], { label: L('與螢閒聊', 'Chatting with Ying') });
   }
+});
+
+// ── Ying: sharing warmth (first night as companions) ──
+registerNode('r1_ying_warmth', () => {
+  var isMale = state.sex === 'male';
+  var yingPronoun = isMale ? L('她', 'she') : L('他', 'he');
+  var yingPronounCap = isMale ? 'She' : 'He';
+  var yPo = isMale ? 'her' : 'his';
+  state.flags.r1YingWarmth = true;
+
+  autoExplore([
+    { tag: '環境', tagColor: 'tag-system', text: '礦道深處的溫度越來越低。你的呼吸在空氣中凝成白霧。', textEn: 'The temperature drops deeper in the mines. Your breath forms white mist in the air.', delay: 2200 },
+    { tag: '感知', tagColor: 'tag-sense', text: '螢縮在牆角，手冊抱在胸前，嘴唇微微發紫。' + yingPronoun + '在發抖，卻還在堅持寫字。', textEn: 'Ying huddles in the corner, notebook clutched to ' + yPo + ' chest, lips tinged blue. ' + yingPronounCap + '\'s shivering but still writing.', delay: 2800 },
+    { tag: '感知', tagColor: 'tag-sense', text: '你注意到' + yingPronoun + '的筆跡已經歪歪扭扭——手指凍得快握不住筆了。', textEn: 'You notice ' + yPo + ' handwriting has gone wobbly — fingers too cold to hold the pen steady.', delay: 2500 },
+    { tag: '行動', tagColor: 'tag-move', text: '你在螢身邊坐下。', textEn: 'You sit down beside Ying.', delay: 1500 },
+    { tag: '感知', tagColor: 'tag-sense', text: '螢的身體僵了一瞬——然後慢慢放鬆下來。', textEn: 'Ying\'s body tenses for a moment — then slowly relaxes.', delay: 2200 },
+    { tag: '情報', tagColor: 'tag-info', text: '「……你也冷嗎？」' + yingPronoun + '的聲音很輕，像是怕驚擾什麼。', textEn: '"...Are you cold too?" ' + yingPronounCap + ' voice is barely a whisper, as if afraid to disturb something.', delay: 2500 },
+    { tag: '環境', tagColor: 'tag-system', text: '你沒有說話，只是把肩膀靠近了一些。', textEn: 'You say nothing, just move your shoulder closer.', delay: 2200 },
+    { tag: '感知', tagColor: 'tag-sense', text: '過了很久——也許只是幾秒——螢的頭輕輕靠上了你的肩膀。', textEn: 'After a long time — or maybe just a few seconds — Ying\'s head gently comes to rest on your shoulder.', delay: 3000 },
+    { tag: '感知', tagColor: 'tag-sense', text: yingPronoun + '的頭髮蹭過你的脖子。有墨水的味道，還有地底苔蘚淡淡的青草氣息。', textEn: yingPronounCap + ' hair brushes your neck. The scent of ink, mingled with the faint green smell of underground moss.', delay: 3000 },
+    { tag: '情報', tagColor: 'tag-info', text: '「……不要動。」螢小聲說。「就一下下。」', textEn: '"...Don\'t move." Ying murmurs. "Just for a moment."', delay: 2500 },
+    { tag: '環境', tagColor: 'tag-system', text: '寂靜中，你能感受到彼此的體溫正在緩慢地匯聚。冰冷的石壁，微弱的磷光，和肩膀上那一小塊溫暖的重量。', textEn: 'In the silence, you feel your shared warmth slowly merging. Cold stone walls, faint phosphorescence, and that small, warm weight on your shoulder.', delay: 3500 },
+    { tag: '感知', tagColor: 'tag-sense', text: '螢的呼吸變得平穩了。筆從指間滑落，輕輕落在地上。', textEn: 'Ying\'s breathing evens out. The pen slips from ' + yPo + ' fingers and drops softly to the ground.', delay: 2800 },
+    { tag: '感知', tagColor: 'tag-sense', text: yingPronoun + '睡著了。', textEn: yingPronounCap + '\'s fallen asleep.', delay: 2000 },
+    { tag: '感知', tagColor: 'tag-sense', text: '你低頭看——' + yingPronoun + '的睫毛在磷光下微微顫動。嘴角有一絲很淺的笑意。', textEn: 'You look down — ' + yPo + ' eyelashes tremble in the phosphorescent glow. A faint smile lingers at the corners of ' + yPo + ' lips.', delay: 3000 },
+    { tag: '環境', tagColor: 'tag-system', text: '你不敢動。你害怕這一刻會碎掉。', textEn: 'You don\'t dare move. You\'re afraid this moment might shatter.', delay: 2500 },
+    { tag: '感知', tagColor: 'tag-sense', text: '過了不知多久，螢在睡夢中翻了個身。' + yingPronoun + '的手無意識地抓住了你的衣角——像是溺水的人抓住了什麼。', textEn: 'After an unknowable time, Ying shifts in ' + yPo + ' sleep. ' + yingPronounCap + ' hand unconsciously clutches the hem of your clothes — like someone drowning grasping for something solid.', delay: 3500 },
+    { tag: '感知', tagColor: 'tag-sense', text: '你把' + yingPronoun + '的手冊撿起來，小心地放在' + yingPronoun + '膝上。然後你閉上眼睛。', textEn: 'You pick up ' + yPo + ' notebook and carefully place it on ' + yPo + ' lap. Then you close your eyes.', delay: 2800 },
+    { tag: '環境', tagColor: 'tag-system', text: '在這座冰冷的石窟最深處——兩個人的體溫，暫時擋住了整個世界的寒意。', textEn: 'In the deepest part of this frozen cavern — two people\'s warmth holds back the cold of the entire world, if only for now.', delay: 3500 },
+  ], [
+    { text: '（醒來時，你發現螢已經不在了。但你的肩膀還殘留著溫度。）', textEn: '(When you wake, Ying is gone. But warmth still lingers on your shoulder.)', action: () => {
+      changeHp(20);
+      changePetri(-8);
+      changeStat('wil', 1);
+      notify(L('HP +20，石化度 -8%，意志 +1（共眠的溫度）', 'HP +20, Petri -8%, WIL +1 (Warmth of sleeping together)'));
+      loadNode('r1_deep');
+    }},
+  ], { label: L('寒夜共眠', 'Warmth in the Cold') });
 });
 
 // ── Gate to Region 2 ──

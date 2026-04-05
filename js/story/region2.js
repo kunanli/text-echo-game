@@ -1241,6 +1241,9 @@ registerNode('r2_ying_talk', () => {
     if (state.flags.r2CampVisited && !state.flags.r2YingNight) {
       c.push({ text: '要不要一起去營地休息？', textEn: 'Want to rest at the camp together?', action: () => loadNode('r2_ying_night') });
     }
+    if (state.flags.r2YingNight && !state.flags.r2YingNightmare) {
+      c.push({ text: '螢，你昨晚睡得好嗎？', textEn: 'Ying, did you sleep well last night?', action: () => loadNode('r2_ying_nightmare') });
+    }
     if (state.flags.r2YingLore3 && state.flags.r2ChiefTalked && !state.flags.r2YingPromise) {
       c.push({ text: '我快要去挑戰巨獸了……', textEn: 'I\'m about to face the colossus...', action: () => loadNode('r2_ying_promise') });
     }
@@ -1508,7 +1511,81 @@ registerNode('r2_ying_promise', () => {
   ], { label: L('螢的護身符', 'Ying\'s charm') });
 });
 
-// ═══════════════════════════════════════════════════
+// ── Ying: nightmare comfort scene (deepening dependence) ──
+registerNode('r2_ying_nightmare', () => {
+  var isMale = state.sex === 'male';
+  var yP = isMale ? L('她', 'she') : L('他', 'he');
+  var yPC = isMale ? 'She' : 'He';
+  var yPo = isMale ? 'her' : 'his';
+  state.flags.r2YingNightmare = true;
+
+  autoExplore([
+    { tag: '環境', tagColor: 'tag-system', text: '深夜。營火已經熄滅，只剩灰燼中偶爾閃爍的餘溫。', textEn: 'Deep night. The campfire has died, leaving only the occasional ember glowing in the ash.', delay: 2200 },
+    { tag: '感知', tagColor: 'tag-sense', text: '你被一陣細微的聲音驚醒——是螢。', textEn: 'A faint sound wakes you — it\'s Ying.', delay: 2000 },
+    { tag: '感知', tagColor: 'tag-sense', text: yP + '蜷縮在毯子裡，身體在顫抖。嘴裡反覆低喃著什麼。', textEn: yPC + '\'s curled up under a blanket, body trembling. Lips moving, repeating something over and over.', delay: 2800 },
+    { tag: '感知', tagColor: 'tag-sense', text: '「不要……不要變成石頭……不要……」', textEn: '"Don\'t... don\'t turn to stone... please don\'t..."', delay: 2500 },
+    { tag: '感知', tagColor: 'tag-sense', text: yP + '的額頭佈滿了冷汗。手指痙攣般地抓著手冊——指節發白。', textEn: yPC + ' forehead is drenched in cold sweat. Fingers clench the notebook spasmodically — knuckles white.', delay: 2800 },
+    { tag: '行動', tagColor: 'tag-move', text: '你輕輕握住了螢的手。', textEn: 'You gently take Ying\'s hand.', delay: 2000 },
+    { tag: '感知', tagColor: 'tag-sense', text: yP + '猛地睜開眼睛——瞳孔因為恐懼而放大，呼吸急促而混亂。', textEn: yPC + ' eyes snap open — pupils dilated with terror, breathing rapid and ragged.', delay: 2500 },
+    { tag: '感知', tagColor: 'tag-sense', text: '螢花了好幾���才認出你。然後——', textEn: 'It takes several seconds for Ying to recognize you. Then —', delay: 2200 },
+    { tag: '感知', tagColor: 'tag-sense', text: yP + '撲進了你的懷裡。', textEn: yPC + ' falls into your arms.', delay: 2000 },
+    { tag: '感知', tagColor: 'tag-sense', text: '沒有猶豫。沒有矜持。像是本能驅使的——就像你是' + yP + '僅存的、唯一真實的東西。', textEn: 'No hesitation. No reserve. Driven by instinct — as though you were the only real thing ' + (isMale ? 'she' : 'he') + ' had left.', delay: 3200 },
+    { tag: '感知', tagColor: 'tag-sense', text: '你能感受到' + yP + '的心跳——快得像被困住的飛蛾。', textEn: 'You can feel ' + yPo + ' heartbeat — racing like a trapped moth.', delay: 2500 },
+    { tag: '情報', tagColor: 'tag-info', text: '「我夢到你石化了。」螢的聲音悶在你的胸口，斷斷續續。', textEn: '"I dreamed you turned to stone." Ying\'s voice is muffled against your chest, broken.', delay: 3000 },
+    { tag: '情報', tagColor: 'tag-info', text: '「你站在那裡……眼睛還是睜開的……但已經不會動了……」', textEn: '"You were standing there... eyes still open... but you couldn\'t move anymore..."', delay: 3000 },
+    { tag: '情報', tagColor: 'tag-info', text: '「我叫你的名字，你聽不見。我碰你的臉——是冰的。」', textEn: '"I called your name, but you couldn\'t hear. I touched your face — it was ice cold."', delay: 3000 },
+    { tag: '感知', tagColor: 'tag-sense', text: yP + '的手指扣在你的背上，收得很緊。像是確認你還是溫的。還是軟的。還是活的。', textEn: yPC + ' fingers dig into your back, gripping tight. As if confirming you\'re still warm. Still soft. Still alive.', delay: 3200 },
+  ], [
+    { text: '把螢抱緊一點', textEn: 'Hold Ying tighter', action: () => {
+      autoExplore([
+        { tag: '行動', tagColor: 'tag-move', text: '你收緊了手臂。不是安慰的擁抱——是承諾的擁抱。', textEn: 'You tighten your arms. Not a comforting embrace — a promise.', delay: 2500 },
+        { tag: '感知', tagColor: 'tag-sense', text: '螢的顫抖漸漸停了。' + yP + '的呼吸從急促變成綿長，從綿長變成平穩。', textEn: 'Ying\'s trembling gradually subsides. ' + yPC + ' breathing slows from ragged to long, from long to steady.', delay: 3000 },
+        { tag: '感知', tagColor: 'tag-sense', text: '但' + yP + '沒有放手。', textEn: 'But ' + (isMale ? 'she' : 'he') + ' doesn\'t let go.', delay: 2000 },
+        { tag: '情報', tagColor: 'tag-info', text: '「……你身上好暖。」螢的聲音幾乎聽不見。像是說給自己聽的。', textEn: '"...You\'re so warm." Ying\'s voice is almost inaudible. As if speaking to ' + (isMale ? 'her' : 'him') + 'self.', delay: 2800 },
+        { tag: '感知', tagColor: 'tag-sense', text: '你低下頭——' + yP + '的臉埋在你的頸窩裡。你能感受到' + yP + '的睫毛在你的皮膚上輕輕刷過。', textEn: 'You lower your head — ' + yPo + ' face is nestled in the crook of your neck. You feel ' + yPo + ' eyelashes brush softly against your skin.', delay: 3200 },
+        { tag: '環境', tagColor: 'tag-system', text: '你們就這樣坐著。彼此的心跳慢慢同步——像兩具快要石化的身體裡，最後還在跳動的東西。', textEn: 'You sit like this. Your heartbeats slowly synchronize — like the last things still beating inside two bodies on the verge of turning to stone.', delay: 3500 },
+        { tag: '感知', tagColor: 'tag-sense', text: '過了很久，螢的手鬆開了一點。但只是一點。', textEn: 'After a long while, Ying\'s grip loosens. But only slightly.', delay: 2500 },
+        { tag: '情報', tagColor: 'tag-info', text: '「……答應我一件事。」', textEn: '"...Promise me one thing."', delay: 2200 },
+        { tag: '情報', tagColor: 'tag-info', text: '「如果有一天你真的開始石化……讓我先知道。不要偷偷一個人扛。」', textEn: '"If the day comes when you start to petrify... tell me first. Don\'t bear it alone in silence."', delay: 3500 },
+        { tag: '感知', tagColor: 'tag-sense', text: yP + '終於抬起頭，和你四目相對。眼眶還是紅的，但目光比任何時候都堅定。', textEn: yPC + ' finally looks up, meeting your eyes. ' + yPC + ' eyes are still red, but ' + yPo + ' gaze is steadier than ever.', delay: 3000 },
+        { tag: '情報', tagColor: 'tag-info', text: '「因為我要把你最後的樣子記下來。」' + yP + '的聲音在發抖，但嘴角在笑。', textEn: '"Because I need to record how you looked at the end." ' + yPC + ' voice trembles, but ' + yPo + ' lips are smiling.', delay: 3200 },
+        { tag: '情報', tagColor: 'tag-info', text: '「……開玩笑的。因為我會想辦法救你。」', textEn: '"...Just kidding. Because I\'ll find a way to save you."', delay: 2800 },
+      ], [
+        { text: '我不會讓那種事發生', textEn: 'I won\'t let that happen', action: () => {
+          changeHp(25);
+          changePetri(-10);
+          changeStat('wil', 1);
+          notify(L('HP +25，石化度 -10%，意志 +1（不會放開的手）', 'HP +25, Petri -10%, WIL +1 (A hand that won\'t let go)'));
+          loadNode('r2_look');
+        }},
+      ], { label: L('不會放手', 'Won\'t Let Go') });
+    }},
+    { text: '輕聲告訴螢：我還在', textEn: 'Whisper to Ying: I\'m still here', action: () => {
+      autoExplore([
+        { tag: '行動', tagColor: 'tag-move', text: '你把手放在螢的後腦——很輕，像是托著什麼易碎的東西。', textEn: 'You place your hand on the back of Ying\'s head — gently, as if cradling something fragile.', delay: 2500 },
+        { tag: '情報', tagColor: 'tag-info', text: '「我還在。你摸摸看——還是溫的。」', textEn: '"I\'m still here. Feel — still warm."', delay: 2500 },
+        { tag: '感知', tagColor: 'tag-sense', text: '螢伸出手，猶豫了一下，然後輕輕碰了碰你的臉。', textEn: 'Ying reaches out, hesitates, then gently touches your face.', delay: 2500 },
+        { tag: '感知', tagColor: 'tag-sense', text: yP + '的指尖從你的額頭滑到臉頰——那觸感帶著墨漬的粗糙，和指尖微微的顫抖。', textEn: yPC + ' fingertips trace from your forehead to your cheek — the touch rough with ink stains, and a faint tremor.', delay: 3200 },
+        { tag: '情報', tagColor: 'tag-info', text: '「……嗯。是溫的。」螢的聲音還在抖，但不再那麼害怕了。', textEn: '"...Mm. Warm." Ying\'s voice still shakes, but the fear is receding.', delay: 2800 },
+        { tag: '感知', tagColor: 'tag-sense', text: yP + '沒有收回手。指尖停在你的頰骨上——那裡有一小片石化紋路。', textEn: yPC + ' doesn\'t pull back. Fingertips rest on your cheekbone — where a small patch of petrification shows.', delay: 3000 },
+        { tag: '感知', tagColor: 'tag-sense', text: '螢的拇指輕輕描過那些灰色的紋理。動作極輕極慢，像是在記住每一條紋路的走向。', textEn: 'Ying\'s thumb traces those grey patterns, slowly and softly, as if memorizing the direction of every line.', delay: 3500 },
+        { tag: '情報', tagColor: 'tag-info', text: '「……我會記住的。你現在的樣子。溫的時候的樣子。」', textEn: '"...I\'ll remember. How you look right now. When you\'re warm."', delay: 3000 },
+        { tag: '環境', tagColor: 'tag-system', text: '黑暗中，你們的距離近得能感受到彼此的呼吸。螢最終把臉埋回你的肩膀，不再說話。', textEn: 'In the darkness, close enough to feel each other\'s breath. Ying buries ' + yPo + ' face against your shoulder again, saying nothing more.', delay: 3200 },
+        { tag: '環境', tagColor: 'tag-system', text: '你也不再說話。有些話不需要語言。指尖殘留的觸感已經說完了一切。', textEn: 'You say nothing either. Some words don\'t need language. The lingering touch has already said everything.', delay: 3000 },
+      ], [
+        { text: '靜靜陪到天亮', textEn: 'Stay quietly until dawn', action: () => {
+          changeHp(25);
+          changePetri(-10);
+          changeStat('wil', 1);
+          notify(L('HP +25，石化度 -10%，意志 +1（觸碰的記憶）', 'HP +25, Petri -10%, WIL +1 (Memory of touch)'));
+          loadNode('r2_look');
+        }},
+      ], { label: L('觸碰的記憶', 'Memory of Touch') });
+    }},
+  ], { label: L('深夜的噩夢', 'Nightmare in the Dark') });
+});
+
+// ═════════════════════════════════════════���═════════
 //  NPC Continuation — 灰鶴 (Grey Crane) in Region 2
 // ═══════════════════════════════════════════════════
 

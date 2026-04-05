@@ -686,6 +686,9 @@ registerNode('r3_ying_talk', () => {
         ], { label: L('分工合作', 'Division of labor') });
       }});
     }
+    if (state.flags.r3YingInn && !state.flags.r3YingRiver) {
+      c.push({ text: '螢，要不要去河邊走走？', textEn: 'Ying, want to walk by the river?', action: () => loadNode('r3_ying_river') });
+    }
     c.push({ text: '離開', textEn: 'Leave', action: () => loadNode('r3_look') });
     return c;
   })(), { label: L('和螢說話', 'Talking to Ying') });
@@ -743,6 +746,103 @@ registerNode('r3_ying_inn', () => {
       loadNode('r3_inn');
     }},
   ], { label: L('河畔居的晚餐', 'Dinner at Riverside Lodge') });
+});
+
+// ── Ying: riverside moonlight scene (near-confession) ──
+registerNode('r3_ying_river', () => {
+  var isMale = state.sex === 'male';
+  var yP = isMale ? L('她', 'she') : L('他', 'he');
+  var yPC = isMale ? 'She' : 'He';
+  var yPo = isMale ? 'her' : 'his';
+  state.flags.r3YingRiver = true;
+
+  autoExplore([
+    { art: `<pre class="ascii-art cyan">
+      · ˚ ·  ✦  · ˚ ·  ✦  · ˚ ·
+    ˚     ·  ˚     ·  ˚     ·  ˚
+  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ╱╲                      · ✦ ·
+     ╱  ╲    ○ ○              ˚   ˚
+    ╱ ╱╲ ╲   ╰▽╯
+   ╱ ╱  ╲ ╲  ╱╲     河    畔
+  ╱ ╱    ╲ ╲╱  ╲
+</pre>`, artEn: `<pre class="ascii-art cyan">
+      · ˚ ·  ✦  · ˚ ·  ✦  · ˚ ·
+    ˚     ·  ˚     ·  ˚     ·  ˚
+  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ╱╲                      · ✦ ·
+     ╱  ╲    ○ ○              ˚   ˚
+    ╱ ╱╲ ╲   ╰▽╯
+   ╱ ╱  ╲ ╲  ╱╲   Riverside
+  ╱ ╱    ╲ ╲╱  ╲
+</pre>`, delay: 800 },
+    { tag: '環境', tagColor: 'tag-system', text: '河城的夜晚比礦道明亮得多。地底河面反射著遠處燈塔的光芒，水面上碎成一片搖曳的星海。', textEn: 'River City\'s night is far brighter than the mines. The underground river reflects a distant lighthouse, shattering into a sea of wavering stars on the water.', delay: 3000 },
+    { tag: '移動', tagColor: 'tag-move', text: '你找到螢的時候，' + yP + '一個人坐在碼頭邊緣。雙腳懸空，手冊攤開在膝上——但沒有在寫。', textEn: 'You find Ying sitting alone at the edge of the dock. Feet dangling, notebook open on ' + yPo + ' lap — but not writing.', delay: 2800 },
+    { tag: '感知', tagColor: 'tag-sense', text: yP + '在看河。河水拍打石岸的聲音，在寂靜中像一首聽不懂歌詞的催眠曲。', textEn: yPC + '\'s watching the river. The sound of water lapping against stone, like a lullaby in an unknown language.', delay: 2800 },
+    { tag: '行動', tagColor: 'tag-move', text: '你在' + yP + '身邊坐下。螢沒有轉頭，但身體微微往你的方向傾了傾。', textEn: 'You sit down beside ' + (isMale ? 'her' : 'him') + '. Ying doesn\'t turn, but leans slightly in your direction.', delay: 2500 },
+    { tag: '環境', tagColor: 'tag-system', text: '你們就這樣看了一會兒河。', textEn: 'You watch the river together for a while.', delay: 2500 },
+    { tag: '情報', tagColor: 'tag-info', text: '「你有沒有想過——」螢忽然開口，聲音比平常輕。', textEn: '"Have you ever thought —" Ying suddenly speaks, voice softer than usual.', delay: 2500 },
+    { tag: '情報', tagColor: 'tag-info', text: '「如果沒有石化瘟疫。沒有封印石室。沒有這些亂七八糟的事。」', textEn: '"If there were no Stone Plague. No Seal Chamber. None of this mess."', delay: 2800 },
+    { tag: '情報', tagColor: 'tag-info', text: '「我們……還會認識嗎？」', textEn: '"Would we... still have met?"', delay: 2500 },
+    { tag: '感知', tagColor: 'tag-sense', text: yP + '低頭看著手冊上攤開的空白頁。水面的反光映在紙上，像流動的銀絲。', textEn: yPC + ' looks down at the blank page in ' + yPo + ' notebook. River light reflects onto the paper like flowing silver threads.', delay: 3000 },
+  ], [
+    { text: '不會。但我很慶幸我們認識了。', textEn: 'No. But I\'m glad we did.', action: () => {
+      autoExplore([
+        { tag: '感知', tagColor: 'tag-sense', text: '螢沒有說話。但你看到' + yP + '的手指收緊了——攥著手冊邊緣的那隻手。', textEn: 'Ying says nothing. But you see ' + yPo + ' fingers tighten — the hand gripping the notebook\'s edge.', delay: 2800 },
+        { tag: '情報', tagColor: 'tag-info', text: '「……嗯。」', textEn: '"...Mm."', delay: 1500 },
+        { tag: '感知', tagColor: 'tag-sense', text: '只有一個字。但那個字裡裝了太多東西——你聽得出來。', textEn: 'Just one syllable. But it carries too much — you can hear it all.', delay: 2500 },
+        { tag: '感知', tagColor: 'tag-sense', text: '螢慢慢把頭靠在了你的肩上。和以前不一樣——這次不是因為冷，不是因為害怕，不是因為疲倦。', textEn: 'Ying slowly rests ' + yPo + ' head on your shoulder. Different from before — not from cold, not from fear, not from exhaustion.', delay: 3200 },
+        { tag: '感知', tagColor: 'tag-sense', text: '就只是想靠著你。', textEn: 'Just wanting to lean on you.', delay: 2000 },
+        { tag: '環境', tagColor: 'tag-system', text: '河水流過。光影搖曳。你感覺到' + yP + '的手悄悄伸過來——指尖碰了碰你的手背。', textEn: 'The river flows. Light sways. You feel ' + yPo + ' hand reach over quietly — fingertips brushing the back of your hand.', delay: 3000 },
+        { tag: '感知', tagColor: 'tag-sense', text: '你翻過手掌。' + yP + '的手指滑進了你的指縫裡。', textEn: 'You turn your palm over. ' + yPC + ' fingers slip between yours.', delay: 2500 },
+        { tag: '感知', tagColor: 'tag-sense', text: '十指相扣。一隻手帶著墨漬和繭，另一隻手帶著石化的灰色紋路。不般配。但契合。', textEn: 'Fingers intertwined. One hand stained with ink and calluses, the other marked with grey petrification. Mismatched. But fitting.', delay: 3500 },
+        { tag: '情報', tagColor: 'tag-info', text: '「我從來沒有在手冊裡記過……自己的事。」螢的聲音很低，像是在河水聲裡故意藏起來。', textEn: '"I\'ve never recorded... anything about myself in the notebook." Ying\'s voice is low, deliberately hidden beneath the sound of the river.', delay: 3200 },
+        { tag: '情報', tagColor: 'tag-info', text: '「但最近我一直在想——如果有一天要寫自己的故事——」', textEn: '"But lately I keep thinking — if I were to write my own story someday —"', delay: 2800 },
+        { tag: '感知', tagColor: 'tag-sense', text: yP + '捏了捏你的手。力道很輕，像是怕弄疼你石化的指節。', textEn: yPC + ' squeezes your hand. Gently, as if afraid of hurting your petrified knuckles.', delay: 2800 },
+        { tag: '情報', tagColor: 'tag-info', text: '「——你會在每一頁上。」', textEn: '"— you\'d be on every page."', delay: 2500 },
+        { tag: '環境', tagColor: 'tag-system', text: '你的心臟漏了一拍。不是石化的麻痺——是另一種完全不同的，讓胸口發燙的東西。', textEn: 'Your heart skips a beat. Not the numbness of petrification — something entirely different, something that burns warm in your chest.', delay: 3200 },
+        { tag: '感知', tagColor: 'tag-sense', text: '你想說什麼。但喉嚨像是被堵住了。在這座地底城市的河邊——你第一次覺得語言不夠用。', textEn: 'You want to say something. But your throat closes up. On the banks of this underground city — for the first time, words feel inadequate.', delay: 3200 },
+        { tag: '行動', tagColor: 'tag-move', text: '你沒有說話。你只是把' + yP + '的手握得更緊了一點。', textEn: 'You don\'t speak. You just hold ' + yPo + ' hand a little tighter.', delay: 2500 },
+        { tag: '環境', tagColor: 'tag-system', text: '螢笑了。很輕。像河面上掠過的風。', textEn: 'Ying smiles. Faintly. Like a breeze skimming the river\'s surface.', delay: 2500 },
+        { tag: '環境', tagColor: 'tag-system', text: '你們在河邊坐了很久。直到手掌被彼此的體溫捂熱。直到連石化的紋路都似乎退了幾分。', textEn: 'You sit by the river for a long time. Until your palms are warmed by each other\'s heat. Until even the petrification patterns seem to fade a little.', delay: 3500 },
+      ], [
+        { text: '（你不知道這算不算告白。但你知道，你再也放不開這隻手了。）', textEn: '(You don\'t know if this counts as a confession. But you know you can never let go of this hand.)', action: () => {
+          changeHp(30);
+          changePetri(-12);
+          changeStat('wil', 2);
+          notify(L('HP +30，石化度 -12%，意志 +2（你會在每一頁上）', 'HP +30, Petri -12%, WIL +2 (You\'d be on every page)'));
+          loadNode('r3_look');
+        }},
+      ], { label: L('每一頁', 'Every Page') });
+    }},
+    { text: '也許會。在某個書店裡、某條街上。', textEn: 'Maybe. In some bookshop, on some street.', action: () => {
+      autoExplore([
+        { tag: '感知', tagColor: 'tag-sense', text: '螢轉過頭看你——眼睛裡映著河面的碎光，像是裝了一整條銀河。', textEn: 'Ying turns to look at you — eyes reflecting the shattered light on the river, as if holding an entire galaxy.', delay: 2800 },
+        { tag: '情報', tagColor: 'tag-info', text: '「你在幻想什麼啊。」' + yP + '笑了，但聲音裡有一種你從未聽過的柔軟。', textEn: '"What are you imagining." ' + yPC + ' laughs, but there\'s a softness you\'ve never heard before.', delay: 2800 },
+        { tag: '情報', tagColor: 'tag-info', text: '「不過……也不是不可能吧。」', textEn: '"Though... it\'s not impossible, is it."', delay: 2200 },
+        { tag: '感知', tagColor: 'tag-sense', text: '螢把手冊翻到空白的一頁，開始寫字。但不是用記錄員的筆跡——是一種更小、更私密的字體。', textEn: 'Ying flips to a blank page and begins to write. But not in a chronicler\'s hand — in a smaller, more private script.', delay: 3000 },
+        { tag: '感知', tagColor: 'tag-sense', text: '你瞥見了幾個字——你的名字。和一個你看不清楚的詞。', textEn: 'You catch a few characters — your name. And a word you can\'t quite read.', delay: 2800 },
+        { tag: '情報', tagColor: 'tag-info', text: '「不准偷看！」螢用手蓋住頁面，耳根到脖子全紅了。', textEn: '"Don\'t peek!" Ying covers the page with ' + yPo + ' hand, flushed from ears to neck.', delay: 2500 },
+        { tag: '情報', tagColor: 'tag-info', text: '「這一頁……是私人的。」', textEn: '"This page... is personal."', delay: 2200 },
+        { tag: '感知', tagColor: 'tag-sense', text: yP + '把手冊合上，抱在胸前。然後往你的方向靠了靠——不多，就一點點。', textEn: yPC + ' closes the notebook and clutches it to ' + yPo + ' chest. Then leans toward you — just a little.', delay: 2800 },
+        { tag: '感知', tagColor: 'tag-sense', text: '你感覺到' + yP + '的肩膀碰到了你的手臂。' + yP + '沒有移開。', textEn: 'You feel ' + yPo + ' shoulder touch your arm. ' + yPC + ' doesn\'t move away.', delay: 2500 },
+        { tag: '環境', tagColor: 'tag-system', text: '水聲、光影、和一頁你永遠讀不到的私密文字。', textEn: 'Water, light, and a page of private words you\'ll never read.', delay: 2500 },
+        { tag: '環境', tagColor: 'tag-system', text: '但你知道——你不需要讀。因為答案就在' + yP + '靠過來的那個動作裡。', textEn: 'But you know — you don\'t need to read it. Because the answer is in the way ' + (isMale ? 'she' : 'he') + ' leaned toward you.', delay: 3200 },
+      ], [
+        { text: '（那一頁上寫了什麼，你始終沒有問。但你會記得這個夜晚。一輩子。）', textEn: '(You never ask what was on that page. But you\'ll remember this night. For the rest of your life.)', action: () => {
+          changeHp(30);
+          changePetri(-12);
+          changeStat('wil', 2);
+          notify(L('HP +30，石化度 -12%，意志 +2（私密的一頁）', 'HP +30, Petri -12%, WIL +2 (A private page)'));
+          loadNode('r3_look');
+        }},
+      ], { label: L('私密的一頁', 'A Private Page') });
+    }},
+  ], { label: L('河邊的月光', 'Moonlight by the River') });
 });
 
 // ═══════════════════════════════════════════════════
