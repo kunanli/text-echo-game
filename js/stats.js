@@ -17,6 +17,7 @@ var globalStats = {
   totalPlayTimeMs: 0,
   fastestRunMs: 0,
   currentRunStartMs: 0,
+  bankedPoints: 0,
 };
 
 function loadGlobalStats() {

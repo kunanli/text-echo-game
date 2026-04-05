@@ -131,12 +131,14 @@ document.querySelectorAll('.lang-btn').forEach(function(btn) {
   btn.addEventListener('click', function() {
     state.lang = btn.dataset.lang;
     applyLang();
-    // NG+ bonus stat points
+    // NG+ bonus stat points from banked conversion
     if (_ngPlusMode) {
-      ngPlusAllocBonus = 3;
-      // Show NG+ indicator on character creation
+      ngPlusAllocBonus = (typeof globalStats !== 'undefined' && globalStats.bankedPoints > 0)
+        ? globalStats.bankedPoints : 3;
       var label = document.getElementById('label-stat-alloc');
-      if (label) label.textContent = state.lang === 'en' ? 'STATS  [NG+ BONUS: +3]' : '能 力 分 配  [NG+ 加成：+3]';
+      if (label) label.textContent = state.lang === 'en'
+        ? 'STATS  [NG+ BONUS: +' + ngPlusAllocBonus + ']'
+        : '能 力 分 配  [NG+ 加成：+' + ngPlusAllocBonus + ']';
     } else {
       ngPlusAllocBonus = 0;
     }

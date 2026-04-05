@@ -1787,20 +1787,55 @@ registerNode('r3_epilogue', () => {
     steps.push({ tag: '系統', tagColor: 'tag-system', html: renderStatsSummary(), delay: 800 });
   }
 
+  // Calculate banked points for NG+ conversion preview
+  var banked = typeof calculateBankedPoints === 'function' ? calculateBankedPoints() : 0;
+  var statBonus = (state.str + state.agi + state.wil) - 9;
+  var levelBonus = Math.max(0, state.level - 5);
+
+  var ngHintHtml = L(
+    '<br>══ NEW GAME+ 能力轉換 ══<br>' +
+    '能力加點：' + statBonus + '（力量' + state.str + ' + 敏捷' + state.agi + ' + 意志' + state.wil + ' − 基礎9）<br>' +
+    '等級獎勵：' + levelBonus + '（Lv.' + state.level + (state.level > 5 ? '，超過5級每級+1' : '，5級以上才有獎勵') + '）<br>' +
+    '<b>下次開局可用點數：' + banked + '</b><br>' +
+    '<span style="opacity:.6">你也可以留在這個世界，前往冥河挑戰更深處。</span>',
+    '<br>══ NG+ STAT CONVERSION ══<br>' +
+    'Stat bonus: ' + statBonus + ' (STR' + state.str + ' + AGI' + state.agi + ' + WIL' + state.wil + ' − base 9)<br>' +
+    'Level bonus: ' + levelBonus + ' (Lv.' + state.level + (state.level > 5 ? ', +1 per level above 5' : ', requires Lv.6+') + ')<br>' +
+    '<b>Next run bonus points: ' + banked + '</b><br>' +
+    '<span style="opacity:.6">Or stay in this world and challenge the Styx for deeper depths.</span>'
+  );
+  steps.push({ tag: '系統', tagColor: 'tag-system', html: ngHintHtml, delay: 1500 });
+
+  var convertLabel = L(
+    'NEW GAME+（轉換能力點：+' + banked + '）',
+    'NEW GAME+ (Convert points: +' + banked + ')'
+  );
+  var convertDetail = L(
+    '能力加點 ' + statBonus + ' + 等級獎勵 ' + levelBonus + ' = ' + banked + ' 點已儲存！',
+    'Stat bonus ' + statBonus + ' + Level bonus ' + levelBonus + ' = ' + banked + ' pts banked!'
+  );
+
   autoExplore(steps, [
     { text: '分享結局卡', textEn: 'Share Ending Card', action: function() {
       if (typeof showEndCard === 'function') showEndCard();
+    }},
+    { text: convertLabel, action: function() {
+      // Bank points: keep the best conversion across runs
+      if (typeof globalStats !== 'undefined') {
+        globalStats.bankedPoints = Math.max(globalStats.bankedPoints || 0, banked);
+        saveGlobalStats();
+      }
+      notify(convertDetail);
+      deleteSave();
+      try { localStorage.setItem('petriabyss_ngplus_pending', '1'); } catch(e) {}
+      location.reload();
+    }},
+    { text: L('繼續探索（挑戰冥河）', 'Continue exploring (Challenge the Styx)'), action: function() {
+      loadNode('r3_look');
     }},
     { text: '回到標題畫面', textEn: 'Return to title screen', action: () => {
       deleteSave();
       location.reload();
     }},
-    { text: 'NEW GAME+（帶著記憶重新開始）', textEn: 'NEW GAME+ (Start over with memories)', action: () => {
-      deleteSave();
-      // Set flag so title screen auto-enters NG+ mode
-      try { localStorage.setItem('petriabyss_ngplus_pending', '1'); } catch(e) {}
-      location.reload();
-    }},
-    { text: '留在河城（自由探索）', textEn: 'Stay in River City (free explore)', action: () => loadNode('r3_look') },
   ], { label: L('尾聲', 'Epilogue') });
 });

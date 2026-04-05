@@ -229,3 +229,12 @@ function checkLabel(text, textEn, stat, dc) {
   var label = state.lang === 'en' ? textEn : text;
   return label + ' [' + name + ' DC' + dc + ' — ' + rate + '%]';
 }
+
+// Calculate NG+ banked points from current run stats
+// Stat bonus: earned points above base (3+3+3=9)
+// Level bonus: each level above 5 gives +1
+function calculateBankedPoints() {
+  var statBonus = (state.str + state.agi + state.wil) - 9;
+  var levelBonus = Math.max(0, state.level - 5);
+  return Math.max(0, statBonus + levelBonus);
+}
