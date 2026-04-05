@@ -146,6 +146,9 @@ registerNode('r2_look', () => {
     if (state.flags.r2MachineCore) {
       c.push({ text: '前往上升通道', textEn: 'Go to the ascent shaft', action: () => loadNode('r2_gate') });
     }
+    if (state.flags.r2ChengAwake || hasItem(L('古代密道通行碼', 'Ancient Passage Code'))) {
+      c.push({ text: '⚙ 前往古代密道', textEn: '⚙ Go to the ancient passage', action: () => loadNode('r2_ancient_tunnel') });
+    }
     if (state.flags.r2YingArrived) {
       c.push({ text: '找螢', textEn: 'Find Ying', action: () => loadNode('r2_ying_talk') });
     }
@@ -645,11 +648,26 @@ registerNode('r2_camp', () => {
     steps.push({ tag: '情報', tagColor: 'tag-info', text: '「上升通道被石化巨獸堵住了。我們一直在想辦法清除牠，但那東西太強了。」', textEn: '"The ascent shaft is blocked by a petrified colossus. We\'ve been trying to clear it, but that thing is too strong."', delay: 3000 });
     steps.push({ tag: '情報', tagColor: 'tag-info', text: '「如果你要向上走——我們可以幫你。但你也得幫我們。」', textEn: '"If you want to go up — we can help you. But you\'ll need to help us too."', delay: 2500 });
   } else {
-    steps.push({ tag: '探索', tagColor: 'tag-explore', text: '你回到了倖存者營地。營火依舊燃燒著，鐵霜向你點了點頭。', textEn: 'You return to the survivor camp. The campfire still burns. Iron Frost nods at you.', delay: 2000 });
+    if (state.flags.r2BossSpared && !state.flags.r2ReunionSeen) {
+      steps.push({ tag: '感知', tagColor: 'tag-sense', text: '你回到營地——氣氛和之前完全不同了。營火旁圍滿了人，有人在低聲祈禱。', textEn: 'You return to camp — the atmosphere is completely different. People crowd the campfire, some praying softly.', delay: 2500 });
+      steps.push({ tag: '感知', tagColor: 'tag-sense', text: '有人朝你跑來：「英雄回來了！」「你救了他！你真的把他救回來了！」', textEn: 'Someone runs to you: "The hero is back!" "You saved him! You actually brought him back!"', delay: 2800 });
+    } else if (state.flags.r2ChengAwake) {
+      steps.push({ tag: '探索', tagColor: 'tag-explore', text: '你回到了倖存者營地。營火依舊燃燒著，氣氛比以前溫暖了許多——承鋼的歸來改變了一切。', textEn: 'You return to the survivor camp. The campfire burns warmly — Cheng Gang\'s return has changed everything.', delay: 2200 });
+    } else if (state.flags.r2BossSpared) {
+      steps.push({ tag: '探索', tagColor: 'tag-explore', text: '你回到了倖存者營地。承鋼還在昏迷中，鐵霜一直守在他身邊。', textEn: 'You return to the survivor camp. Cheng Gang is still unconscious, Iron Frost keeping vigil.', delay: 2200 });
+    } else {
+      steps.push({ tag: '探索', tagColor: 'tag-explore', text: '你回到了倖存者營地。營火依舊燃燒著，鐵霜向你點了點頭。', textEn: 'You return to the survivor camp. The campfire still burns. Iron Frost nods at you.', delay: 2000 });
+    }
   }
   autoExplore(steps, (function() {
     var c = [];
-    c.push({ text: '和鐵霜說話', textEn: 'Talk to Iron Frost', action: () => loadNode('r2_camp_chief') });
+    if (state.flags.r2BossSpared && !state.flags.r2ReunionSeen) {
+      c.push({ text: '去看鐵霜和被救出的男人', textEn: 'Visit Iron Frost and the rescued man', action: () => loadNode('r2_camp_chief') });
+    } else if (state.flags.r2BossSpared && state.flags.r2ReunionSeen && !state.flags.r2ChengAwake) {
+      c.push({ text: '看看承鋼醒了沒有', textEn: 'Check if Cheng Gang is awake', action: () => loadNode('r2_camp_chief') });
+    } else {
+      c.push({ text: '和鐵霜說話', textEn: 'Talk to Iron Frost', action: () => loadNode('r2_camp_chief') });
+    }
     c.push({ text: '找鐵匠', textEn: 'Visit the blacksmith', action: () => loadNode('r2_camp_smith') });
     c.push({ text: '找醫師', textEn: 'Visit the medic', action: () => loadNode('r2_camp_medic') });
     if (state.flags.r2YingArrived) {
@@ -667,6 +685,113 @@ registerNode('r2_camp', () => {
 // ── Camp NPCs ──
 registerNode('r2_camp_chief', () => {
   var steps = [];
+
+  // ── Phase 1: First reunion — Iron Frost tenderly caring for unconscious man ──
+  if (state.flags.r2BossSpared && !state.flags.r2ReunionSeen) {
+    state.flags.r2ReunionSeen = true;
+    steps.push({ art: `<pre class="ascii-art gold">
+      ˚  ·  ˚  重逢  ˚  ·  ˚
+
+          ╱─────────╲
+         │  ◉     ◉  │
+         │  ─══════─  │      ╱───────╲
+         │   ╲▽▽▽╱   │     │ ─   ─  │
+          ╲─────────╱      │  ───   │
+  █████████│         │      │  ╲─╱   │
+ ██████████├────╮╭───┤      ╲───────╱
+ ██████████│    ││   │──────│       │
+  █████████│    ╰╯   │      │  ░░░  │
+    ·█·█·█·│  ╭────╮ │      │  ░░░  │
+     鐵 霜  │  │ 他 │ │       昏迷中
+             ╰──────╯
+</pre>`, artEn: `<pre class="ascii-art gold">
+      ˚  ·  ˚  Reunion  ˚  ·  ˚
+
+          ╱─────────╲
+         │  ◉     ◉  │
+         │  ─══════─  │      ╱───────╲
+         │   ╲▽▽▽╱   │     │ ─   ─  │
+          ╲─────────╱      │  ───   │
+  █████████│         │      │  ╲─╱   │
+ ██████████├────╮╭───┤      ╲───────╱
+ ██████████│    ││   │──────│       │
+  █████████│    ╰╯   │      │  ░░░  │
+    ·█·█·█·│  ╭────╮ │      │  ░░░  │
+   Iron     │  │Him │ │    Unconscious
+   Frost     ╰──────╯
+</pre>`, delay: 800 });
+    steps.push({ tag: '感知', tagColor: 'tag-sense', html: '你走進鐵霜的帳篷——她正跪在一張行軍床邊。床上躺著一個瘦弱的男人，身上裹著毛毯，雙眼緊閉，臉色蒼白如紙。', htmlEn: 'You enter Iron Frost\'s tent — she kneels beside a cot. A frail man lies wrapped in blankets, eyes shut, face white as paper.', delay: 2800 });
+    steps.push({ tag: '感知', tagColor: 'tag-sense', text: '鐵霜沒有回頭。她的石化左手輕輕捧著男人的手，粗糙的石指與他骨瘦的手指交纏在一起。', textEn: 'Iron Frost doesn\'t look back. Her petrified left hand gently cradles the man\'s hand, rough stone fingers intertwined with his gaunt ones.', delay: 3000 });
+    steps.push({ tag: '感知', tagColor: 'tag-sense', text: '她的右手沾著藥膏，正一寸一寸地塗在他手臂上殘留的石化紋路上。每一下都很慢，像是怕弄碎什麼。', textEn: 'Her right hand, smeared with salve, traces the residual petrification lines on his arm. Each stroke is slow, as if afraid of breaking something.', delay: 3200 });
+    steps.push({ tag: '情報', tagColor: 'tag-info', html: '「……他叫<b>承鋼</b>。」鐵霜的聲音很輕，像是怕吵醒他。「三號戰甲的駕駛員。」', htmlEn: '"...His name is <b>Cheng Gang</b>." Iron Frost\'s voice is barely a whisper, afraid to wake him. "Pilot of Mech Unit No.3."', delay: 3000 });
+    steps.push({ tag: '感知', tagColor: 'tag-sense', text: '她低頭，額頭輕輕靠在男人的手背上。那個動作太過私密——你幾乎覺得不該看到。', textEn: 'She lowers her head, resting her forehead against the back of his hand. The gesture is so intimate — you feel you shouldn\'t be watching.', delay: 3000 });
+    steps.push({ tag: '情報', tagColor: 'tag-info', text: '「三年了。」她的肩膀微微發抖。「三年來，每次路過那條通道，我都能聽到他在裡面哭。」', textEn: '"Three years." Her shoulders tremble. "For three years, every time I passed that shaft, I could hear him crying inside."', delay: 3200 });
+    steps.push({ tag: '情報', tagColor: 'tag-info', text: '「所有人都說他已經死了，那只是石化巨獸的回聲。但我知道不是——」', textEn: '"Everyone said he was dead, that it was just the colossus echoing. But I knew it wasn\'t—"', delay: 2800 });
+    steps.push({ tag: '感知', tagColor: 'tag-sense', text: '她用石化的指尖輕輕撥開男人額前的頭髮。那隻能劈碎岩石的手，此刻溫柔得像在觸碰蝴蝶的翅膀。', textEn: 'She brushes the hair from his forehead with her petrified fingertips. The hand that can shatter rock now moves as gently as touching butterfly wings.', delay: 3200 });
+    steps.push({ tag: '情報', tagColor: 'tag-info', text: '「他的體溫在回來了。」鐵霜終於抬頭看你——這個鐵一般的女人，臉上滿是淚痕。', textEn: '"His warmth is returning." Iron Frost finally looks at you — this iron woman, her face streaked with tears.', delay: 3000 });
+    steps.push({ tag: '情報', tagColor: 'tag-info', html: '「你沒有殺死他。你<b>把他喚醒了</b>。」她深吸一口氣。「這份恩情——我不知道該怎麼還。」', htmlEn: '"You didn\'t kill him. You <b>awakened him</b>." She takes a deep breath. "This debt — I don\'t know how to repay."', delay: 3500 });
+    steps.push({ tag: '感知', tagColor: 'tag-sense', text: '男人在昏迷中發出了一聲低吟。鐵霜立刻回過頭，用手指撫過他的嘴唇——像是在確認那一聲是真的。', textEn: 'The man lets out a soft moan in his sleep. Iron Frost immediately turns back, fingers brushing his lips — as if confirming that sound was real.', delay: 3000 });
+    steps.push({ tag: '情報', tagColor: 'tag-info', text: '「他還需要休息。」她輕聲說，聲音裡帶著久違的柔軟。「過一段時間再來吧——等他醒了。」', textEn: '"He needs rest." She whispers, her voice carrying a softness long forgotten. "Come back later — when he wakes."', delay: 3000 });
+
+    autoExplore(steps, [
+      { text: '（悄悄離開帳篷）', textEn: '(Quietly leave the tent)', action: () => loadNode('r2_camp') },
+    ], { label: L('重逢', 'Reunion') });
+    return;
+  }
+
+  // ── Phase 2: Return later — Cheng Gang awakens, gives passcode ──
+  if (state.flags.r2BossSpared && state.flags.r2ReunionSeen && !state.flags.r2ChengAwake) {
+    state.flags.r2ChengAwake = true;
+    steps.push({ art: `<pre class="ascii-art gold">
+      ˚  ·  ˚  甦醒  ˚  ·  ˚
+
+          ╱─────────╲
+         │  ◉     ◉  │       ╱───────╲
+         │  ─══════─  │     │ ◦   ◦  │
+         │   ╲═══╱   │     │  ═══   │
+          ╲─────────╱      │  ╲▽╱   │
+  █████████│         │      ╲───────╱
+ ██████████├─────────┤──────│       │
+ ██████████│ ░░░░░░░ │      │  ╱╲   │
+  █████████│ ░░░░░░░ │      │ ╱  ╲  │
+    ·█·█·█·│         │      │╱    ╲ │
+     鐵 霜              承鋼（已甦醒）
+</pre>`, artEn: `<pre class="ascii-art gold">
+      ˚  ·  ˚  Awakening  ˚  ·  ˚
+
+          ╱─────────╲
+         │  ◉     ◉  │       ╱───────╲
+         │  ─══════─  │     │ ◦   ◦  │
+         │   ╲═══╱   │     │  ═══   │
+          ╲─────────╱      │  ╲▽╱   │
+  █████████│         │      ╲───────╱
+ ██████████├─────────┤──────│       │
+ ██████████│ ░░░░░░░ │      │  ╱╲   │
+  █████████│ ░░░░░░░ │      │ ╱  ╲  │
+    ·█·█·█·│         │      │╱    ╲ │
+   Iron Frost        Cheng Gang (Awake)
+</pre>`, delay: 800 });
+    steps.push({ tag: '感知', tagColor: 'tag-sense', text: '你掀開帳篷——承鋼半坐在床上，背後靠著捲起的毛毯。他的眼睛睜開了，雖然依舊虛弱，但目光清明。', textEn: 'You lift the tent flap — Cheng Gang sits propped up in bed, blankets rolled behind him. His eyes are open, weak but lucid.', delay: 2800 });
+    steps.push({ tag: '感知', tagColor: 'tag-sense', text: '鐵霜站在旁邊，手裡端著一碗清水。她看見你進來，難得地露出了一個笑容。', textEn: 'Iron Frost stands beside him, holding a bowl of water. She sees you enter and, for once, smiles.', delay: 2500 });
+    steps.push({ tag: '情報', tagColor: 'tag-info', html: '承鋼看向你，聲音沙啞：「……你就是那個用共鳴把我喚回來的人？」', htmlEn: 'Cheng Gang looks at you, voice hoarse: "...You\'re the one who used resonance to call me back?"', delay: 2800 });
+    steps.push({ tag: '情報', tagColor: 'tag-info', text: '「我在石頭裡面……做了三年的噩夢。」他低下頭，瘦削的手微微發抖。「我以為永遠出不來了。」', textEn: '"I was trapped in stone... three years of nightmares." He lowers his head, thin hands trembling. "I thought I\'d never get out."', delay: 3200 });
+    steps.push({ tag: '感知', tagColor: 'tag-sense', text: '鐵霜走過去把水碗放到他手中，石化的手指在他手背上停留了一瞬——但很快收回。', textEn: 'Iron Frost walks over and places the bowl in his hands, her petrified fingers lingering on his knuckles for a moment — then quickly withdrawing.', delay: 2800 });
+    steps.push({ tag: '情報', tagColor: 'tag-info', html: '承鋼喝了一口水，然後看著你：「鐵霜告訴我你需要往上走。我有一個東西——也許能幫到你。」', htmlEn: 'Cheng Gang takes a sip, then looks at you: "Iron Frost told me you need to go up. I have something — it might help."', delay: 3000 });
+    steps.push({ tag: '情報', tagColor: 'tag-info', html: '「被石化之前，我一直在探索採石場西側的<b>古代遺跡</b>。那裡有一條通道——是石化瘟疫爆發前的文明留下的。」', htmlEn: '"Before I was petrified, I explored the <b>ancient ruins</b> on the quarry\'s west side. There\'s a passage there — left by the civilization before the petrification plague."', delay: 3500 });
+    steps.push({ tag: '情報', tagColor: 'tag-info', text: '「通道入口有一扇刻著齒輪紋樣的石門。需要輸入通行密碼才能開啟。」', textEn: '"The passage entrance has a stone door carved with gear patterns. It requires a passcode to open."', delay: 2800 });
+    steps.push({ tag: '情報', tagColor: 'tag-info', html: '他湊近你，壓低了聲音：「密碼是——<b>『巨神之眼』</b>。在門前的符文板上按照齒輪的順序輸入就行。」', htmlEn: 'He leans closer, lowering his voice: "The passcode is — <b>\'Eye of the Colossus\'</b>. Enter it on the rune panel at the door, following the gear sequence."', delay: 3500 });
+    steps.push({ tag: '物品', tagColor: 'tag-item', text: '「裡面有很多古代的東西……我沒來得及探索完。也許——你能發現石化瘟疫的真相。」', textEn: '"Inside are many ancient things... I never finished exploring. Perhaps — you\'ll uncover the truth about the petrification plague."', delay: 3000,
+      effect: function() { addItem(L('古代密道通行碼', 'Ancient Passage Code')); sfx.item(); notify(L('獲得「古代密道通行碼」', 'Obtained "Ancient Passage Code"')); }
+    });
+    steps.push({ tag: '感知', tagColor: 'tag-sense', text: '鐵霜站在一旁，石化的手臂環在胸前。她看著承鋼的眼神——你第一次在那雙鐵灰色的眼睛裡看到了柔光。', textEn: 'Iron Frost stands beside them, petrified arm crossed over her chest. The way she looks at Cheng Gang — for the first time, you see softness in those iron-grey eyes.', delay: 3000 });
+    steps.push({ tag: '情報', tagColor: 'tag-info', text: '「去吧。」鐵霜說。「密道入口在採石場西側的岩壁上。小心裡面的東西——那些古代防禦系統可能還在運作。」', textEn: '"Go." Iron Frost says. "The passage is on the quarry\'s west wall. Be careful — the ancient defense systems may still be active."', delay: 3000 });
+
+    autoExplore(steps, [
+      { text: '返回營地', textEn: 'Return to camp', action: () => loadNode('r2_camp') },
+    ], { label: L('承鋼甦醒', 'Cheng Gang Awakens') });
+    return;
+  }
+
   if (!state.flags.r2ChiefTalked) {
     state.flags.r2ChiefTalked = true;
     steps.push({ art: `<pre class="ascii-art">
@@ -705,12 +830,18 @@ registerNode('r2_camp_chief', () => {
     steps.push({ tag: '情報', tagColor: 'tag-info', text: '「我們原本有五十人。現在……只剩十二個。」', textEn: '"We started with fifty. Now... only twelve remain."', delay: 2500 });
     steps.push({ tag: '情報', tagColor: 'tag-info', text: '「上升通道是通往地表的唯一出路。但通道入口被一隻石化巨獸盤踞著。」', textEn: '"The ascent shaft is the only way to the surface. But a Petrified Colossus guards the entrance."', delay: 2800 });
     steps.push({ tag: '情報', tagColor: 'tag-info', html: '「那東西曾是我們的同伴——<b>第三號戰甲的駕駛員</b>。他和機甲一起被石化了，變成了怪物。」', htmlEn: '"That thing was once one of us — <b>the pilot of Mech Unit No.3</b>. He and the mech petrified together, becoming a monster."', delay: 3000 });
+  } else if (state.flags.r2ChengAwake) {
+    steps.push({ tag: '情報', tagColor: 'tag-info', text: '承鋼靠在床上，鐵霜坐在旁邊幫他換藥。看見你進來，兩人都抬起了頭。', textEn: 'Cheng Gang leans in bed while Iron Frost changes his dressings. Both look up as you enter.', delay: 2500 });
+    steps.push({ tag: '感知', tagColor: 'tag-sense', text: '承鋼朝你點了點頭：「找到密道了嗎？小心裡面。」', textEn: 'Cheng Gang nods at you: "Found the passage? Be careful in there."', delay: 2000 });
+  } else if (state.flags.r2BossSpared) {
+    steps.push({ tag: '情報', tagColor: 'tag-info', text: '鐵霜跪在床邊，正在給承鋼擦身。男人仍在昏迷中，但臉色比之前好了一些。', textEn: 'Iron Frost kneels by the bed, wiping Cheng Gang down. He\'s still unconscious, but his color looks better.', delay: 2500 });
+    steps.push({ tag: '感知', tagColor: 'tag-sense', text: '她頭也不回地說：「他還沒醒。再等等吧。」', textEn: 'Without turning, she says: "He hasn\'t woken yet. Give it more time."', delay: 2200 });
   } else {
     steps.push({ tag: '情報', tagColor: 'tag-info', text: '鐵霜看著營火：「準備好了就告訴我。我們會一起面對那頭巨獸。」', textEn: 'Iron Frost gazes at the fire: "Tell me when you\'re ready. We\'ll face that colossus together."', delay: 2500 });
   }
   autoExplore(steps, (function() {
     var c = [];
-    if (state.flags.r2MachineCore) {
+    if (state.flags.r2MachineCore && !state.flags.r2BossDefeated) {
       c.push({ text: '「我準備好了，一起去挑戰巨獸。」', textEn: '"I\'m ready. Let\'s challenge the colossus."', action: () => loadNode('r2_boss_prep') });
     }
     c.push({ text: '返回營地', textEn: 'Return to camp', action: () => loadNode('r2_camp') });
@@ -1085,6 +1216,9 @@ registerNode('r2_boss', () => {
       startCombat(BOSS, function() {
         // Victory
         state.flags.r2BossDefeated = true;
+        if (state.flags._lastCombatSpared) {
+          state.flags.r2BossSpared = true;
+        }
         loadNode('r2_gate');
       }, function() {
         // Flee
@@ -1124,21 +1258,45 @@ registerNode('r2_gate', () => {
   ║        ◇ Gate Opened ◇      ║
   ╚═══════════════════════════════╝
 </pre>`, delay: 800 },
-      { tag: '環境', tagColor: 'tag-system', text: '石化巨像已經倒下。通往上升通道的路終於暢通了。', textEn: 'The Petrified Colossus has fallen. The path to the ascent shaft is finally clear.', delay: 2000 },
+      { tag: '環境', tagColor: 'tag-system',
+        text: state.flags.r2BossSpared
+          ? '石化巨像的殘骸散落在通道前。那個困在裡面的男人已經被安全救出。'
+          : '石化巨像已經倒下。通往上升通道的路終於暢通了。',
+        textEn: state.flags.r2BossSpared
+          ? 'The colossus\'s remains lie scattered before the shaft. The man trapped within has been safely rescued.'
+          : 'The Petrified Colossus has fallen. The path to the ascent shaft is finally clear.',
+        delay: 2000 },
       { tag: '行動', tagColor: 'tag-move', text: '你將機甲控制鍵插入通道閘門的控制台。', textEn: 'You insert the mech control key into the shaft gate\'s control panel.', delay: 2200 },
       { tag: '環境', tagColor: 'tag-system', text: '齒輪轉動的聲音在岩壁中迴盪——厚重的金屬閘門緩緩升起。', textEn: 'Gears grind within the rock — the heavy metal gate slowly rises.', delay: 2500 },
       { tag: '感知', tagColor: 'tag-sense', text: '閘門後是一條向上延伸的斜坡隧道。你能感覺到……來自上方的風。', textEn: 'Beyond the gate, a sloped tunnel ascends. You can feel... wind from above.', delay: 2500 },
-      { tag: '情報', tagColor: 'tag-info', html: '鐵霜拍了拍你的肩膀：「前面就是<b>河城渡口</b>——地底世界的交通樞紐。如果還有人類社會存在的話，就在那裡。」', htmlEn: 'Iron Frost pats your shoulder: "Ahead lies the <b>River City Ferry</b> — the underground world\'s transport hub. If human society still exists, it\'s there."', delay: 3000 },
-      { tag: '情報', tagColor: 'tag-info', text: '「我會帶大家跟上來的。你先走吧——路上小心。」', textEn: '"I\'ll bring everyone along. Go ahead — be careful."', delay: 2500 },
-    ], [
-      { text: '踏入上升通道，前往河城渡口', textEn: 'Enter the shaft, head for River City Ferry', action: () => {
+      { tag: '情報', tagColor: 'tag-info', html: state.flags.r2BossSpared
+        ? '鐵霜的眼眶還是紅的，但她的語氣堅定：「前面就是<b>河城渡口</b>——地底世界的交通樞紐。你去吧。承鋼……我會照顧好他的。」'
+        : '鐵霜拍了拍你的肩膀：「前面就是<b>河城渡口</b>——地底世界的交通樞紐。如果還有人類社會存在的話，就在那裡。」',
+        htmlEn: state.flags.r2BossSpared
+        ? 'Iron Frost\'s eyes are still red, but her voice is firm: "Ahead lies the <b>River City Ferry</b> — the underground world\'s transport hub. Go. Cheng Gang... I\'ll take care of him."'
+        : 'Iron Frost pats your shoulder: "Ahead lies the <b>River City Ferry</b> — the underground world\'s transport hub. If human society still exists, it\'s there."',
+        delay: 3000 },
+      { tag: '情報', tagColor: 'tag-info', text: state.flags.r2BossSpared
+        ? '「謝謝你——真的。」她的聲音微微發顫。「我會帶大家跟上來的。」'
+        : '「我會帶大家跟上來的。你先走吧——路上小心。」',
+        textEn: state.flags.r2BossSpared
+        ? '"Thank you — truly." Her voice trembles slightly. "I\'ll bring everyone along."'
+        : '"I\'ll bring everyone along. Go ahead — be careful."',
+        delay: 2500 },
+    ], (function() {
+      var c = [];
+      if (state.flags.r2BossSpared) {
+        c.push({ text: '先回營地看看承鋼的情況', textEn: 'Return to camp to check on Cheng Gang first', action: () => loadNode('r2_camp') });
+      }
+      c.push({ text: '踏入上升通道，前往河城渡口', textEn: 'Enter the shaft, head for River City Ferry', action: () => {
         changeHp(25);
         changePetri(-8);
         notify(L('HP +25，石化度 -8%', 'HP +25, Petri -8%'));
         loadNode('r3_start');
-      }},
-      { text: '留下來做最後的準備', textEn: 'Stay to make final preparations', action: () => loadNode('r2_look') },
-    ], { label: L('開啟上升通道', 'Opening ascent shaft') });
+      }});
+      c.push({ text: '留下來做最後的準備', textEn: 'Stay to make final preparations', action: () => loadNode('r2_look') });
+      return c;
+    })(), { label: L('開啟上升通道', 'Opening ascent shaft') });
   } else {
     autoExplore([
       { art: `<pre class="ascii-art red">
@@ -1784,4 +1942,163 @@ registerNode('r2_patrol', () => {
     { text: '開始巡邏', textEn: 'Begin patrol', action: () => startPatrol() },
     { text: '返回', textEn: 'Return', action: () => loadNode('r2_look') },
   ], { label: L('準備巡邏', 'Preparing patrol') });
+});
+
+// ═══════════════════════════════════════════════════
+//  Ancient Science Passage — 古代科學密道
+//  (Unlocked by sparing the Colossus boss + Cheng Gang's passcode)
+// ═══════════════════════════════════════════════════
+
+registerNode('r2_ancient_tunnel', () => {
+  var hasCode = hasItem(L('古代密道通行碼', 'Ancient Passage Code'));
+
+  // ── No passcode yet ──
+  if (!hasCode) {
+    autoExplore([
+      { art: `<pre class="ascii-art">
+  ════════════════════════════════════
+       ╔═══╗     ╔═══╗     ╔═══╗
+       ║ ⚙ ║─────║ ⚙ ║─────║ ⚙ ║
+       ╚═══╝     ╚═══╝     ╚═══╝
+       │                         │
+       │   ╔═══════════════╗     │
+       │   ║               ║     │
+       │   ║   ◇ ◇ ◇ ◇   ║     │
+       │   ║   符文密碼鎖   ║     │
+       │   ║               ║     │
+       │   ╚═══════════════╝     │
+       │          ✖ 鎖定          │
+  ════════════════════════════════════
+</pre>`, artEn: `<pre class="ascii-art">
+  ════════════════════════════════════
+       ╔═══╗     ╔═══╗     ╔═══╗
+       ║ ⚙ ║─────║ ⚙ ║─────║ ⚙ ║
+       ╚═══╝     ╚═══╝     ╚═══╝
+       │                         │
+       │   ╔═══════════════╗     │
+       │   ║               ║     │
+       │   ║   ◇ ◇ ◇ ◇   ║     │
+       │   ║   Rune  Lock  ║     │
+       │   ║               ║     │
+       │   ╚═══════════════╝     │
+       │        ✖ Locked          │
+  ════════════════════════════════════
+</pre>`, delay: 800 },
+      { tag: '探索', tagColor: 'tag-explore', text: '採石場西側的岩壁上，你找到了一面刻滿齒輪紋樣的石門。門上有一個符文密碼鎖。', textEn: 'On the quarry\'s west wall, you find a stone door carved with gear patterns. A rune-based code lock is set into it.', delay: 2500 },
+      { tag: '感知', tagColor: 'tag-sense', text: '你試著觸摸符文板——上面的符號微微發光，但你不知道正確的密碼。', textEn: 'You try touching the rune panel — the symbols glow faintly, but you don\'t know the correct code.', delay: 2200 },
+      { tag: '環境', tagColor: 'tag-system', text: '也許有人知道這扇門的秘密。', textEn: 'Perhaps someone knows this door\'s secret.', delay: 1800 },
+    ], [
+      { text: '返回', textEn: 'Return', action: () => loadNode('r2_look') },
+    ], { label: L('古代石門', 'Ancient stone door') });
+    return;
+  }
+
+  // ── Have passcode — enter the tunnel ──
+  if (!state.flags.r2TunnelVisited) {
+    state.flags.r2TunnelVisited = true;
+    autoExplore([
+      { art: `<pre class="ascii-art gold">
+  ════════════════════════════════════
+       ╔═══╗     ╔═══╗     ╔═══╗
+       ║ ⚙ ║─────║ ⚙ ║─────║ ⚙ ║
+       ╚═══╝     ╚═══╝     ╚═══╝
+       │                         │
+       │   ╔═══════════════╗     │
+       │   ║  ✦ 巨神之眼 ✦ ║     │
+       │   ║               ║     │
+       │   ║   ◆ ◆ ◆ ◆   ║     │
+       │   ║   密碼正確！   ║     │
+       │   ╚═══════════════╝     │
+       │        ◇ 開啟中 ◇        │
+  ════════════════════════════════════
+</pre>`, artEn: `<pre class="ascii-art gold">
+  ════════════════════════════════════
+       ╔═══╗     ╔═══╗     ╔═══╗
+       ║ ⚙ ║─────║ ⚙ ║─────║ ⚙ ║
+       ╚═══╝     ╚═══╝     ╚═══╝
+       │                         │
+       │   ╔═══════════════╗     │
+       │   ║ ✦ Eye of the  ║     │
+       │   ║   Colossus ✦  ║     │
+       │   ║   ◆ ◆ ◆ ◆   ║     │
+       │   ║  Code Accepted ║     │
+       │   ╚═══════════════╝     │
+       │       ◇ Opening ◇       │
+  ════════════════════════════════════
+</pre>`, delay: 800 },
+      { tag: '行動', tagColor: 'tag-move', text: '你在符文板上按照承鋼教的順序輸入密碼——「巨神之眼」。', textEn: 'You enter the passcode on the rune panel in the sequence Cheng Gang taught — "Eye of the Colossus."', delay: 2500 },
+      { tag: '環境', tagColor: 'tag-system', text: '齒輪紋樣開始轉動，石門發出沉重的嗡鳴聲。塵封千年的機關緩緩啟動。', textEn: 'The gear patterns begin to turn, the stone door emitting a deep hum. Mechanisms sealed for millennia slowly awaken.', delay: 2800 },
+      { tag: '環境', tagColor: 'tag-system', text: '石門向兩側滑開——露出一條向下延伸的金屬走廊。牆壁上的古代照明裝置逐一亮起，散發出柔和的藍光。', textEn: 'The door slides apart — revealing a metal corridor descending downward. Ancient lighting panels flicker on one by one, casting soft blue light.', delay: 3000 },
+      { tag: '感知', tagColor: 'tag-sense', text: '空氣乾燥而純淨——和採石場的潮濕完全不同。這裡被完美地密封了不知多少年。', textEn: 'The air is dry and clean — nothing like the quarry\'s humidity. This place has been perfectly sealed for untold years.', delay: 2500 },
+      { art: `<pre class="ascii-art cyan">
+  ╔═════════════════════════════════════╗
+  ║                                     ║
+  ║   ┌──┐  ┌──┐  ┌──┐  ┌──┐  ┌──┐  ║
+  ║   │⚙│──│⚙│──│⚙│──│⚙│──│⚙│  ║
+  ║   └──┘  └──┘  └──┘  └──┘  └──┘  ║
+  ║   │     │     │     │     │      ║
+  ║   ◇ 石化瘟疫研究紀錄 ◇            ║
+  ║                                     ║
+  ║   ╔════╗  ╔════╗  ╔════╗          ║
+  ║   ║ 樣 ║  ║ 基 ║  ║ 報 ║          ║
+  ║   ║ 本 ║  ║ 因 ║  ║ 告 ║          ║
+  ║   ╚════╝  ╚════╝  ╚════╝          ║
+  ║              ·✦·                    ║
+  ╚═════════════════════════════════════╝
+</pre>`, artEn: `<pre class="ascii-art cyan">
+  ╔═════════════════════════════════════╗
+  ║                                     ║
+  ║   ┌──┐  ┌──┐  ┌──┐  ┌──┐  ┌──┐  ║
+  ║   │⚙│──│⚙│──│⚙│──│⚙│──│⚙│  ║
+  ║   └──┘  └──┘  └──┘  └──┘  └──┘  ║
+  ║   │     │     │     │     │      ║
+  ║   ◇ Petrification Plague Research ◇ ║
+  ║                                     ║
+  ║   ╔════╗  ╔════╗  ╔════╗          ║
+  ║   ║Sam-║  ║Gene║  ║Rep-║          ║
+  ║   ║ples║  ║tic ║  ║ort ║          ║
+  ║   ╚════╝  ╚════╝  ╚════╝          ║
+  ║              ·✦·                    ║
+  ╚═════════════════════════════════════╝
+</pre>`, delay: 800 },
+      { tag: '探索', tagColor: 'tag-explore', html: '走廊盡頭是一間寬敞的<b>古代研究室</b>。圓弧形的天花板上佈滿管線，中央有一座六角形的工作台。', htmlEn: 'The corridor ends in a spacious <b>ancient laboratory</b>. Curved ceilings lined with conduits, a hexagonal workstation at the center.', delay: 2800 },
+      { tag: '探索', tagColor: 'tag-explore', text: '工作台上整齊擺放著密封的玻璃容器——裡面是各種石化樣本。牆壁上的銅板刻滿了研究記錄。', textEn: 'The workstation holds sealed glass containers — petrification samples inside. Copper panels on the walls are covered with research records.', delay: 2800 },
+      { tag: '情報', tagColor: 'tag-info', html: '你仔細閱讀銅板上的記錄：「<b>石化瘟疫並非天然疾病。</b>」', htmlEn: 'You study the copper panel records: "<b>The petrification plague is not a natural disease.</b>"', delay: 3000 },
+      { tag: '情報', tagColor: 'tag-info', text: '「石化因子最初是我們研發的——目的是讓人類的肉體獲得礦物般的耐久性，以適應地底極端環境。」', textEn: '"The petrification factor was originally developed by us — designed to grant human flesh mineral-like durability, adapting to extreme underground conditions."', delay: 3500 },
+      { tag: '情報', tagColor: 'tag-info', text: '「第七代改良株在受試者體內發生了不可控突變。石化不再停止在表皮——它開始侵蝕神經系統。」', textEn: '"The seventh-generation strain mutated uncontrollably in test subjects. Petrification no longer stopped at the epidermis — it began eroding the nervous system."', delay: 3500 },
+      { tag: '警告', tagColor: 'tag-warn', html: '「<b>我們試圖銷毀所有樣本，但為時已晚。</b>石化因子已通過地下水系擴散到了整個深淵。」', htmlEn: '"<b>We attempted to destroy all samples, but it was too late.</b> The petrification factor had spread through the underground water systems to the entire abyss."', delay: 3500 },
+      { tag: '情報', tagColor: 'tag-info', text: '「附錄：解石化的理論可能性存在。關鍵在於……」', textEn: '"Appendix: A theoretical possibility for reversing petrification exists. The key lies in..."', delay: 2500 },
+      { tag: '環境', tagColor: 'tag-system', text: '銅板的最後幾行被刻意抹去了。有人不想讓這個秘密被發現。', textEn: 'The final lines of the copper panel have been deliberately erased. Someone didn\'t want this secret found.', delay: 2500 },
+      { tag: '探索', tagColor: 'tag-explore', text: '工作台下方有一個未被打開的抽屜。你拉開它——裡面是一疊保存完好的古代文件。', textEn: 'Beneath the workstation, an unopened drawer. You pull it open — inside, a stack of perfectly preserved ancient documents.', delay: 2500 },
+      { tag: '物品', tagColor: 'tag-item', html: '文件封面寫著：「<b>石化瘟疫起源報告——機密</b>」。這就是瘟疫的真相。', htmlEn: 'The cover reads: "<b>Petrification Plague Origin Report — CLASSIFIED</b>". This is the truth about the plague.', delay: 3000,
+        effect: function() {
+          addItem(L('瘟疫起源報告', 'Plague Origin Report'));
+          state.flags.r3PlagueProof = true;
+          sfx.item();
+          notify(L('獲得「瘟疫起源報告」— 關鍵證據！', 'Obtained "Plague Origin Report" — Key evidence!'));
+        }
+      },
+      { tag: '感知', tagColor: 'tag-sense', text: '研究室角落還有一個金屬箱。箱蓋上刻著「應急醫療物資」。', textEn: 'In a corner of the lab, a metal crate. Its lid reads "Emergency Medical Supplies."', delay: 2200 },
+      { tag: '物品', tagColor: 'tag-item', text: '你打開箱子——裡面有一瓶古代抗石化藥劑，雖然過了保質期，但成分依然穩定。', textEn: 'You open the crate — inside, a vial of ancient anti-petrification serum. Past its expiry, but the compounds remain stable.', delay: 2500,
+        effect: function() {
+          changePetri(-10);
+          changeStat('wil', 1);
+          sfx.item();
+          notify(L('石化度 -10%，WIL +1', 'Petri -10%, WIL +1'));
+        }
+      },
+      { tag: '感知', tagColor: 'tag-sense', text: '你環顧這間千年前的研究室。這裡的一切——都是一場災難的起點。', textEn: 'You survey this millennia-old laboratory. Everything here — marks the beginning of a catastrophe.', delay: 2500 },
+      { tag: '環境', tagColor: 'tag-system', html: '帶著<b>瘟疫起源報告</b>，你離開了密道。這份證據，也許能改變河城渡口所有人的命運。', htmlEn: 'With the <b>Plague Origin Report</b> in hand, you leave the passage. This evidence may change the fate of everyone at River City Ferry.', delay: 3000 },
+    ], [
+      { text: '返回採石場', textEn: 'Return to the quarry', action: () => loadNode('r2_look') },
+    ], { label: L('古代科學密道', 'Ancient Science Passage') });
+  } else {
+    // ── Already explored ──
+    autoExplore([
+      { tag: '探索', tagColor: 'tag-explore', text: '你回到了古代研究室。銅板上的文字依舊沉默地訴說著真相。', textEn: 'You return to the ancient laboratory. The copper panels still silently tell their truth.', delay: 2000 },
+      { tag: '環境', tagColor: 'tag-system', text: '這裡已經沒有新的發現了。', textEn: 'Nothing new remains to find here.', delay: 1500 },
+    ], [
+      { text: '返回採石場', textEn: 'Return to the quarry', action: () => loadNode('r2_look') },
+    ], { label: L('古代科學密道', 'Ancient Science Passage') });
+  }
 });

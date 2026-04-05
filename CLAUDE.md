@@ -189,6 +189,7 @@ R0 祭獻坑 → R1 石脈迴廊 → R2 大採石場 → R3 河城渡口 → 4 �
 | `r2_ying_promise` | 浪漫 | Boss 前的承諾 | 螢 |
 | `r2_crane` | NPC | 灰鶴再登場——交易 + 吹牛骰 | 灰鶴 |
 | `r2_zhou_trace` | 線索 | 發現老周蹤跡 | — |
+| `r2_ancient_tunnel` | **隱藏** | 古代科學密道（需饒恕 Boss + 承鋼通行碼），獲得瘟疫起源報告 | 承鋼 |
 | `r2_patrol` | 戰鬥 | 採石場巡邏練等 | R2 怪物池 |
 
 ### R3 — 河城渡口（含 4 結局）`region3.js`
@@ -225,7 +226,8 @@ R0 祭獻坑 → R1 石脈迴廊 → R2 大採石場 → R3 河城渡口 → 4 �
 | 螢 Ying | 配合主角 | R1 `r1_ying_encounter` | R1→R2→R3 | 5 | `r1YingCompanion`, `r2YingPromise` |
 | 老周 Old Zhou | 男 | R1 `r1_survivor` | R1→R3 | 3 | `r1SurvivorMet`, `r3ZhouMet` |
 | 灰鶴 Grey Crane | **女** | R1 `r1_wanderer` | R1→R2→R3 | 5 | `r1WandererMet`, `r2CraneMet`, `r3CraneTestimony` |
-| 鐵霜 Iron Frost | 女 | R2 `r2_camp_chief` | R2 | 3 | `r2CampVisited` |
+| 鐵霜 Iron Frost | 女 | R2 `r2_camp_chief` | R2 | 3 | `r2CampVisited`, `r2BossSpared`, `r2ReunionSeen` |
+| 承鋼 Cheng Gang | 男 | R2 `r2_camp_chief`(饒恕Boss後) | R2 | — | `r2BossSpared`, `r2ChengAwake` |
 | 老鑄 Old Cast | 男 | R2 `r2_camp_smith` | R2 | 3 | `r2SmithVisited` |
 | 清露 Dew | 女 | R2 `r2_camp_medic` | R2 | 3 | `r2MedicHealed`, `r2MedicElixir` |
 | 銅鐘 Bronze Bell | 女 | R3 `r3_bell` | R3 | 3 | `r3BellMet`, `r3BellAlliance`, `r3BellQuest` |

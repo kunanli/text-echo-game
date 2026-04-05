@@ -90,6 +90,7 @@ function startCombat(enemy, onWin, onFlee) {
 
     if (enemyHp <= 0) {
       sfx.pass();
+      state.flags._lastCombatSpared = false;
       log += '<div class="combat-log combat-log-enemy">'
         + '<span class="cl-tag cl-enemy">' + L('【' + eName + '】', '[' + eName + ']') + '</span> '
         + L('被擊敗了！', 'has been defeated!')
@@ -170,6 +171,7 @@ function startCombat(enemy, onWin, onFlee) {
 
       if (empathy >= empathyGoal) {
         // Spare the enemy — peaceful resolution
+        state.flags._lastCombatSpared = true;
         sfx.item();
         var spareText = enemy.spareText
           || { zh: eName + ' 的眼中閃過一絲清明，它緩緩後退，消失在陰影中……', en: eName + '\'s eyes flicker with clarity. It slowly backs away into the shadows...' };
