@@ -1217,35 +1217,49 @@ registerNode('r0_ferryman_gate', () => {
       text: '你側身擠進裂縫，沿著濕滑的石階一路下行……',
       textEn: 'You squeeze through sideways, descending along slippery stone steps...',
       delay: 3000 },
+    { tag: '感知', tagColor: 'tag-sense',
+      text: '腳下的岩壁變得濕滑，指尖觸碰到的不是石頭——是骨頭。',
+      textEn: 'The rock beneath your feet turns slick. What your fingers touch is not stone — it is bone.',
+      delay: 3000 },
     { art: `<pre class="ascii-art purple">
       ·    ✦    ·         ·    ✦    ·
-  ════════════════════════════════════════
-  ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-  ░░  ╱▔▔╲  ░░  ╱▔▔╲  ░░  ╱▔▔╲  ░░░░░
-  ░░ │ xx │ ░░ │ xx │ ░░ │ xx │ ░░░░░
-  ░░ │    │ ░░ │    │ ░░ │    │ ░░░░░
-  ░░ │░░░░│ ░░ │░░░░│ ░░ │░░░░│ ░░░░░
-  ░░ ╱░░░░╲ ░░ ╱░░░░╲ ░░ ╱░░░░╲ ░░░░░
-  ░═══════░░═══════░░═══════░░░░░░░░░░
-  ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  ~~~~~~~~~  冥    河  ~~~~~~~~~~~~~~~~~~~~~~~~~
-  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+  ▓  ☠  ░░  ☠  ░░░  ☠  ░░  ☠  ░░  ▓
+  ▓ ░/|\\░░░/|\\░░░░░/|\\░░░/|\\░░░░░ ▓
+  ▓ ░/ \\░░░/ \\░░░░░/ \\░░░/ \\░░░░░ ▓
+  ▓░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░▓
+  ▓  ☠ ░░ ☠   ☠ ░░░ ☠   ☠ ░░ ☠   ▓
+  ▓ /|\\░░/|\\ /|\\░░░/|\\ /|\\░░/|\\  ▓
+  ▓ / \\░░/ \\ / \\░░░/ \\ / \\░░/ \\  ▓
+  ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+  ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+  █  骸  骨  之  道  ·  三  百  年    █
+  ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     ~  ~  ~  ~ 冥  河 ~  ~  ~  ~  ~  ~
+     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 </pre>`, artEn: `<pre class="ascii-art purple">
       ·    ✦    ·         ·    ✦    ·
-  ════════════════════════════════════════
-  ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-  ░░  ╱▔▔╲  ░░  ╱▔▔╲  ░░  ╱▔▔╲  ░░░░░
-  ░░ │ xx │ ░░ │ xx │ ░░ │ xx │ ░░░░░
-  ░░ │    │ ░░ │    │ ░░ │    │ ░░░░░
-  ░░ │░░░░│ ░░ │░░░░│ ░░ │░░░░│ ░░░░░
-  ░░ ╱░░░░╲ ░░ ╱░░░░╲ ░░ ╱░░░░╲ ░░░░░
-  ░═══════░░═══════░░═══════░░░░░░░░░░
-  ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  ~~~~~~~~~ S T Y X ~~~~~~~~~~~~~~~~~~~~~~~~
-  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+  ▓  ☠  ░░  ☠  ░░░  ☠  ░░  ☠  ░░  ▓
+  ▓ ░/|\\░░░/|\\░░░░░/|\\░░░/|\\░░░░░ ▓
+  ▓ ░/ \\░░░/ \\░░░░░/ \\░░░/ \\░░░░░ ▓
+  ▓░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░▓
+  ▓  ☠ ░░ ☠   ☠ ░░░ ☠   ☠ ░░ ☠   ▓
+  ▓ /|\\░░/|\\ /|\\░░░/|\\ /|\\░░/|\\  ▓
+  ▓ / \\░░/ \\ / \\░░░/ \\ / \\░░/ \\  ▓
+  ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+  ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+  █ P A S S A G E  O F  B O N E S    █
+  ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     ~  ~  ~  ~  S T Y X  ~  ~  ~  ~  ~
+     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 </pre>`, delay: 1000 },
+    { tag: '死寂', tagColor: 'tag-petri',
+      text: '通道兩側嵌滿了人骨——三百年來被投入祭獻坑的爐灶' + (state.sex === 'male' ? '少年' : '少女') + '們。他們的臉凝固在痛苦中，有些人的手仍然向上伸展，彷彿至死都在攀爬。',
+      textEn: 'The walls are embedded with human remains — three hundred years of ' + (state.sex === 'male' ? 'Hearth-Youths' : 'Hearth-Maidens') + ' thrown into the pit. Their faces are frozen in agony, some still reaching upward, clawing for escape even in death.',
+      delay: 3500 },
     { tag: '環境', tagColor: 'tag-sense',
       text: '空氣變得冰冷刺骨。你來到一個巨大的地下河岸。',
       textEn: 'The air turns biting cold. You arrive at a vast underground riverbank.',
@@ -1441,7 +1455,8 @@ registerNode('r0_ferryman_challenge', () => {
       var result = statCheck('wil', 10);
       if (result === 'crit') {
         sfx.pass();
-        notify(L('大成功！', 'Critical Success!'));
+        changeStat('wil', 2);
+        notify(L('大成功！意志 +2', 'Critical Success! WIL +2'));
         loadNode('r0_ferryman_descent');
       } else if (result === 'pass') {
         sfx.pass();
@@ -1513,39 +1528,6 @@ registerNode('r0_ferryman_descent', () => {
       text: '「上船吧。我送你去深淵的另一邊。」',
       textEn: '"Board the vessel. I will take you to the other side of the abyss."',
       delay: 2500 },
-    { art: `<pre class="ascii-art" style="color:#7a9aaa;">
-    ·    ✦    ·    ✦    ·    ✦    ·
-  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  ~~~                                  ~~~
-  ~~   ╭──────────────────────╮        ~~
-  ~~   │  ╱▔╲        ╱▔╲     │        ~~
-  ~~   │ │ ◉│    ☆  │  │     │        ~~
-  ~~   │  ╲▁╱   │    ╲▁╱     │        ~~
-  ~~   │        ─┤──          │        ~~
-  ~~   │         │            │        ~~
-  ~~   ╰────╥────╨────────────╯        ~~
-  ~~~~~~~~~╱╱╲~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  ~~~~~~~~╱╱  ╲~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  ~~~   ▼  ▼  ▼   更  深  處  ▼  ▼  ▼  ~~~
-  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-</pre>`, artEn: `<pre class="ascii-art" style="color:#7a9aaa;">
-    ·    ✦    ·    ✦    ·    ✦    ·
-  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  ~~~                                  ~~~
-  ~~   ╭──────────────────────╮        ~~
-  ~~   │  ╱▔╲        ╱▔╲     │        ~~
-  ~~   │ │ ◉│    ☆  │  │     │        ~~
-  ~~   │  ╲▁╱   │    ╲▁╱     │        ~~
-  ~~   │        ─┤──          │        ~~
-  ~~   │         │            │        ~~
-  ~~   ╰────╥────╨────────────╯        ~~
-  ~~~~~~~~~╱╱╲~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  ~~~~~~~~╱╱  ╲~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  ~~~  ▼  ▼  ▼  T H E  D E E P  ▼  ▼  ▼ ~~~
-  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-</pre>`, delay: 1500 },
     { tag: '行動', tagColor: 'tag-move',
       text: '你踏上那艘破舊的木船。船身在黑水中輕輕搖晃。',
       textEn: 'You step onto the decrepit boat. It sways gently in the black water.',
@@ -1554,28 +1536,96 @@ registerNode('r0_ferryman_descent', () => {
       text: '渡江人站在船尾，用一根長篙撐開了河岸。',
       textEn: 'The ferryman stands at the stern, pushing off with a long pole.',
       delay: 2500 },
+    { tag: '環境', tagColor: 'tag-system',
+      text: '完全的黑暗。冰冷。唯一的聲音是水滴落在石頭上的回響。',
+      textEn: 'Total darkness. Biting cold. The only sound is the echo of water dripping on stone.',
+      delay: 3000 },
+    { art: `<pre class="ascii-art" style="color:#7a9aaa;">
+    ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+    ░░                                  ░░
+    ░░   ·    ˚    ·    ˚    ·    ˚    ░░
+    ░░                                  ░░
+    ░░    ☠       ☠           ☠        ░░
+    ░░   /|\\     /|\\         /|\\       ░░
+    ~~╌~~╌~~╌~~╌~~╌~~╌~~╌~~╌~~╌~~╌~~╌~~╌~
+    ~ ~ ═══════════════════════ ~ ~ ~ ~ ~
+    ~ ~ ║  ▓    ·    ○    · ║ ~ ~ ~ ~ ~ ~
+    ~ ~ ║  ▓    ·  你/妳  · ║ ~ ~ ~ ~ ~ ~
+    ~ ~ ═══════════════════════ ~ ~ ~ ~ ~
+    ~~╌~~╌~~╌~~╌~~╌~~╌~~╌~~╌~~╌~~╌~~╌~~╌~
+    ░░   /|\\         ☠       /|\\       ░░
+    ░░    ☠         /|\\       ☠        ░░
+    ░░                                  ░░
+    ░░   ·    ˚    ·    ˚    ·    ˚    ░░
+    ░░                                  ░░
+    ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+</pre>`, artEn: `<pre class="ascii-art" style="color:#7a9aaa;">
+    ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+    ░░                                  ░░
+    ░░   ·    ˚    ·    ˚    ·    ˚    ░░
+    ░░                                  ░░
+    ░░    ☠       ☠           ☠        ░░
+    ░░   /|\\     /|\\         /|\\       ░░
+    ~~╌~~╌~~╌~~╌~~╌~~╌~~╌~~╌~~╌~~╌~~╌~~╌~
+    ~ ~ ═══════════════════════ ~ ~ ~ ~ ~
+    ~ ~ ║  ▓    ·    ○    · ║ ~ ~ ~ ~ ~ ~
+    ~ ~ ║  ▓    ·   YOU   · ║ ~ ~ ~ ~ ~ ~
+    ~ ~ ═══════════════════════ ~ ~ ~ ~ ~
+    ~~╌~~╌~~╌~~╌~~╌~~╌~~╌~~╌~~╌~~╌~~╌~~╌~
+    ░░   /|\\         ☠       /|\\       ░░
+    ░░    ☠         /|\\       ☠        ░░
+    ░░                                  ░░
+    ░░   ·    ˚    ·    ˚    ·    ˚    ░░
+    ░░                                  ░░
+    ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+</pre>`, delay: 1500 },
+    { tag: '死寂', tagColor: 'tag-petri',
+      text: '水面下隱約可見石化的人影——沉入河底的祭品，凝固在溺亡的最後一刻。',
+      textEn: 'Beneath the water\'s surface, petrified figures are faintly visible — sacrifices sunken to the riverbed, frozen in their final drowning moments.',
+      delay: 3500 },
     { tag: '環境', tagColor: 'tag-sense',
       text: '木船緩緩駛入黑暗。河岸上那些屍體的輪廓漸漸消失。',
       textEn: 'The boat drifts into darkness. The silhouettes of corpses on the bank fade away.',
       delay: 3000 },
     { tag: '渡江人', tagColor: 'tag-npc',
-      text: '「河的對岸……是石化瘟疫的源頭。那裡有比你見過的一切都更古老的東西。」',
-      textEn: '"On the other shore... lies the source of the Stone Plague. Things far older than anything you have seen."',
+      text: '「下方……是第一封印。」渡江人的聲音在黑暗中迴盪。「石疫的源頭。一切的開端。」',
+      textEn: '"Below... lies the First Seal." The ferryman\'s voice echoes through the darkness. "The origin of the plague. Where it all began."',
+      delay: 3500 },
+    { tag: '渡江人', tagColor: 'tag-npc',
+      text: '「三百年前有人打破了封印。三百年後，也許有人能重新封上。也許。」',
+      textEn: '"Three hundred years ago someone broke the Seal. Three hundred years later, perhaps someone can reseal it. Perhaps."',
       delay: 3500 },
     { tag: '渡江人', tagColor: 'tag-npc',
       text: '「也許你能找到終結這一切的方法。也許你會成為下一具河岸上的屍體。」',
       textEn: '"Perhaps you will find a way to end it all. Perhaps you will become the next corpse on the bank."',
       delay: 3500 },
-    { tag: '環境', tagColor: 'tag-petri',
-      text: '前方的黑暗中，隱約浮現出一個巨大的輪廓……',
-      textEn: 'In the darkness ahead, a vast silhouette slowly takes shape...',
+    { tag: '環境', tagColor: 'tag-sense',
+      text: '船緩緩靠岸。一座由黑曜石雕成的古碼頭在幽光中浮現。',
+      textEn: 'The raft drifts to a halt. An ancient dock carved from obsidian materializes in the faint glow.',
       delay: 3000 },
+    { tag: '發現', tagColor: 'tag-sense',
+      text: '碼頭盡頭是一扇巨大的石門，表面刻滿了古老的符文。封印完好無損——但隱隱散發著不祥的脈動。',
+      textEn: 'At the dock\'s end stands a massive stone gate, its surface carved with ancient runes. The seal is intact — yet it pulses with an ominous rhythm.',
+      delay: 3500 },
     { tag: '系統', tagColor: 'tag-system',
       html: '<b>—— 深淵更深處．敬請期待 ——</b>',
       htmlEn: '<b>—— The Deeper Abyss · Coming Soon ——</b>',
-      delay: 2000 },
+      delay: 2000,
+      effect: function() {
+        changeStat('str', 1);
+        changeStat('agi', 1);
+        changeStat('wil', 1);
+        changeHp(20);
+        changePetri(-15);
+        addItem(L('深淵渡河令', 'Abyss Ferry Token'));
+        sfx.item();
+      } },
+    { tag: '物品', tagColor: 'tag-item',
+      text: '渡江人遞給你一枚冰冷的石牌——深淵渡河令。「留著它。也許有一天你會需要再來。」（STR +1, AGI +1, WIL +1, HP +20, 石化度 -15%）',
+      textEn: 'The ferryman hands you a cold stone token — the Abyss Ferry Token. "Keep it. Perhaps one day you will need to return." (STR +1, AGI +1, WIL +1, HP +20, Petri -15%)',
+      delay: 3500 },
   ], [
-    { text: '返回河岸（暫時結束）', textEn: 'Return to the bank (end of current content)', action: function() {
+    { text: '返回河岸', textEn: 'Return to the bank', action: function() {
       notify(L('冥河渡江人的印記已刻在你的額頭上。', 'The ferryman\'s mark is etched upon your forehead.'));
       loadNode('r0_look');
     }},
