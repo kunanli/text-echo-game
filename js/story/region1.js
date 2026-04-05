@@ -768,6 +768,31 @@ registerNode('r1_quarters', () => {
 
 registerNode('r1_rest', () => {
   autoExplore([
+    { art: `<pre class="ascii-art">
+  ┌────────────────────────────────┐
+  │  ╔═══╗                        │
+  │  ║    ║  z Z z                 │
+  │  ║ ～ ║   z Z                  │
+  │  ║____║    z                   │
+  │  ┊····┊                       │
+  │                                │
+  │  .:*~*:.    .:*~*:.           │
+  │   礦脈光      礦脈光          │
+  └────────────────────────────────┘
+          礦 工 床 鋪
+</pre>`, artEn: `<pre class="ascii-art">
+  ┌────────────────────────────────┐
+  │  ╔═══╗                        │
+  │  ║    ║  z Z z                 │
+  │  ║ ～ ║   z Z                  │
+  │  ║____║    z                   │
+  │  ┊····┊                       │
+  │                                │
+  │  .:*~*:.    .:*~*:.           │
+  │   Ore glow    Ore glow        │
+  └────────────────────────────────┘
+         Miner's Bunk
+</pre>`, delay: 800 },
     { tag: '行動', tagColor: 'tag-move', text: '你找了一張沒有石化礦工的床鋪，小心翼翼地躺了下來。', textEn: 'You find an empty bunk and carefully lie down.', delay: 2000 },
     { tag: '感知', tagColor: 'tag-sense', text: '床墊硬邦邦的，但比起石頭地面已經好太多了。', textEn: 'The mattress is stiff, but far better than the stone floor.', delay: 2500 },
     { tag: '環境', tagColor: 'tag-system', text: '……', textEn: '...', delay: 3000 },
@@ -1835,6 +1860,35 @@ registerNode('r1_gate', () => {
 
 registerNode('r1_gate_open', () => {
   autoExplore([
+    { art: `<pre class="ascii-art gold">
+  ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+  ░  ╔═══════════╗ ╔═══════════╗   ░
+  ░  ║▓▓▓▓▓▓▓▓▓▓▓║ ║▓▓▓▓▓▓▓▓▓▓▓║   ░
+  ░  ║▓  ✦ ✦ ✦  ▓║ ║▓  ✦ ✦ ✦  ▓║   ░
+  ░  ║▓         ▓║ ║▓         ▓║   ░
+  ░  ║▓  ═══════▓║ ║▓═══════  ▓║   ░
+  ░  ║▓    ╔═╗  ▓╠═╣▓  ╔═╗   ▓║   ░
+  ░  ║▓    ║◆║  ▓║ ║▓  ║◆║   ▓║   ░
+  ░  ║▓    ╚═╝  ▓║ ║▓  ╚═╝   ▓║   ░
+  ░  ║▓▓▓▓▓▓▓▓▓▓▓║ ║▓▓▓▓▓▓▓▓▓▓▓║   ░
+  ░  ╚═══════════╝ ╚═══════════╝   ░
+  ░           ← 開 啟 →            ░
+  ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+</pre>`, artEn: `<pre class="ascii-art gold">
+  ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+  ░  ╔═══════════╗ ╔═══════════╗   ░
+  ░  ║▓▓▓▓▓▓▓▓▓▓▓║ ║▓▓▓▓▓▓▓▓▓▓▓║   ░
+  ░  ║▓  ✦ ✦ ✦  ▓║ ║▓  ✦ ✦ ✦  ▓║   ░
+  ░  ║▓         ▓║ ║▓         ▓║   ░
+  ░  ║▓  ═══════▓║ ║▓═══════  ▓║   ░
+  ░  ║▓    ╔═╗  ▓╠═╣▓  ╔═╗   ▓║   ░
+  ░  ║▓    ║◆║  ▓║ ║▓  ║◆║   ▓║   ░
+  ░  ║▓    ╚═╝  ▓║ ║▓  ╚═╝   ▓║   ░
+  ░  ║▓▓▓▓▓▓▓▓▓▓▓║ ║▓▓▓▓▓▓▓▓▓▓▓║   ░
+  ░  ╚═══════════╝ ╚═══════════╝   ░
+  ░          ← Opening →           ░
+  ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+</pre>`, delay: 800 },
     { tag: '行動', tagColor: 'tag-move', text: '你將守衛核心石嵌入凹槽。', textEn: 'You press the Guardian Core Stone into the slot.', delay: 1500 },
     { tag: '環境', tagColor: 'tag-system', text: '核心石亮起耀眼的光芒——門上的紋飾依次點亮。', textEn: 'The core blazes with light — engravings ignite one by one.', delay: 2200 },
     { tag: '環境', tagColor: 'tag-system', text: '沉重的金屬碰撞聲迴盪在走廊中——', textEn: 'Heavy metallic clangs echo through the corridor —', delay: 2000 },
@@ -1856,6 +1910,29 @@ registerNode('r1_gate_open', () => {
 // ── Region 1 Patrol ──
 registerNode('r1_patrol', () => {
   autoExplore([
+    { art: `<pre class="ascii-art blue">
+  ═══╦════════════════════════╦═══
+  ░░░║  .:*~*:.    .:*~*:.   ║░░░
+  ░░░║                        ║░░░
+  ░░░║     · _o_ ·           ║░░░
+  ░░░║    · ╱ │ ╲ ·    ?     ║░░░
+  ░░░║       ╱ ╲      ╱╲     ║░░░
+  ░░░║      ╱   ╲    ╱??╲    ║░░░
+  ░░░║  ══════════════════    ║░░░
+  ═══╩════════════════════════╩═══
+         迴 廊 巡 邏
+</pre>`, artEn: `<pre class="ascii-art blue">
+  ═══╦════════════════════════╦═══
+  ░░░║  .:*~*:.    .:*~*:.   ║░░░
+  ░░░║                        ║░░░
+  ░░░║     · _o_ ·           ║░░░
+  ░░░║    · ╱ │ ╲ ·    ?     ║░░░
+  ░░░║       ╱ ╲      ╱╲     ║░░░
+  ░░░║      ╱   ╲    ╱??╲    ║░░░
+  ░░░║  ══════════════════    ║░░░
+  ═══╩════════════════════════╩═══
+       Corridor Patrol
+</pre>`, delay: 800 },
     { tag: '判斷', tagColor: 'tag-move', text: '迴廊中的怪物比坑底更強，但也能提供更好的戰鬥經驗。', textEn: 'Corridor monsters are tougher, but offer better combat experience.', delay: 2000 },
     { tag: '感知', tagColor: 'tag-sense', text: '你握緊武器，沿著礦脈的冷光前進。', textEn: 'You grip your weapon and advance by the cold glow of ore veins.', delay: 2000 },
   ], [
