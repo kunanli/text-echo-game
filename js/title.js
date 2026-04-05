@@ -98,24 +98,22 @@ var _ngPlusMode = false;
   // Show NG+ button only if player has completed the game at least once
   if (typeof globalStats !== 'undefined' && globalStats.totalRuns > 0) {
     ngBtn.style.display = '';
-    // Peek saved language for button text
+    var runs = globalStats.totalRuns;
+    var scale = Math.pow(2, runs);
+    var cycleNames = { 1: '二周目', 2: '三周目', 3: '四周目' };
+    var cycleName = cycleNames[runs] || (runs + 1) + '周目';
+    // Set button text with cycle info
+    var isZh = true;
     try {
       var json = localStorage.getItem(SAVE_KEY);
       if (json) {
         var d = JSON.parse(json);
-        if (d.lang !== 'en') ngBtn.textContent = '新 遊 戲 +';
+        if (d.lang === 'en') isZh = false;
       }
     } catch (e) {}
-    // Also check if no save exists but stats show completion
-    if (!hasSave()) {
-      try {
-        var statsJson = localStorage.getItem('petriabyss_global_stats');
-        if (statsJson) {
-          var s = JSON.parse(statsJson);
-          // No saved language to peek — use default
-        }
-      } catch (e) {}
-    }
+    ngBtn.textContent = isZh
+      ? cycleName + '（怪物' + scale + '倍）'
+      : 'Cycle ' + (runs + 1) + ' (Enemies ' + scale + 'x)';
   }
   ngBtn.addEventListener('touchstart', splashWarmup, { passive: true });
   ngBtn.addEventListener('click', function(e) {
@@ -135,10 +133,16 @@ document.querySelectorAll('.lang-btn').forEach(function(btn) {
     if (_ngPlusMode) {
       ngPlusAllocBonus = (typeof globalStats !== 'undefined' && globalStats.bankedPoints > 0)
         ? globalStats.bankedPoints : 3;
+      var ngRun = (typeof globalStats !== 'undefined') ? globalStats.totalRuns : 1;
+      var cycleNames = { 1: '二周目', 2: '三周目', 3: '四周目' };
+      var cycleNamesEn = { 1: 'Cycle 2', 2: 'Cycle 3', 3: 'Cycle 4' };
+      var cycleName = cycleNames[ngRun] || (ngRun + 1) + '周目';
+      var cycleNameEn = cycleNamesEn[ngRun] || 'Cycle ' + (ngRun + 1);
+      var scale = Math.pow(2, ngRun);
       var label = document.getElementById('label-stat-alloc');
       if (label) label.textContent = state.lang === 'en'
-        ? 'STATS  [NG+ BONUS: +' + ngPlusAllocBonus + ']'
-        : '能 力 分 配  [NG+ 加成：+' + ngPlusAllocBonus + ']';
+        ? 'STATS  [' + cycleNameEn + ' +' + ngPlusAllocBonus + 'pts | Enemies ' + scale + 'x]'
+        : '能 力 分 配  [' + cycleName + ' +' + ngPlusAllocBonus + '點｜怪物' + scale + '倍]';
     } else {
       ngPlusAllocBonus = 0;
     }
@@ -235,8 +239,10 @@ function startGame() {
   if (_ngPlusMode) {
     state.flags.ngPlus = true;
     state.flags.ngPlusRun = (typeof globalStats !== 'undefined' ? globalStats.totalRuns : 1);
-    state.maxHp = 60;
-    state.hp = 60;
+    var ngRun = state.flags.ngPlusRun;
+    var ngHpBonus = 10 * ngRun; // +10/+20/+30... per cycle
+    state.maxHp = 50 + ngHpBonus;
+    state.hp = state.maxHp;
     // Record which endings were achieved previously
     if (typeof globalStats !== 'undefined') {
       if (globalStats.endings.dawn > 0) state.flags.ngEndingDawn = true;

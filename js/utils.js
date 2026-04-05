@@ -175,23 +175,32 @@ function effectiveStat(stat) {
   return Math.max(1, state[stat] + (pen[stat] || 0));
 }
 
-// Base max HP before petri reduction (accounts for NG+ and level)
+// Base max HP before petri reduction (accounts for NG+ run and level)
 function getBaseMaxHp() {
-  var base = state.flags.ngPlus ? 60 : 50;
+  var ngRun = state.flags.ngPlusRun || 0;
+  var base = 50 + (ngRun > 0 ? 10 * ngRun : 0);
   base += (state.level - 1) * 5;
   return base;
 }
 
+// Get NG+ scaling factor based on run number (2x, 4x, 8x...)
+function getNgPlusScale() {
+  if (!state.flags.ngPlus) return 1;
+  var run = state.flags.ngPlusRun || 1;
+  return Math.pow(2, run); // run1=2x, run2=4x, run3=8x
+}
+
 // Scale enemy stats for NG+ (returns shallow copy with scaled combat stats)
 function scaleEnemyNgPlus(enemy) {
-  if (!state.flags.ngPlus) return enemy;
+  var scale = getNgPlusScale();
+  if (scale <= 1) return enemy;
   var scaled = {};
   for (var k in enemy) { if (enemy.hasOwnProperty(k)) scaled[k] = enemy[k]; }
-  scaled.hp = Math.floor(enemy.hp * 1.5);
-  scaled.atkMin = Math.floor(enemy.atkMin * 1.5);
-  scaled.atkMax = Math.floor(enemy.atkMax * 1.5);
-  scaled.petriDmg = Math.floor(enemy.petriDmg * 1.5);
-  scaled.xp = Math.floor(enemy.xp * 1.25);
+  scaled.hp = Math.floor(enemy.hp * scale);
+  scaled.atkMin = Math.floor(enemy.atkMin * scale);
+  scaled.atkMax = Math.floor(enemy.atkMax * scale);
+  scaled.petriDmg = Math.floor(enemy.petriDmg * scale);
+  scaled.xp = Math.floor(enemy.xp * (1 + (state.flags.ngPlusRun || 1) * 0.25));
   return scaled;
 }
 

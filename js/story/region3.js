@@ -1791,28 +1791,36 @@ registerNode('r3_epilogue', () => {
   var banked = typeof calculateBankedPoints === 'function' ? calculateBankedPoints() : 0;
   var statBonus = (state.str + state.agi + state.wil) - 9;
   var levelBonus = Math.max(0, state.level - 5);
+  var nextRun = (typeof globalStats !== 'undefined' ? globalStats.totalRuns : 1);
+  var nextScale = Math.pow(2, nextRun);
+  var cycleNames = { 1: '二周目', 2: '三周目', 3: '四周目' };
+  var cycleNamesEn = { 1: 'Cycle 2', 2: 'Cycle 3', 3: 'Cycle 4' };
+  var nextCycle = cycleNames[nextRun] || (nextRun + 1) + '周目';
+  var nextCycleEn = cycleNamesEn[nextRun] || 'Cycle ' + (nextRun + 1);
 
   var ngHintHtml = L(
     '<br>══ NEW GAME+ 能力轉換 ══<br>' +
     '能力加點：' + statBonus + '（力量' + state.str + ' + 敏捷' + state.agi + ' + 意志' + state.wil + ' − 基礎9）<br>' +
     '等級獎勵：' + levelBonus + '（Lv.' + state.level + (state.level > 5 ? '，超過5級每級+1' : '，5級以上才有獎勵') + '）<br>' +
-    '<b>下次開局可用點數：' + banked + '</b><br>' +
+    '<b>下次開局加成點數：+' + banked + '</b><br>' +
+    '<span style="color:#e85050"><b>' + nextCycle + '怪物強度：' + nextScale + '倍</b></span><br>' +
     '<span style="opacity:.6">你也可以留在這個世界，前往冥河挑戰更深處。</span>',
     '<br>══ NG+ STAT CONVERSION ══<br>' +
     'Stat bonus: ' + statBonus + ' (STR' + state.str + ' + AGI' + state.agi + ' + WIL' + state.wil + ' − base 9)<br>' +
     'Level bonus: ' + levelBonus + ' (Lv.' + state.level + (state.level > 5 ? ', +1 per level above 5' : ', requires Lv.6+') + ')<br>' +
-    '<b>Next run bonus points: ' + banked + '</b><br>' +
+    '<b>Next run bonus points: +' + banked + '</b><br>' +
+    '<span style="color:#e85050"><b>' + nextCycleEn + ' enemy strength: ' + nextScale + 'x</b></span><br>' +
     '<span style="opacity:.6">Or stay in this world and challenge the Styx for deeper depths.</span>'
   );
   steps.push({ tag: '系統', tagColor: 'tag-system', html: ngHintHtml, delay: 1500 });
 
   var convertLabel = L(
-    'NEW GAME+（轉換能力點：+' + banked + '）',
-    'NEW GAME+ (Convert points: +' + banked + ')'
+    nextCycle + ' NEW GAME+（+' + banked + '點｜怪物' + nextScale + '倍）',
+    nextCycleEn + ' NEW GAME+ (+' + banked + 'pts | Enemies ' + nextScale + 'x)'
   );
   var convertDetail = L(
-    '能力加點 ' + statBonus + ' + 等級獎勵 ' + levelBonus + ' = ' + banked + ' 點已儲存！',
-    'Stat bonus ' + statBonus + ' + Level bonus ' + levelBonus + ' = ' + banked + ' pts banked!'
+    '加成 +' + banked + ' 點已儲存！' + nextCycle + '怪物 ' + nextScale + ' 倍！',
+    '+' + banked + ' pts banked! ' + nextCycleEn + ' enemies ' + nextScale + 'x!'
   );
 
   autoExplore(steps, [
