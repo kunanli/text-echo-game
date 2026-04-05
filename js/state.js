@@ -5,7 +5,7 @@ var DEBUG = false;
 const state = {
   name: '旅者',
   sex: 'male',       // 'male' | 'female'
-  hp: 100, maxHp: 100,
+  hp: 50, maxHp: 50,
   petri: 0,          // 石化度 0-100
   str: 5, agi: 5, wil: 5,
   xp: 0, level: 1, xpToNext: 20,
