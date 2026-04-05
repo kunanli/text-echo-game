@@ -8,6 +8,7 @@
 function startCombat(enemy, onWin, onFlee) {
   state.mood = 'combat';
   ambientAudio.setCombat(true);
+  state.flags._runCombats = (state.flags._runCombats || 0) + 1;
   if (typeof statsTrackCombat === 'function') statsTrackCombat();
   let enemyHp = enemy.hp;
   const eName = enemy.name;

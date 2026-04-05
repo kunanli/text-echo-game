@@ -388,9 +388,15 @@ function generateEndCard() {
   // Highlights: sorted by rarity (highest first), show top 3
   var hlAll = [];
   if (state.deathCount === 0)          hlAll.push({ text: en ? 'Deathless Run'    : '零死亡通關', color: '#d4a843', rank: 5 });
+  if (!state.flags._runCombats)        hlAll.push({ text: en ? 'Pacifist Run'     : '不戰通關',   color: '#d4a843', rank: 5 });
   if (state.petri <= 10)               hlAll.push({ text: en ? 'Stone Resistant'  : '抗石化體質', color: '#9a5ac8', rank: 4 });
+  if (state.petri >= 60)               hlAll.push({ text: en ? 'Stone Bloom'      : '石中花',     color: '#9a5ac8', rank: 4 });
+  if (state.flags.r3BossMethod==='persuade') hlAll.push({ text: en ? 'Peacemaker' : '和平使者',   color: '#60c8e0', rank: 3 });
+  if (state.flags.r2BossSpared)        hlAll.push({ text: en ? 'Merciful Heart'   : '慈悲之心',   color: '#60c8e0', rank: 3 });
   if (state.flags.r3CraneTestimony)    hlAll.push({ text: en ? 'Crane Testified'  : '灰鶴作證',   color: '#4a8ac8', rank: 3 });
   if (state.flags.r3PlagueProof)       hlAll.push({ text: en ? 'Plague Proof'     : '瘟疫證據',   color: '#4a8ac8', rank: 3 });
+  if (state.flags.r3YingRiver)         hlAll.push({ text: en ? 'Moonlit Promise'  : '月下相守',   color: '#c06090', rank: 3 });
+  if (state.flags.ferrymanPassed)      hlAll.push({ text: en ? 'Styx Crosser'     : '冥河渡者',   color: '#9a5ac8', rank: 4 });
   if (state.flags.r1YingCompanion)     hlAll.push({ text: en ? 'Ying\'s Companion': '螢的同伴',   color: '#4a9e4a', rank: 2 });
   hlAll.sort(function(a, b) { return b.rank - a.rank; });
   var hlItems = hlAll.slice(0, 3);

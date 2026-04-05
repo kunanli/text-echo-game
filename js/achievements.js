@@ -106,6 +106,79 @@ var ACHIEVEMENT_DEFS = [
     desc: '取得瘟疫封印的證據', descEn: 'Obtain proof of the plague seal',
     check: function() { return !!state.flags.r3PlagueProof; }
   },
+
+  // ── Boss Methods ──
+  {
+    id: 'diplomat', icon: '\u{1F54A}',
+    name: '和平使者', nameEn: 'Peacemaker',
+    desc: '以說服方式通過最終 Boss', descEn: 'Persuade the final boss',
+    check: function() { return state.flags.r3BossMethod === 'persuade'; }
+  },
+  {
+    id: 'shadow', icon: '\u{1F311}',
+    name: '暗影行者', nameEn: 'Shadow Walker',
+    desc: '以潛行方式通過最終 Boss', descEn: 'Sneak past the final boss',
+    check: function() { return state.flags.r3BossMethod === 'sneak'; }
+  },
+  {
+    id: 'boss_spared', icon: '\u{1F932}',
+    name: '慈悲之心', nameEn: 'Merciful Heart',
+    desc: '饒恕石化巨像', descEn: 'Spare the Petrified Colossus',
+    check: function() { return !!state.flags.r2BossSpared; }
+  },
+
+  // ── Advanced Survival ──
+  {
+    id: 'pacifist', icon: '\u262E',
+    name: '不戰之勇', nameEn: 'Pacifist',
+    desc: '零戰鬥通關', descEn: 'Complete the game with zero combats',
+    check: function() { return !!state.flags.r3Ending && !state.flags._runCombats; }
+  },
+  {
+    id: 'stone_bloom', icon: '\u{1F338}',
+    name: '石中花', nameEn: 'Stone Bloom',
+    desc: '以石化度 60% 以上通關（在石化邊緣倖存）', descEn: 'Finish with 60%+ petrification (surviving on the edge)',
+    check: function() { return !!state.flags.r3Ending && state.petri >= 60; }
+  },
+  {
+    id: 'speed_run', icon: '\u26A1',
+    name: '疾風穿越', nameEn: 'Speed Runner',
+    desc: '在 20 分鐘內通關', descEn: 'Complete the game in under 20 minutes',
+    check: function() {
+      return !!state.flags.r3Ending && typeof globalStats !== 'undefined'
+        && globalStats.fastestRunMs > 0 && globalStats.fastestRunMs < 20 * 60 * 1000;
+    }
+  },
+
+  // ── Relationships & Exploration ──
+  {
+    id: 'ying_river', icon: '\u{1F319}',
+    name: '月下相守', nameEn: 'Moonlit Promise',
+    desc: '完成螢的河邊月光場景', descEn: "Complete Ying's riverside moonlight scene",
+    check: function() { return !!state.flags.r3YingRiver; }
+  },
+  {
+    id: 'ferryman', icon: '\u{1F6F6}',
+    name: '冥河渡者', nameEn: 'River Styx Crosser',
+    desc: '通過冥河渡江人的試煉', descEn: "Pass the Ferryman's trial",
+    check: function() { return !!state.flags.ferrymanPassed; }
+  },
+  {
+    id: 'gambler', icon: '\u{1F3B2}',
+    name: '骰運亨通', nameEn: 'Lucky Roller',
+    desc: '在吹牛骰中贏得 3 場以上', descEn: 'Win 3+ rounds of Liar\'s Dice',
+    check: function() { return (state.flags.diceWins || 0) >= 3; }
+  },
+  {
+    id: 'all_endings', icon: '\u{1F451}',
+    name: '命運收藏家', nameEn: 'Fate Collector',
+    desc: '解鎖全部 4 種結局（跨遊玩累計）', descEn: 'Unlock all 4 endings (across playthroughs)',
+    check: function() {
+      if (typeof globalStats === 'undefined') return false;
+      var e = globalStats.endings;
+      return e.dawn > 0 && e.compromise > 0 && e.lockdown > 0 && e.sacrifice > 0;
+    }
+  },
 ];
 
 // ── Persistence (localStorage, separate from game saves) ──
