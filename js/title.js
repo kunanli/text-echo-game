@@ -145,8 +145,8 @@ function startGame() {
   // Reset all state to defaults before applying character creation values.
   // This prevents stale data from a previous save (e.g. if the player opened
   // chapter select which calls loadSave(), then went back to start a new game).
-  state.hp = 100;
-  state.maxHp = 100;
+  state.hp = 50;
+  state.maxHp = 50;
   state.petri = 0;
   state.xp = 0;
   state.level = 1;

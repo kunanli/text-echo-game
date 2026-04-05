@@ -42,8 +42,8 @@ function loadSave() {
     var data = JSON.parse(json);
     state.name = data.name || '旅者';
     state.sex = data.sex || 'male';
-    state.maxHp = data.maxHp || 100;
-    state.hp = clamp(data.hp != null ? data.hp : 100, 0, state.maxHp);
+    state.maxHp = data.maxHp || 50;
+    state.hp = clamp(data.hp != null ? data.hp : 50, 0, state.maxHp);
     state.petri = clamp(data.petri || 0, 0, 99);
     state.str = data.str || 5;
     state.agi = data.agi || 5;
@@ -429,8 +429,8 @@ function loadFromSlot(n) {
     var data = JSON.parse(json);
     state.name = data.name || '旅者';
     state.sex = data.sex || 'male';
-    state.maxHp = data.maxHp || 100;
-    state.hp = clamp(data.hp != null ? data.hp : 100, 0, state.maxHp);
+    state.maxHp = data.maxHp || 50;
+    state.hp = clamp(data.hp != null ? data.hp : 50, 0, state.maxHp);
     state.petri = clamp(data.petri || 0, 0, 99);
     state.str = data.str || 5;
     state.agi = data.agi || 5;
