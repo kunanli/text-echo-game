@@ -229,7 +229,7 @@ registerNode('r0_look', () => {
     c.push({ text: '查看北面攀爬痕跡', textEn: 'Check the climbing marks to the north', action: () => loadNode('r0_climb_check') });
     c.push({ text: '探索南面裂縫', textEn: 'Explore the southern crack', action: () => loadNode('r0_crack') });
     // Ferryman route — always visible, but blocked if no ending achieved
-    c.push({ text: '⚰ 走向深處傳來的低語……', textEn: '⚰ Follow the whispers from below...', action: () => loadNode('r0_ferryman_gate') });
+    c.push({ text: '◇ 走向深處傳來的低語……', textEn: '◇ Follow the whispers from below...', action: () => loadNode('r0_ferryman_gate') });
     return c;
   })(), { label: L('觀察環境', 'Observing area') });
 });
