@@ -1,9 +1,4 @@
 // ══ Combat System ══
-// 4 actions: Attack, Observe, Commune, Flee
-//   Attack  — STR-based damage, enemy counter-attacks
-//   Observe — AGI check, success grants 2x dmg buff next attack
-//   Commune — WIL check, build empathy to spare enemy (bonus XP, less petri)
-//   Flee    — escape (if allowed)
 
 function startCombat(enemy, onWin, onFlee) {
   state.mood = 'combat';
@@ -11,18 +6,7 @@ function startCombat(enemy, onWin, onFlee) {
   state.flags._runCombats = (state.flags._runCombats || 0) + 1;
   if (typeof statsTrackCombat === 'function') statsTrackCombat();
   // NG+ scaling: 1.5x enemy stats
-  var ngScale = state.flags.ngPlus ? 1.5 : 1;
-  var scaledEnemy = enemy;
-  if (ngScale > 1) {
-    scaledEnemy = {};
-    for (var k in enemy) { if (enemy.hasOwnProperty(k)) scaledEnemy[k] = enemy[k]; }
-    scaledEnemy.hp = Math.floor(enemy.hp * ngScale);
-    scaledEnemy.atkMin = Math.floor(enemy.atkMin * ngScale);
-    scaledEnemy.atkMax = Math.floor(enemy.atkMax * ngScale);
-    scaledEnemy.petriDmg = Math.floor(enemy.petriDmg * ngScale);
-    scaledEnemy.xp = Math.floor(enemy.xp * 1.25); // bonus XP in NG+
-  }
-  enemy = scaledEnemy;
+  enemy = scaleEnemyNgPlus(enemy);
   let enemyHp = enemy.hp;
   const eName = enemy.name;
   let observed = false;   // next attack deals 2x
@@ -87,8 +71,8 @@ function startCombat(enemy, onWin, onFlee) {
   // ── Attack ──
   function doAttack() {
     var weaponBonus = state.flags.weaponDmg || 0;
-    var effStr = typeof effectiveStat === 'function' ? effectiveStat('str') : state.str;
-    var effAgi = typeof effectiveStat === 'function' ? effectiveStat('agi') : state.agi;
+    var effStr = effectiveStat('str');
+    var effAgi = effectiveStat('agi');
     var baseDmg = rng(3, 6) + Math.floor(effStr * 1.2) + weaponBonus;
     var dmg = observed ? baseDmg * 2 : baseDmg;
     var wasObserved = observed;
@@ -135,7 +119,7 @@ function startCombat(enemy, onWin, onFlee) {
 
   // ── Observe ──
   function doObserve() {
-    var effAgi = typeof effectiveStat === 'function' ? effectiveStat('agi') : state.agi;
+    var effAgi = effectiveStat('agi');
     var roll = rng(1, 6) + effAgi;
     var dc = 7;
     var log;
@@ -172,7 +156,7 @@ function startCombat(enemy, onWin, onFlee) {
 
   // ── Commune ──
   function doCommune() {
-    var effWil = typeof effectiveStat === 'function' ? effectiveStat('wil') : state.wil;
+    var effWil = effectiveStat('wil');
     var roll = rng(1, 6) + effWil;
     var dc = 8;
     var log;
@@ -213,13 +197,13 @@ function startCombat(enemy, onWin, onFlee) {
     } else {
       sfx.fail();
       var txt = communeFail[rng(0, communeFail.length - 1)];
-      var petriPenalty = Math.max(1, Math.floor((enemy.petriDmg || 1) * 1.5));
-      changePetri(petriPenalty);
+      var communePetriDmg = Math.max(1, Math.floor((enemy.petriDmg || 1) * 1.5));
+      changePetri(communePetriDmg);
       sfx.petri();
       log = '<div class="combat-log combat-log-commune">'
         + '<span class="cl-tag cl-commune">' + L('【感應】', '[COMMUNE]') + '</span> '
         + L(txt.zh, txt.en)
-        + ' <span class="cl-petri">' + L('石化 +' + petriPenalty + '%', 'Petri +' + petriPenalty + '%') + '</span>'
+        + ' <span class="cl-petri">' + L('石化 +' + communePetriDmg + '%', 'Petri +' + communePetriDmg + '%') + '</span>'
         + '</div>';
     }
 

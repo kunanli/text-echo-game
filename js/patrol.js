@@ -606,21 +606,21 @@ function runPatrolCycle() {
   var monster = monsters[rng(0, monsters.length - 1)];
   var mName = L(monster.name, monster.nameEn);
 
-  // NG+ scaling: 1.5x enemy stats in patrol
-  var ngScale = state.flags.ngPlus ? 1.5 : 1;
-  var mHpMax = Math.floor(monster.hp * ngScale);
-  var mAtkMin = Math.floor(monster.atkMin * ngScale);
-  var mAtkMax = Math.floor(monster.atkMax * ngScale);
-  var mPetriDmg = Math.floor(monster.petriDmg * ngScale);
-  var mXpBase = Math.floor(monster.xp * (ngScale > 1 ? 1.25 : 1));
+  // NG+ scaling
+  var scaled = scaleEnemyNgPlus(monster);
+  var mHpMax = scaled.hp;
+  var mAtkMin = scaled.atkMin;
+  var mAtkMax = scaled.atkMax;
+  var mPetriDmg = scaled.petriDmg;
+  var mXpBase = scaled.xp;
 
   // Pre-simulate combat
   var mHp = mHpMax;
   var totalDmg = 0, totalPetri = 0, rounds = 0;
   var combatLog = [];
+  var effStr = effectiveStat('str');
   while (mHp > 0 && rounds < 12) {
     rounds++;
-    var effStr = typeof effectiveStat === 'function' ? effectiveStat('str') : state.str;
     var pAtk = rng(Math.max(1, effStr), effStr + 4);
     var mAtk = rng(mAtkMin, mAtkMax);
     mHp -= pAtk;

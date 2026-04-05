@@ -128,10 +128,8 @@ function changePetri(delta) {
   }
   // Apply max HP reduction from petri
   var pen = petriPenalty();
+  var baseMax = getBaseMaxHp();
   if (pen.maxHpMult < 1.0) {
-    var baseMax = state.flags.ngPlus ? 60 : 50;
-    // Account for level-up HP gains: +5 per level above 1
-    baseMax += (state.level - 1) * 5;
     var newMax = Math.floor(baseMax * pen.maxHpMult);
     if (state.maxHp > newMax) {
       state.maxHp = newMax;
@@ -144,8 +142,6 @@ function changePetri(delta) {
   }
   // Restore max HP when petri decreases below threshold
   if (delta < 0) {
-    var baseMax = state.flags.ngPlus ? 60 : 50;
-    baseMax += (state.level - 1) * 5;
     var allowedMax = Math.floor(baseMax * pen.maxHpMult);
     if (state.maxHp < allowedMax) state.maxHp = allowedMax;
   }
@@ -179,16 +175,36 @@ function effectiveStat(stat) {
   return Math.max(1, state[stat] + (pen[stat] || 0));
 }
 
+// Base max HP before petri reduction (accounts for NG+ and level)
+function getBaseMaxHp() {
+  var base = state.flags.ngPlus ? 60 : 50;
+  base += (state.level - 1) * 5;
+  return base;
+}
+
+// Scale enemy stats for NG+ (returns shallow copy with scaled combat stats)
+function scaleEnemyNgPlus(enemy) {
+  if (!state.flags.ngPlus) return enemy;
+  var scaled = {};
+  for (var k in enemy) { if (enemy.hasOwnProperty(k)) scaled[k] = enemy[k]; }
+  scaled.hp = Math.floor(enemy.hp * 1.5);
+  scaled.atkMin = Math.floor(enemy.atkMin * 1.5);
+  scaled.atkMax = Math.floor(enemy.atkMax * 1.5);
+  scaled.petriDmg = Math.floor(enemy.petriDmg * 1.5);
+  scaled.xp = Math.floor(enemy.xp * 1.25);
+  return scaled;
+}
+
 // ── Stat Check System ──
 // Returns 'crit' | 'pass' | 'fail'
 function statCheck(stat, dc) {
   var roll = rng(1, 6);
-  var eff = effectiveStat(stat);
+  var pen = petriPenalty();
+  var eff = Math.max(1, state[stat] + (pen[stat] || 0));
   var total = eff + roll;
   var result = total >= dc + 3 ? 'crit' : total >= dc ? 'pass' : 'fail';
   var statNames = { str: ['力量', 'STR'], agi: ['敏捷', 'AGI'], wil: ['意志', 'WIL'] };
   var name = state.lang === 'en' ? statNames[stat][1] : statNames[stat][0];
-  var pen = petriPenalty();
   var penStr = (pen[stat] && pen[stat] < 0) ? (' ' + pen[stat]) : '';
   var sym = result !== 'fail' ? ' >= ' : ' < ';
   var tag = result === 'crit' ? (state.lang === 'en' ? 'CRITICAL!' : '大成功！') : result === 'pass' ? (state.lang === 'en' ? 'Passed!' : '成功！') : (state.lang === 'en' ? 'Failed...' : '失敗……');

@@ -6,7 +6,7 @@
 function renderStatus() {
   $hp.textContent = state.hp + ' / ' + state.maxHp;
   $barHp.style.width = (state.hp / state.maxHp * 100) + '%';
-  var pen = typeof petriPenalty === 'function' ? petriPenalty() : { stage: 0, str: 0, agi: 0, wil: 0 };
+  var pen = petriPenalty();
   var stageLabel = pen.stage > 0 ? (' Lv.' + pen.stage) : '';
   $petri.textContent = state.petri + '%' + stageLabel;
   $barPetri.style.width = state.petri + '%';
