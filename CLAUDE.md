@@ -54,6 +54,7 @@ assets/
 - **HTML 內容**：部分步驟用 `html`/`htmlEn` 取代 `text`/`textEn`，支援粗體等標記
 - **CSS 命名**：用 `.tag-xxx` 管理標籤顏色（tag-combat, tag-info, tag-sense, tag-system, tag-warn, tag-petri 等）
 - **雙語必備**：所有面向玩家的文字都必須同時提供 `zh` 和 `en` 版本
+- **版本號**：每次 push 前必須更新 `index.html` 中的版本號（`<div id="title-version">v1.x</div>`，約第 68 行）。版本遞增規則：新功能或劇情 → minor 版本 +0.1，bug fix / 文字修正 → patch 加後綴（如 v1.2.1）
 
 ## 目前狀態
 
