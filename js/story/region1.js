@@ -1152,28 +1152,26 @@ registerNode('r1_wanderer', () => {
 registerNode('r1_wanderer_lore', () => {
   autoExplore([
     { art: `<pre class="ascii-art gold">
-       ╱▔▔▔▔╲
-      │ ─  ─ │  ⌒
-      │  △   │╱
-       ╲___╱╱
-      ╱│   │╲   ╭──╮
-     ╱ │   │ ╲  │囊│
-    ╱  │   │  ╲ ╰┬─╯
-       │   │   ╲ │
-      ╱ ╲ ╱ ╲  ╲╯
-      ═══════════
+       ╭━━━━━━━╮
+      ╱ ╭━━━━━╮ ╲
+     │  │─  ─ │  │
+     │  │ ╰△╯ │  │
+      ╲ ╰━┯━━━╯ ╱
+    ╭╮ ╲╲─┤──╱╱ ╭──╮
+    ╰┤╱╱ ╲│ ╱╲╲ │囊│
+     ╱╱   ╱╲  ╲╰┬──╯
+          ╱  ╲  │╯
     灰 鶴 · 流 浪 者
 </pre>`, artEn: `<pre class="ascii-art gold">
-       ╱▔▔▔▔╲
-      │ ─  ─ │  ⌒
-      │  △   │╱
-       ╲___╱╱
-      ╱│   │╲   ╭──╮
-     ╱ │   │ ╲  │Pack│
-    ╱  │   │  ╲ ╰┬─╯
-       │   │   ╲ │
-      ╱ ╲ ╱ ╲  ╲╯
-      ═══════════
+       ╭━━━━━━━╮
+      ╱ ╭━━━━━╮ ╲
+     │  │─  ─ │  │
+     │  │ ╰△╯ │  │
+      ╲ ╰━┯━━━╯ ╱
+    ╭╮ ╲╲─┤──╱╱ ╭───╮
+    ╰┤╱╱ ╲│ ╱╲╲ │Pack│
+     ╱╱   ╱╲  ╲╰┬───╯
+          ╱  ╲  │╯
   Grey Crane · Wanderer
 </pre>`, delay: 800 },
     { tag: '情報', tagColor: 'tag-info', text: '灰鶴的笑容消失了。她沉默了一會兒。', textEn: 'Grey Crane\'s smile fades. She\'s silent for a moment.', delay: 2200 },
@@ -1211,28 +1209,26 @@ registerNode('r1_wanderer_trade', () => {
   var hasPureCrystal = hasItem(L('純淨石化結晶', 'Pure Petri Crystal'));
   autoExplore([
     { art: `<pre class="ascii-art gold">
-       ╱▔▔▔▔╲
-      │ ─  ─ │  ⌒
-      │  △   │╱
-       ╲___╱╱
-      ╱│   │╲   ╭──╮
-     ╱ │   │ ╲  │囊│
-    ╱  │   │  ╲ ╰┬─╯
-       │   │   ╲ │
-      ╱ ╲ ╱ ╲  ╲╯
-      ═══════════
+       ╭━━━━━━━╮
+      ╱ ╭━━━━━╮ ╲
+     │  │─  ─ │  │
+     │  │ ╰△╯ │  │
+      ╲ ╰━┯━━━╯ ╱
+    ╭╮ ╲╲─┤──╱╱ ╭──╮
+    ╰┤╱╱ ╲│ ╱╲╲ │囊│
+     ╱╱   ╱╲  ╲╰┬──╯
+          ╱  ╲  │╯
     灰 鶴 · 流 浪 者
 </pre>`, artEn: `<pre class="ascii-art gold">
-       ╱▔▔▔▔╲
-      │ ─  ─ │  ⌒
-      │  △   │╱
-       ╲___╱╱
-      ╱│   │╲   ╭──╮
-     ╱ │   │ ╲  │Pack│
-    ╱  │   │  ╲ ╰┬─╯
-       │   │   ╲ │
-      ╱ ╲ ╱ ╲  ╲╯
-      ═══════════
+       ╭━━━━━━━╮
+      ╱ ╭━━━━━╮ ╲
+     │  │─  ─ │  │
+     │  │ ╰△╯ │  │
+      ╲ ╰━┯━━━╯ ╱
+    ╭╮ ╲╲─┤──╱╱ ╭───╮
+    ╰┤╱╱ ╲│ ╱╲╲ │Pack│
+     ╱╱   ╱╲  ╲╰┬───╯
+          ╱  ╲  │╯
   Grey Crane · Wanderer
 </pre>`, delay: 800 },
     { tag: '情報', tagColor: 'tag-info', text: '灰鶴解開行囊，裡面裝滿了各種從礦道中搜刮來的物資。', textEn: 'Grey Crane opens her pack, filled with scavenged supplies from the mines.', delay: 2000 },
