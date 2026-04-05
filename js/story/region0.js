@@ -234,7 +234,34 @@ registerNode('r0_look', () => {
 
 registerNode('r0_patrol', () => {
   autoExplore([
-    { tag: '判斷', tagColor: 'tag-move', text: '離開這裡之前，也許應該先清除周圍的威脅。', textEn: 'Before leaving, perhaps you should clear the threats lurking nearby.', delay: 2000 },
+    { tag: '判斷', tagColor: 'tag-move', text: '離開這裡之前，也許應該先清除周圍的威脅。', textEn: 'Before leaving, perhaps you should clear the threats lurking nearby.', delay: 2000,
+      art: `<pre class="ascii-art">
+    ╔══════════════════════════════════╗
+    ║  ·  .    ·    .  ·    .    ·  . ║
+    ║      ▓▓▓▓▓▓              ·      ║
+    ║     ▓░░░░░▓    ·    .           ║
+    ║    ▓░░░░░░░▓                    ║
+    ║   ▓░░░░░░░░░▓  .        /\\     ║
+    ║    ▓░░░░░░░▓          __/  \\    ║
+    ║     ▓░░░░░▓    ·     /  ·· |    ║
+    ║  .   ▓▓▓▓▓          | ·  · |    ║
+    ║          ·    .   ·  |  ··  |    ║
+    ║   ·  .      ·        \\____/     ║
+    ╚══════════════════════════════════╝
+</pre>`, artEn: `<pre class="ascii-art">
+    ╔══════════════════════════════════╗
+    ║  ·  .    ·    .  ·    .    ·  . ║
+    ║      ▓▓▓▓▓▓              ·      ║
+    ║     ▓░░░░░▓    ·    .           ║
+    ║    ▓░░░░░░░▓                    ║
+    ║   ▓░░░░░░░░░▓  .        /\\     ║
+    ║    ▓░░░░░░░▓          __/  \\    ║
+    ║     ▓░░░░░▓    ·     /  ·· |    ║
+    ║  .   ▓▓▓▓▓          | ·  · |    ║
+    ║          ·    .   ·  |  ··  |    ║
+    ║   ·  .      ·        \\____/     ║
+    ╚══════════════════════════════════╝
+</pre>` },
     { tag: '感知', tagColor: 'tag-sense', text: '你握緊武器，壓低身體，沿著洞穴邊緣摸索前進。', textEn: 'You grip your weapon, crouch low, and creep along the cave walls.', delay: 2000 },
   ], [
     { text: '深入警戒搜索', textEn: 'Begin patrol sweep', action: () => startPatrol() },
@@ -358,7 +385,34 @@ registerNode('r0_statues', () => {
 // ── Mysterious whisper among statues ──
 registerNode('r0_whisper', () => {
   autoExplore([
-    { tag: '行動', tagColor: 'tag-move', text: '你繼續在石像之間翻找。', textEn: 'You continue searching among the statues.', delay: 2000 },
+    { tag: '行動', tagColor: 'tag-move', text: '你繼續在石像之間翻找。', textEn: 'You continue searching among the statues.', delay: 2000,
+      art: `<pre class="ascii-art">
+    ·    .    ·    ✦    ·    .    ·
+       _____       _____       _____
+      / ·x· \\     / ·x· \\     / ·x· \\
+     | (   ) |   | (   ) |   | (   ) |
+      \\_____/     \\_____/     \\_____/
+      ░│   │░     ░│   │░     ░│   │░
+     ░░├───┤░░   ░░├───┤░░   ░░├───┤░░
+     ░░│   │░░   ░░│   │░░   ░░│   │░░
+     ░░/   \\░░   ░░/   \\░░   ░░/   \\░░
+    ░░/     \\░░ ░░/     \\░░ ░░/     \\░░
+    ˜˜˜˜˜˜˜˜˜˜˜˜˜˜˜˜˜˜˜˜˜˜˜˜˜˜˜˜˜˜˜˜˜
+     ≋  ≋  ≋   ≋  ≋  ≋   ≋  ≋  ≋  ≋
+</pre>`, artEn: `<pre class="ascii-art">
+    ·    .    ·    ✦    ·    .    ·
+       _____       _____       _____
+      / ·x· \\     / ·x· \\     / ·x· \\
+     | (   ) |   | (   ) |   | (   ) |
+      \\_____/     \\_____/     \\_____/
+      ░│   │░     ░│   │░     ░│   │░
+     ░░├───┤░░   ░░├───┤░░   ░░├───┤░░
+     ░░│   │░░   ░░│   │░░   ░░│   │░░
+     ░░/   \\░░   ░░/   \\░░   ░░/   \\░░
+    ░░/     \\░░ ░░/     \\░░ ░░/     \\░░
+    ˜˜˜˜˜˜˜˜˜˜˜˜˜˜˜˜˜˜˜˜˜˜˜˜˜˜˜˜˜˜˜˜˜
+     ≋  ≋  ≋   ≋  ≋  ≋   ≋  ≋  ≋  ≋
+</pre>` },
     { tag: '感知', tagColor: 'tag-sense', text: '突然——', textEn: 'Suddenly —', delay: 1500 },
     { tag: '感知', tagColor: 'tag-sense', text: '你聽到了什麼。', textEn: 'You hear something.', delay: 2500 },
     { tag: '感知', tagColor: 'tag-sense', text: '不是石塊掉落的聲音。不是水滴。', textEn: 'Not the sound of falling rocks. Not dripping water.', delay: 2500 },
@@ -501,7 +555,32 @@ registerNode('r0_hidden', () => {
   state.flags.hiddenFound = true;
   var hasGlow = hasItem(L('微光石', 'Glowstone'));
   var steps = [
-    { tag: '探索', tagColor: 'tag-explore', text: '在東側岩壁的角落，你注意到一處不自然的石塊堆疊。', textEn: 'In the eastern corner, you notice an unnatural pile of rocks.', delay: 2000 },
+    { tag: '探索', tagColor: 'tag-explore', text: '在東側岩壁的角落，你注意到一處不自然的石塊堆疊。', textEn: 'In the eastern corner, you notice an unnatural pile of rocks.', delay: 2000,
+      art: `<pre class="ascii-art">
+    ╔═══════════════════════════════╗
+    ║ ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ ║
+    ║ ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░▓▓ ║
+    ║ ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░   ░▓ ║
+    ║ ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░ ┌──┐ ░ ║
+    ║ ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░  │⚘ │ ░ ║
+    ║  ·  ·  ·  ·  ░░░░░  │≈≈│ ░░ ║
+    ║           ▄▄▄░░  ░░  └──┘ ░░ ║
+    ║      ▄▄▄▄█░░█▄▄   ░░░░░░░░░ ║
+    ║  ▄▄▄█░░░░░░░░░░█▄▄▄▄▄▄▄▄▄▄ ║
+    ╚═══════════════════════════════╝
+</pre>`, artEn: `<pre class="ascii-art">
+    ╔═══════════════════════════════╗
+    ║ ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ ║
+    ║ ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░▓▓ ║
+    ║ ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░   ░▓ ║
+    ║ ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░ ┌──┐ ░ ║
+    ║ ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░  │⚘ │ ░ ║
+    ║  ·  ·  ·  ·  ░░░░░  │≈≈│ ░░ ║
+    ║           ▄▄▄░░  ░░  └──┘ ░░ ║
+    ║      ▄▄▄▄█░░█▄▄   ░░░░░░░░░ ║
+    ║  ▄▄▄█░░░░░░░░░░█▄▄▄▄▄▄▄▄▄▄ ║
+    ╚═══════════════════════════════╝
+</pre>` },
     { tag: '行動', tagColor: 'tag-move', text: '你搬開了幾塊石頭——後面是一個狹小的凹洞。', textEn: 'You move some rocks aside — revealing a small alcove behind.', delay: 2200 },
   ];
   if (hasGlow) {
@@ -533,7 +612,36 @@ registerNode('r0_hidden', () => {
 // ── Rest and memory flashback ──
 registerNode('r0_rest', () => {
   autoExplore([
-    { tag: '行動', tagColor: 'tag-move', text: '你靠著岩壁坐了下來，讓自己喘口氣。', textEn: 'You lean against the wall and sit down, catching your breath.', delay: 2000 },
+    { tag: '行動', tagColor: 'tag-move', text: '你靠著岩壁坐了下來，讓自己喘口氣。', textEn: 'You lean against the wall and sit down, catching your breath.', delay: 2000,
+      art: `<pre class="ascii-art">
+    ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+    ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+    ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+    ▓▓                            ▓▓
+    ▓▓          ·  ✦  ·          ▓▓
+    ▓▓    .  ·          ·  .    ▓▓
+    ▓▓                          ▓▓
+    ▓▓            _n_           ▓▓
+    ▓▓           / _ \\          ▓▓
+    ▓▓          | (_) |         ▓▓
+    ▓▓     _____|/   \\|_____    ▓▓
+    ▓▓    /     ·     ·     \\   ▓▓
+    ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+</pre>`, artEn: `<pre class="ascii-art">
+    ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+    ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+    ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+    ▓▓                            ▓▓
+    ▓▓          ·  ✦  ·          ▓▓
+    ▓▓    .  ·          ·  .    ▓▓
+    ▓▓                          ▓▓
+    ▓▓            _n_           ▓▓
+    ▓▓           / _ \\          ▓▓
+    ▓▓          | (_) |         ▓▓
+    ▓▓     _____|/   \\|_____    ▓▓
+    ▓▓    /     ·     ·     \\   ▓▓
+    ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+</pre>` },
     { tag: '感知', tagColor: 'tag-sense', text: '黑暗中，你的呼吸聲格外清晰。', textEn: 'In the darkness, your breathing sounds unnervingly loud.', delay: 2500 },
     { tag: '環境', tagColor: 'tag-system', text: '……', textEn: '...', delay: 3000 },
     { tag: '記憶', tagColor: 'tag-system', text: '你閉上眼睛——碎片般的記憶開始浮現。', textEn: 'You close your eyes — fragmented memories surface.', delay: 3000 },
@@ -741,7 +849,34 @@ registerNode('r0_climb_str', () => {
   if (r === 'crit') {
     changePetri(1);
     autoExplore([
-      { tag: '大成功', tagColor: 'tag-move', text: '你深吸一口氣——手腳如同猿猴般靈活！', textEn: 'You take a deep breath — climbing with ape-like agility!', delay: 1500 },
+      { tag: '大成功', tagColor: 'tag-move', text: '你深吸一口氣——手腳如同猿猴般靈活！', textEn: 'You take a deep breath — climbing with ape-like agility!', delay: 1500,
+      art: `<pre class="ascii-art">
+    ▓▓▓▓▓▓│  ·  ·  ·  │▓▓▓▓▓▓▓▓▓▓
+    ▓▓▓▓▓▓│ ░░░░░░░░░ │▓▓▓▓▓▓▓▓▓▓
+    ▓▓▓▓▓▓│·░░˚·˚░░░░·│▓▓▓▓▓▓▓▓▓▓
+    ▓▓▓▓▓▓│ ░░░░░░░░░ │▓▓▓▓▓▓▓▓▓▓
+    ▓▓▓▓▓▓│·░˚░░░░˚░░·│▓▓▓▓▓▓▓▓▓▓
+    ▓▓▓▓▓▓│ ░░░░░░░░░ │▓▓▓▓▓▓▓▓▓▓
+    ▓▓▓▓▓▓│·░░░˚░░░░░·│▓▓▓▓▓▓▓▓▓▓
+    ▓▓▓▓▓▓│ ░░░░░░░░░ │▓▓▓▓▓▓▓▓▓▓
+    ▓▓▓▓▓▓│·░░░░░░˚░░·│▓▓▓▓▓▓▓▓▓▓
+    ▓▓▓▓▓▓│ ░░░░░░░░░ │▓▓▓▓▓▓▓▓▓▓
+    ▓▓▓▓▓▓│  ·  ·  ·  │▓▓▓▓▓▓▓▓▓▓
+    ▓▓▓▓▓▓╘════════════╛▓▓▓▓▓▓▓▓▓▓
+</pre>`, artEn: `<pre class="ascii-art">
+    ▓▓▓▓▓▓│  ·  ·  ·  │▓▓▓▓▓▓▓▓▓▓
+    ▓▓▓▓▓▓│ ░░░░░░░░░ │▓▓▓▓▓▓▓▓▓▓
+    ▓▓▓▓▓▓│·░░˚·˚░░░░·│▓▓▓▓▓▓▓▓▓▓
+    ▓▓▓▓▓▓│ ░░░░░░░░░ │▓▓▓▓▓▓▓▓▓▓
+    ▓▓▓▓▓▓│·░˚░░░░˚░░·│▓▓▓▓▓▓▓▓▓▓
+    ▓▓▓▓▓▓│ ░░░░░░░░░ │▓▓▓▓▓▓▓▓▓▓
+    ▓▓▓▓▓▓│·░░░˚░░░░░·│▓▓▓▓▓▓▓▓▓▓
+    ▓▓▓▓▓▓│ ░░░░░░░░░ │▓▓▓▓▓▓▓▓▓▓
+    ▓▓▓▓▓▓│·░░░░░░˚░░·│▓▓▓▓▓▓▓▓▓▓
+    ▓▓▓▓▓▓│ ░░░░░░░░░ │▓▓▓▓▓▓▓▓▓▓
+    ▓▓▓▓▓▓│  ·  ·  ·  │▓▓▓▓▓▓▓▓▓▓
+    ▓▓▓▓▓▓╘════════════╛▓▓▓▓▓▓▓▓▓▓
+</pre>` },
       { tag: '行動', tagColor: 'tag-move', text: '完美避開所有灰色苔蘚，一口氣攀上了岩棚！', textEn: 'You avoid every patch of grey moss and reach the ledge in one go!', delay: 2000 },
       { tag: '探索', tagColor: 'tag-explore', text: '岩棚上方，一條蜿蜒的隧道延伸向黑暗深處。', textEn: 'Above the ledge, a winding tunnel stretches into the darkness.', delay: 1800 },
     ], [{ text: '進入隧道', textEn: 'Enter the tunnel', action: () => loadNode('r0_tunnel') }]);
@@ -772,7 +907,34 @@ registerNode('r0_climb_str', () => {
 registerNode('r0_climb_alt', () => {
   const hasMikouStone = hasItem(L('微光石', 'Glowstone'));
   var steps = [
-    { tag: '探索', tagColor: 'tag-explore', text: '你退後幾步，打量整個岩壁。', textEn: 'You step back and survey the entire wall.', delay: 1500 },
+    { tag: '探索', tagColor: 'tag-explore', text: '你退後幾步，打量整個岩壁。', textEn: 'You step back and survey the entire wall.', delay: 1500,
+      art: `<pre class="ascii-art">
+    ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+    ▓▓▓▓▓▓║            ║▓▓▓▓▓▓▓▓▓▓▓
+    ▓▓▓▓▓▓║  ˚  ˚  ˚  ║▓▓▓▓▓▓▓▓▓▓▓
+    ▓▓▓▓▓▓║    ░░░░░   ║▓▓▓▓▓▓▓▓▓▓▓
+    ▓▓▓▓▓▓║  ░░░░░░░░  ║▓▓▓▓▓▓▓▓▓▓▓
+    ▓▓▓▓▓▓║══╗░░░░░░░  ║▓▓▓▓▓▓▓▓▓▓▓
+    ▓▓▓▓▓▓║  ║░░░░░░░  ║▓▓▓▓▓▓▓▓▓▓▓
+    ▓▓▓▓▓▓║══╝░░˚░░░░  ║▓▓▓▓▓▓▓▓▓▓▓
+    ▓▓▓▓▓▓║  ░░░░░░░░  ║▓▓▓▓▓▓▓▓▓▓▓
+    ▓▓▓▓▓╔╩═══╗░░░░░░  ║▓▓▓▓▓▓▓▓▓▓▓
+    ▓▓▓▓▓║▄▄▄▄║░░░░░░  ║▓▓▓▓▓▓▓▓▓▓▓
+    ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+</pre>`, artEn: `<pre class="ascii-art">
+    ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+    ▓▓▓▓▓▓║            ║▓▓▓▓▓▓▓▓▓▓▓
+    ▓▓▓▓▓▓║  ˚  ˚  ˚  ║▓▓▓▓▓▓▓▓▓▓▓
+    ▓▓▓▓▓▓║    ░░░░░   ║▓▓▓▓▓▓▓▓▓▓▓
+    ▓▓▓▓▓▓║  ░░░░░░░░  ║▓▓▓▓▓▓▓▓▓▓▓
+    ▓▓▓▓▓▓║══╗░░░░░░░  ║▓▓▓▓▓▓▓▓▓▓▓
+    ▓▓▓▓▓▓║  ║░░░░░░░  ║▓▓▓▓▓▓▓▓▓▓▓
+    ▓▓▓▓▓▓║══╝░░˚░░░░  ║▓▓▓▓▓▓▓▓▓▓▓
+    ▓▓▓▓▓▓║  ░░░░░░░░  ║▓▓▓▓▓▓▓▓▓▓▓
+    ▓▓▓▓▓╔╩═══╗░░░░░░  ║▓▓▓▓▓▓▓▓▓▓▓
+    ▓▓▓▓▓║▄▄▄▄║░░░░░░  ║▓▓▓▓▓▓▓▓▓▓▓
+    ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+</pre>` },
     { tag: '發現', tagColor: 'tag-item', text: '角落裡有幾塊碎石可以堆起來墊腳。', textEn: 'Some rubble in the corner could be stacked as footholds.', delay: 1800 },
     { tag: '發現', tagColor: 'tag-item', text: '岩壁裂縫中卡著一根朽木——也許可以當支撐。', textEn: 'A rotting beam is wedged in a crack — might work as support.', delay: 1800 },
   ];
@@ -1002,7 +1164,34 @@ registerNode('r0_after_lizard', () => {
 // ═══════════════════════════════════════════════════
 registerNode('r0_path', () => {
   autoExplore([
-    { tag: '決意', tagColor: 'tag-info', text: '你不想在這個死亡之坑裡多待一秒。', textEn: 'You don\'t want to spend another second in this death pit.', delay: 2000 },
+    { tag: '決意', tagColor: 'tag-info', text: '你不想在這個死亡之坑裡多待一秒。', textEn: 'You don\'t want to spend another second in this death pit.', delay: 2000,
+      art: `<pre class="ascii-art">
+        ·    ✦    ·         ·    ✦
+    ╔═══════════════════════════════╗
+    ║  ·  ·  ·     ·  ·  ·  ·  ·  ║
+    ║     ░░░░░░░░░░░░░░░░░░░     ║
+    ║   ░░░░░  ·  ░░░  ·  ░░░░░  ║
+    ║  ░░░  ·       ·       ·░░░  ║
+    ║  ░░               ↑     ░░  ║
+    ║  ░░   ·    ☆    · ↑  ·  ░░  ║
+    ║  ░░░  ·       ·   ↑ · ░░░  ║
+    ║   ░░░░░  ·  ░░░  ·  ░░░░░  ║
+    ║     ░░░░░░░░░░░░░░░░░░░     ║
+    ╚═══════════════════════════════╝
+</pre>`, artEn: `<pre class="ascii-art">
+        ·    ✦    ·         ·    ✦
+    ╔═══════════════════════════════╗
+    ║  ·  ·  ·     ·  ·  ·  ·  ·  ║
+    ║     ░░░░░░░░░░░░░░░░░░░     ║
+    ║   ░░░░░  ·  ░░░  ·  ░░░░░  ║
+    ║  ░░░  ·       ·       ·░░░  ║
+    ║  ░░               ↑     ░░  ║
+    ║  ░░   ·    ☆    · ↑  ·  ░░  ║
+    ║  ░░░  ·       ·   ↑ · ░░░  ║
+    ║   ░░░░░  ·  ░░░  ·  ░░░░░  ║
+    ║     ░░░░░░░░░░░░░░░░░░░     ║
+    ╚═══════════════════════════════╝
+</pre>` },
     { tag: '探索', tagColor: 'tag-explore', text: '快速掃視洞穴——北面岩壁上的攀爬痕跡最為明顯。', textEn: 'Quick scan of the cave — climbing marks on the north wall are the most obvious.', delay: 2500 },
     { tag: '情報', tagColor: 'tag-info', text: '那應該是唯一的出路。但也許應該先做些準備。', textEn: 'That seems to be the only exit. But perhaps some preparation first.', delay: 2200 },
   ], [
