@@ -100,32 +100,59 @@ var diceGame = (function() {
 
   // ── Crane dialogue ──
   var CRANE_BID_LINES = [
-    { zh: '灰鶴摸了摸下巴：', en: 'Grey Crane strokes his chin:' },
-    { zh: '灰鶴瞇起眼睛：', en: 'Grey Crane narrows his eyes:' },
-    { zh: '灰鶴晃了晃酒瓶：', en: 'Grey Crane swirls his bottle:' },
+    { zh: '灰鶴摸了摸下巴：', en: 'Grey Crane strokes her chin:' },
+    { zh: '灰鶴瞇起眼睛：', en: 'Grey Crane narrows her eyes:' },
+    { zh: '灰鶴晃了晃酒瓶：', en: 'Grey Crane swirls her bottle:' },
     { zh: '灰鶴嘿嘿一笑：', en: 'Grey Crane chuckles:' },
     { zh: '灰鶴不緊不慢地說：', en: 'Grey Crane says unhurriedly:' },
+    { zh: '灰鶴撥了撥垂在臉頰旁的碎髮：', en: 'Grey Crane brushes a strand of hair from her cheek:' },
+    { zh: '灰鶴慵懶地靠在椅背上：', en: 'Grey Crane leans back lazily:' },
   ];
 
   var CRANE_CALL_LINES = [
-    { zh: '灰鶴一拍桌子：「開！我不信！」', en: 'Grey Crane slams the table: "Open! I don\'t buy it!"' },
-    { zh: '灰鶴眯起眼：「吹牛吧你——開！」', en: 'Grey Crane squints: "You\'re bluffing — open!"' },
-    { zh: '「少來了，開骰子！」灰鶴笑著說。', en: '"Nice try — show me!" Grey Crane grins.' },
+    { zh: '灰鶴一拍桌子，斗篷滑落一邊露出纖細的鎖骨：「開！我不信！」', en: 'Grey Crane slams the table, her cloak slipping to reveal a slender collarbone: "Open! I don\'t buy it!"' },
+    { zh: '灰鶴眯起眼，嘴角勾起一抹狡黠的笑：「吹牛吧你——開！」', en: 'Grey Crane squints, lips curling into a sly grin: "You\'re bluffing — open!"' },
+    { zh: '「少來了，開骰子！」灰鶴笑著探過身來，酒氣和草藥的味道撲面而來。', en: '"Nice try — show me!" Grey Crane leans in with a grin, the scent of liquor and herbs washing over you.' },
   ];
 
   var CRANE_WIN_LINES = [
-    { zh: '灰鶴得意地收起金幣：「跟我賭？嫩了點。」', en: 'Grey Crane pockets the coins smugly: "Gambling with me? Too green."' },
-    { zh: '「承讓承讓。」灰鶴笑得像隻狐狸。', en: '"Better luck next time." Grey Crane grins like a fox.' },
+    { zh: '灰鶴得意地收起金幣，修長的手指在桌面上輕敲：「跟我賭？嫩了點。」', en: 'Grey Crane pockets the coins smugly, her slender fingers tapping the table: "Gambling with me? Too green."' },
+    { zh: '「承讓承讓。」灰鶴笑得像隻狐狸，身子慵懶地往後一靠。', en: '"Better luck next time." Grey Crane grins like a fox, lounging back languidly.' },
+    { zh: '灰鶴把金幣一枚一枚慢慢拾起，修長的手指在燭光下顯得格外好看：「想贏回去？那就再來啊。」', en: 'Grey Crane picks up the coins one by one, her slender fingers beautiful in the candlelight: "Want them back? Then play again."' },
   ];
 
-  var CRANE_LOSE_LINES = [
+  // Progressive lose lines — escalate body language with each player win
+  var CRANE_LOSE_LINES_TIER1 = [
     { zh: '灰鶴把金幣推過來，表情有些僵硬：「……算你走運。」', en: 'Grey Crane pushes the coins over, expression stiff: "...Lucky you."' },
     { zh: '「嘖——」灰鶴不情願地掏出金幣。', en: '"Tch —" Grey Crane reluctantly hands over the coins.' },
   ];
+  var CRANE_LOSE_LINES_TIER2 = [
+    { zh: '灰鶴嘆了口氣，把金幣推過來時手指不自覺地碰到了你的手背：「……你還真有兩下子。」', en: 'Grey Crane sighs, her fingers brushing your hand as she pushes the coins over: "...You\'re actually good."' },
+    { zh: '灰鶴搖了搖頭，身子微微前傾，斗篷的領口隨著動作鬆開了些：「行吧，這把算你的。」', en: 'Grey Crane shakes her head, leaning forward slightly — her cloak\'s collar loosens with the motion: "Fine, this one\'s yours."' },
+    { zh: '「又輸了……」灰鶴煩躁地把頭髮撥到耳後，露出頸側一道淡淡的舊傷疤：「再來。」', en: '"Lost again..." Grey Crane irritably tucks her hair behind her ear, revealing a faint scar along her neck: "Again."' },
+  ];
+  var CRANE_LOSE_LINES_TIER3 = [
+    { zh: '灰鶴仰頭灌了一口酒，喉結微動，幾滴酒液沿著下巴滑落：「……你是來搶劫我的吧？」', en: 'Grey Crane tilts her head back for a swig, throat moving — a few drops trail down her chin: "...Are you here to rob me?"' },
+    { zh: '灰鶴用手背擦了擦嘴，身體慵懶地靠向你這邊，斗篷從肩頭滑落了一半：「有本事就把我贏到一無所有啊。」', en: 'Grey Crane wipes her mouth with the back of her hand, leaning lazily toward you — her cloak slips halfway off one shoulder: "If you dare, win everything I have."' },
+    { zh: '「你啊——」灰鶴苦笑著搖頭，身體隨著笑聲微微搖晃，燭光映照出她精緻卻帶著幾分滄桑的輪廓：「真是我的剋星。」', en: '"You —" Grey Crane smiles bitterly, her body swaying with quiet laughter, candlelight tracing her refined yet weathered features: "You\'re my nemesis."' },
+  ];
+  var CRANE_LOSE_LINES_TIER4 = [
+    { zh: '灰鶴把金幣扔過來，整個人往你肩膀的方向靠了靠——酒意讓她比平時放鬆得多，斗篷大敞，裡面的襯衣被汗水貼在身上：「贏了就請我喝酒，公平吧？」', en: 'Grey Crane tosses the coins over and leans toward your shoulder — the alcohol has loosened her up. Her cloak hangs wide open, the inner shirt clinging with sweat: "Buy me a drink since you won. Fair, right?"' },
+    { zh: '灰鶴輸得有些上頭了，她解開斗篷的扣子隨手搭在椅背上，露出裡面貼身的皮甲背心，手臂上縱橫交錯的放血刀疤在燭火下若隱若現：「熱死了……再來一把，我要贏回來。」', en: 'Grey Crane is getting heated. She unclasps her cloak and drapes it over the chair, revealing a fitted leather vest — criss-crossed bloodletting scars on her arms flickering in the candlelight: "Too hot... one more, I\'m winning it back."' },
+    { zh: '「你知道嗎——」灰鶴撐著下巴看你，眼神因為酒精變得迷濛而危險，嘴唇微微彎起：「在深淵裡能讓我連輸這麼多次的，你是第一個。我記住你了。」', en: '"You know —" Grey Crane props her chin on her hand, her gaze hazy and dangerous from the alcohol, lips curving: "You\'re the first person in the abyss to beat me this many times. I\'ll remember you."' },
+  ];
+
+  function pickCraneLoseLine() {
+    var wins = (state.flags.diceWins || 0);
+    if (wins >= 7) return pickLine(CRANE_LOSE_LINES_TIER4);
+    if (wins >= 4) return pickLine(CRANE_LOSE_LINES_TIER3);
+    if (wins >= 2) return pickLine(CRANE_LOSE_LINES_TIER2);
+    return pickLine(CRANE_LOSE_LINES_TIER1);
+  }
 
   var CRANE_CHEAT_CAUGHT = [
-    { zh: '灰鶴一把抓住你的手腕：「嗯？你在幹什麼？」', en: 'Grey Crane grabs your wrist: "Hm? What are you doing?"' },
-    { zh: '「動作太慢了啊朋友。」灰鶴搖了搖頭。', en: '"Too slow, friend." Grey Crane shakes his head.' },
+    { zh: '灰鶴一把抓住你的手腕，她的手指意外地有力：「嗯？你在幹什麼？」', en: 'Grey Crane grabs your wrist — her grip is surprisingly strong: "Hm? What are you doing?"' },
+    { zh: '「動作太慢了啊朋友。」灰鶴搖了搖頭，鬆開你的手時指尖劃過你的手掌。', en: '"Too slow, friend." Grey Crane shakes her head, her fingertips trailing across your palm as she lets go.' },
   ];
 
   function pickLine(arr) {
@@ -189,7 +216,7 @@ var diceGame = (function() {
         state.flags.gold = gold + bet;
         state.flags.diceWins = (state.flags.diceWins || 0) + 1;
         state.flags.diceEarnings = (state.flags.diceEarnings || 0) + bet;
-        var line = pickLine(CRANE_LOSE_LINES);
+        var line = pickCraneLoseLine();
         steps.push({ tag: en ? 'WIN' : '勝利', tagColor: 'tag-explore',
           text: L(line.zh + ' (+' + bet + '金幣)', line.en + ' (+' + bet + ' gold)'), delay: 2500 });
         sfx.pass();
@@ -297,8 +324,8 @@ var diceGame = (function() {
               peeked = true;
               var peekSteps = [
                 { tag: en ? 'CHEAT' : '作弊', tagColor: 'tag-explore',
-                  text: L('你趁灰鶴喝酒的空檔，迅速瞥了一眼他的骰子——',
-                         'While Grey Crane takes a swig, you catch a glimpse of his dice —'),
+                  text: L('你趁灰鶴喝酒的空檔，迅速瞥了一眼她的骰子——',
+                         'While Grey Crane takes a swig, you catch a glimpse of her dice —'),
                   delay: 1500 },
                 { tag: en ? 'DICE' : '骰子', tagColor: 'tag-info',
                   text: L('灰鶴的骰子：' + renderDice(craneDice), 'Grey Crane\'s dice: ' + renderDice(craneDice)),
@@ -314,7 +341,7 @@ var diceGame = (function() {
                   text: L(line.zh, line.en), delay: 2000 },
                 { tag: en ? 'DICE' : '骰子', tagColor: 'tag-info',
                   text: L('灰鶴重新搖了骰子。你的小動作白費了。',
-                         'Grey Crane re-rolls his dice. Your trick was wasted.'),
+                         'Grey Crane re-rolls her dice. Your trick was wasted.'),
                   delay: 2000 },
               ];
               craneDice = rollDice(5);
@@ -343,7 +370,7 @@ var diceGame = (function() {
               var bluffSteps = [
                 { tag: en ? 'CHEAT' : '作弊', tagColor: 'tag-explore',
                   text: L('你盯著灰鶴的眼睛，嘴角微微上揚。那個眼神讓灰鶴猶豫了。',
-                         'You lock eyes with Grey Crane, lips curling. That look makes him hesitate.'),
+                         'You lock eyes with Grey Crane, lips curling. That look makes her hesitate.'),
                   delay: 2000 },
                 { tag: en ? 'WIN' : '勝利', tagColor: 'tag-explore',
                   text: L('「……算了算了，這把你贏了。」灰鶴把金幣推過來。(+' + bet + '金幣)',

@@ -509,13 +509,17 @@ registerNode('r3_bell', () => {
     state.flags.r3BellMet = true;
     steps.push({ tag: '移動', tagColor: 'tag-move', text: '你走進議會廳右側走廊盡頭的房間。門半開著。', textEn: 'You enter the room at the end of the right corridor. The door is ajar.', delay: 2000 });
     steps.push({ tag: '感知', tagColor: 'tag-sense', text: '房間不大，堆滿了文件和地圖。靠窗的桌子旁坐著一個人。', textEn: 'A small room packed with documents and maps. Someone sits at a desk by the window.', delay: 2200 });
-    steps.push({ tag: '感知', tagColor: 'tag-sense', html: '那是一個四十多歲的女人，頭髮花白，但目光銳利。她的右手從手腕到指尖已經完全石化——卻依然握著筆在寫字。', htmlEn: 'A woman in her forties, hair streaked with grey, gaze sharp. Her right hand is fully petrified from wrist to fingertips — yet she still grips a pen, writing.', delay: 3200 });
-    steps.push({ tag: '情報', tagColor: 'tag-info', html: '「進來吧。」她沒有抬頭。「我是<b>銅鐘</b>。聽說有人從下面爬上來了——想必就是你。」', htmlEn: '"Come in." She doesn\'t look up. "I\'m <b>Bronze Bell</b>. I heard someone climbed up from below — that must be you."', delay: 3000 });
-    steps.push({ tag: '情報', tagColor: 'tag-info', text: '她終於放下筆，轉過身看著你。她的目光停在你身上的石化痕跡上，沒有嫌惡，只有某種沉重的理解。', textEn: 'She finally puts down the pen and turns to face you. Her gaze rests on your petri-marks — not with disgust, but a heavy understanding.', delay: 3000 });
-    steps.push({ tag: '情報', tagColor: 'tag-info', text: '「下面的情況怎麼樣？還有多少人活著？」', textEn: '"How are things below? How many are still alive?"', delay: 2200 });
+    steps.push({ tag: '感知', tagColor: 'tag-sense', html: '那是一個四十多歲的女人——但她的存在感遠比年齡所暗示的更加強烈。', htmlEn: 'A woman in her forties — but her presence is far more commanding than her age suggests.', delay: 2800 });
+    steps.push({ tag: '感知', tagColor: 'tag-sense', text: '淡金色的頭髮梳成利落的髮髻，幾縷花白的碎髮垂在臉頰旁。高挺的鼻梁、輪廓分明的下顎線條——即使歲月在她臉上留下了痕跡，也掩蓋不住骨子裡的銳利與美。', textEn: 'Pale gold hair swept into a sharp bun, a few grey-streaked strands framing her face. High nose, sculpted jawline — even with time\'s marks upon her, the underlying sharpness and beauty are unmistakable.', delay: 3500 });
+    steps.push({ tag: '感知', tagColor: 'tag-sense', text: '她的身材高挑而豐腴，官服被撐得很滿，但每一個動作都透著毫不費力的威嚴——像是習慣了被人仰望。', textEn: 'She\'s tall and full-figured, filling out her official robes, yet every motion carries effortless authority — as if accustomed to being looked up to.', delay: 3200 });
+    steps.push({ tag: '感知', tagColor: 'tag-sense', html: '她的右手從手腕到指尖已經完全石化——冰冷的灰色石頭取代了血肉。但那隻石化的手依然穩穩地握著筆在寫字，力道絲毫不減。', htmlEn: 'Her right hand is fully petrified from wrist to fingertips — cold grey stone replacing flesh. Yet that stone hand still grips the pen firmly, writing without the slightest tremor.', delay: 3200 });
+    steps.push({ tag: '情報', tagColor: 'tag-info', html: '「進來吧。」她沒有抬頭，聲音低沉而具有穿透力。「我是<b>銅鐘</b>。聽說有人從下面爬上來了——想必就是你。」', htmlEn: '"Come in." She doesn\'t look up, her voice low and penetrating. "I\'m <b>Bronze Bell</b>. I heard someone climbed up from below — that must be you."', delay: 3000 });
+    steps.push({ tag: '感知', tagColor: 'tag-sense', text: '她終於放下筆，轉過身看著你。那雙琥珀色的眼睛帶著審視的壓迫感——像在用目光丈量你的分量。', textEn: 'She finally puts down the pen and turns to face you. Those amber eyes carry an appraising intensity — as if measuring your worth with her gaze alone.', delay: 3000 });
+    steps.push({ tag: '感知', tagColor: 'tag-sense', text: '她的目光停在你身上的石化痕跡上。沒有嫌惡，沒有憐憫——只有某種沉重的、感同身受的理解。她不自覺地用左手按了按自己石化的右手腕。', textEn: 'Her gaze rests on your petri-marks. No disgust, no pity — just a heavy, empathetic understanding. She unconsciously presses her left hand against her own petrified right wrist.', delay: 3500 });
+    steps.push({ tag: '情報', tagColor: 'tag-info', text: '「下面的情況怎麼樣？還有多少人活著？」她的語氣不是在詢問——更像是在下達命令要求你回報。', textEn: '"How are things below? How many are still alive?" Her tone isn\'t a question — it\'s closer to an order demanding a report.', delay: 2800 });
   } else {
-    steps.push({ tag: '移動', tagColor: 'tag-move', text: '銅鐘還是坐在那張堆滿文件的桌子旁。看到你來，她放下筆。', textEn: 'Bronze Bell sits at her document-laden desk. She puts down her pen when she sees you.', delay: 2000 });
-    steps.push({ tag: '情報', tagColor: 'tag-info', text: '「有什麼進展？」', textEn: '"Any progress?"', delay: 1500 });
+    steps.push({ tag: '移動', tagColor: 'tag-move', text: '銅鐘還是坐在那張堆滿文件的桌子旁。看到你來，她放下筆，身子微微後靠，雙臂交叉在胸前。', textEn: 'Bronze Bell sits at her document-laden desk. Seeing you, she puts down her pen and leans back, arms crossed over her chest.', delay: 2500 });
+    steps.push({ tag: '情報', tagColor: 'tag-info', text: '「有什麼進展？」她的目光從你的頭頂掃到腳底，像在確認你還有幾分完好。', textEn: '"Any progress?" Her gaze sweeps you from head to toe, as if assessing how intact you still are.', delay: 2200 });
   }
 
   autoExplore(steps, (function() {
@@ -527,7 +531,9 @@ registerNode('r3_bell', () => {
           { tag: '行動', tagColor: 'tag-move', text: '你把在祭獻坑、石脈迴廊和大採石場的經歷告訴了銅鐘。', textEn: 'You recount your experiences in the Sacrificial Pit, Vein Corridor, and Great Quarry.', delay: 2500 },
           { tag: '情報', tagColor: 'tag-info', text: '鐵霜帶領的營地、迴廊裡的倖存者、老周、守衛——', textEn: 'Iron Frost\'s camp, corridor survivors, Old Zhou, the guards —', delay: 2200 },
           { tag: '感知', tagColor: 'tag-sense', text: '銅鐘一邊聽一邊用石化的右手在紙上做記錄。那隻手雖然已經變成石頭，卻仍能寫字——像某種不屈的意志。', textEn: 'Bronze Bell takes notes with her petrified right hand as she listens. Though turned to stone, it still writes — like some indomitable will.', delay: 3000 },
-          { tag: '情報', tagColor: 'tag-info', text: '「……我就知道。」她嘆了口氣。「封鎖通道只會害死更多人。下面還有倖存者在苦撐。」', textEn: '"...I knew it." She sighs. "Sealing the passages will only kill more people. Survivors below are still holding on."', delay: 3000 },
+          { tag: '感知', tagColor: 'tag-sense', text: '說到傷亡最慘重的部分時，她停下了筆。你看見她咬緊了下唇，胸口微微起伏——然後她深吸一口氣，重新拿起筆繼續記錄。', textEn: 'At the worst of the casualties, she stops writing. You see her bite her lower lip, chest rising slightly — then she draws a deep breath and picks up the pen again.', delay: 3200 },
+          { tag: '情報', tagColor: 'tag-info', text: '「……我就知道。」她把筆放下，雙手撐在桌面上站起身來——她站起來的瞬間，你才真正感受到她的氣場。比坐著的時候壓迫感強了一倍。', textEn: '"...I knew it." She sets down the pen and stands, palms flat on the desk — the moment she rises, you truly feel her presence. Twice as commanding as when seated.', delay: 3500 },
+          { tag: '情報', tagColor: 'tag-info', text: '「封鎖通道只會害死更多人。下面還有倖存者在苦撐。」她走到窗邊，背對著你。窗外微弱的光線勾勒出她挺拔的輪廓。', textEn: '"Sealing the passages will only kill more people. Survivors below are still holding on." She walks to the window, back to you. Faint light traces her upright silhouette.', delay: 3200 },
           { tag: '情報', tagColor: 'tag-info', html: '「你的證詞很重要。下一次議會投票時，我需要你<b>在議會上作證</b>——證明下面的人不是威脅，而是需要幫助的同胞。」', htmlEn: '"Your testimony matters. At the next Council vote, I need you to <b>testify before the Council</b> — prove the people below aren\'t a threat, but fellow humans who need help."', delay: 3500 },
           { tag: '情報', tagColor: 'tag-info', text: '「你願意嗎？」', textEn: '"Will you?"', delay: 1800 },
         ], [
@@ -536,19 +542,22 @@ registerNode('r3_bell', () => {
             gainXp(15);
             notify(L('經驗 +15（與銅鐘建立同盟）', 'XP +15 (Allied with Bronze Bell)'));
             autoExplore([
-              { tag: '感知', tagColor: 'tag-sense', text: '銅鐘看著你，眼中閃過一絲久違的光芒。', textEn: 'Bronze Bell looks at you, a long-absent gleam in her eyes.', delay: 2000 },
-              { tag: '情報', tagColor: 'tag-info', text: '「……謝謝你。」她的聲音很輕，但很堅定。', textEn: '"...Thank you." Her voice is soft but resolute.', delay: 2200 },
+              { tag: '感知', tagColor: 'tag-sense', text: '銅鐘轉過身來看著你。燈光映在她的琥珀色眼眸裡，你看到了某種久違的光芒——不是感激，而是找到同路人的釋然。', textEn: 'Bronze Bell turns to face you. Lamplight reflects in her amber eyes, and you see a long-absent gleam — not gratitude, but the relief of finding a kindred soul.', delay: 3200 },
+              { tag: '感知', tagColor: 'tag-sense', text: '她走上前一步——比你想像的近。你能聞到她身上淡淡的墨水和茶葉的氣味。', textEn: 'She steps forward — closer than expected. You catch the faint scent of ink and tea on her.', delay: 2800 },
+              { tag: '情報', tagColor: 'tag-info', text: '「……謝謝你。」她的聲音突然輕了下來。這個在議會上叱咤風雲的女人，此刻的語氣柔軟得讓你有些不適應。', textEn: '"...Thank you." Her voice suddenly softens. This woman who commands the council — her tone now tender enough to catch you off guard.', delay: 3000 },
             ], [
               { text: '下一步怎麼做？', textEn: 'What\'s next?', action: () => {
                 state.flags.r3BellQuest = true;
                 autoExplore([
-                  { tag: '情報', tagColor: 'tag-info', text: '銅鐘攤開一張渡口的地圖，指著幾個位置。', textEn: 'Bronze Bell spreads a map of the docks, pointing to several locations.', delay: 2200 },
-                  { tag: '情報', tagColor: 'tag-info', html: '「議會投票還有三天。在那之前，你需要做三件事——」', htmlEn: '"The Council vote is in three days. Before then, you need three things —"', delay: 2500 },
+                  { tag: '行動', tagColor: 'tag-move', text: '銅鐘站起身來——她站起來的動作從容有力，像一堵牆緩緩升起。', textEn: 'Bronze Bell rises — the movement is slow, powerful, like a wall coming up.', delay: 2500 },
+                  { tag: '情報', tagColor: 'tag-info', text: '她走到牆邊，伸手從高處取下一張捲起的地圖。你注意到她即使用石化的右手也能輕鬆固定地圖的一角——力道驚人。', textEn: 'She strides to the wall, reaching up for a rolled map. You notice her petrified right hand pins the map\'s corner effortlessly — formidable strength.', delay: 3000 },
+                  { tag: '情報', tagColor: 'tag-info', text: '銅鐘把地圖攤在桌面上，俯身用左手指著幾個位置。她俯身時，花白的碎髮從耳後滑落，你能清楚看見她堅毅的側臉輪廓。', textEn: 'She spreads the map across the desk, leaning over to point out locations. As she bends, grey-streaked strands slip from behind her ear — you get a clear view of her resolute profile.', delay: 3200 },
+                  { tag: '情報', tagColor: 'tag-info', html: '「議會投票還有三天。在那之前，你需要做三件事——」她抬眼看你，琥珀色的瞳孔裡帶著不容置疑的堅定。', htmlEn: '"The Council vote is in three days. Before then, you need three things —" She looks up, amber eyes carrying an unquestionable resolve.', delay: 2800 },
                   { tag: '情報', tagColor: 'tag-info', html: '「第一：去<b>河岸隧道</b>清除那裡的變異生物。鏽刃說封鎖通道是因為怪物從下面上來——如果你能證明怪物不是來自下層，他就沒藉口了。」', htmlEn: '"First: clear the <b>river tunnels</b> of mutants. Rust Blade claims sealing is needed because monsters come from below — if you prove the creatures aren\'t from the lower levels, his excuse crumbles."', delay: 3800 },
-                  { tag: '情報', tagColor: 'tag-info', html: '「第二：在市場找到<b>灰鶴</b>。他是唯一在上下層之間跑商路的人，他的證詞能動搖商會的玉秤。」', htmlEn: '"Second: find <b>Grey Crane</b> in the market. He\'s the only trader running routes between levels — his testimony can sway Jade Scale of the Merchants."', delay: 3200 },
+                  { tag: '情報', tagColor: 'tag-info', html: '「第二：在市場找到<b>灰鶴</b>。她是唯一在上下層之間跑商路的人，她的證詞能動搖商會的玉秤。」', htmlEn: '"Second: find <b>Grey Crane</b> in the market. She\'s the only trader running routes between levels — her testimony can sway Jade Scale of the Merchants."', delay: 3200 },
                   { tag: '情報', tagColor: 'tag-info', html: '「第三：找到能證明<b>石化瘟疫起源</b>的證據。如果能證明瘟疫不是因為下層通道——而是因為古代封印——那封鎖通道就毫無意義。」', htmlEn: '"Third: find evidence of the <b>plague\'s true origin</b>. If you can prove it came from the ancient seal, not the lower passages — sealing is pointless."', delay: 3800 },
-                  { tag: '感知', tagColor: 'tag-sense', text: '銅鐘看著你。她石化的右手不自覺地握緊了筆。', textEn: 'Bronze Bell looks at you. Her petrified hand unconsciously grips the pen tighter.', delay: 2500 },
-                  { tag: '情報', tagColor: 'tag-info', text: '「……拜託你了。這不只是我一個人的戰鬥。」', textEn: '"...I\'m counting on you. This isn\'t just my fight."', delay: 2500 },
+                  { tag: '感知', tagColor: 'tag-sense', text: '銅鐘直起身子，站在窗邊回頭看你。逆光勾勒出她寬闊的肩膀和挺拔的腰線——像一尊還未完全石化的雕像，威嚴而不可動搖。', textEn: 'Bronze Bell straightens and turns from the window. Backlit, her broad shoulders and upright waist are silhouetted — like a statue not yet fully petrified, majestic and immovable.', delay: 3000 },
+                  { tag: '情報', tagColor: 'tag-info', text: '「……拜託你了。」她的石化右手不自覺地握成了拳。你聽見石指關節碾磨的細微聲響。「這不只是我一個人的戰鬥。」', textEn: '"...I\'m counting on you." Her petrified right hand clenches into a fist. You hear the faint grinding of stone knuckles. "This isn\'t just my fight."', delay: 3000 },
                 ], [
                   { text: '我會完成的', textEn: 'I\'ll get it done', action: () => {
                     changeStat('wil', 1);
@@ -568,12 +577,12 @@ registerNode('r3_bell', () => {
       c.push({ text: '下一步怎麼做？', textEn: 'What\'s next?', action: () => {
         state.flags.r3BellQuest = true;
         autoExplore([
-          { tag: '情報', tagColor: 'tag-info', text: '銅鐘攤開一張渡口的地圖，指著幾個位置。', textEn: 'Bronze Bell spreads a map of the docks, pointing to several locations.', delay: 2200 },
-          { tag: '情報', tagColor: 'tag-info', html: '「議會投票還有三天。在那之前，你需要做三件事——」', htmlEn: '"The Council vote is in three days. Before then, you need three things —"', delay: 2500 },
+          { tag: '行動', tagColor: 'tag-move', text: '銅鐘站起身，從牆上取下地圖攤在桌面上。', textEn: 'Bronze Bell stands, taking a map from the wall and spreading it across the desk.', delay: 2200 },
+          { tag: '情報', tagColor: 'tag-info', html: '「議會投票還有三天。在那之前，你需要做三件事——」她抬起琥珀色的眼睛看著你。', htmlEn: '"The Council vote is in three days. Before then, you need three things —" She raises her amber eyes to you.', delay: 2800 },
           { tag: '情報', tagColor: 'tag-info', html: '「第一：去<b>河岸隧道</b>清除那裡的變異生物。鏽刃說封鎖通道是因為怪物從下面上來——如果你能證明怪物不是來自下層，他就沒藉口了。」', htmlEn: '"First: clear the <b>river tunnels</b> of mutants. Rust Blade claims sealing is needed because monsters come from below — if you prove the creatures aren\'t from the lower levels, his excuse crumbles."', delay: 3800 },
-          { tag: '情報', tagColor: 'tag-info', html: '「第二：在市場找到<b>灰鶴</b>。他是唯一在上下層之間跑商路的人，他的證詞能動搖商會的玉秤。」', htmlEn: '"Second: find <b>Grey Crane</b> in the market. He\'s the only trader running routes between levels — his testimony can sway Jade Scale of the Merchants."', delay: 3200 },
+          { tag: '情報', tagColor: 'tag-info', html: '「第二：在市場找到<b>灰鶴</b>。她是唯一在上下層之間跑商路的人，她的證詞能動搖商會的玉秤。」', htmlEn: '"Second: find <b>Grey Crane</b> in the market. She\'s the only trader running routes between levels — her testimony can sway Jade Scale of the Merchants."', delay: 3200 },
           { tag: '情報', tagColor: 'tag-info', html: '「第三：找到能證明<b>石化瘟疫起源</b>的證據。如果能證明瘟疫不是因為下層通道——而是因為古代封印——那封鎖通道就毫無意義。」', htmlEn: '"Third: find evidence of the <b>plague\'s true origin</b>. If you can prove it came from the ancient seal, not the lower passages — sealing is pointless."', delay: 3800 },
-          { tag: '感知', tagColor: 'tag-sense', text: '銅鐘看著你。她石化的右手不自覺地握緊了筆。', textEn: 'Bronze Bell looks at you. Her petrified hand unconsciously grips the pen tighter.', delay: 2500 },
+          { tag: '感知', tagColor: 'tag-sense', text: '銅鐘直起腰，石化的右手握成拳按在桌面上，指節發出石碴碾磨的聲響。', textEn: 'Bronze Bell straightens, her petrified right fist pressed against the desk, stone knuckles grinding faintly.', delay: 2800 },
           { tag: '情報', tagColor: 'tag-info', text: '「……拜託你了。這不只是我一個人的戰鬥。」', textEn: '"...I\'m counting on you. This isn\'t just my fight."', delay: 2500 },
         ], [
           { text: '我會完成的', textEn: 'I\'ll get it done', action: () => {
@@ -880,10 +889,10 @@ registerNode('r3_crane', () => {
       c.push({ text: '請灰鶴在議會作證', textEn: 'Ask Grey Crane to testify', action: () => {
         state.flags.r3CraneTestimony = true;
         autoExplore([
-          { tag: '情報', tagColor: 'tag-info', text: '你把銅鐘的計劃告訴了灰鶴——需要他在議會上證明下層通道的商業價值。', textEn: 'You tell Grey Crane about Bronze Bell\'s plan — they need him to prove the lower passages\' trade value at the Council.', delay: 2800 },
-          { tag: '情報', tagColor: 'tag-info', text: '灰鶴沉默了一會兒。他收起了商人笑容，表情變得認真。', textEn: 'Grey Crane falls silent. The merchant\'s grin fades, replaced by a serious expression.', delay: 2500 },
+          { tag: '情報', tagColor: 'tag-info', text: '你把銅鐘的計劃告訴了灰鶴——需要她在議會上證明下層通道的商業價值。', textEn: 'You tell Grey Crane about Bronze Bell\'s plan — they need her to prove the lower passages\' trade value at the Council.', delay: 2800 },
+          { tag: '情報', tagColor: 'tag-info', text: '灰鶴沉默了一會兒。她收起了商人笑容，表情變得認真。', textEn: 'Grey Crane falls silent. The merchant\'s grin fades, replaced by a serious expression.', delay: 2500 },
           { tag: '情報', tagColor: 'tag-info', text: '「做生意的不喜歡趟政治的渾水……但封了通道，我的商路也沒了。」', textEn: '"Traders don\'t like wading into politics... but if the passages are sealed, my trade routes die too."', delay: 3000 },
-          { tag: '情報', tagColor: 'tag-info', text: '「行。我去作證。但你欠我一個人情——以後到了地表，請我喝酒。」灰鶴伸出手。', textEn: '"Fine. I\'ll testify. But you owe me — buy me a drink when we reach the surface." Grey Crane extends his hand.', delay: 3000 },
+          { tag: '情報', tagColor: 'tag-info', text: '「行。我去作證。但你欠我一個人情——以後到了地表，請我喝酒。」灰鶴伸出手。', textEn: '"Fine. I\'ll testify. But you owe me — buy me a drink when we reach the surface." Grey Crane extends her hand.', delay: 3000 },
         ], [
           { text: '一言為定', textEn: 'Deal', action: () => {
             gainXp(10);
@@ -897,7 +906,7 @@ registerNode('r3_crane', () => {
       c.push({ text: '看看新貨', textEn: 'Browse new goods', action: () => {
         state.flags.r3CraneTrade3 = true;
         autoExplore([
-          { tag: '情報', tagColor: 'tag-info', text: '灰鶴攤開包裹。河城的物資比下面豐富得多。', textEn: 'Grey Crane opens his pack. River City\'s supplies are far more abundant than below.', delay: 2200 },
+          { tag: '情報', tagColor: 'tag-info', text: '灰鶴攤開包裹。河城的物資比下面豐富得多。', textEn: 'Grey Crane opens her pack. River City\'s supplies are far more abundant than below.', delay: 2200 },
           { tag: '物品', tagColor: 'tag-item', html: '灰鶴遞給你一瓶清澈的液體：「<b>河城淨化液</b>——最新配方。比之前那瓶好十倍。」', htmlEn: 'Grey Crane hands you a clear liquid: "<b>River City Purifier</b> — latest formula. Ten times better than the last."', delay: 2800, effect: () => { addItem(L('河城淨化液', 'River City Purifier')); } },
           { tag: '效果', tagColor: 'tag-system', text: '石化度 -15%', delay: 800, effect: () => changePetri(-15) },
         ], [
@@ -1034,7 +1043,7 @@ registerNode('r3_quest_check', () => {
   if (state.flags.r3CraneTestimony) {
     steps.push({ tag: '情報', tagColor: 'tag-info', html: '✓ 「灰鶴答應作證了。商會的玉秤應該會動搖。」', htmlEn: '✓ "Grey Crane agreed to testify. Jade Scale of the Merchants should waver."', delay: 2500 });
   } else {
-    steps.push({ tag: '警告', tagColor: 'tag-warn', html: '✗ 「灰鶴的證詞還沒到手。去市場找他吧。」', htmlEn: '✗ "Grey Crane\'s testimony isn\'t secured yet. Find him at the market."', delay: 2500 });
+    steps.push({ tag: '警告', tagColor: 'tag-warn', html: '✗ 「灰鶴的證詞還沒到手。去市場找她吧。」', htmlEn: '✗ "Grey Crane\'s testimony isn\'t secured yet. Find her at the market."', delay: 2500 });
   }
 
   // Quest 3 status

@@ -835,12 +835,24 @@ registerNode('r2_camp_medic', () => {
         changeHp(30);
         changePetri(-10);
         autoExplore([
-          { tag: '恢復', tagColor: 'tag-explore', text: '清露用特製的藥膏塗抹你的石化部位，然後纏上浸泡過淨化液的繃帶。', textEn: 'Dew applies a special salve to your petrified areas, then wraps them in purified bandages.', delay: 2200 },
-          { tag: '恢復', tagColor: 'tag-explore', text: '一股清涼的感覺擴散開來——石化的灰色紋路明顯消退了。', textEn: 'A cool sensation spreads — the grey petrification patterns visibly recede.', delay: 2200 },
-          { tag: '恢復', tagColor: 'tag-explore', text: '「這是我僅剩的藥膏了。好好利用。」清露嘆了口氣。', textEn: '"That\'s the last of my salve. Use it well." Dew sighs.', delay: 2200 },
-          { tag: '物品', tagColor: 'tag-item', html: '清露又從藥箱深處翻出一塊發光的石頭：「<b>復活石</b>——這是在深處採集到的，能在瀕死時將你從石化中拉回來。」', htmlEn: 'Dew digs out a glowing stone from deep in her kit: "<b>Revival Stone</b> — found in the depths. It can pull you back from the brink of petrification."', delay: 2800, effect: () => { addItem(L('復活石', 'Revival Stone')); sfx.item(); } },
+          { tag: '行動', tagColor: 'tag-move', text: '「坐下。把袖子捲起來。」清露的語氣不容拒絕。', textEn: '"Sit down. Roll up your sleeves." Dew\'s tone allows no argument.', delay: 2500 },
+          { tag: '感知', tagColor: 'tag-sense', text: '你坐在簡陋的行軍床上。清露跪在你面前，摘下了一隻手套。', textEn: 'You sit on the makeshift cot. Dew kneels before you, removing one glove.', delay: 2800 },
+          { tag: '感知', tagColor: 'tag-sense', text: '她的手指纖細而冰涼——沿著你的手臂慢慢移動，仔細按壓每一處石化紋路。', textEn: 'Her fingers are slender and cool — tracing slowly along your arm, pressing each petrification line.', delay: 3200 },
+          { tag: '感知', tagColor: 'tag-petri', text: '當她觸碰到石化最嚴重的部位時，你不自覺地抽了一口氣。', textEn: 'When she touches the worst of the petrification, you inhale sharply.', delay: 2800 },
+          { tag: '清露', tagColor: 'tag-npc', text: '「忍一下。」她的聲音從面罩後面傳出，比想像中柔軟。', textEn: '"Bear with it." Her voice comes from behind the mask, softer than expected.', delay: 2500 },
+          { tag: '恢復', tagColor: 'tag-explore', text: '清露從藥箱裡取出一罐深色的藥膏，用指尖挖出少量，小心翼翼地塗抹在你的石化紋路上。', textEn: 'Dew takes a jar of dark salve from her kit, scoops a small amount with her fingertips, and carefully applies it to your petrification patterns.', delay: 3000 },
+          { tag: '感知', tagColor: 'tag-sense', text: '她的手指帶著藥膏，一遍一遍地在你的皮膚上畫圈——動作很輕，幾乎像是撫摸。', textEn: 'Her fingers, coated with salve, trace circles on your skin over and over — so gently it\'s almost a caress.', delay: 3200 },
+          { tag: '恢復', tagColor: 'tag-explore', text: '一股清涼的感覺從接觸點擴散開來，石化的灰色紋路在她的指尖下緩緩消退。', textEn: 'A cool sensation spreads from her touch, the grey petrification patterns slowly receding beneath her fingertips.', delay: 3000 },
+          { tag: '感知', tagColor: 'tag-sense', text: '你看見她面罩上方露出的眼睛——專注、認真，睫毛微微顫動。那雙眼睛比深淵裡的任何光源都明亮。', textEn: 'You catch her eyes above the mask — focused, earnest, lashes trembling slightly. Those eyes are brighter than any light in the abyss.', delay: 3500 },
+          { tag: '行動', tagColor: 'tag-move', text: '她開始纏繃帶。浸泡過淨化液的布條緊貼你的皮膚，每一圈都帶著她手指的溫度。', textEn: 'She wraps the bandages. The purified cloth clings to your skin, each layer carrying the warmth of her fingers.', delay: 3000 },
+          { tag: '清露', tagColor: 'tag-npc', text: '纏好最後一圈後，她的手停留在繃帶上多了幾秒，像是在確認——又像是不捨得鬆開。', textEn: 'After the last wrap, her hand lingers on the bandage a few seconds longer — as if checking, or perhaps reluctant to let go.', delay: 3200 },
+          { tag: '清露', tagColor: 'tag-npc', text: '「……這是我僅剩的藥膏了。」她輕輕嘆了口氣，把藥罐蓋好放回箱子。', textEn: '"...That\'s the last of my salve." She sighs softly, sealing the jar and returning it to the kit.', delay: 3000 },
+          { tag: '感知', tagColor: 'tag-sense', text: '她站起身時，你注意到她自己的手腕上也有淡淡的灰色紋路——石化的痕跡。她一直在治療別人，卻沒有藥留給自己。', textEn: 'As she stands, you notice faint grey patterns on her own wrist — traces of petrification. She treats everyone else, saving nothing for herself.', delay: 3500 },
+          { tag: '清露', tagColor: 'tag-npc', text: '「好好利用吧。」她轉過身去翻找藥箱，聲音壓得很低：「……活下去。」', textEn: '"Use it well." She turns to rummage through her kit, voice barely a whisper: "...Stay alive."', delay: 3000 },
+          { tag: '物品', tagColor: 'tag-item', html: '清露又從藥箱深處翻出一塊發光的石頭，雙手捧著遞給你——她的手指微微發抖：「<b>復活石</b>——這是在深處採集到的，能在瀕死時將你從石化中拉回來。」', htmlEn: 'Dew digs out a glowing stone from deep in her kit, offering it with both hands — her fingers trembling slightly: "<b>Revival Stone</b> — found in the depths. It can pull you back from the brink of petrification."', delay: 3200, effect: () => { addItem(L('復活石', 'Revival Stone')); sfx.item(); } },
+          { tag: '感知', tagColor: 'tag-sense', text: '當你接過石頭的瞬間，你的手指碰到了她的。她沒有馬上縮回去。', textEn: 'As you take the stone, your fingers brush hers. She doesn\'t pull away immediately.', delay: 2800 },
         ], [
-          { text: '返回營地', textEn: 'Return to camp', action: () => loadNode('r2_camp') },
+          { text: '「……謝謝你，清露。」', textEn: '"...Thank you, Dew."', action: () => loadNode('r2_camp') },
         ], { label: L('接受治療', 'Receiving treatment') });
       }});
     }
@@ -849,10 +861,13 @@ registerNode('r2_camp_medic', () => {
         state.flags.r2MedicElixir = true;
         addItem(L('濃縮淨化液', 'Concentrated Purifier'));
         autoExplore([
-          { tag: '情報', tagColor: 'tag-info', html: '清露猶豫了一下，然後從藥箱裡拿出一小瓶深綠色的液體：「<b>濃縮淨化液</b>——最後一瓶了。」', htmlEn: 'Dew hesitates, then produces a small bottle of dark green liquid from her kit: "<b>Concentrated Purifier</b> — the last bottle."', delay: 2800 },
-          { tag: '情報', tagColor: 'tag-info', text: '「在關鍵時刻用。它能大幅降低石化度。」', textEn: '"Use it at a critical moment. It dramatically reduces petrification."', delay: 2200 },
+          { tag: '清露', tagColor: 'tag-npc', text: '清露聽到你的請求後沉默了一會兒。她低下頭，你看不到面罩後面的表情。', textEn: 'Dew falls silent at your request. She lowers her head — you can\'t see her expression behind the mask.', delay: 2800 },
+          { tag: '行動', tagColor: 'tag-move', text: '她慢慢打開藥箱，手指在幾個瓶子之間遊移——最後停在一個被藏在最裡層的深綠色小瓶上。', textEn: 'She slowly opens the kit, fingers hovering between several bottles — settling on a small dark green vial hidden in the deepest layer.', delay: 3000 },
+          { tag: '感知', tagColor: 'tag-sense', text: '她握著那個瓶子猶豫了很久。你注意到她的拇指在瓶身上反覆摩挲——那是她為自己留下的最後一瓶。', textEn: 'She holds the bottle for a long time. You notice her thumb rubbing the glass again and again — this was the last one she\'d saved for herself.', delay: 3500 },
+          { tag: '物品', tagColor: 'tag-item', html: '最終她還是把瓶子遞給了你，聲音平靜但帶著一絲不易察覺的顫抖：「<b>濃縮淨化液</b>——最後一瓶了。在關鍵時刻用。」', htmlEn: 'In the end she offers you the bottle, her voice steady but with an imperceptible tremor: "<b>Concentrated Purifier</b> — the last bottle. Use it when it matters most."', delay: 3000 },
+          { tag: '清露', tagColor: 'tag-npc', text: '「答應我一件事——」她抬起眼看著你，面罩上方的那雙眼睛認真得讓你無法移開視線：「不要浪費它。」', textEn: '"Promise me one thing —" She looks up at you, the eyes above her mask so earnest you can\'t look away: "Don\'t waste it."', delay: 3200 },
         ], [
-          { text: '道謝', textEn: 'Thank her', action: () => loadNode('r2_camp') },
+          { text: '「我答應你。」', textEn: '"I promise."', action: () => loadNode('r2_camp') },
         ], { label: L('獲得淨化液', 'Getting purifier') });
       }});
     }
@@ -1555,9 +1570,9 @@ registerNode('r2_crane', () => {
     steps.push({ tag: '遭遇', tagColor: 'tag-explore', html: '「喲——<b>又見面了</b>。」灰鶴轉過身，露出那張永遠帶著商人笑容的臉。', htmlEn: '"Well — <b>we meet again</b>." Grey Crane turns, showing that perpetual merchant\'s grin.', delay: 2500 });
     steps.push({ tag: '情報', tagColor: 'tag-info', text: '「怎麼，你也上來了？比我想的快。」他把包裹放下，從裡面掏出一瓶酒。', textEn: '"So, you made it up too? Faster than I expected." He sets down the pack and pulls out a bottle.', delay: 2800 });
     steps.push({ tag: '情報', tagColor: 'tag-info', text: '「我從另一條商路繞過來的。迴廊東邊有一條暗渠——做生意的都知道。」', textEn: '"I came through another trade route. There\'s a culvert east of the corridor — all the traders know it."', delay: 3000 });
-    steps.push({ tag: '情報', tagColor: 'tag-info', text: '「這個營地的人跟我買了不少東西。鐵霜那個女人殺價很狠。」灰鶴搖搖頭笑了。', textEn: '"The camp folk bought plenty from me. That Iron Frost woman drives a hard bargain." Grey Crane shakes his head, laughing.', delay: 2800 });
+    steps.push({ tag: '情報', tagColor: 'tag-info', text: '「這個營地的人跟我買了不少東西。鐵霜那個女人殺價很狠。」灰鶴搖搖頭笑了。', textEn: '"The camp folk bought plenty from me. That Iron Frost woman drives a hard bargain." Grey Crane shakes her head, laughing.', delay: 2800 });
   } else {
-    steps.push({ tag: '遭遇', tagColor: 'tag-explore', text: '灰鶴坐在他那堆貨物旁邊喝酒。看到你走來，他舉起酒瓶晃了晃。', textEn: 'Grey Crane sits beside his pile of goods, drinking. He waves the bottle as you approach.', delay: 2200 });
+    steps.push({ tag: '遭遇', tagColor: 'tag-explore', text: '灰鶴坐在她那堆貨物旁邊喝酒。看到你走來，她舉起酒瓶晃了晃。', textEn: 'Grey Crane sits beside her pile of goods, drinking. She waves the bottle as you approach.', delay: 2200 });
     steps.push({ tag: '情報', tagColor: 'tag-info', text: '「又來找我？是要做生意，還是聽故事？」', textEn: '"Back again? Business, or stories?"', delay: 2000 });
   }
   autoExplore(steps, (function() {
@@ -1566,7 +1581,7 @@ registerNode('r2_crane', () => {
       c.push({ text: '聽灰鶴說說上面的情況', textEn: 'Ask Grey Crane about what\'s above', action: () => {
         state.flags.r2CraneLore = true;
         autoExplore([
-          { tag: '情報', tagColor: 'tag-info', text: '灰鶴喝了口酒，眼神變得認真了一些。', textEn: 'Grey Crane takes a swig, his eyes growing more serious.', delay: 2000 },
+          { tag: '情報', tagColor: 'tag-info', text: '灰鶴喝了口酒，眼神變得認真了一些。', textEn: 'Grey Crane takes a swig, her eyes growing more serious.', delay: 2000 },
           { tag: '情報', tagColor: 'tag-info', html: '「上面是<b>河城渡口</b>——曾經是地底最繁華的交通樞紐。」', htmlEn: '"Above is the <b>River City Ferry</b> — once the underground world\'s busiest transport hub."', delay: 2800 },
           { tag: '情報', tagColor: 'tag-info', text: '「現在嘛……還有一些人在那裡。但情況很複雜。有好幾個勢力在搶地盤。」', textEn: '"Now... some people remain. But things are complicated. Several factions fighting over territory."', delay: 3000 },
           { tag: '情報', tagColor: 'tag-info', html: '「有一個叫<b>「渡口議會」</b>的組織在維持秩序——但他們對外來者不太友善。」', htmlEn: '"An organization called the <b>Ferry Council</b> maintains order — but they aren\'t friendly to outsiders."', delay: 3000 },
@@ -1584,7 +1599,7 @@ registerNode('r2_crane', () => {
       c.push({ text: '看看有什麼好東西', textEn: 'Browse his wares', action: () => {
         state.flags.r2CraneTrade = true;
         autoExplore([
-          { tag: '情報', tagColor: 'tag-info', text: '灰鶴攤開他的包裹。裡面的東西比上次豐富了不少。', textEn: 'Grey Crane opens his pack. Far more goods than last time.', delay: 2000 },
+          { tag: '情報', tagColor: 'tag-info', text: '灰鶴攤開她的包裹。裡面的東西比上次豐富了不少。', textEn: 'Grey Crane opens her pack. Far more goods than last time.', delay: 2000 },
           { tag: '情報', tagColor: 'tag-info', text: '「看你面子，給你便宜點——不收錢，用情報換。」', textEn: '"Since it\'s you, I\'ll cut you a deal — no coin, just intel."', delay: 2500 },
           { tag: '物品', tagColor: 'tag-item', html: '灰鶴遞給你一瓶渾濁的液體：「<b>石化抑制劑</b>——河城那邊的配方。比淨化液好用。」', htmlEn: 'Grey Crane hands you a murky liquid: "<b>Petri Suppressant</b> — River City formula. Better than purifiers."', delay: 2800, effect: () => { addItem(L('石化抑制劑', 'Petri Suppressant')); } },
           { tag: '情報', tagColor: 'tag-info', text: '「你跟我說的那些迴廊裡的路線——很有價值。這就當是回報。」', textEn: '"The corridor routes you told me about — valuable intel. Consider this payback."', delay: 2500 },
@@ -1610,7 +1625,7 @@ registerNode('r2_crane', () => {
       var introSteps = [
         { tag: L('骰子', 'DICE'), tagColor: 'tag-npc',
           text: L('灰鶴從包裹裡掏出兩個皮杯和十顆骰子，眼睛亮了起來。',
-                 'Grey Crane pulls two leather cups and ten dice from his pack, eyes lighting up.'),
+                 'Grey Crane pulls two leather cups and ten dice from her pack, eyes lighting up.'),
           delay: 2000 },
         { tag: L('骰子', 'DICE'), tagColor: 'tag-npc',
           text: L('「吹牛骰——地底商路上最受歡迎的賭法。各搖五顆，輪流喊場上有幾個某點數。喊不下去就叫開，看誰在吹牛。」',
@@ -1656,7 +1671,7 @@ function offerCraneSword(onDone) {
   var steps = [
     { tag: en ? 'NPC' : '灰鶴', tagColor: 'tag-npc',
       text: L('灰鶴看了你一眼，從包裹最底層翻出一個布包。',
-             'Grey Crane eyes you, then rummages to the bottom of his pack and pulls out a cloth bundle.'),
+             'Grey Crane eyes you, then rummages to the bottom of her pack and pulls out a cloth bundle.'),
       delay: 2500 },
     { tag: en ? 'NPC' : '灰鶴', tagColor: 'tag-npc',
       html: L('「贏了我 ' + (state.flags.diceWins || 3) + ' 把的人不多。」他把布包打開——裡面是一把<b>泛著冷光的短刀</b>。',
