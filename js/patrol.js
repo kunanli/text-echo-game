@@ -65,6 +65,39 @@ var R0_MONSTERS = [
     ],
     spareText: { zh: '鼠群一哄而散，消失在石縫中。臨走前，一隻老鼠叼來了什麼東西放在你腳邊。', en: 'The rats scatter into crevices. Before leaving, one drops something at your feet.' },
   },
+  { name: '洞窟水蛭', nameEn: 'Cave Leech', hp: 14, atkMin: 5, atkMax: 11, petriDmg: 3, xp: 6,
+    empathyGoal: 2,
+    art: [
+      '       ╭━━╮',
+      '      ╱ ○○ ╲',
+      '     │ ╰──╯ │',
+      '      ╲░░░░╱',
+      '       ╰━━╯',
+      '       ╱╲╱╲',
+    ],
+    commune: [
+      { zh: '你靜靜地把手伸入水坑……水蛭輕輕吸附上來，卻沒有用力。', en: 'You dip your hand into the pool... the leech latches on gently, without force.' },
+      { zh: '它的身體發出幽暗的微光——像是地底的螢火蟲。它只是餓了。', en: 'Its body emits a dim glow — like an underground firefly. It\'s just hungry.' },
+    ],
+    spareText: { zh: '水蛭鬆開了你的手，緩緩沉回水坑深處。水面上留下一圈淡淡的光暈。', en: 'The leech releases your hand and sinks back into the pool. A faint halo of light lingers on the surface.' },
+  },
+  { name: '石化甲蟲', nameEn: 'Petrified Beetle', hp: 20, atkMin: 7, atkMax: 13, petriDmg: 3, xp: 7,
+    empathyGoal: 3,
+    art: [
+      '      ╭════╮',
+      '     ╱ ◆  ◆ ╲',
+      '    │ ▓▓▓▓▓▓ │',
+      '    │ ▓▓▓▓▓▓ │',
+      '     ╲╱╲╱╲╱╲╱',
+      '      ~~  ~~',
+    ],
+    commune: [
+      { zh: '你用指節輕叩它的甲殼——裡面傳來微弱的振動回應。', en: 'You tap its shell with your knuckle — a faint vibration responds from within.' },
+      { zh: '甲蟲翻了翻身，露出腹部柔軟的石化紋路。它在示弱。', en: 'The beetle rolls over, revealing soft petrified patterns on its belly. It\'s showing submission.' },
+      { zh: '它用觸角輕碰你的靴子，像小狗一樣蹭了蹭。', en: 'It brushes your boot with its antennae, nuzzling like a puppy.' },
+    ],
+    spareText: { zh: '石化甲蟲展開翅鞘，笨拙地飛了起來，撞了兩次石壁才找到方向。', en: 'The beetle opens its wing case and clumsily takes flight, bumping the wall twice before finding its way.' },
+  },
 ];
 
 var R1_MONSTERS = [
@@ -136,6 +169,38 @@ var R1_MONSTERS = [
     ],
     spareText: { zh: '結晶蝎回到巢穴，用身體護住那些結晶卵。在牠轉身的瞬間，你看見甲殼上刻著古老的符文。', en: 'The scorpion returns to its nest, shielding the crystal eggs. As it turns, you see ancient runes etched on its shell.' },
   },
+  { name: '磷光蜈蚣', nameEn: 'Phosphor Centipede', hp: 24, atkMin: 9, atkMax: 17, petriDmg: 5, xp: 11,
+    empathyGoal: 3,
+    art: [
+      '   ╭╮╭╮╭╮╭╮╭╮╭╮',
+      '  ╱◎╲╲╱╲╲╱╲╲╱◎╲',
+      '  ╲╱╱╱╲╱╱╲╱╱╲╱╱',
+      '  ╱╲╱╲╱╲╱╲╱╲╱╲╱',
+      '  ╰╯╰╯╰╯╰╯╰╯╰╯',
+    ],
+    commune: [
+      { zh: '你蹲下身……蜈蚣停止蠕動，無數足肢在空中微微顫抖。', en: 'You crouch... the centipede stops writhing, countless legs trembling in the air.' },
+      { zh: '它的磷光變成了柔和的藍色——從警戒轉為好奇。', en: 'Its phosphorescence shifts to a soft blue — from alarm to curiosity.' },
+      { zh: '蜈蚣繞著你的腳踝轉了一圈，像是在撒嬌。', en: 'The centipede circles your ankle, as if being affectionate.' },
+    ],
+    spareText: { zh: '磷光蜈蚣亮起全身的光芒——像一條活生生的燈帶——然後鑽入石壁縫隙消失了。', en: 'The centipede lights up entirely — like a living light strip — then vanishes into a wall crack.' },
+  },
+  { name: '礦道幽靈', nameEn: 'Tunnel Phantom', hp: 16, atkMin: 8, atkMax: 19, petriDmg: 7, xp: 13,
+    empathyGoal: 2,
+    art: [
+      '      ╱▔▔▔╲',
+      '     ╱ ○  ○ ╲',
+      '    │   ▽   │',
+      '     ╲ ·══· ╱',
+      '      ╲░░░╱',
+      '       ·╱╲·',
+    ],
+    commune: [
+      { zh: '「你……也是……迷路的人嗎？」幽靈的聲音像風穿過裂縫。', en: '"Are you... also... lost?" The phantom\'s voice is like wind through a crack.' },
+      { zh: '它伸出透明的手指了指前方——是在指路。它一直在這裡等人來。', en: 'It points a translucent finger ahead — showing the way. It has been waiting here for someone.' },
+    ],
+    spareText: { zh: '幽靈露出一個模糊的微笑，身形漸漸消散：「……謝謝你……願意停下來聽我說話。」', en: 'The phantom smiles faintly, its form dissolving: "...Thank you... for stopping to listen."' },
+  },
 ];
 
 var R0_PATROL_TEXTS = [
@@ -147,6 +212,10 @@ var R0_PATROL_TEXTS = [
   { text: '你蹲下身子，檢查地上的抓痕——是新的。', textEn: 'You crouch to inspect scratches on the ground — fresh ones.' },
   { text: '你繞過一具完全石化的蟲殼，不敢觸碰。', textEn: 'You skirt a fully petrified insect husk, not daring to touch it.' },
   { text: '你靠著岩壁調整呼吸，準備繼續前進。', textEn: 'You lean on the wall to steady your breath, then press on.' },
+  { text: '一滴冰冷的水珠從洞頂落下，滴在你的脖頸上。', textEn: 'An icy drop falls from the ceiling onto your neck.' },
+  { text: '你的手指拂過石壁——上面刻著某個早已遺忘的名字。', textEn: 'Your fingers brush the wall — someone carved a long-forgotten name here.' },
+  { text: '空氣中飄著一絲硫磺的氣味，越往深處越濃。', textEn: 'A faint sulfur smell hangs in the air, growing stronger deeper in.' },
+  { text: '你踩碎了一塊發光的石化結晶，碎片散發出短暫的冷光。', textEn: 'You crush a glowing petrified crystal underfoot; shards emit a brief cold light.' },
 ];
 
 var R1_PATROL_TEXTS = [
@@ -158,6 +227,10 @@ var R1_PATROL_TEXTS = [
   { text: '地面上散落著生鏽的採礦工具。', textEn: 'Rusted mining tools litter the ground.' },
   { text: '你踩過一片碎裂的石化礦石，發出清脆的聲響。', textEn: 'You step on shattered petri-ore, a crisp crunch echoing.' },
   { text: '一陣冰冷的氣流從走廊深處吹來，夾帶著石化粒子。', textEn: 'A freezing draft from deep in the corridor carries petri-particles.' },
+  { text: '你發現牆上刻著礦工留下的計數線——數到四百多就中斷了。', textEn: 'You find tally marks carved by miners on the wall — they stop at over four hundred.' },
+  { text: '一根鏽蝕的釘子從支撐架上掉落，在寂靜中叮噹作響。', textEn: 'A rusted nail drops from a support frame, clanging in the silence.' },
+  { text: '你腳下的鐵軌突然震動了一下——遠處有什麼在移動。', textEn: 'The rails beneath your feet vibrate briefly — something moves in the distance.' },
+  { text: '走廊的盡頭傳來微弱的哼唱聲，但當你靠近時就消失了。', textEn: 'Faint humming echoes from the corridor\'s end, but vanishes as you approach.' },
 ];
 
 var R2_MONSTERS = [
@@ -234,6 +307,41 @@ var R2_MONSTERS = [
     ],
     spareText: { zh: '深層石化蟒朝你點了點頭——是的，它點了頭。然後潛入了地底的裂縫中，留下一道金色的蛻皮。', en: 'The stone serpent nods at you — yes, it nods. Then dives into a ground fissure, leaving a golden shed skin.' },
   },
+  { name: '碎晶飛蛾', nameEn: 'Shard Moth', hp: 22, atkMin: 10, atkMax: 20, petriDmg: 5, xp: 14,
+    empathyGoal: 3,
+    art: [
+      '      ╱ ✦ ╲',
+      '    ╱╱ ╱ ╲ ╲╲',
+      '   ╱╱╱ ◎◎ ╲╲╲',
+      '   ╲╲╲ ╰╯ ╱╱╱',
+      '    ╲╲ ╲ ╱ ╱╱',
+      '      ╲ ║ ╱',
+    ],
+    commune: [
+      { zh: '你舉起手掌——飛蛾停在你指尖上，翅膀上的碎晶折射出微弱的虹光。', en: 'You raise your palm — the moth lands on your fingertip, wing shards refracting faint rainbow light.' },
+      { zh: '它輕輕拍動翅膀，碎晶粉塵飄落在你肩上，帶著一絲溫暖。', en: 'It gently flaps, shard dust drifting onto your shoulder with a hint of warmth.' },
+      { zh: '飛蛾繞著你飛了三圈，留下一條閃爍的軌跡——像是祝福。', en: 'The moth circles you three times, leaving a glimmering trail — like a blessing.' },
+    ],
+    spareText: { zh: '碎晶飛蛾向著採石場頂部飛去，在黑暗中化為一顆遙遠的星星。', en: 'The shard moth flies toward the quarry ceiling, becoming a distant star in the darkness.' },
+  },
+  { name: '鑄造殘兵', nameEn: 'Forged Remnant', hp: 36, atkMin: 15, atkMax: 28, petriDmg: 7, xp: 19,
+    empathyGoal: 3,
+    art: [
+      '     ╔═══╗',
+      '     ║ ● ●║',
+      '     ╠═══╣',
+      '    ╱║▓▓▓║╲',
+      '   ╱ ║▓▓▓║ ╲',
+      '  ╱╱ ╚═╤═╝ ╲╲',
+      '      ╱ ╲',
+    ],
+    commune: [
+      { zh: '「……命令……執行……」它的動作僵硬而重複。你叫了一聲「休息」。', en: '"...orders...execute..." Its movements are stiff and repetitive. You call out "rest."' },
+      { zh: '殘兵停頓了——手中的武器微微下垂。它聽懂了。', en: 'The remnant pauses — its weapon droops slightly. It understood.' },
+      { zh: '它緩緩舉手行了一個軍禮，鏽蝕的關節發出吱嘎聲。', en: 'It slowly raises its hand in a salute, rusted joints creaking.' },
+    ],
+    spareText: { zh: '鑄造殘兵收起武器，筆直地站在原地。它選擇了站崗——永遠地守護這片空無一人的廣場。', en: 'The remnant sheathes its weapon and stands at attention. It chose to stand guard — forever watching over this empty plaza.' },
+  },
 ];
 
 var R2_PATROL_TEXTS = [
@@ -245,6 +353,10 @@ var R2_PATROL_TEXTS = [
   { text: '你沿著一條乾涸的水渠前進，渠壁上佈滿了石化紋路。', textEn: 'You follow a dried-up canal, its walls covered in petrification patterns.' },
   { text: '一陣熱風從地底深處湧來，空氣中夾雜著金屬燒灼的氣味。', textEn: 'A hot gust surges from the depths, carrying the smell of scorched metal.' },
   { text: '你踩到了什麼軟的東西——是一塊被石化到一半的菌毯。', textEn: 'You step on something soft — a mat of fungus, half petrified.' },
+  { text: '一面巨大的石化浮雕從岩壁上剝落，砸在地上碎成齏粉。', textEn: 'A massive petrified relief crumbles off the wall, shattering to dust on the ground.' },
+  { text: '你路過一處營火遺跡，灰燼還帶著餘溫——有人不久前來過。', textEn: 'You pass campfire remains, ashes still warm — someone was here recently.' },
+  { text: '腳下的石板裂開了一條縫，從中散發出熱氣和硫磺味。', textEn: 'A flagstone cracks open, venting hot gas and sulfur from below.' },
+  { text: '你抬頭看了一眼——無數石化的鐘乳石倒懸在頭頂，像凝固的雨。', textEn: 'You look up — countless petrified stalactites hang overhead, like frozen rain.' },
 ];
 
 var R3_MONSTERS = [
@@ -317,6 +429,41 @@ var R3_MONSTERS = [
     ],
     spareText: { zh: '淵底鱷龍站起身，用尾巴輕輕碰了碰你的手。然後它轉身滑入河流深處——水面上泛起的漣漪漸漸消失。', en: 'The crocodilian rises, gently tapping your hand with its tail. Then it slides into the river depths — ripples fading on the surface.' },
   },
+  { name: '潮汐寄居蟹', nameEn: 'Tidal Hermit Crab', hp: 32, atkMin: 14, atkMax: 26, petriDmg: 6, xp: 20,
+    empathyGoal: 3,
+    art: [
+      '      ╭═══╮',
+      '    ╱╱ ▓▓▓ ╲╲',
+      '   │  ◎  ◎  │',
+      '   │╲ ╰──╯ ╱│',
+      '  ╱╱ ╲════╱ ╲╲',
+      ' ╱╱   ╱╲╱╲   ╲╲',
+    ],
+    commune: [
+      { zh: '你蹲在水邊，輕輕敲了敲它背上的石殼。寄居蟹縮了一下，又探出了觸角。', en: 'You crouch by the water and tap its stone shell. The crab flinches, then extends its antennae.' },
+      { zh: '它用螯夾了一小塊石頭放在你面前——像是在送禮物。', en: 'It picks up a pebble with its claw and places it before you — like offering a gift.' },
+      { zh: '寄居蟹爬上了你的手掌，在上面轉了幾圈才滿意地停下。', en: 'The crab climbs onto your palm, turning in circles before settling contentedly.' },
+    ],
+    spareText: { zh: '潮汐寄居蟹背著石殼，橫著走進水裡。它回頭舉起一隻螯——像是在跟你揮手道別。', en: 'The hermit crab sidesteps into the water with its shell. It raises a claw over its shoulder — as if waving goodbye.' },
+  },
+  { name: '深水燈籠魚', nameEn: 'Deep Lanternfish', hp: 26, atkMin: 12, atkMax: 34, petriDmg: 10, xp: 23,
+    empathyGoal: 3,
+    art: [
+      '        ✦',
+      '        │',
+      '    ╭━━━╯━━━╮',
+      '   ╱  ◉    ◉ ╲',
+      '   ╲  ╰════╯  ╱',
+      '    ╰━━━━━━━━╯',
+      '      ╲╱╲╱╲╱',
+    ],
+    commune: [
+      { zh: '你閉上眼睛，不再注視它頭頂誘人的光——燈籠魚停止了搖擺。', en: 'You close your eyes, ignoring the lure atop its head — the lanternfish stops swaying.' },
+      { zh: '它游近你，用頭頂的燈照亮了你的臉——不是誘餌，而是觀察。', en: 'It swims close, illuminating your face with its lantern — not as bait, but to observe.' },
+      { zh: '燈籠魚的光從刺眼的白變成溫暖的橙色——它放下了戒備。', en: 'The lanternfish\'s light shifts from blinding white to warm orange — it\'s lowering its guard.' },
+    ],
+    spareText: { zh: '深水燈籠魚在你周圍繞了一圈光環，然後沉入水底。黑暗中，那盞小小的燈籠漸行漸遠，像是地底深處的一顆星。', en: 'The lanternfish draws a circle of light around you, then sinks. In the dark, its tiny lantern drifts away — a star in the deep.' },
+  },
 ];
 
 var R3_PATROL_TEXTS = [
@@ -328,6 +475,10 @@ var R3_PATROL_TEXTS = [
   { text: '一股腥臭的氣味從隧道深處飄來——有什麼東西住在那裡。', textEn: 'A foul stench drifts from deep in the tunnel — something lives there.' },
   { text: '你踩過一灘散發螢光的淺水。水底有什麼東西在游動。', textEn: 'You wade through luminescent shallows. Something swims below.' },
   { text: '隧道分岔了。你選了水聲更大的那條——那裡通常有更多生物。', textEn: 'The tunnel forks. You choose the louder water sound — usually means more creatures.' },
+  { text: '石壁上嵌著一面破碎的銅鏡——你在裡面看見了自己佈滿石化紋路的臉。', textEn: 'A cracked bronze mirror is set into the wall — you see your own face, lined with petrification marks.' },
+  { text: '河面上漂過一盞紙燈——不知道是誰放的，也不知道它漂了多久。', textEn: 'A paper lantern drifts past on the river — no telling who set it afloat, or how long ago.' },
+  { text: '你聽見遠處傳來模糊的歌聲，但旋律太古老了，你聽不出歌詞。', textEn: 'Faint singing echoes from afar, but the melody is too ancient to make out any words.' },
+  { text: '碼頭的木板在你腳下發出不安的嘎吱聲，河水在下方黑暗中湧動。', textEn: 'Dock planks creak nervously beneath you, dark water surging below.' },
 ];
 
 // Region-aware helpers
@@ -417,6 +568,9 @@ var SUSPENSE_TEXTS = [
   { zh: '空氣突然變得凝重，你屏住了呼吸。', en: 'The air grows heavy. You hold your breath.' },
   { zh: '腳下的碎石突然震動——有東西來了。', en: 'Gravel trembles underfoot — something approaches.' },
   { zh: '一股殺意從暗處襲來，你本能地戒備。', en: 'Killing intent washes over you. You brace instinctively.' },
+  { zh: '陰影在牆壁上扭動——那不是你的影子。', en: 'Shadows twist on the wall — those aren\'t yours.' },
+  { zh: '你的石化紋路突然隱隱作痛——附近有石化生物。', en: 'Your petrification marks throb — a petrified creature is nearby.' },
+  { zh: '地面傳來有節奏的振動，越來越近……', en: 'Rhythmic vibrations pulse through the ground, drawing closer...' },
 ];
 
 // ── Attack / counter verb pools for vivid combat text ──
@@ -426,17 +580,23 @@ var ATK_VERBS = [
   { zh: '你找到破綻突刺——', en: 'You find an opening — ' },
   { zh: '你衝上前攻擊——', en: 'You rush in — ' },
   { zh: '你側身劈砍——', en: 'You slash from the side — ' },
+  { zh: '你低身掃腿——', en: 'You sweep low — ' },
+  { zh: '你抓準時機反擊——', en: 'You seize the moment — ' },
 ];
 var COUNTER_VERBS = [
   { zh: '反擊了！', en: 'strikes back!' },
   { zh: '猛撲而來！', en: 'lunges at you!' },
   { zh: '揮爪回擊！', en: 'claws back!' },
   { zh: '狠狠撞來！', en: 'charges at you!' },
+  { zh: '發出怒吼反擊！', en: 'roars and retaliates!' },
+  { zh: '抓住你的空隙攻擊！', en: 'exploits your opening!' },
 ];
 var DEFEAT_VERBS = [
   { zh: '——致命一擊！擊敗了', en: ' — a killing blow! ' },
   { zh: '——貫穿要害！擊倒了', en: ' — a critical strike! ' },
   { zh: '——最後一擊命中！擊敗了', en: ' — the final blow lands! ' },
+  { zh: '——一擊必殺！擊倒了', en: ' — one-shot kill! ' },
+  { zh: '——石化紋路爆發！粉碎了', en: ' — petrification surges! Shattered ' },
 ];
 
 function runPatrolCycle() {
