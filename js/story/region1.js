@@ -1038,6 +1038,31 @@ registerNode('r1_ying_truth', () => {
   var yingPronounCap = isMale ? 'She' : 'He';
   state.flags.r1YingTrustUp = true;
   autoExplore([
+    { art: `<pre class="ascii-art cyan">
+        ╱▔▔▔▔▔╲
+       │ °   ° │
+       │  ‿‿‿  │
+        ╲_____╱
+     ─────┤ ├─────
+    ╱     │ │     ╲  ╭──╮
+   ╱      │ │      ╲ │冊│
+          │ │       ╰┬─╯
+         ╱   ╲       │
+        ═══════
+       螢  ·  記錄員
+</pre>`, artEn: `<pre class="ascii-art cyan">
+        ╱▔▔▔▔▔╲
+       │ °   ° │
+       │  ‿‿‿  │
+        ╲_____╱
+     ─────┤ ├─────
+    ╱     │ │     ╲  ╭──╮
+   ╱      │ │      ╲ │冊│
+          │ │       ╰┬─╯
+         ╱   ╲       │
+        ═══════
+     Ying · Chronicler
+</pre>`, delay: 800 },
     { tag: '情報', tagColor: 'tag-info', text: '你把自己的名字和來歷簡單說了。螢聽到「爐灶少女」四個字時，手微微一顫。', textEn: 'You briefly share your name and background. When Ying hears "Hearth-Maiden," ' + (isMale ? 'her' : 'his') + ' hand trembles.', delay: 3000 },
     { tag: '情報', tagColor: 'tag-info', text: '「……你就是那個被獻祭的人？」' + yingPronoun + '的聲音微微發抖，但眼中多了一種複雜的光芒。', textEn: '"...You\'re the one who was sacrificed?" ' + yingPronounCap + ' voice trembles, but ' + (isMale ? 'her' : 'his') + ' eyes fill with something complicated.', delay: 3200 },
     { tag: '情報', tagColor: 'tag-info', html: yingPronoun + '翻開手冊，指著其中一頁：「<b>我記錄過你的事。</b>長老會議的紀錄裡提到過——第十七任爐灶少女，被選中的理由是「對石化具有異常的抗性」。」', htmlEn: yingPronounCap + ' flips open the notebook, pointing to a page: "<b>I chronicled your case.</b> The elders\' council records mention — the 17th Hearth-Maiden, chosen for \'anomalous resistance to petrification.\'"', delay: 4000 },
@@ -1057,6 +1082,31 @@ registerNode('r1_ying_alone', () => {
   var yingPronoun = isMale ? L('她', 'she') : L('他', 'he');
   var yingPronounCap = isMale ? 'She' : 'He';
   autoExplore([
+    { art: `<pre class="ascii-art cyan">
+        ╱▔▔▔▔▔╲
+       │ °   ° │
+       │  ‿‿‿  │
+        ╲_____╱
+     ─────┤ ├─────
+    ╱     │ │     ╲  ╭──╮
+   ╱      │ │      ╲ │冊│
+          │ │       ╰┬─╯
+         ╱   ╲       │
+        ═══════
+       螢  ·  記錄員
+</pre>`, artEn: `<pre class="ascii-art cyan">
+        ╱▔▔▔▔▔╲
+       │ °   ° │
+       │  ‿‿‿  │
+        ╲_____╱
+     ─────┤ ├─────
+    ╱     │ │     ╲  ╭──╮
+   ╱      │ │      ╲ │冊│
+          │ │       ╰┬─╯
+         ╱   ╲       │
+        ═══════
+     Ying · Chronicler
+</pre>`, delay: 800 },
     { tag: '情報', tagColor: 'tag-info', text: '螢苦笑了一下：「一個人？習慣了。」', textEn: 'Ying smiles bitterly: "Alone? I\'m used to it."', delay: 2200 },
     { tag: '情報', tagColor: 'tag-info', text: '「瘟疫爆發後，城市裡的人分成了兩派——一派往上逃，一派往更深處挖。我哪邊都不想去。」', textEn: '"After the plague hit, the city split — one group fled upward, the other dug deeper. I didn\'t want either."', delay: 3500 },
     { tag: '情報', tagColor: 'tag-info', html: '「我只想<b>記下來</b>。發生了什麼，為什麼會這樣。如果所有人都變成石頭了，至少要有人寫下來。」', htmlEn: '"I just wanted to <b>write it down</b>. What happened, why it happened. If everyone turns to stone, at least someone should record it."', delay: 3500 },
@@ -1074,6 +1124,31 @@ registerNode('r1_ying_silent', () => {
   var isMale = state.sex === 'male';
   var yingPronoun = isMale ? L('她', 'she') : L('他', 'he');
   autoExplore([
+    { art: `<pre class="ascii-art cyan">
+        ╱▔▔▔▔▔╲
+       │ °   ° │
+       │  ‿‿‿  │
+        ╲_____╱
+     ─────┤ ├─────
+    ╱     │ │     ╲  ╭──╮
+   ╱      │ │      ╲ │冊│
+          │ │       ╰┬─╯
+         ╱   ╲       │
+        ═══════
+       螢  ·  記錄員
+</pre>`, artEn: `<pre class="ascii-art cyan">
+        ╱▔▔▔▔▔╲
+       │ °   ° │
+       │  ‿‿‿  │
+        ╲_____╱
+     ─────┤ ├─────
+    ╱     │ │     ╲  ╭──╮
+   ╱      │ │      ╲ │冊│
+          │ │       ╰┬─╯
+         ╱   ╲       │
+        ═══════
+     Ying · Chronicler
+</pre>`, delay: 800 },
     { tag: '行動', tagColor: 'tag-move', text: '你沒有說話，只是點了點頭，表示自己沒有敵意。', textEn: 'You say nothing, just nod to show you mean no harm.', delay: 2000 },
     { tag: '感知', tagColor: 'tag-sense', text: '螢盯著你看了很久。然後' + yingPronoun + '輕聲說——', textEn: 'Ying stares at you for a long time. Then ' + (isMale ? 'she' : 'he') + ' says softly —', delay: 2500 },
     { tag: '情報', tagColor: 'tag-info', text: '「……你的眼睛跟別人不一樣。不像放棄了的人。」', textEn: '"...Your eyes are different. Not like someone who\'s given up."', delay: 2800 },
