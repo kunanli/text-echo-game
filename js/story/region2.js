@@ -1393,7 +1393,7 @@ registerNode('r2_ying_night', () => {
     { tag: '記憶', tagColor: 'tag-system', text: '地表……那個概念對你來說已經模糊得像一場夢了。陽光、風、天空——你甚至記不清它們的顏色。', textEn: 'The surface... that concept has grown dream-like. Sunlight, wind, sky — you can\'t even recall their colors.', delay: 3000 },
     { tag: '感知', tagColor: 'tag-sense', text: '螢似乎看出了你的困惑。' + yP + '輕輕靠近了一些——肩膀幾乎碰到了你的。', textEn: 'Ying seems to sense your confusion. ' + yPC + ' leans slightly closer — shoulders nearly touching yours.', delay: 2800 },
     { tag: '情報', tagColor: 'tag-info', text: '「我想……找一個安靜的地方。把這一切都寫成書。」螢的聲音很輕。', textEn: '"I want to... find a quiet place. Write all of this into a book." Ying\'s voice is soft.', delay: 2800 },
-    { tag: '情報', tagColor: 'tag-info', text: '「三百年的石化瘟疫史。從第一任爐灶少女到最後一個。」', textEn: '"Three hundred years of the Stone Plague. From the first Hearth-Maiden to the last."', delay: 2500 },
+    { tag: '情報', tagColor: 'tag-info', text: '「三百年的石化瘟疫史。從第一任爐灶' + (isMale ? '少年' : '少女') + '到最後一個。」', textEn: '"Three hundred years of the Stone Plague. From the first ' + (isMale ? 'Hearth-Youth' : 'Hearth-Maiden') + ' to the last."', delay: 2500 },
     { tag: '感知', tagColor: 'tag-sense', text: yP + '側過頭看著你，火光映在' + yP + '的瞳孔裡，像兩顆微小的星。', textEn: yPC + ' turns to look at you, firelight reflected in ' + yPo + ' eyes like two tiny stars.', delay: 2800 },
     { tag: '情報', tagColor: 'tag-info', text: '「如果你願意……我希望你能在旁邊。幫我校對。」', textEn: '"If you\'re willing... I\'d like you nearby. To help me proofread."', delay: 2800 },
     { tag: '感知', tagColor: 'tag-sense', text: '那句話聽起來像是在說校對。但你知道' + yP + '的意思不只是校對。', textEn: 'It sounds like proofreading. But you know ' + (isMale ? 'she' : 'he') + ' means more than that.', delay: 2800 },

@@ -136,7 +136,7 @@ registerNode('r0_body', () => {
     { tag: '感知', tagColor: 'tag-sense', text: '你的身體還算結實，也許是最近才被丟下來的。', textEn: 'Your body is still sturdy — you were probably thrown down recently.', delay: 2500 },
     { tag: '記憶', tagColor: 'tag-system', text: '記憶一片模糊……', textEn: 'Memories are hazy...', delay: 3000 },
     { tag: '記憶', tagColor: 'tag-system', text: '唯一記得的，是墜落前那些穿著灰袍的長老，和他們面無表情的臉。', textEn: 'The only memory — grey-robed elders before the fall, their expressionless faces.', delay: 2500 },
-    { tag: '記憶', tagColor: 'tag-system', text: '「爐灶少女」……這個詞從腦海深處浮起，像刀一樣刺痛。', textEn: '"Hearth-Maiden"... the word surfaces from deep within, sharp as a blade.', delay: 2800 },
+    { tag: '記憶', tagColor: 'tag-system', text: '「爐灶' + (state.sex === 'male' ? '少年' : '少女') + '」……這個詞從腦海深處浮起，像刀一樣刺痛。', textEn: '"' + (state.sex === 'male' ? 'Hearth-Youth' : 'Hearth-Maiden') + '"... the word surfaces from deep within, sharp as a blade.', delay: 2800 },
   ], [
     { text: '嘗試活動關節，恢復身體機能', textEn: 'Stretch your joints to restore mobility', action: () => {
       changeStat('agi', 1);
@@ -493,9 +493,9 @@ registerNode('r0_ritual', () => {
 </pre>`, delay: 800 },
     { tag: '探索', tagColor: 'tag-explore', text: '在石像群的後方，你發現了一片被刻意清理過的空地。', textEn: 'Behind the statues, you find a patch of deliberately cleared ground.', delay: 2000 },
     { tag: '感知', tagColor: 'tag-sense', text: '地面上刻著複雜的幾何圖案——五芒星形的溝槽中殘留著暗紅色的痕跡。', textEn: 'Complex geometric patterns are carved into the ground — pentagram grooves stained with dark red residue.', delay: 2800 },
-    { tag: '情報', tagColor: 'tag-info', text: '這是一個祭壇。長老們用來進行「爐灶少女」獻祭的祭壇。', textEn: 'This is an altar. Used by the elders for the "Hearth-Maiden" sacrifice.', delay: 2500 },
+    { tag: '情報', tagColor: 'tag-info', text: '這是一個祭壇。長老們用來進行「爐灶' + (state.sex === 'male' ? '少年' : '少女') + '」獻祭的祭壇。', textEn: 'This is an altar. Used by the elders for the "' + (state.sex === 'male' ? 'Hearth-Youth' : 'Hearth-Maiden') + '" sacrifice.', delay: 2500 },
     { tag: '探索', tagColor: 'tag-explore', text: '五芒星的五個頂點各放著一塊石化結晶，暗淡但尚有微光。', textEn: 'At each of the five points sits a petrification crystal, dim but still faintly glowing.', delay: 2500 },
-    { tag: '情報', tagColor: 'tag-info', html: '中央有一塊石板，上面刻著古老的文字：<b>「以石化為養，以血肉為種——獻爐灶之女，平息石瘟之怒。」</b>', htmlEn: 'A stone slab at the center bears ancient text: <b>"Nourished by petrification, seeded with flesh — offer the Hearth-Maiden to quell the Stone Plague\'s wrath."</b>', delay: 3200 },
+    { tag: '情報', tagColor: 'tag-info', html: '中央有一塊石板，上面刻著古老的文字：<b>「以石化為養，以血肉為種——獻爐灶之' + (state.sex === 'male' ? '子' : '女') + '，平息石瘟之怒。」</b>', htmlEn: 'A stone slab at the center bears ancient text: <b>"Nourished by petrification, seeded with flesh — offer the ' + (state.sex === 'male' ? 'Hearth-Youth' : 'Hearth-Maiden') + ' to quell the Stone Plague\'s wrath."</b>', delay: 3200 },
     { tag: '記憶', tagColor: 'tag-system', text: '你的腦海中隱約浮現出灰袍長老們圍著你吟誦的場景……他們試圖以你為祭品平息瘟疫。', textEn: 'A faint vision surfaces — grey-robed elders chanting around you... They tried to sacrifice you to appease the plague.', delay: 3500 },
     { tag: '感知', tagColor: 'tag-sense', text: '空氣中瀰漫著不自然的寒意。離這裡越近，你的左手就越疼。', textEn: 'An unnatural chill pervades the air. The closer you get, the more your left hand aches.', delay: 2500 },
   ], [
@@ -648,7 +648,7 @@ registerNode('r0_rest', () => {
     { tag: '記憶', tagColor: 'tag-system', text: '……一座小鎮。地下的小鎮。自從地表崩潰後，人們就住在這裡。', textEn: '...A small town. Underground. People have lived here since the surface collapsed.', delay: 3000 },
     { tag: '記憶', tagColor: 'tag-system', text: '……街道先開始淹水。井水變苦了。牆壁上長出了灰色的紋路。', textEn: '...The streets flooded first. Well water turned bitter. Grey patterns grew on the walls.', delay: 3000 },
     { tag: '記憶', tagColor: 'tag-system', text: '……鄰居的臉龐不再會動。他們沒有消失——只是停止了移動。', textEn: '...Neighbors\' faces stopped moving. They didn\'t vanish — they just... stopped.', delay: 3000 },
-    { tag: '記憶', tagColor: 'tag-system', text: '……然後是灰袍。長老們。「爐灶少女」的祭祀。你被綁在熱泉的底部。', textEn: '...Then grey robes. The elders. The "Hearth-Maiden" ritual. You were bound at the bottom of a hot spring.', delay: 3500 },
+    { tag: '記憶', tagColor: 'tag-system', text: '……然後是灰袍。長老們。「爐灶' + (state.sex === 'male' ? '少年' : '少女') + '」的祭祀。你被綁在熱泉的底部。', textEn: '...Then grey robes. The elders. The "' + (state.sex === 'male' ? 'Hearth-Youth' : 'Hearth-Maiden') + '" ritual. You were bound at the bottom of a hot spring.', delay: 3500 },
     { tag: '記憶', tagColor: 'tag-system', text: '……他們的吟唱聲越來越大。滾燙的水淹沒了你。你的身體開始僵硬。', textEn: '...Their chanting grew louder. Scalding water engulfed you. Your body began to stiffen.', delay: 3000 },
     { tag: '記憶', tagColor: 'tag-system', text: '……墜落。無盡的墜落。', textEn: '...Falling. Endless falling.', delay: 3000 },
     { tag: '感知', tagColor: 'tag-sense', text: '你猛地睜開眼睛。冷汗浸透了後背。', textEn: 'Your eyes snap open. Cold sweat soaks your back.', delay: 2500 },

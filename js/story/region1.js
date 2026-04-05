@@ -1135,10 +1135,10 @@ registerNode('r1_wanderer', () => {
     { tag: '情報', tagColor: 'tag-info', text: '「你不是石礦工，也不是亡魂。有意思。」她的聲音平靜而低沉。', textEn: '"Not a Stone Miner, not a ghost. Interesting." Her voice is calm and low.', delay: 2800 },
     { tag: '情報', tagColor: 'tag-info', text: '「叫我灰鶴就好。我在這些礦道裡……來來回回很多年了。」', textEn: '"Call me Grey Crane. I\'ve been going back and forth through these mines... for many years."', delay: 2800 },
     { tag: '感知', tagColor: 'tag-sense', text: '她背著一個鼓鼓囊囊的行囊，裡面發出各種叮叮噹噹的聲響。', textEn: 'She carries a bulging pack that clinks and clatters with every step.', delay: 2200 },
-    { tag: '情報', tagColor: 'tag-info', html: '「看你的樣子，是從坑底爬上來的？<b>你是「爐灶少女」嗎？</b>」', htmlEn: '"By the look of you, climbed up from the pit? <b>Are you the \'Hearth-Maiden\'?</b>"', delay: 3000 },
+    { tag: '情報', tagColor: 'tag-info', html: '「看你的樣子，是從坑底爬上來的？<b>你是「爐灶' + (state.sex === 'male' ? '少年' : '少女') + '」嗎？</b>」', htmlEn: '"By the look of you, climbed up from the pit? <b>Are you the \'' + (state.sex === 'male' ? 'Hearth-Youth' : 'Hearth-Maiden') + '\'?</b>"', delay: 3000 },
     { tag: '感知', tagColor: 'tag-sense', text: '這個詞再次刺痛了你的記憶。她怎麼會知道？', textEn: 'The word stings your memory again. How does she know?', delay: 2500 },
   ], [
-    { text: '你怎麼知道「爐灶少女」？', textEn: 'How do you know about the "Hearth-Maiden"?', action: () => loadNode('r1_wanderer_lore') },
+    { text: '你怎麼知道「爐灶' + (state.sex === 'male' ? '少年' : '少女') + '」？', textEn: 'How do you know about the "' + (state.sex === 'male' ? 'Hearth-Youth' : 'Hearth-Maiden') + '"?', action: () => loadNode('r1_wanderer_lore') },
     { text: '你有什麼東西可以交易嗎？', textEn: 'Do you have anything to trade?', action: () => loadNode('r1_wanderer_trade') },
     { text: '保持警惕，沉默不語', textEn: 'Stay silent and on guard', action: () => {
       autoExplore([
@@ -1200,7 +1200,7 @@ registerNode('r1_wanderer_lore', () => {
       ]);
     }},
     { text: '我想交易', textEn: 'I want to trade', action: () => loadNode('r1_wanderer_trade') },
-  ], { label: L('爐灶少女的真相', 'Truth about the Hearth-Maiden') });
+  ], { label: L('爐灶' + (state.sex === 'male' ? '少年' : '少女') + '的真相', 'Truth about the ' + (state.sex === 'male' ? 'Hearth-Youth' : 'Hearth-Maiden')) });
 });
 
 registerNode('r1_wanderer_trade', () => {
@@ -1384,9 +1384,9 @@ registerNode('r1_ying_truth', () => {
       ╱╱    ╲╲
      Ying · Chronicler
 </pre>`, delay: 800 },
-    { tag: '情報', tagColor: 'tag-info', text: '你把自己的名字和來歷簡單說了。螢聽到「爐灶少女」四個字時，手微微一顫。', textEn: 'You briefly share your name and background. When Ying hears "Hearth-Maiden," ' + (isMale ? 'her' : 'his') + ' hand trembles.', delay: 3000 },
+    { tag: '情報', tagColor: 'tag-info', text: '你把自己的名字和來歷簡單說了。螢聽到「爐灶' + (isMale ? '少年' : '少女') + '」四個字時，手微微一顫。', textEn: 'You briefly share your name and background. When Ying hears "' + (isMale ? 'Hearth-Youth' : 'Hearth-Maiden') + '," ' + (isMale ? 'her' : 'his') + ' hand trembles.', delay: 3000 },
     { tag: '情報', tagColor: 'tag-info', text: '「……你就是那個被獻祭的人？」' + yingPronoun + '的聲音微微發抖，但眼中多了一種複雜的光芒。', textEn: '"...You\'re the one who was sacrificed?" ' + yingPronounCap + ' voice trembles, but ' + (isMale ? 'her' : 'his') + ' eyes fill with something complicated.', delay: 3200 },
-    { tag: '情報', tagColor: 'tag-info', html: yingPronoun + '翻開手冊，指著其中一頁：「<b>我記錄過你的事。</b>長老會議的紀錄裡提到過——第十七任爐灶少女，被選中的理由是「對石化具有異常的抗性」。」', htmlEn: yingPronounCap + ' flips open the notebook, pointing to a page: "<b>I chronicled your case.</b> The elders\' council records mention — the 17th Hearth-Maiden, chosen for \'anomalous resistance to petrification.\'"', delay: 4000 },
+    { tag: '情報', tagColor: 'tag-info', html: yingPronoun + '翻開手冊，指著其中一頁：「<b>我記錄過你的事。</b>長老會議的紀錄裡提到過——第十七任爐灶' + (isMale ? '少年' : '少女') + '，被選中的理由是「對石化具有異常的抗性」。」', htmlEn: yingPronounCap + ' flips open the notebook, pointing to a page: "<b>I chronicled your case.</b> The elders\' council records mention — the 17th ' + (isMale ? 'Hearth-Youth' : 'Hearth-Maiden') + ', chosen for \'anomalous resistance to petrification.\'"', delay: 4000 },
     { tag: '記憶', tagColor: 'tag-system', text: '第十七任……在你之前，已經有十六個人被丟進熱泉。', textEn: 'The seventeenth... before you, sixteen others were cast into the hot spring.', delay: 2800 },
     { tag: '情報', tagColor: 'tag-info', text: '「我以為你已經死了。」螢低聲說，目光停留在你泛灰的左手上。', textEn: '"I thought you were dead," Ying murmurs, eyes lingering on your grey-tinged left hand.', delay: 2800 },
     { tag: '感知', tagColor: 'tag-sense', text: yingPronoun + '伸出手，猶豫了一瞬，輕輕碰了碰你石化的指尖——像是在確認你是否真實存在。', textEn: yingPronounCap + ' reaches out, hesitates, then lightly touches your petrified fingertips — as if checking whether you\'re real.', delay: 3200 },
@@ -1592,13 +1592,13 @@ registerNode('r1_ying_talk', () => {
   if (companion && !state.flags.r1YingLore1) {
     state.flags.r1YingLore1 = true;
     steps.push({ tag: '情報', tagColor: 'tag-info', text: '「對了——我整理筆記的時候發現了一件有趣的事。」', textEn: '"By the way — I found something interesting while organizing my notes."', delay: 2500 });
-    steps.push({ tag: '情報', tagColor: 'tag-info', html: '「長老會議的紀錄裡有一段被刪掉了，但我能看出底稿的痕跡——<b>「第一任爐灶少女不是被獻祭的。她是自願走進熱泉的。」</b>」', htmlEn: '"A passage was deleted from the elders\' council records, but I can see traces of the draft — <b>\'The first Hearth-Maiden wasn\'t sacrificed. She walked into the hot spring willingly.\'</b>"', delay: 4000 });
+    steps.push({ tag: '情報', tagColor: 'tag-info', html: '「長老會議的紀錄裡有一段被刪掉了，但我能看出底稿的痕跡——<b>「第一任爐灶' + (isMale ? '少年' : '少女') + '不是被獻祭的。' + (isMale ? '他' : '她') + '是自願走進熱泉的。」</b>」', htmlEn: '"A passage was deleted from the elders\' council records, but I can see traces of the draft — <b>\'The first ' + (isMale ? 'Hearth-Youth' : 'Hearth-Maiden') + ' wasn\'t sacrificed. ' + (isMale ? 'He' : 'She') + ' walked into the hot spring willingly.\'</b>"', delay: 4000 });
     steps.push({ tag: '記憶', tagColor: 'tag-system', text: '自願？為什麼有人會自願走進那片滾燙的水中……？', textEn: 'Willingly? Why would anyone willingly walk into those scalding waters...?', delay: 2500 });
   } else if (companion && state.flags.r1YingLore1 && !state.flags.r1YingLore2) {
     state.flags.r1YingLore2 = true;
     steps.push({ tag: '感知', tagColor: 'tag-sense', text: '你注意到螢的手冊上多了很多新的墨跡。' + yingPronoun + '一直在寫。', textEn: 'You notice fresh ink marks filling Ying\'s notebook. ' + yingPronounCap + '\'s been writing non-stop.', delay: 2500 });
     steps.push({ tag: '情報', tagColor: 'tag-info', text: '「我在記錄你。」螢說得很自然，好像這是理所當然的事。', textEn: '"I\'m recording you," Ying says matter-of-factly, as if it were the most natural thing.', delay: 2800 });
-    steps.push({ tag: '情報', tagColor: 'tag-info', html: '「第十七任爐灶少女，從祭獻坑生還，正在向大採石場前進。<b>這是三百年來第一個活著回來的。</b>」', htmlEn: '"The 17th Hearth-Maiden, survived the Sacrificial Pit, advancing toward the Great Quarry. <b>The first to return alive in three hundred years.</b>"', delay: 3500 });
+    steps.push({ tag: '情報', tagColor: 'tag-info', html: '「第十七任爐灶' + (isMale ? '少年' : '少女') + '，從祭獻坑生還，正在向大採石場前進。<b>這是三百年來第一個活著回來的。</b>」', htmlEn: '"The 17th ' + (isMale ? 'Hearth-Youth' : 'Hearth-Maiden') + ', survived the Sacrificial Pit, advancing toward the Great Quarry. <b>The first to return alive in three hundred years.</b>"', delay: 3500 });
     steps.push({ tag: '感知', tagColor: 'tag-sense', text: yingPronoun + '抬起頭看著你，眼神裡有一種你說不清楚的溫度。', textEn: yingPronounCap + ' looks up at you, eyes carrying a warmth you can\'t quite name.', delay: 2500 });
     steps.push({ tag: '情報', tagColor: 'tag-info', text: '「……要是以後有人讀到這段記錄，他們會知道你的名字。」', textEn: '"...If anyone reads these records someday, they\'ll know your name."', delay: 2800 });
   }
