@@ -123,7 +123,7 @@ assets/
 
 ### 內容擴展
 
-- [ ] **場景 ASCII 美術圖補齊** — 為每個探索節點添加場景 ASCII art，提升沉浸感。目前覆蓋率偏低，尤其 R3 渡口最缺。詳見下方「ASCII 美術圖現況分析」。
+- [x] **場景 ASCII 美術圖補齊** — 98 個劇情節點全部 100% 覆蓋。NPC 肖像各有獨特無框設計（螢/老周/灰鶴/鐵霜/老鑄/清露/銅鐘）。詳見下方「ASCII 美術圖現況」。
 - [ ] **隨機事件池擴充** — 各區域巡邏遭遇和環境描述加更多變體，提高重玩新鮮感
 - [ ] **成就系統** — 追蹤隱藏行為（全程零戰鬥通關、石化度壓在 10% 以下、所有 NPC 都交流過），結局畫面顯示
 - [ ] **New Game+** — 通關後帶部分屬性/物品重玩，解鎖新對話選項或隱藏路線
@@ -141,42 +141,41 @@ assets/
 - [x] **玩家排行榜** — `js/leaderboard.js`，Dreamlo API。詳見下方「玩家排行榜（leaderboard.js）」
 - [ ] **多語言擴展** — 架構已支援 i18n，可加日文或其他社群翻譯
 
-## ASCII 美術圖現況分析
+## ✅ 已完成：ASCII 美術圖全覆蓋
 
-全遊戲共 98 個劇情節點，僅 34 個有場景 ASCII art（34.7%），需補齊以提升沉浸感。
-巡邏怪物（16 隻）和結局卡已全部有 art，不需處理。
+全遊戲 98 個劇情節點 + 16 隻巡邏怪物 + 結局卡，全部 **100% 有 ASCII art**。
 
 ### 各區域覆蓋率
 
-| 區域 | 節點總數 | 有 art | 無 art | 覆蓋率 |
-|------|---------|--------|--------|--------|
-| R0 祭獻坑 | 17 | 10 | 7 | 58.8% |
-| R1 石脈迴廊 | 33 | 10 | 23 | 30.3% |
-| R2 大採石場 | 26 | 7 | 19 | 26.9% |
-| R3 河城渡口 | 22 | 7 | 15 | 31.8% |
+| 區域 | 節點總數 | 覆蓋率 |
+|------|---------|--------|
+| R0 祭獻坑 | 17 | 100% |
+| R1 石脈迴廊 | 33 | 100% |
+| R2 大採石場 | 26 | 100% |
+| R3 河城渡口 | 22 | 100% |
 
-### 需補 art 的節點清單
+### NPC 肖像設計
 
-**R0 祭獻坑**（7 個）：
-`r0_climb_alt` `r0_climb_str` `r0_hidden` `r0_path` `r0_patrol` `r0_rest` `r0_whisper`
+每個 NPC 有獨特無框（frameless）肖像，跨區域復用同一角色設計：
 
-**R1 石脈迴廊**（23 個）：
-`r1_crystal_items` `r1_deep` `r1_forge_search` `r1_furnace` `r1_gate_open` `r1_guard_fight` `r1_guard_sneak` `r1_guard_weak` `r1_patrol` `r1_rest` `r1_survivor_bread` `r1_survivor_info` `r1_survivor_reward` `r1_survivor_talk` `r1_wanderer_lore` `r1_wanderer_trade` `r1_ying_alone` `r1_ying_chat` `r1_ying_herb` `r1_ying_share` `r1_ying_silent` `r1_ying_talk` `r1_ying_truth`
+| 角色 | 視覺特徵 | 色彩 | 出現次數 |
+|------|---------|------|---------|
+| 螢 Ying | 嬌小身形、飄逸馬尾、✦ 石化發光紋路、手持筆記本 | cyan | 13 處 |
+| 老周 Old Zhou | 壯碩礦工、半邊 ░ 石化紋理、礦燈、不對稱造型 | gold | 5 處 |
+| 灰鶴 Grey Crane | 高瘦、大簷帽、長斗篷、商人背包 | gold | 4 處 |
+| 鐵霜 Iron Frost | 魁梧戰士、█ 石化左臂、石錘 | — | 1 處 |
+| 老鑄 Old Cast | 矮壯鐵匠、石化雙手 ░、鐵砧 | — | 1 處 |
+| 清露 Dew | 纖細醫師、防石化面罩、✚ 十字、藥箱 | cyan | 1 處 |
+| 銅鐘 Bronze Bell | 威嚴女官、官服頭冠、石化右手、文件簿 | — | 1 處 |
 
-**R2 大採石場**（19 個）：
-`r2_boss_prep` `r2_bridge_fix` `r2_bridge_jump` `r2_bridge_swing` `r2_camp_chief` `r2_camp_medic` `r2_camp_smith` `r2_crane` `r2_crystal_deep` `r2_crystal_harvest` `r2_gate` `r2_machine_activate` `r2_patrol` `r2_rest` `r2_ying_night` `r2_ying_promise` `r2_ying_seal` `r2_ying_talk` `r2_zhou_trace`
-
-**R3 河城渡口**（15 個）：
-`r3_bell` `r3_boss_prep` `r3_council` `r3_crane` `r3_dock` `r3_epilogue` `r3_inn` `r3_look` `r3_market` `r3_patrol` `r3_quest_check` `r3_testimony` `r3_ying_inn` `r3_ying_talk` `r3_zhou`
-
-### 美術風格指引
+### 美術風格指引（新增內容時參考）
 
 - 使用 `<pre class="ascii-art">` 包裹，寬度建議 40-60 字元內（手機相容）
 - 用半形 box-drawing 字元（╔═╗║╚╝├┤┬┴┼）和符號（·˚✦░▓█）
 - 風格統一為暗黑奇幻地下城風格
 - 每個 art 需提供 `art` + `artEn`（通常可共用同一份 ASCII 圖，僅文字標註不同）
-- 對話/交易類節點可用簡化版 NPC 頭像代替場景圖
-- 優先補齊：關鍵場景（boss 準備、地圖概覽）> NPC 互動 > 休息/巡邏
+- NPC 肖像使用無框開放式設計（不要用 ╔══╗ 方框包圍）
+- 同一 NPC 跨區域復用同一肖像設計，保持視覺一致性
 
 ## API 速查表
 
