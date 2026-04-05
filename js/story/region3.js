@@ -69,6 +69,43 @@ registerNode('r3_look', () => {
   state.flags.r3Looked = true;
   var steps = [];
 
+  var mapArt = { art: `<pre class="ascii-art">
+        北：河岸隧道
+          │
+  ┌───────┼───────────────┐
+  │ ≈≈≈≈≈≈│≈≈≈≈≈≈≈≈≈≈≈≈≈ │
+  │ ≈  河  ≈  ╔═══╗  ≈≈≈ │
+  │ ≈≈≈≈≈≈≈≈  ║議會║  ≈≈ │
+  │ ╔════╗ ≈  ╚═══╝  ≈≈≈ │
+  │ ║客棧║─────橋─────≈≈ │
+  │ ╚════╝ ≈  ┌───┐  ≈≈≈ │
+  │ ≈≈≈≈≈≈≈≈  │市場│  ≈≈ │
+  │ ≈  河  ≈  └───┘  ≈≈≈ │
+  │ ≈≈≈≈≈≈≈≈  ⚓碼頭  ≈≈ │
+  │ ≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈ │
+  └───────┼───────────────┘
+          │
+       南：上升通道（返回）
+</pre>`, artEn: `<pre class="ascii-art">
+         N: River Tunnels
+          │
+  ┌───────┼───────────────┐
+  │ ≈≈≈≈≈≈│≈≈≈≈≈≈≈≈≈≈≈≈≈ │
+  │ ≈ River ≈ ╔═════╗ ≈≈ │
+  │ ≈≈≈≈≈≈≈≈  ║Council║ ≈ │
+  │ ╔════╗ ≈  ╚═════╝ ≈≈ │
+  │ ║ Inn║──── Bridge ──≈ │
+  │ ╚════╝ ≈  ┌──────┐ ≈ │
+  │ ≈≈≈≈≈≈≈≈  │Market│ ≈ │
+  │ ≈ River ≈ └──────┘ ≈ │
+  │ ≈≈≈≈≈≈≈≈  ⚓ Dock  ≈ │
+  │ ≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈ │
+  └───────┼───────────────┘
+          │
+       S: Ascent Shaft (Return)
+</pre>`, delay: 800 };
+  steps.push(mapArt);
+
   if (firstVisit) {
     if (!state.flags.r3YingArrived && state.flags.r1YingCompanion) {
       steps.push({ tag: '感知', tagColor: 'tag-sense', text: '你回頭看了一眼上升通道的出口——螢應該很快就會跟上來了。', textEn: 'You glance back at the ascent shaft exit — Ying should catch up soon.', delay: 2000 });
@@ -123,6 +160,31 @@ registerNode('r3_dock', () => {
   var firstVisit = !state.flags.r3DockVisited;
   state.flags.r3DockVisited = true;
   var steps = [];
+  steps.push({ art: `<pre class="ascii-art">
+  ≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈
+  ≈                                  ≈
+  ≈    ┌─────┐  ┌─────┐  ┌─────┐    ≈
+  ≈    │ ╱─╲ │  │ ╱─╲ │  │ ╱─╲ │    ≈
+  ≈    │/   \\│  │/ 鐵 \\│  │/   \\│    ≈
+  ≈    │ 渡船│  │ 鯨號│  │ 渡船│    ≈
+  ≈    └──┬──┘  └──┬──┘  └──┬──┘    ≈
+  ≈≈≈≈≈≈≈│≈≈≈≈≈≈≈≈│≈≈≈≈≈≈≈│≈≈≈≈≈≈≈≈
+  ════════╧════════╧═══════╧════════
+  ░░  ⚓  石砌碼頭  ·  繩索  ·  木箱  ░░
+  ══════════════════════════════════
+</pre>`, artEn: `<pre class="ascii-art">
+  ≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈
+  ≈                                  ≈
+  ≈    ┌─────┐  ┌─────┐  ┌─────┐    ≈
+  ≈    │ ╱─╲ │  │ ╱─╲ │  │ ╱─╲ │    ≈
+  ≈    │/   \\│  │/Iron\\│  │/   \\│    ≈
+  ≈    │Ferry│  │Whale│  │Ferry│    ≈
+  ≈    └──┬──┘  └──┬──┘  └──┬──┘    ≈
+  ≈≈≈≈≈≈≈│≈≈≈≈≈≈≈≈│≈≈≈≈≈≈≈│≈≈≈≈≈≈≈≈
+  ════════╧════════╧═══════╧════════
+  ░░  ⚓  Stone Dock · Rope · Crates ░░
+  ══════════════════════════════════
+</pre>`, delay: 800 });
   if (firstVisit) {
     steps.push({ tag: '移動', tagColor: 'tag-move', text: '你走向碼頭。河風裹著水霧撲在臉上，帶著鏽鐵和魚腥的氣味。', textEn: 'You head for the dock. River wind carries mist, rust, and fish against your face.', delay: 2000 });
     steps.push({ tag: '感知', tagColor: 'tag-sense', text: '三艘平底渡船靠在石砌的碼頭邊。最大的那艘船頭刻著「鐵鯨號」三個字。', textEn: 'Three flat-bottomed ferries sit at the stone dock. The largest bears the name "Iron Whale" on its prow.', delay: 2500 });
@@ -180,6 +242,35 @@ registerNode('r3_market', () => {
   var firstVisit = !state.flags.r3MarketVisited;
   state.flags.r3MarketVisited = true;
   var steps = [];
+  steps.push({ art: `<pre class="ascii-art">
+  ╔══════╗  ╔══════╗  ╔══════╗
+  ║ 草藥 ║  ║ 工具 ║  ║ 書籍 ║
+  ╚══╤═══╝  ╚══╤═══╝  ╚══╤═══╝
+  ───┴─────────┴─────────┴───
+    ☼        ☼        ☼
+   ╱ ╲      ╱ ╲      ╱ ╲
+  ╱燈籠╲   ╱燈籠╲   ╱燈籠╲
+  ─────────────────────────────
+  ░ 人群 ·· 叫賣聲 ·· 討價 ░
+  ░░░░░░░░░░░░░░░░░░░░░░░░░░░
+  ┌─────────────────────────┐
+  │  ▓▓ 佈告牆：尋人·招工 ▓▓ │
+  └─────────────────────────┘
+</pre>`, artEn: `<pre class="ascii-art">
+  ╔══════╗  ╔══════╗  ╔══════╗
+  ║ Herbs║  ║ Tools║  ║ Books║
+  ╚══╤═══╝  ╚══╤═══╝  ╚══╤═══╝
+  ───┴─────────┴─────────┴───
+    ☼        ☼        ☼
+   ╱ ╲      ╱ ╲      ╱ ╲
+  ╱Lamp ╲  ╱Lamp ╲  ╱Lamp ╲
+  ─────────────────────────────
+  ░ Crowd · Hawking · Bargains ░
+  ░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+  ┌────────────────────────────┐
+  │ ▓▓ Bulletin: Missing·Jobs ▓▓│
+  └────────────────────────────┘
+</pre>`, delay: 800 });
   if (firstVisit) {
     steps.push({ tag: '移動', tagColor: 'tag-move', text: '你走進市場。狹窄的通道兩旁擠滿了攤位和帳篷。', textEn: 'You enter the market. Narrow passages flanked by stalls and tents.', delay: 2000 });
     steps.push({ tag: '感知', tagColor: 'tag-sense', text: '叫賣聲、討價還價聲、孩子的笑聲——在石化瘟疫的陰影下，這裡竟然還有生機。', textEn: 'Hawking, bargaining, children\'s laughter — even under the plague\'s shadow, life persists here.', delay: 2500 });
@@ -239,6 +330,31 @@ registerNode('r3_market', () => {
 registerNode('r3_council', () => {
   state.flags.r3CouncilVisited = true;
   var steps = [];
+  steps.push({ art: `<pre class="ascii-art">
+       ╔═══════════════════╗
+       ║   渡 口 議 會 廳   ║
+       ╚═══════╤═══╤═══════╝
+       ┌───────┴───┴───────┐
+       │  ╔═╗         ╔═╗  │
+       │  ║柱║  ┌───┐  ║柱║  │
+       │  ║ ║  │ 門 │  ║ ║  │
+       │  ╚═╝  └─┬─┘  ╚═╝  │
+       │    ⚔  守衛  ⚔    │
+       └───────────────────┘
+       ░░░ 石階 ·· 火把 ░░░
+</pre>`, artEn: `<pre class="ascii-art">
+       ╔═══════════════════╗
+       ║  COUNCIL  HALL    ║
+       ╚═══════╤═══╤═══════╝
+       ┌───────┴───┴───────┐
+       │  ╔═╗         ╔═╗  │
+       │  ║ ║  ┌───┐  ║ ║  │
+       │  ║ ║  │Door│  ║ ║  │
+       │  ╚═╝  └─┬─┘  ╚═╝  │
+       │   ⚔  Guards  ⚔   │
+       └───────────────────┘
+       ░░ Stone Steps · Torches ░░
+</pre>`, delay: 800 });
   steps.push({ tag: '移動', tagColor: 'tag-move', text: '議會廳建在河流東岸的一座石砌建築裡。門口站著兩個全副武裝的守衛。', textEn: 'The Council Hall is a stone building on the east bank. Two fully armed guards stand at the entrance.', delay: 2500 });
 
   if (!state.flags.r3CouncilEntry) {
@@ -293,6 +409,31 @@ registerNode('r3_council', () => {
 // ── Riverside Inn (rest + save point) ──
 registerNode('r3_inn', () => {
   var steps = [];
+  steps.push({ art: `<pre class="ascii-art">
+       ┌─────────────┐
+       │ ☼  ☼  ☼  ☼ │  三樓
+       ├─────────────┤
+       │ ☼  ☼  ☼  ☼ │  二樓
+       ├──────┬──────┤
+       │      │河畔居│  一樓
+       │      │ OPEN │
+       └──────┴──────┘
+    ≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈
+    ≈  河  水  拍  岸  ≈
+    ≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈
+</pre>`, artEn: `<pre class="ascii-art">
+       ┌─────────────┐
+       │ ☼  ☼  ☼  ☼ │  3F
+       ├─────────────┤
+       │ ☼  ☼  ☼  ☼ │  2F
+       ├──────┬──────┤
+       │      │ Inn  │  1F
+       │      │ OPEN │
+       └──────┴──────┘
+    ≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈
+    ≈  River  lapping  ≈
+    ≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈
+</pre>`, delay: 800 });
   steps.push({ tag: '移動', tagColor: 'tag-move', text: '河畔居是一棟三層的石砌建築，窗戶透出暖黃色的燈光。', textEn: 'Riverside Lodge is a three-story stone building, windows glowing warm yellow.', delay: 2000 });
   steps.push({ tag: '感知', tagColor: 'tag-sense', text: '推開門，一股酒香和烤肉的味道迎面而來。大廳裡坐著十幾個人在喝酒。', textEn: 'You push open the door to the scent of ale and roasted meat. A dozen people drink in the hall.', delay: 2500 });
 
@@ -335,6 +476,31 @@ registerNode('r3_inn', () => {
 
 registerNode('r3_bell', () => {
   var steps = [];
+  steps.push({ art: `<pre class="ascii-art">
+        ╭─────────╮
+        │  ·   ·  │
+        │  ╰─┬─╯  │
+        │   ───   │
+        ╰────┬────╯
+         ╱───┴───╲
+        ╱ ░░░░░░░ ╲
+       │  ░銅 鐘░  │
+       │  ░░░░░░░  │
+        ╲  ██···  ╱  ← 石化右手
+         ╲───────╱
+</pre>`, artEn: `<pre class="ascii-art">
+        ╭─────────╮
+        │  ·   ·  │
+        │  ╰─┬─╯  │
+        │   ───   │
+        ╰────┬────╯
+         ╱───┴───╲
+        ╱ ░░░░░░░ ╲
+       │  ░Bronze░ │
+       │  ░ Bell ░ │
+        ╲  ██···  ╱  ← petrified hand
+         ╲───────╱
+</pre>`, delay: 800 });
   if (!state.flags.r3BellMet) {
     state.flags.r3BellMet = true;
     steps.push({ tag: '移動', tagColor: 'tag-move', text: '你走進議會廳右側走廊盡頭的房間。門半開著。', textEn: 'You enter the room at the end of the right corridor. The door is ajar.', delay: 2000 });
@@ -433,6 +599,33 @@ registerNode('r3_ying_talk', () => {
   var yPo = isMale ? 'her' : 'his';
 
   var steps = [];
+  steps.push({ art: `<pre class="ascii-art">
+        ╭─────────╮
+        │ ✦    ✦  │
+        │  ╰─┬─╯  │
+        │   ╰╯    │
+        ╰────┬────╯
+         ╱───┴───╲
+        ╱  ·˚✦˚·  ╲
+       │   螢 Ying  │
+       │  ˚·发光·˚  │
+        ╲ ┌──────┐╱
+         ╲│ 手冊 │
+          └──────┘
+</pre>`, artEn: `<pre class="ascii-art">
+        ╭─────────╮
+        │ ✦    ✦  │
+        │  ╰─┬─╯  │
+        │   ╰╯    │
+        ╰────┬────╯
+         ╱───┴───╲
+        ╱  ·˚✦˚·  ╲
+       │    Ying    │
+       │  ˚·glow·˚ │
+        ╲ ┌──────┐╱
+         ╲│ Note │
+          └──────┘
+</pre>`, delay: 800 });
   // First time — Ying arrives
   if (!state.flags.r3YingArrived) {
     state.flags.r3YingArrived = true;
@@ -502,6 +695,33 @@ registerNode('r3_ying_inn', () => {
   var yPo = isMale ? 'her' : 'his';
   state.flags.r3YingInn = true;
   autoExplore([
+    { art: `<pre class="ascii-art">
+        ╭─────────╮
+        │ ✦    ✦  │
+        │  ╰─┬─╯  │
+        │   ╰╯    │
+        ╰────┬────╯
+         ╱───┴───╲
+        ╱  ·˚✦˚·  ╲
+       │   螢 Ying  │
+       │  ˚·发光·˚  │
+        ╲ ┌──────┐╱
+         ╲│ 手冊 │
+          └──────┘
+</pre>`, artEn: `<pre class="ascii-art">
+        ╭─────────╮
+        │ ✦    ✦  │
+        │  ╰─┬─╯  │
+        │   ╰╯    │
+        ╰────┬────╯
+         ╱───┴───╲
+        ╱  ·˚✦˚·  ╲
+       │    Ying    │
+       │  ˚·glow·˚ │
+        ╲ ┌──────┐╱
+         ╲│ Note │
+          └──────┘
+</pre>`, delay: 800 },
     { tag: '移動', tagColor: 'tag-move', text: '你帶螢到河畔居吃晚飯。老闆娘端上了兩碗熱騰騰的河魚湯和一盤黑麵包。', textEn: 'You bring Ying to Riverside Lodge for dinner. The landlady serves two bowls of steaming river-fish soup and a plate of black bread.', delay: 2500 },
     { tag: '感知', tagColor: 'tag-sense', text: '螢拿起湯碗，喝了一口。' + yP + '的眼睛瞬間睜大了。', textEn: 'Ying picks up the bowl, takes a sip. ' + yPC + ' eyes widen instantly.', delay: 2200 },
     { tag: '情報', tagColor: 'tag-info', text: '「好、好喝……！這是真正的食物！不是乾糧和蘑菇！」', textEn: '"Good — so good...! This is real food! Not rations and mushrooms!"', delay: 2500 },
@@ -528,6 +748,33 @@ registerNode('r3_ying_inn', () => {
 registerNode('r3_zhou', () => {
   state.flags.r3ZhouMet = true;
   autoExplore([
+    { art: `<pre class="ascii-art">
+        ╭─────────╮
+        │  -   -  │
+        │  ╰─┬─╯  │
+        │  ╭───╮  │
+        ╰──┤皺紋├──╯
+         ╱─┴───┴─╲
+        ╱  老  周  ╲
+       │  ░░░░░░░░  │
+       │  ██ 石化手 │
+        ╲   ╱│     ╱
+         ╲─╱─┴──拐╱
+           ░░░ 工具箱
+</pre>`, artEn: `<pre class="ascii-art">
+        ╭─────────╮
+        │  -   -  │
+        │  ╰─┬─╯  │
+        │  ╭───╮  │
+        ╰──┤lines├─╯
+         ╱─┴───┴─╲
+        ╱ Old Zhou ╲
+       │  ░░░░░░░░  │
+       │  ██ petri  │
+        ╲   ╱│     ╱
+         ╲─╱─┴─crutch
+           ░░░ Toolbox
+</pre>`, delay: 800 },
     { tag: '遭遇', tagColor: 'tag-explore', text: '你在市場的一角看到了一個坐在木箱上的老人。他的左腿被粗布包裹著，旁邊靠著一根拐杖。', textEn: 'You spot an old man sitting on a crate in a market corner. His left leg is wrapped in rough cloth, a crutch leaning beside him.', delay: 2500 },
     { tag: '感知', tagColor: 'tag-sense', html: '那張飽經風霜的臉——是<b>老周</b>。', htmlEn: 'That weathered face — it\'s <b>Old Zhou</b>.', delay: 2000 },
     { tag: '情報', tagColor: 'tag-info', text: '老周看到你的瞬間，渾濁的眼睛亮了一下。他努力站起來，拐杖差點滑倒。', textEn: 'Old Zhou\'s cloudy eyes brighten the moment he sees you. He struggles to stand, crutch nearly slipping.', delay: 2800 },
@@ -585,6 +832,33 @@ registerNode('r3_zhou', () => {
 
 registerNode('r3_crane', () => {
   var steps = [];
+  steps.push({ art: `<pre class="ascii-art">
+        ╭─────────╮
+        │  ˆ   ˆ  │
+        │  ╰─┬─╯  │
+        │   ───   │
+        ╰────┬────╯
+        ╱╲───┴───╱╲
+       ╱斗╲░░░░░╱斗╲
+      ╱ 篷 ╲灰鶴╱ 篷 ╲
+      ╲    ╱░░░░╲    ╱
+       ╲╱╱ ┌────┐╲╲╱
+           │貨物│
+           └────┘
+</pre>`, artEn: `<pre class="ascii-art">
+        ╭─────────╮
+        │  ˆ   ˆ  │
+        │  ╰─┬─╯  │
+        │   ───   │
+        ╰────┬────╯
+        ╱╲───┴───╱╲
+       ╱  ╲░░░░░╱  ╲
+      ╱Grey╲Crane╱loak╲
+      ╲    ╱░░░░╲    ╱
+       ╲╱╱ ┌────┐╲╲╱
+           │Goods│
+           └────┘
+</pre>`, delay: 800 });
   if (!state.flags.r3CraneMet3) {
     state.flags.r3CraneMet3 = true;
     steps.push({ tag: '遭遇', tagColor: 'tag-explore', text: '市場的角落裡，一面灰色斗篷在貨箱堆間若隱若現。', textEn: 'In a market corner, a grey cloak flickers between stacked crates.', delay: 2000 });
@@ -675,6 +949,31 @@ registerNode('r3_crane', () => {
 // ── Region 3 Patrol ──
 registerNode('r3_patrol', () => {
   autoExplore([
+    { art: `<pre class="ascii-art">
+  ╔═══════════════════════════════╗
+  ║  河 岸 隧 道                  ║
+  ╠═══════════════════════════════╣
+  ║                               ║
+  ║  ≈≈≈≈≈≈╗         ╔≈≈≈≈≈≈≈≈  ║
+  ║  ≈ 暗河 ║ ░░░░░░ ║ 暗河 ≈≈  ║
+  ║  ≈≈≈≈≈≈╝ ░隧道░░ ╚≈≈≈≈≈≈≈≈  ║
+  ║          ░░░░░░░░             ║
+  ║    ·˚  ← 變異生物 →  ˚·     ║
+  ║                               ║
+  ╚═══════════════════════════════╝
+</pre>`, artEn: `<pre class="ascii-art">
+  ╔═══════════════════════════════╗
+  ║  RIVER  TUNNELS               ║
+  ╠═══════════════════════════════╣
+  ║                               ║
+  ║  ≈≈≈≈≈≈╗         ╔≈≈≈≈≈≈≈≈  ║
+  ║  ≈ Dark ║ ░░░░░░ ║ Dark  ≈≈  ║
+  ║  ≈River╝ ░Tunnel░ ╚River ≈≈  ║
+  ║          ░░░░░░░░             ║
+  ║   ·˚  ← Mutants  →  ˚·     ║
+  ║                               ║
+  ╚═══════════════════════════════╝
+</pre>`, delay: 800 },
     { tag: '判斷', tagColor: 'tag-move', text: '渡口外圍的河岸隧道裡棲息著各種變異生物。城市的守衛不會巡邏到那裡。', textEn: 'Mutated creatures nest in the river tunnels beyond the docks. City guards don\'t patrol there.', delay: 2200 },
     { tag: '感知', tagColor: 'tag-sense', text: '你握緊武器，踏入了河岸隧道的陰暗深處。', textEn: 'You grip your weapon and step into the dark river tunnels.', delay: 2000 },
   ], [
@@ -695,6 +994,27 @@ registerNode('r3_quest_check', () => {
   if (state.flags.r3YingEvidence) questsDone++; // Quest 3: plague origin (Ying working on it)
 
   var steps = [];
+  steps.push({ art: `<pre class="ascii-art">
+  ╔═══════════════════════════╗
+  ║     任 務 進 度            ║
+  ╠═══════════════════════════╣
+  ║  ① 河岸隧道  ░░░░░  ?   ║
+  ║  ② 灰鶴證詞  ░░░░░  ?   ║
+  ║  ③ 瘟疫起源  ░░░░░  ?   ║
+  ╠═══════════════════════════╣
+  ║  銅鐘：「進展如何？」      ║
+  ╚═══════════════════════════╝
+</pre>`, artEn: `<pre class="ascii-art">
+  ╔═══════════════════════════╗
+  ║     QUEST  PROGRESS       ║
+  ╠═══════════════════════════╣
+  ║  ① River Tunnels  ░░  ?  ║
+  ║  ② Crane Testimony ░  ?  ║
+  ║  ③ Plague Origin  ░░  ?  ║
+  ╠═══════════════════════════╣
+  ║  Bell: "Any progress?"    ║
+  ╚═══════════════════════════╝
+</pre>`, delay: 800 });
   steps.push({ tag: '系統', tagColor: 'tag-system', text: '你回到議會廳向銅鐘匯報進展。', textEn: 'You return to the Council Hall to report to Bronze Bell.', delay: 2000 });
 
   // Quest 1 status
@@ -746,6 +1066,31 @@ registerNode('r3_quest_check', () => {
 // ── Boss Prep ──
 registerNode('r3_boss_prep', () => {
   var steps = [];
+  steps.push({ art: `<pre class="ascii-art">
+  ╔═══════════════════════════════╗
+  ║       決 戰 前 夕              ║
+  ╠═══════════════════════════════╣
+  ║                               ║
+  ║    ·˚✦˚·  ───────  ⚔⚔⚔    ║
+  ║    銅鐘     走廊     鏽刃    ║
+  ║    ·˚✦˚·  ───────  ⚔⚔⚔    ║
+  ║                               ║
+  ║     「他不會讓你進去。」       ║
+  ║                               ║
+  ╚═══════════════════════════════╝
+</pre>`, artEn: `<pre class="ascii-art">
+  ╔═══════════════════════════════╗
+  ║     EVE OF THE SHOWDOWN       ║
+  ╠═══════════════════════════════╣
+  ║                               ║
+  ║   ·˚✦˚·  ────────  ⚔⚔⚔   ║
+  ║   Bell    Corridor   Rust    ║
+  ║   ·˚✦˚·  ────────  ⚔⚔⚔   ║
+  ║                               ║
+  ║   "He won't let you in."     ║
+  ║                               ║
+  ╚═══════════════════════════════╝
+</pre>`, delay: 800 });
   steps.push({ tag: '情報', tagColor: 'tag-info', text: '銅鐘站起身，整理了一下衣領。她的表情前所未有地凝重。', textEn: 'Bronze Bell stands, straightening her collar. Her expression is graver than ever.', delay: 2200 });
   steps.push({ tag: '情報', tagColor: 'tag-info', text: '「議會大廳在走廊盡頭。其他四個人應該已經到了。」', textEn: '"The Council chamber is at the end of the hall. The other four should already be there."', delay: 2500 });
   steps.push({ tag: '警告', tagColor: 'tag-warn', html: '「但我必須警告你——守衛隊長<b>鏽刃</b>不會讓你這麼容易走進去。他反對外來者的態度最為激烈。」', htmlEn: '"But I must warn you — Guard Captain <b>Rust Blade</b> won\'t let you in easily. He\'s the most hostile toward outsiders."', delay: 3200 });
@@ -942,6 +1287,31 @@ registerNode('r3_testimony', () => {
   var steps = [];
 
   // Core testimony
+  steps.push({ art: `<pre class="ascii-art">
+  ╔═══════════════════════════════════╗
+  ║          議  會  大  廳            ║
+  ╠═══════════════════════════════════╣
+  ║  鉛錘  黑鰭  ╔═══╗  玉秤  鏽刃  ║
+  ║   □     □    ║銅鐘║   □     □    ║
+  ║              ╚═══╝              ║
+  ║  ─────────────┬─────────────── ║
+  ║               │                 ║
+  ║             ◆ 你 ◆              ║
+  ║                                 ║
+  ╚═══════════════════════════════════╝
+</pre>`, artEn: `<pre class="ascii-art">
+  ╔═══════════════════════════════════╗
+  ║       COUNCIL   CHAMBER           ║
+  ╠═══════════════════════════════════╣
+  ║  Lead  Black  ╔════╗ Jade  Rust  ║
+  ║  Ham.  Fin    ║Bell║ Scale Blade ║
+  ║               ╚════╝             ║
+  ║  ─────────────┬──────────────── ║
+  ║               │                  ║
+  ║             ◆ You ◆             ║
+  ║                                  ║
+  ╚═══════════════════════════════════╝
+</pre>`, delay: 800 });
   steps.push({ tag: '行動', tagColor: 'tag-move', text: '你站在議會桌前，深吸一口氣。', textEn: 'You stand before the Council table and take a deep breath.', delay: 2000 });
   steps.push({ tag: '行動', tagColor: 'tag-move', text: '「我從最底層的祭獻坑爬上來。經過石脈迴廊、大採石場，一路到這裡。」', textEn: '"I climbed from the Sacrificial Pit at the very bottom. Through the Vein Corridor, the Great Quarry, all the way here."', delay: 3000 });
   steps.push({ tag: '行動', tagColor: 'tag-move', text: '「下面還有人在活著——還有人在希望著有一天能上來。」', textEn: '"People below are still alive — still hoping to someday make it up."', delay: 2800 });
@@ -1186,6 +1556,29 @@ registerNode('r3_epilogue', () => {
   var steps = [];
 
   // Time skip
+  steps.push({ art: `<pre class="ascii-art">
+  ·    ✦    ·    ✦    ·    ✦    ·
+     .    .    .    .    .    .
+  ═══════════════════════════════
+        ·˚✦˚·  三個月後  ·˚✦˚·
+  ═══════════════════════════════
+  ≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈
+  ≈  河城渡口  ·  平靜的日常  ≈
+  ≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈
+     .    .    .    .    .    .
+  ·    ✦    ·    ✦    ·    ✦    ·
+</pre>`, artEn: `<pre class="ascii-art">
+  ·    ✦    ·    ✦    ·    ✦    ·
+     .    .    .    .    .    .
+  ═══════════════════════════════
+      ·˚✦˚· Three Months ·˚✦˚·
+  ═══════════════════════════════
+  ≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈
+  ≈  River City  ·  Peaceful  ≈
+  ≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈
+     .    .    .    .    .    .
+  ·    ✦    ·    ✦    ·    ✦    ·
+</pre>`, delay: 800 });
   steps.push({ tag: '系統', tagColor: 'tag-system', text: '——三個月後。', textEn: '— Three months later.', delay: 3000 });
 
   if (ending === 'dawn') {

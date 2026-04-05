@@ -231,7 +231,30 @@ registerNode('r2_crystal_harvest', () => {
     state.flags.r2CrystalHarvested = true;
     addItem(L('高純度石化結晶', 'High-Purity Petri Crystal'));
     autoExplore([
-      { tag: '行動', tagColor: 'tag-move', text: '你舉起鶴嘴鋤，用力鑿向結晶根部——', textEn: 'You raise the pickaxe and strike at the crystal\'s base —', delay: 1800 },
+      { art: `<pre class="ascii-art gold">
+    .:*~*:.    .:*~*:.    .:*~*:.
+   .:*~*~*:.  .:*~*~*:.  .:*~*~*:.
+   ·✦ 結晶 ✦· ·✦ 結晶 ✦· ·✦ 結晶 ✦·
+    ˚:·△·:˚    ˚:·△·:˚    ˚:·△·:˚
+     ║██║       ║██║       ║██║
+     ║██║       ║██║       ║██║
+  ───╨══╨───────╨══╨───────╨══╨───
+        ╱⚒╲  ← 鶴嘴鋤
+       ╱····╲
+  ════════════════════════════════
+</pre>`, artEn: `<pre class="ascii-art gold">
+    .:*~*:.    .:*~*:.    .:*~*:.
+   .:*~*~*:.  .:*~*~*:.  .:*~*~*:.
+   ·✦Crystal✦· ·✦Crystal✦· ·✦Crystal✦·
+    ˚:·△·:˚    ˚:·△·:˚    ˚:·△·:˚
+     ║██║       ║██║       ║██║
+     ║██║       ║██║       ║██║
+  ───╨══╨───────╨══╨───────╨══╨───
+        ╱⚒╲  ← Pickaxe
+       ╱····╲
+  ════════════════════════════════
+</pre>`, delay: 800 },
+    { tag: '行動', tagColor: 'tag-move', text: '你舉起鶴嘴鋤，用力鑿向結晶根部——', textEn: 'You raise the pickaxe and strike at the crystal\'s base —', delay: 1800 },
       { tag: '成功', tagColor: 'tag-item', html: '結晶應聲碎裂！你小心翼翼地取下一塊拳頭大小的<b>高純度石化結晶</b>。', htmlEn: 'The crystal shatters! You carefully extract a fist-sized <b>High-Purity Petri Crystal</b>.', delay: 2200 },
       { tag: '石化', tagColor: 'tag-petri', text: '碎裂的瞬間釋放出一股石化粒子——你的手臂瞬間僵硬了一下。', textEn: 'A burst of petrification particles — your arm goes rigid for a moment.', delay: 2000 },
     ], [
@@ -253,6 +276,29 @@ registerNode('r2_crystal_harvest', () => {
 registerNode('r2_crystal_deep', () => {
   changePetri(2);
   var steps = [
+    { art: `<pre class="ascii-art gold">
+  .:*~*~*:..:*~*~*:. .:*~*~*:..:*~*:.
+  ·✦·✦·✦·✦··✦·✦·✦·✦· ·✦·✦·✦·✦··✦·✦·
+   ║██████║║██████║   ║██████║║████║
+   ║██████║║██████║   ║██████║║████║
+   ║██████║║██████║   ║██████║║████║
+   ║██░░██║║██░░██║   ║██░░██║║██║
+   ║██░░██║║██░░██║   ║██░░██║║██║
+  ─╨══════╨╨══════╨───╨══════╨╨══╨──
+     ✦ 結晶密林 — 深處 ✦
+  ══════════════════════════════════
+</pre>`, artEn: `<pre class="ascii-art gold">
+  .:*~*~*:..:*~*~*:. .:*~*~*:..:*~*:.
+  ·✦·✦·✦·✦··✦·✦·✦·✦· ·✦·✦·✦·✦··✦·✦·
+   ║██████║║██████║   ║██████║║████║
+   ║██████║║██████║   ║██████║║████║
+   ║██████║║██████║   ║██████║║████║
+   ║██░░██║║██░░██║   ║██░░██║║██║
+   ║██░░██║║██░░██║   ║██░░██║║██║
+  ─╨══════╨╨══════╨───╨══════╨╨══╨──
+     ✦ Crystal Thicket — Deep ✦
+  ══════════════════════════════════
+</pre>`, delay: 800 },
     { tag: '移動', tagColor: 'tag-move', text: '你深入結晶密林。四周的結晶越來越高大密集。', textEn: 'You venture deep into the crystal thicket. Crystals grow taller and denser.', delay: 2000 },
     { tag: '石化', tagColor: 'tag-petri', text: '空氣中的石化濃度極高——你的呼吸變得沉重。', textEn: 'Petrification density is extreme — breathing grows heavy.', delay: 2200 },
     { tag: '感知', tagColor: 'tag-sense', text: '結晶之間……有一具石化的軀體。不——是一座雕像般的人形。', textEn: 'Among the crystals... a petrified body. No — a statuesque humanoid form.', delay: 2500 },
@@ -344,6 +390,35 @@ registerNode('r2_machine_activate', () => {
   state.flags.r2MachineCore = true;
   addItem(L('機甲控制鍵', 'Mech Control Key'));
   autoExplore([
+    { art: `<pre class="ascii-art red">
+      ╔═══════════════════════════╗
+      ║    ╱▔▔▔▔▔▔▔▔▔╲         ║
+      ║   │  ◉      ◉  │         ║
+      ║   │     ▓▓▓     │         ║
+      ║    ╲___________╱          ║
+      ║      ║║█████║║            ║
+      ║    ╔═╬╬═✦✦✦═╬╬═╗         ║
+      ║    ║ ║║ ◆◆◆ ║║ ║  ← 核心 ║
+      ║    ╚═╬╬═════╬╬═╝         ║
+      ║      ║║█████║║            ║
+      ║     ╱╱║█████║╲╲          ║
+      ║    ╱╱  ═════  ╲╲         ║
+      ╚═══════════════════════════╝
+</pre>`, artEn: `<pre class="ascii-art red">
+      ╔═══════════════════════════╗
+      ║    ╱▔▔▔▔▔▔▔▔▔╲         ║
+      ║   │  ◉      ◉  │         ║
+      ║   │     ▓▓▓     │         ║
+      ║    ╲___________╱          ║
+      ║      ║║█████║║            ║
+      ║    ╔═╬╬═✦✦✦═╬╬═╗         ║
+      ║    ║ ║║ ◆◆◆ ║║ ║  ← Core ║
+      ║    ╚═╬╬═════╬╬═╝         ║
+      ║      ║║█████║║            ║
+      ║     ╱╱║█████║╲╲          ║
+      ║    ╱╱  ═════  ╲╲         ║
+      ╚═══════════════════════════╝
+</pre>`, delay: 800 },
     { tag: '行動', tagColor: 'tag-move', text: '你按照筆記中的步驟，將高純度結晶嵌入機甲胸口的反應爐。', textEn: 'Following the notebook\'s instructions, you insert the crystal into the mech\'s chest reactor.', delay: 2000 },
     { tag: '環境', tagColor: 'tag-system', text: '結晶開始發出耀眼的金色光芒——機甲的全身石化外殼出現了裂紋。', textEn: 'The crystal blazes with golden light — cracks spider across the mech\'s petrified shell.', delay: 2500 },
     { tag: '環境', tagColor: 'tag-system', text: '石殼一塊塊剝落，露出了底下生鏽但完整的金屬裝甲。', textEn: 'Stone shell peels away chunk by chunk, revealing rusted but intact metal armor beneath.', delay: 2200 },
@@ -402,6 +477,29 @@ registerNode('r2_bridge_fix', () => {
   removeItem(L('粗繩', 'Rope'));
   state.flags.r2BridgeFixed = true;
   autoExplore([
+    { art: `<pre class="ascii-art">
+  ╔══════╗                  ╔══════╗
+  ║ 此岸 ║                  ║ 彼岸 ║
+  ║══════║   ～～繩索～～   ║══════║
+  ║██████║─ ─ ─ ─ ─ ─ ─ ─ ─║██████║
+  ║██████║  ⚒鶴嘴鋤(固定)  ║██████║
+  ╚══════╝                  ╚══════╝
+      ║                        ║
+      ║    ░░ 深  淵 ░░        ║
+      ║    ░░░░░░░░░░░░        ║
+      ║    ░░░░░░░░░░░░        ║
+</pre>`, artEn: `<pre class="ascii-art">
+  ╔══════╗                  ╔══════╗
+  ║ This ║                  ║ Far  ║
+  ║ Side ║   ~~~ Rope ~~~   ║ Side ║
+  ║██████║─ ─ ─ ─ ─ ─ ─ ─ ─║██████║
+  ║██████║  ⚒Pickaxe(anchor)║██████║
+  ╚══════╝                  ╚══════╝
+      ║                        ║
+      ║    ░░  Abyss  ░░      ║
+      ║    ░░░░░░░░░░░░        ║
+      ║    ░░░░░░░░░░░░        ║
+</pre>`, delay: 800 },
     { tag: '行動', tagColor: 'tag-move', text: '你將鶴嘴鋤深深釘入橋的斷口邊緣，然後把粗繩牢牢綁在上面。', textEn: 'You drive the pickaxe deep into the bridge\'s broken edge and tie the rope securely.', delay: 2200 },
     { tag: '行動', tagColor: 'tag-move', text: '你把繩索的另一端甩向對面——繩子纏住了一根突出的石柱！', textEn: 'You hurl the rope\'s other end across — it catches on a protruding stone pillar!', delay: 2000 },
     { tag: '成功', tagColor: 'tag-item', text: '繩索被拉緊後形成了一條簡易通道。雖然搖搖晃晃，但足以通過。', textEn: 'The taut rope forms a makeshift crossing. Shaky, but passable.', delay: 2200 },
@@ -416,6 +514,29 @@ registerNode('r2_bridge_swing', () => {
   if (result !== 'fail') {
     state.flags.r2BridgeFixed = true;
     autoExplore([
+      { art: `<pre class="ascii-art">
+          ┃ 繩索
+          ┃╱
+  ║██████║┃         ║██████║
+  ║██████║ ╲        ║██████║
+  ║══════║  ╲ ○     ║══════║
+  ╚══════╝   ╲╱│╲   ╚══════╝
+               │  →
+  ░░░░░░░░░░╱  ╲░░░░░░░░░░
+  ░░░ 深  淵 ░░░░░░░ 深 淵 ░░
+  ░░░░░░░░░░░░░░░░░░░░░░░░░░
+</pre>`, artEn: `<pre class="ascii-art">
+          ┃ Rope
+          ┃╱
+  ║██████║┃         ║██████║
+  ║██████║ ╲        ║██████║
+  ║══════║  ╲ ○     ║══════║
+  ╚══════╝   ╲╱│╲   ╚══════╝
+               │  →
+  ░░░░░░░░░░╱  ╲░░░░░░░░░░
+  ░░░ A b y s s ░░░░ Abyss ░░
+  ░░░░░░░░░░░░░░░░░░░░░░░░░░
+</pre>`, delay: 800 },
       { tag: '行動', tagColor: 'tag-move', text: '你將繩索甩向對面的石柱，然後用力擺盪——', textEn: 'You throw the rope at a stone pillar across and swing —', delay: 1800 },
       { tag: '成功', tagColor: 'tag-item', text: '腳尖精準地踩上了對面的邊緣！你把繩索綁好，留作日後通行之用。', textEn: 'Your toes land precisely on the far edge! You tie the rope for future crossing.', delay: 2200 },
     ], [
@@ -437,6 +558,25 @@ registerNode('r2_bridge_jump', () => {
   if (result !== 'fail') {
     state.flags.r2BridgeFixed = true;
     autoExplore([
+      { art: `<pre class="ascii-art">
+  ║██████║              ║██████║
+  ║██████║    ○         ║██████║
+  ║══════║   ╱│╲  →→→   ║══════║
+  ╚══════╝  ╱  ╲        ╚══════╝
+           ╱    ╲
+  ░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+  ░░░░░░░ 深    淵 ░░░░░░░░░░░
+  ░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+</pre>`, artEn: `<pre class="ascii-art">
+  ║██████║              ║██████║
+  ║██████║    ○         ║██████║
+  ║══════║   ╱│╲  →→→   ║══════║
+  ╚══════╝  ╱  ╲        ╚══════╝
+           ╱    ╲
+  ░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+  ░░░░░░░ A b y s s ░░░░░░░░░░
+  ░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+</pre>`, delay: 800 },
       { tag: '行動', tagColor: 'tag-move', text: '你深吸一口氣，助跑——然後用盡全力跳躍！', textEn: 'You take a deep breath, sprint — and leap with all your might!', delay: 2000 },
       { tag: '成功', tagColor: 'tag-item', text: '你的身體劃過深淵上方的空氣——雙腳穩穩落在了對面！', textEn: 'Your body arcs over the abyss — both feet land firmly on the other side!', delay: 2200 },
     ], [
@@ -529,6 +669,37 @@ registerNode('r2_camp_chief', () => {
   var steps = [];
   if (!state.flags.r2ChiefTalked) {
     state.flags.r2ChiefTalked = true;
+    steps.push({ art: `<pre class="ascii-art">
+      ╔═══════════════════════════════╗
+      ║                               ║
+      ║         ╱▔▔▔▔▔╲             ║
+      ║        │ ◉   ◉ │             ║
+      ║        │  ═══   │             ║
+      ║         ╲_____╱              ║
+      ║    ░░░░░░│   │░░░░░░         ║
+      ║   ░░░░░──┤   ├──░░░░░        ║
+      ║  ░░░░░╱  │   │  ╲█████       ║
+      ║ ░░░░░╱   │   │   █████       ║
+      ║  ░░░░    │ ⚒ │    ████       ║
+      ║     鐵霜 — 營地隊長           ║
+      ║    （左臂已石化）              ║
+      ╚═══════════════════════════════╝
+</pre>`, artEn: `<pre class="ascii-art">
+      ╔═══════════════════════════════╗
+      ║                               ║
+      ║         ╱▔▔▔▔▔╲             ║
+      ║        │ ◉   ◉ │             ║
+      ║        │  ═══   │             ║
+      ║         ╲_____╱              ║
+      ║    ░░░░░░│   │░░░░░░         ║
+      ║   ░░░░░──┤   ├──░░░░░        ║
+      ║  ░░░░░╱  │   │  ╲█████       ║
+      ║ ░░░░░╱   │   │   █████       ║
+      ║  ░░░░    │ ⚒ │    ████       ║
+      ║   Iron Frost — Camp Leader    ║
+      ║    (Left arm petrified)       ║
+      ╚═══════════════════════════════╝
+</pre>`, delay: 800 });
     steps.push({ tag: '情報', tagColor: 'tag-info', html: '<b>鐵霜</b>坐在營火旁，石錘靠在身邊。她的左臂從肘部以下已經完全石化。', htmlEn: '<b>Iron Frost</b> sits by the fire, hammer beside her. Her left arm is fully petrified from the elbow down.', delay: 2500 });
     steps.push({ tag: '情報', tagColor: 'tag-info', text: '「我曾是地下城的守備軍指揮官。瘟疫爆發那天，我下令撤退到這裡。」', textEn: '"I was the underground city\'s garrison commander. The day the plague erupted, I ordered retreat here."', delay: 2800 });
     steps.push({ tag: '情報', tagColor: 'tag-info', text: '「我們原本有五十人。現在……只剩十二個。」', textEn: '"We started with fifty. Now... only twelve remain."', delay: 2500 });
@@ -549,6 +720,39 @@ registerNode('r2_camp_chief', () => {
 
 registerNode('r2_camp_smith', () => {
   var steps = [
+    { art: `<pre class="ascii-art">
+      ╔═══════════════════════════════╗
+      ║                               ║
+      ║         ╱▔▔▔▔▔╲             ║
+      ║        │ ─   ─ │             ║
+      ║        │  ╲_╱  │             ║
+      ║         ╲_____╱              ║
+      ║   ██░░░░░│   │░░░░░██       ║
+      ║  ███░░░──┤   ├──░░░███      ║
+      ║  ███░░╱  │   │  ╲░░███      ║
+      ║   ██╱    │   │    ╲██       ║
+      ║         ╔═════╗              ║
+      ║    ⚒    ║鐵砧 ║   ⚒        ║
+      ║         ╚═════╝              ║
+      ║      老鑄 — 鍛匠             ║
+      ╚═══════════════════════════════╝
+</pre>`, artEn: `<pre class="ascii-art">
+      ╔═══════════════════════════════╗
+      ║                               ║
+      ║         ╱▔▔▔▔▔╲             ║
+      ║        │ ─   ─ │             ║
+      ║        │  ╲_╱  │             ║
+      ║         ╲_____╱              ║
+      ║   ██░░░░░│   │░░░░░██       ║
+      ║  ███░░░──┤   ├──░░░███      ║
+      ║  ███░░╱  │   │  ╲░░███      ║
+      ║   ██╱    │   │    ╲██       ║
+      ║         ╔═════╗              ║
+      ║    ⚒    ║Anvil║   ⚒        ║
+      ║         ╚═════╝              ║
+      ║    Old Cast — Blacksmith     ║
+      ╚═══════════════════════════════╝
+</pre>`, delay: 800 },
     { tag: '探索', tagColor: 'tag-explore', html: '營地的鐵匠叫<b>老鑄</b>——一個沉默寡言的矮壯男人。他的雙手佈滿了石化紋路，但依然在敲打著鐵砧。', htmlEn: 'The camp smith is <b>Old Cast</b> — a quiet, stocky man. His hands are lined with petrification patterns, but still hammer the anvil.', delay: 2500 },
     { tag: '情報', tagColor: 'tag-info', text: '「……需要什麼？」他頭也不抬地問。', textEn: '"...Need something?" he asks without looking up.', delay: 1800 },
   ];
@@ -591,6 +795,35 @@ registerNode('r2_camp_smith', () => {
 
 registerNode('r2_camp_medic', () => {
   autoExplore([
+    { art: `<pre class="ascii-art cyan">
+      ╔═══════════════════════════════╗
+      ║                               ║
+      ║         ╱▔▔▔▔▔╲             ║
+      ║        │ ˚   ˚ │             ║
+      ║        │ ╔═══╗ │ ← 面罩     ║
+      ║         ╲╚═══╝╱              ║
+      ║    ░░░░░░│   │░░░░░░         ║
+      ║   ░░░░░──┤   ├──░░░░░        ║
+      ║  ░░░░░╱  │   │  ╲░░░░░       ║
+      ║ ░░░░░╱   │ ✚ │   ╲░░░░░      ║
+      ║  ░░░░    │   │    ░░░░       ║
+      ║      清露 — 醫師              ║
+      ╚═══════════════════════════════╝
+</pre>`, artEn: `<pre class="ascii-art cyan">
+      ╔═══════════════════════════════╗
+      ║                               ║
+      ║         ╱▔▔▔▔▔╲             ║
+      ║        │ ˚   ˚ │             ║
+      ║        │ ╔═══╗ │ ← Mask     ║
+      ║         ╲╚═══╝╱              ║
+      ║    ░░░░░░│   │░░░░░░         ║
+      ║   ░░░░░──┤   ├──░░░░░        ║
+      ║  ░░░░░╱  │   │  ╲░░░░░       ║
+      ║ ░░░░░╱   │ ✚ │   ╲░░░░░      ║
+      ║  ░░░░    │   │    ░░░░       ║
+      ║       Dew — Medic            ║
+      ╚═══════════════════════════════╝
+</pre>`, delay: 800 },
     { tag: '探索', tagColor: 'tag-explore', html: '營地的醫師叫<b>清露</b>——一個年輕的女人，臉上戴著防石化面罩。', htmlEn: 'The camp medic is <b>Dew</b> — a young woman wearing an anti-petrification mask.', delay: 2500 },
     { tag: '情報', tagColor: 'tag-info', text: '「讓我看看你的石化程度。」她伸手檢查你的手臂。', textEn: '"Let me check your petrification level." She examines your arm.', delay: 2000 },
     { tag: '情報', tagColor: 'tag-info', text: '「……比我預想的好。你的意志力很強。」', textEn: '"...Better than I expected. Your willpower is strong."', delay: 2200 },
@@ -631,6 +864,40 @@ registerNode('r2_camp_medic', () => {
 // ── Rest ──
 registerNode('r2_rest', () => {
   autoExplore([
+    { art: `<pre class="ascii-art">
+  ·  ˚   ·  ˚   ·  ˚   ·  ˚   ·
+       ╱╲          ╱╲
+      ╱░░╲        ╱░░╲
+     ╱░░░░╲      ╱░░░░╲
+     ════════    ════════
+
+           ·  🔥  ·
+          ╱ ✦✦✦✦ ╲
+         ╱ ✦ 營火 ✦╲
+          ════════════
+
+       ○            ○
+      ╱│╲          ╱│╲
+       │            │
+  ·  ˚   ·  ˚   ·  ˚   ·  ˚   ·
+</pre>`, artEn: `<pre class="ascii-art">
+  ·  ˚   ·  ˚   ·  ˚   ·  ˚   ·
+       ╱╲          ╱╲
+      ╱░░╲        ╱░░╲
+     ╱░░░░╲      ╱░░░░╲
+     ════════    ════════
+
+           · 🔥  ·
+          ╱ ✦✦✦✦ ╲
+         ╱ ✦Camp ✦╲
+         ╱✦ Fire ✦╲
+          ════════════
+
+       ○            ○
+      ╱│╲          ╱│╲
+       │            │
+  ·  ˚   ·  ˚   ·  ˚   ·  ˚   ·
+</pre>`, delay: 800 },
     { tag: '行動', tagColor: 'tag-move', text: '你在營火旁找了個位置坐下。溫暖的火光照在臉上。', textEn: 'You find a spot by the campfire and sit down. Warm firelight on your face.', delay: 2000 },
     { tag: '環境', tagColor: 'tag-system', text: '營地裡的人各自忙碌著——有人在修補裝備，有人在低聲交談。', textEn: 'Camp residents go about their tasks — some repair gear, others talk quietly.', delay: 2500 },
     { tag: '感知', tagColor: 'tag-sense', text: '在這個石化肆虐的世界裡，營火的溫暖是如此珍貴。', textEn: 'In this world ravaged by petrification, the campfire\'s warmth is so precious.', delay: 2500 },
@@ -687,6 +954,37 @@ registerNode('r2_boss_prep', () => {
     }
   }
   autoExplore([
+    { art: `<pre class="ascii-art red">
+  ╔═══════════════════════════════════╗
+  ║         ⚠  作 戰 準 備  ⚠        ║
+  ╠═══════════════════════════════════╣
+  ║                                   ║
+  ║    ╱▔▔▔╲     ╱▔▔▔▔▔▔▔╲         ║
+  ║   │◉   ◉│   │           │        ║
+  ║   │ ═══ │   │  石化巨像  │        ║
+  ║    ╲___╱    │   ◉   ◉   │        ║
+  ║    ░║ ║░    │  ═══════  │        ║
+  ║   ░░║⚒║░░   │  ╱██◆██╲  │        ║
+  ║   鐵 霜     │  ║██◆██║  │        ║
+  ║              ╲___________╱        ║
+  ║         → 目標：胸口核心 ←        ║
+  ╚═══════════════════════════════════╝
+</pre>`, artEn: `<pre class="ascii-art red">
+  ╔═══════════════════════════════════╗
+  ║       ⚠  Battle Preparation  ⚠   ║
+  ╠═══════════════════════════════════╣
+  ║                                   ║
+  ║    ╱▔▔▔╲     ╱▔▔▔▔▔▔▔╲         ║
+  ║   │◉   ◉│   │           │        ║
+  ║   │ ═══ │   │  Petrified │        ║
+  ║    ╲___╱    │  Colossus  │        ║
+  ║    ░║ ║░    │  ◉     ◉  │        ║
+  ║   ░░║⚒║░░   │  ╱██◆██╲  │        ║
+  ║  Iron Frost  │  ║██◆██║  │        ║
+  ║              ╲___________╱        ║
+  ║       → Target: Chest Core ←     ║
+  ╚═══════════════════════════════════╝
+</pre>`, delay: 800 },
     { tag: '情報', tagColor: 'tag-info', text: '鐵霜站了起來，用石化的左手握緊了石錘。', textEn: 'Iron Frost rises, gripping her stone hammer with her petrified left hand.', delay: 2000 },
     { tag: '情報', tagColor: 'tag-info', text: '「好。我帶兩個最好的戰士跟你一起去。其他人留下守營地。」', textEn: '"Good. I\'ll take two of our best fighters with you. The rest guard the camp."', delay: 2500 },
     { tag: '情報', tagColor: 'tag-info', text: '「記住——那頭巨獸是半人半機甲的存在。普通攻擊對它的外殼效果很差。」', textEn: '"Remember — that colossus is half-human, half-mech. Normal attacks barely scratch its shell."', delay: 2800 },
@@ -780,6 +1078,31 @@ registerNode('r2_gate', () => {
   var hasKey = hasItem(L('機甲控制鍵', 'Mech Control Key'));
   if (state.flags.r2BossDefeated) {
     autoExplore([
+      { art: `<pre class="ascii-art gold">
+  ╔═══════════════════════════════╗
+  ║   ▓▓▓▓▓▓▓   ↑ 上升  ▓▓▓▓▓▓ ║
+  ║   ▓▓▓▓▓▓▓   ↑ 通道  ▓▓▓▓▓▓ ║
+  ║   ▓▓▓▓▓▓▓           ▓▓▓▓▓▓ ║
+  ║   ═══════╗  ╔═══╗  ╔══════  ║
+  ║          ║  ║ ✦ ║  ║        ║
+  ║   ░閘門░ ║  ║控制║  ║ ░閘門░ ║
+  ║          ║  ║ 台 ║  ║        ║
+  ║   ═══════╝  ╚═══╝  ╚══════  ║
+  ║        ◇ 閘門已開啟 ◇       ║
+  ╚═══════════════════════════════╝
+</pre>`, artEn: `<pre class="ascii-art gold">
+  ╔═══════════════════════════════╗
+  ║   ▓▓▓▓▓▓▓  ↑ Ascent ▓▓▓▓▓▓ ║
+  ║   ▓▓▓▓▓▓▓  ↑ Shaft  ▓▓▓▓▓▓ ║
+  ║   ▓▓▓▓▓▓▓           ▓▓▓▓▓▓ ║
+  ║   ═══════╗  ╔═══╗  ╔══════  ║
+  ║          ║  ║ ✦ ║  ║        ║
+  ║   ░Gate░ ║  ║Ctrl║  ║ ░Gate░ ║
+  ║          ║  ║Panl║  ║        ║
+  ║   ═══════╝  ╚═══╝  ╚══════  ║
+  ║        ◇ Gate Opened ◇      ║
+  ╚═══════════════════════════════╝
+</pre>`, delay: 800 },
       { tag: '環境', tagColor: 'tag-system', text: '石化巨像已經倒下。通往上升通道的路終於暢通了。', textEn: 'The Petrified Colossus has fallen. The path to the ascent shaft is finally clear.', delay: 2000 },
       { tag: '行動', tagColor: 'tag-move', text: '你將機甲控制鍵插入通道閘門的控制台。', textEn: 'You insert the mech control key into the shaft gate\'s control panel.', delay: 2200 },
       { tag: '環境', tagColor: 'tag-system', text: '齒輪轉動的聲音在岩壁中迴盪——厚重的金屬閘門緩緩升起。', textEn: 'Gears grind within the rock — the heavy metal gate slowly rises.', delay: 2500 },
@@ -797,6 +1120,31 @@ registerNode('r2_gate', () => {
     ], { label: L('開啟上升通道', 'Opening ascent shaft') });
   } else {
     autoExplore([
+      { art: `<pre class="ascii-art red">
+  ╔═══════════════════════════════╗
+  ║   ▓▓▓▓▓▓▓  ✖ 封鎖  ▓▓▓▓▓▓ ║
+  ║   ▓▓▓▓▓▓▓  ✖ 中··  ▓▓▓▓▓▓ ║
+  ║   ▓▓▓▓▓▓▓           ▓▓▓▓▓▓ ║
+  ║   ███████╗  ╔═══╗  ╔██████  ║
+  ║   ███████║  ║ ◇ ║  ║██████  ║
+  ║   █閘門█║  ║鑰匙║  ║█閘門█  ║
+  ║   ███████║  ║ 槽 ║  ║██████  ║
+  ║   ███████╝  ╚═══╝  ╚██████  ║
+  ║      ⚠ 巨影在閘門後蠕動 ⚠    ║
+  ╚═══════════════════════════════╝
+</pre>`, artEn: `<pre class="ascii-art red">
+  ╔═══════════════════════════════╗
+  ║   ▓▓▓▓▓▓▓  ✖ Sealed ▓▓▓▓▓▓ ║
+  ║   ▓▓▓▓▓▓▓  ✖ ····   ▓▓▓▓▓▓ ║
+  ║   ▓▓▓▓▓▓▓           ▓▓▓▓▓▓ ║
+  ║   ███████╗  ╔═══╗  ╔██████  ║
+  ║   ███████║  ║ ◇ ║  ║██████  ║
+  ║   █Gate█║  ║Key ║  ║█Gate█  ║
+  ║   ███████║  ║Slot║  ║██████  ║
+  ║   ███████╝  ╚═══╝  ╚██████  ║
+  ║    ⚠ A shadow stirs beyond ⚠ ║
+  ╚═══════════════════════════════╝
+</pre>`, delay: 800 },
       { tag: '探索', tagColor: 'tag-explore', text: '你來到了上升通道的入口。一座巨大的金屬閘門封鎖了去路。', textEn: 'You reach the ascent shaft entrance. A massive metal gate blocks the way.', delay: 2000 },
       { tag: '感知', tagColor: 'tag-sense', text: '閘門旁有一個控制台——上面有機甲控制鍵的插槽。', textEn: 'A control panel beside the gate — with a slot for the mech control key.', delay: 2200 },
       { tag: '環境', tagColor: 'tag-system', text: '但閘門前方的通道裡……有一個巨大的影子在移動。', textEn: 'But in the passage before the gate... a massive shadow moves.', delay: 2500 },
@@ -823,6 +1171,37 @@ registerNode('r2_ying_talk', () => {
   var yPo = isMale ? 'her' : 'his';
 
   var steps = [];
+  steps.push({ art: `<pre class="ascii-art cyan">
+      ╔═══════════════════════════════╗
+      ║                               ║
+      ║         ╱▔▔▔▔▔╲             ║
+      ║        │ ˚   ˚ │             ║
+      ║        │  ‿‿‿  │             ║
+      ║         ╲_____╱              ║
+      ║    ·✦·░░░│   │░░░·✦·        ║
+      ║   ░░░░░──┤   ├──░░░░░        ║
+      ║  ░░░░░╱  │   │  ╲░░░░░       ║
+      ║ ░░░░░╱   │ ☆ │   ╲░░░░░      ║
+      ║  ░░░░    │   │    ░░░░       ║
+      ║     螢 — 記錄員少女          ║
+      ║   ·✦· 石化紋微微發光 ·✦·     ║
+      ╚═══════════════════════════════╝
+</pre>`, artEn: `<pre class="ascii-art cyan">
+      ╔═══════════════════════════════╗
+      ║                               ║
+      ║         ╱▔▔▔▔▔╲             ║
+      ║        │ ˚   ˚ │             ║
+      ║        │  ‿‿‿  │             ║
+      ║         ╲_____╱              ║
+      ║    ·✦·░░░│   │░░░·✦·        ║
+      ║   ░░░░░──┤   ├──░░░░░        ║
+      ║  ░░░░░╱  │   │  ╲░░░░░       ║
+      ║ ░░░░░╱   │ ☆ │   ╲░░░░░      ║
+      ║  ░░░░    │   │    ░░░░       ║
+      ║    Ying — Young Chronicler   ║
+      ║   ·✦· Petri-marks glow ·✦·  ║
+      ╚═══════════════════════════════╝
+</pre>`, delay: 800 });
   steps.push({ tag: '移動', tagColor: 'tag-move', text: '你在瞭望台的邊緣找到了螢。' + yP + '正蹲在地上，用炭筆在手冊上飛速地畫著什麼。', textEn: 'You find Ying at the edge of the overlook. ' + yPC + '\'s crouching, charcoal pencil flying across the notebook.', delay: 2200 });
 
   if (!state.flags.r2YingLore3) {
@@ -895,6 +1274,39 @@ registerNode('r2_ying_seal', () => {
   var yPo = isMale ? 'her' : 'his';
   state.flags.r2YingLore3 = true;
   autoExplore([
+    { art: `<pre class="ascii-art cyan">
+      ╔═══════════════════════════════╗
+      ║                               ║
+      ║         ╱▔▔▔▔▔╲             ║
+      ║        │ ˚   ˚ │             ║
+      ║        │  ‿‿‿  │             ║
+      ║         ╲_____╱              ║
+      ║    ·✦·░░░│   │░░░·✦·        ║
+      ║   ░░░░░──┤   ├──░░░░░        ║
+      ║  ░░░░░╱  │   │  ╲░░░░░       ║
+      ║         ╔═══════╗            ║
+      ║         ║手  冊 ║            ║
+      ║         ║· 地圖 ·║           ║
+      ║         ╚═══════╝            ║
+      ║    螢 — 封印石室的線索        ║
+      ╚═══════════════════════════════╝
+</pre>`, artEn: `<pre class="ascii-art cyan">
+      ╔═══════════════════════════════╗
+      ║                               ║
+      ║         ╱▔▔▔▔▔╲             ║
+      ║        │ ˚   ˚ │             ║
+      ║        │  ‿‿‿  │             ║
+      ║         ╲_____╱              ║
+      ║    ·✦·░░░│   │░░░·✦·        ║
+      ║   ░░░░░──┤   ├──░░░░░        ║
+      ║  ░░░░░╱  │   │  ╲░░░░░       ║
+      ║         ╔═══════╗            ║
+      ║         ║Note-  ║            ║
+      ║         ║· Map ·║            ║
+      ║         ╚═══════╝            ║
+      ║    Ying — Seal Chamber Clue  ║
+      ╚═══════════════════════════════╝
+</pre>`, delay: 800 },
     { tag: '情報', tagColor: 'tag-info', text: '螢把手冊攤在地上，指著一張泛黃的手繪地圖。', textEn: 'Ying spreads the notebook on the ground, pointing to a yellowed hand-drawn map.', delay: 2200 },
     { tag: '情報', tagColor: 'tag-info', html: '「根據舊記錄，<b>封印石室在採石場的最底層</b>——比我們現在站的位置還要深三層。」', htmlEn: '"According to old records, <b>the Seal Chamber is on the quarry\'s deepest level</b> — three floors below where we stand now."', delay: 3200 },
     { tag: '情報', tagColor: 'tag-info', text: '「但那條路在五十年前的瘟疫爆發時就被封死了。唯一的通道——」', textEn: '"But that path was sealed fifty years ago when the plague broke out. The only passage —"', delay: 2800 },
@@ -937,6 +1349,33 @@ registerNode('r2_ying_night', () => {
   var yPo = isMale ? 'her' : 'his';
   state.flags.r2YingNight = true;
   autoExplore([
+    { art: `<pre class="ascii-art cyan">
+  ·  ˚   ·  ˚   ·  ˚   ·  ˚   ·
+  ·✦·  .:*~*:.  ·✦·  .:*~*:.  ·✦·
+
+           ·  🔥  ·
+          ╱ ✦✦✦✦ ╲
+
+       ○            ○
+      ╱│╲   ·✦·   ╱│╲
+       │    ˚ ˚    │
+      你          螢
+
+  ·  ˚   ·  ˚   ·  ˚   ·  ˚   ·
+</pre>`, artEn: `<pre class="ascii-art cyan">
+  ·  ˚   ·  ˚   ·  ˚   ·  ˚   ·
+  ·✦·  .:*~*:.  ·✦·  .:*~*:.  ·✦·
+
+           ·  🔥  ·
+          ╱ ✦✦✦✦ ╲
+
+       ○            ○
+      ╱│╲   ·✦·   ╱│╲
+       │    ˚ ˚    │
+      You         Ying
+
+  ·  ˚   ·  ˚   ·  ˚   ·  ˚   ·
+</pre>`, delay: 800 },
     { tag: '移動', tagColor: 'tag-move', text: '你帶著螢來到了營地。營火的光芒讓' + yP + '的表情柔和了不少。', textEn: 'You bring Ying to the camp. The campfire\'s glow softens ' + yPo + ' expression.', delay: 2200 },
     { tag: '環境', tagColor: 'tag-system', text: '營地裡的人大多已經睡了。只有零星的幾個人在輪值守夜。', textEn: 'Most camp residents have turned in. Only a few stand watch.', delay: 2200 },
     { tag: '感知', tagColor: 'tag-sense', text: '你和螢在營火旁坐下。火光在你們之間跳躍，把兩個人的影子拉得很長。', textEn: 'You and Ying sit by the campfire. Flames dance between you, casting long shadows.', delay: 2500 },
@@ -999,6 +1438,37 @@ registerNode('r2_ying_promise', () => {
   var yPo = isMale ? 'her' : 'his';
   state.flags.r2YingPromise = true;
   autoExplore([
+    { art: `<pre class="ascii-art cyan">
+      ╔═══════════════════════════════╗
+      ║                               ║
+      ║         ╱▔▔▔▔▔╲             ║
+      ║        │ ˚   ˚ │             ║
+      ║        │  ───   │             ║
+      ║         ╲_____╱              ║
+      ║    ·✦·░░░│   │░░░·✦·        ║
+      ║   ░░░░░──┤   ├──░░░░░        ║
+      ║  ░░░░░╱  │   │  ╲░░░░░       ║
+      ║         ╱─────╲             ║
+      ║        │ ◇螢◇ │  ← 護身符   ║
+      ║         ╲─────╱             ║
+      ║    螢 — 出征前的約定         ║
+      ╚═══════════════════════════════╝
+</pre>`, artEn: `<pre class="ascii-art cyan">
+      ╔═══════════════════════════════╗
+      ║                               ║
+      ║         ╱▔▔▔▔▔╲             ║
+      ║        │ ˚   ˚ │             ║
+      ║        │  ───   │             ║
+      ║         ╲_____╱              ║
+      ║    ·✦·░░░│   │░░░·✦·        ║
+      ║   ░░░░░──┤   ├──░░░░░        ║
+      ║  ░░░░░╱  │   │  ╲░░░░░       ║
+      ║         ╱─────╲             ║
+      ║        │ ◇✦◇  │  ← Charm   ║
+      ║         ╲─────╱             ║
+      ║   Ying — A Promise Before Battle ║
+      ╚═══════════════════════════════╝
+</pre>`, delay: 800 },
     { tag: '感知', tagColor: 'tag-sense', text: '聽到你要去挑戰石化巨獸，螢的手停了。', textEn: 'Hearing you\'re going to face the Petrified Colossus, Ying\'s hand stops.', delay: 2000 },
     { tag: '感知', tagColor: 'tag-sense', text: yP + '慢慢合上手冊，抬起頭。' + yP + '的表情很平靜，但你看到' + yP + '咬緊了嘴唇。', textEn: yPC + ' slowly closes the notebook and looks up. ' + yPC + ' expression is calm, but you see ' + yPo + ' lips pressed tight.', delay: 2800 },
     { tag: '情報', tagColor: 'tag-info', text: '「……我知道攔不住你。」螢站了起來，走到你面前。', textEn: '"...I know I can\'t stop you." Ying stands and walks up to you.', delay: 2500 },
@@ -1036,6 +1506,39 @@ registerNode('r2_crane', () => {
   var steps = [];
   if (!state.flags.r2CraneMet) {
     state.flags.r2CraneMet = true;
+    steps.push({ art: `<pre class="ascii-art">
+      ╔═══════════════════════════════╗
+      ║                               ║
+      ║         ╱▔▔▔▔▔╲             ║
+      ║        │ ─   ─ │             ║
+      ║        │  ╲▽╱  │             ║
+      ║         ╲_____╱              ║
+      ║   ╱░░░░░░│   │░░░░░░╲       ║
+      ║  ╱░斗篷░──┤   ├──░斗篷░╲     ║
+      ║ ╱░░░░░░╱ │   │ ╲░░░░░░╲    ║
+      ║  ░░░░░╱  │   │  ╲░░░░░     ║
+      ║         ╔═══════╗            ║
+      ║         ║ 貨 物 ║            ║
+      ║         ╚═══════╝            ║
+      ║      灰鶴 — 行商人            ║
+      ╚═══════════════════════════════╝
+</pre>`, artEn: `<pre class="ascii-art">
+      ╔═══════════════════════════════╗
+      ║                               ║
+      ║         ╱▔▔▔▔▔╲             ║
+      ║        │ ─   ─ │             ║
+      ║        │  ╲▽╱  │             ║
+      ║         ╲_____╱              ║
+      ║   ╱░░░░░░│   │░░░░░░╲       ║
+      ║  ╱░Cloak░──┤   ├──░Cloak░╲   ║
+      ║ ╱░░░░░░╱ │   │ ╲░░░░░░╲    ║
+      ║  ░░░░░╱  │   │  ╲░░░░░     ║
+      ║         ╔═══════╗            ║
+      ║         ║ Wares ║            ║
+      ║         ╚═══════╝            ║
+      ║    Grey Crane — Merchant     ║
+      ╚═══════════════════════════════╝
+</pre>`, delay: 800 });
     steps.push({ tag: '遭遇', tagColor: 'tag-explore', text: '你在營地的角落看到一個熟悉的身影——一件灰色的斗篷，背上的大包裹叮噹作響。', textEn: 'In a camp corner, a familiar figure — a grey cloak, a large pack clinking on the back.', delay: 2500 });
     steps.push({ tag: '遭遇', tagColor: 'tag-explore', html: '「喲——<b>又見面了</b>。」灰鶴轉過身，露出那張永遠帶著商人笑容的臉。', htmlEn: '"Well — <b>we meet again</b>." Grey Crane turns, showing that perpetual merchant\'s grin.', delay: 2500 });
     steps.push({ tag: '情報', tagColor: 'tag-info', text: '「怎麼，你也上來了？比我想的快。」他把包裹放下，從裡面掏出一瓶酒。', textEn: '"So, you made it up too? Faster than I expected." He sets down the pack and pulls out a bottle.', delay: 2800 });
@@ -1173,6 +1676,33 @@ function offerCraneSword(onDone) {
 registerNode('r2_zhou_trace', () => {
   state.flags.r2ZhouTrace = true;
   autoExplore([
+    { art: `<pre class="ascii-art">
+  ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+  ▓                                ▓
+  ▓  ┌────────────────────────┐    ▓
+  ▓  │                        │    ▓
+  ▓  │  老周到此一遊          │    ▓
+  ▓  │  往北走了              │    ▓
+  ▓  │  腿快不行了            │    ▓
+  ▓  │  活著就好    → 北      │    ▓
+  ▓  │                        │    ▓
+  ▓  └────────────────────────┘    ▓
+  ▓          ← 刻痕               ▓
+  ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+</pre>`, artEn: `<pre class="ascii-art">
+  ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+  ▓                                ▓
+  ▓  ┌────────────────────────┐    ▓
+  ▓  │                        │    ▓
+  ▓  │  Old Zhou was here     │    ▓
+  ▓  │  Headed north          │    ▓
+  ▓  │  Legs giving out       │    ▓
+  ▓  │  Just stay alive → N   │    ▓
+  ▓  │                        │    ▓
+  ▓  └────────────────────────┘    ▓
+  ▓        ← Carved message        ▓
+  ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+</pre>`, delay: 800 },
     { tag: '探索', tagColor: 'tag-explore', text: '採石台的角落裡，你注意到了一些不尋常的東西——岩壁上刻著字。', textEn: 'In a corner of the quarry platform, you notice something unusual — words carved into the rock wall.', delay: 2200 },
     { tag: '感知', tagColor: 'tag-sense', text: '刻痕很新。不是古代的遺跡——是最近才有人用鑿子刻上去的。', textEn: 'The carvings are fresh. Not ancient ruins — someone chiseled these recently.', delay: 2200 },
     { tag: '情報', tagColor: 'tag-info', html: '「<b>老周到此一遊。往北走了。腿快不行了。誰看到這行字，替我跟下面的人說一聲——活著就好。</b>」', htmlEn: '"<b>Old Zhou was here. Headed north. My legs are giving out. Whoever reads this, tell the folks below — just stay alive.</b>"', delay: 3500 },
@@ -1192,6 +1722,33 @@ registerNode('r2_zhou_trace', () => {
 // ── Region 2 Patrol ──
 registerNode('r2_patrol', () => {
   autoExplore([
+    { art: `<pre class="ascii-art red">
+  ════════════════════════════════
+      ╱╲    ·˚✦˚·    ╱╲
+     ╱░░╲  .:*~*:.  ╱░░╲
+    ╱░░░░╲.:*~*~*:.╱░░░░╲
+    ════════ 結  晶 ════════
+       ·  ·  ·  ·  ·  ·
+      ⚠ 暗 影 在 移 動 ⚠
+       ·  ·  ·  ·  ·  ·
+         ╱▔╲   ╱▔╲
+        │??│  │??│  ← 敵影
+         ╲_╱   ╲_╱
+  ════════════════════════════════
+</pre>`, artEn: `<pre class="ascii-art red">
+  ════════════════════════════════
+      ╱╲    ·˚✦˚·    ╱╲
+     ╱░░╲  .:*~*:.  ╱░░╲
+    ╱░░░░╲.:*~*~*:.╱░░░░╲
+    ════════Crystal ════════
+       ·  ·  ·  ·  ·  ·
+     ⚠ Shadows are moving ⚠
+       ·  ·  ·  ·  ·  ·
+         ╱▔╲   ╱▔╲
+        │??│  │??│  ← Hostiles
+         ╲_╱   ╲_╱
+  ════════════════════════════════
+</pre>`, delay: 800 },
     { tag: '判斷', tagColor: 'tag-move', text: '採石場的怪物比迴廊更加兇猛。但你需要更多的戰鬥經驗來面對前方的挑戰。', textEn: 'Quarry monsters are fiercer than those in the corridor. But you need combat experience for the challenges ahead.', delay: 2200 },
     { tag: '感知', tagColor: 'tag-sense', text: '你握緊武器，踏入了採石台之間的暗影。', textEn: 'You grip your weapon and step into the shadows between quarry platforms.', delay: 2000 },
   ], [
