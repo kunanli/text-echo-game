@@ -228,6 +228,12 @@ registerNode('r0_look', () => {
     }
     c.push({ text: '查看北面攀爬痕跡', textEn: 'Check the climbing marks to the north', action: () => loadNode('r0_climb_check') });
     c.push({ text: '探索南面裂縫', textEn: 'Explore the southern crack', action: () => loadNode('r0_crack') });
+    // Ferryman route — only after all 4 endings achieved
+    if (typeof globalStats !== 'undefined' &&
+        globalStats.endings.dawn > 0 && globalStats.endings.compromise > 0 &&
+        globalStats.endings.lockdown > 0 && globalStats.endings.sacrifice > 0) {
+      c.push({ text: '⚰ 走向深處傳來的低語……', textEn: '⚰ Follow the whispers from below...', action: () => loadNode('r0_ferryman_gate') });
+    }
     return c;
   })(), { label: L('觀察環境', 'Observing area') });
 });
@@ -1157,6 +1163,389 @@ registerNode('r0_after_lizard', () => {
       ], [{ text: '推開石門，進入石脈迴廊', textEn: 'Push open the gate, enter the Vein Corridor', action: () => { state.region = 1; loadNode('r1_start'); } }]);
     }},
   ], { label: L('向上攀升', 'Ascending') });
+});
+
+// ═══════════════════════════════════════════════════
+//  Region 0 — 冥河渡江人（全結局後隱藏路線）
+// ═══════════════════════════════════════════════════
+
+registerNode('r0_ferryman_gate', () => {
+  autoExplore([
+    { tag: '感知', tagColor: 'tag-sense',
+      text: '你注意到祭獻坑最深處的角落，有一股不尋常的氣流。',
+      textEn: 'You notice an unusual draft in the deepest corner of the Sacrificial Pit.',
+      delay: 2500 },
+    { tag: '探索', tagColor: 'tag-explore',
+      text: '撥開碎石和殘骸，一條向下延伸的窄縫赫然出現。',
+      textEn: 'Pushing aside rubble and remains, a narrow crevice leading downward appears.',
+      delay: 2500 },
+    { tag: '行動', tagColor: 'tag-move',
+      text: '你側身擠進裂縫，沿著濕滑的石階一路下行……',
+      textEn: 'You squeeze through sideways, descending along slippery stone steps...',
+      delay: 3000 },
+    { art: `<pre class="ascii-art purple">
+      ·    ✦    ·         ·    ✦    ·
+  ════════════════════════════════════════
+  ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+  ░░  ╱▔▔╲  ░░  ╱▔▔╲  ░░  ╱▔▔╲  ░░░░░
+  ░░ │ xx │ ░░ │ xx │ ░░ │ xx │ ░░░░░
+  ░░ │    │ ░░ │    │ ░░ │    │ ░░░░░
+  ░░ │░░░░│ ░░ │░░░░│ ░░ │░░░░│ ░░░░░
+  ░░ ╱░░░░╲ ░░ ╱░░░░╲ ░░ ╱░░░░╲ ░░░░░
+  ░═══════░░═══════░░═══════░░░░░░░░░░
+  ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  ~~~~~~~~~  冥    河  ~~~~~~~~~~~~~~~~~~~~~~~~~
+  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+</pre>`, artEn: `<pre class="ascii-art purple">
+      ·    ✦    ·         ·    ✦    ·
+  ════════════════════════════════════════
+  ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+  ░░  ╱▔▔╲  ░░  ╱▔▔╲  ░░  ╱▔▔╲  ░░░░░
+  ░░ │ xx │ ░░ │ xx │ ░░ │ xx │ ░░░░░
+  ░░ │    │ ░░ │    │ ░░ │    │ ░░░░░
+  ░░ │░░░░│ ░░ │░░░░│ ░░ │░░░░│ ░░░░░
+  ░░ ╱░░░░╲ ░░ ╱░░░░╲ ░░ ╱░░░░╲ ░░░░░
+  ░═══════░░═══════░░═══════░░░░░░░░░░
+  ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  ~~~~~~~~~ S T Y X ~~~~~~~~~~~~~~~~~~~~~~~~
+  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+</pre>`, delay: 1000 },
+    { tag: '環境', tagColor: 'tag-sense',
+      text: '空氣變得冰冷刺骨。你來到一個巨大的地下河岸。',
+      textEn: 'The air turns biting cold. You arrive at a vast underground riverbank.',
+      delay: 2500 },
+    { tag: '環境', tagColor: 'tag-sense',
+      text: '河岸邊散落著數十具屍體——全都是被獻祭的人。',
+      textEn: 'Dozens of corpses litter the riverbank — all sacrificial victims.',
+      delay: 2800 },
+    { tag: '感知', tagColor: 'tag-petri',
+      text: '有些屍體完全石化，姿勢扭曲；有些還保留著血肉，表情凝固在最後的恐懼中。',
+      textEn: 'Some are fully petrified in twisted poses; others still have flesh, expressions frozen in final terror.',
+      delay: 3000 },
+    { tag: '環境', tagColor: 'tag-sense',
+      text: '他們的手都朝著河水的方向伸出——彷彿在祈求什麼。',
+      textEn: 'Their hands all reach toward the river — as if pleading for something.',
+      delay: 2800 },
+    { tag: '感知', tagColor: 'tag-warn',
+      text: '黑色的河水無聲流淌，水面上漂浮著微弱的磷光。',
+      textEn: 'Black water flows silently, faint phosphorescence drifting on its surface.',
+      delay: 2500 },
+    { tag: '發現', tagColor: 'tag-info',
+      html: '河岸盡頭——一個<b>高大的身影</b>靜靜佇立在一艘破舊的木船旁。',
+      htmlEn: 'At the far end of the bank — a <b>tall figure</b> stands motionless beside a decrepit wooden boat.',
+      delay: 3000 },
+  ], [
+    { text: '走近那個身影', textEn: 'Approach the figure', action: function() { loadNode('r0_ferryman_meet'); } },
+    { text: '這裡太詭異了，返回', textEn: 'Too eerie here, turn back', action: function() { loadNode('r0_look'); } },
+  ], { label: L('冥河河岸', 'River of the Dead') });
+});
+
+registerNode('r0_ferryman_meet', () => {
+  var totalStat = state.str + state.agi + state.wil;
+  var isStrong = totalStat >= 25 && state.level >= 5;
+
+  autoExplore([
+    { art: `<pre class="ascii-art" style="color:#7a9aaa;">
+            ·  ✦  ·
+           ╱ ▔▔▔▔▔ ╲
+          │  ◉    ◉  │
+          │     ▽    │
+          │  ╰─────╯ │
+           ╲ ▁▁▁▁▁ ╱
+        ╭───┤       ├───╮
+       ╱░░░░│       │░░░░╲
+      │░░░░░│       │░░░░░│
+      │░░░░░╰───┬───╯░░░░░│
+      │░░░░░░░░░│░░░░░░░░░│
+       ╲░░░░░░░░│░░░░░░░░╱
+        ╲░░░░░░░│░░░░░░░╱
+         ╲░░░░╱   ╲░░░░╱
+          ╲░░╱     ╲░░╱
+    ~~~~~~╱╱╱~~~~~~~╲╲╲~~~~~~
+    ~~~ 冥 河 渡 江 人 ~~~
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~
+</pre>`, artEn: `<pre class="ascii-art" style="color:#7a9aaa;">
+            ·  ✦  ·
+           ╱ ▔▔▔▔▔ ╲
+          │  ◉    ◉  │
+          │     ▽    │
+          │  ╰─────╯ │
+           ╲ ▁▁▁▁▁ ╱
+        ╭───┤       ├───╮
+       ╱░░░░│       │░░░░╲
+      │░░░░░│       │░░░░░│
+      │░░░░░╰───┬───╯░░░░░│
+      │░░░░░░░░░│░░░░░░░░░│
+       ╲░░░░░░░░│░░░░░░░░╱
+        ╲░░░░░░░│░░░░░░░╱
+         ╲░░░░╱   ╲░░░░╱
+          ╲░░╱     ╲░░╱
+    ~~~~~~╱╱╱~~~~~~~╲╲╲~~~~~~
+    ~~~ F E R R Y M A N ~~~
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~
+</pre>`, delay: 1500 },
+    { tag: '???', tagColor: 'tag-petri',
+      text: '那個身影緩緩轉過身來。',
+      textEn: 'The figure slowly turns to face you.',
+      delay: 2500 },
+    { tag: '感知', tagColor: 'tag-sense',
+      text: '他穿著被河水浸透的灰色長袍，兜帽遮住了大半張臉。',
+      textEn: 'He wears a grey robe soaked by river water, a hood obscuring most of his face.',
+      delay: 2500 },
+    { tag: '感知', tagColor: 'tag-sense',
+      text: '露出的下半張臉——半邊已經石化成光滑的黑曜石，另一半卻毫無石化痕跡。',
+      textEn: 'The lower half of his face — one side petrified to smooth obsidian, the other untouched.',
+      delay: 3000 },
+    { tag: '感知', tagColor: 'tag-petri',
+      text: '他的雙眼在兜帽下發出幽藍色的微光，像深海中的磷火。',
+      textEn: 'His eyes glow faint blue beneath the hood, like deep-sea phosphorescence.',
+      delay: 2800 },
+    { tag: '渡江人', tagColor: 'tag-npc',
+      text: '「……又一個從上面掉下來的？」',
+      textEn: '"...Another one cast down from above?"',
+      delay: 2500 },
+    { tag: '渡江人', tagColor: 'tag-npc',
+      text: '「不……你不一樣。你身上帶著所有結局的重量。」',
+      textEn: '"No... you are different. You carry the weight of every ending."',
+      delay: 3000 },
+    { tag: '渡江人', tagColor: 'tag-npc',
+      text: '「黎明、妥協、封鎖、犧牲——你都經歷過了。」',
+      textEn: '"Dawn, Compromise, Lockdown, Sacrifice — you have lived them all."',
+      delay: 3000 },
+    { tag: '渡江人', tagColor: 'tag-npc',
+      text: '「這條河通往更深的地方。比祭獻坑更深，比任何人挖掘過的地方都更深。」',
+      textEn: '"This river leads deeper. Deeper than the Pit. Deeper than anyone has ever dug."',
+      delay: 3000 },
+    { tag: '渡江人', tagColor: 'tag-npc',
+      html: isStrong
+        ? '「你的力量……」<b>他微微點頭。</b>「足夠了。也許你能活著回來。」'
+        : '「但你……」<b>他搖了搖頭。</b>「還太弱了。深淵會把你碾成粉末。」',
+      htmlEn: isStrong
+        ? '"Your strength..." <b>He nods slightly.</b> "Sufficient. Perhaps you can return alive."'
+        : '"But you..." <b>He shakes his head.</b> "Too weak. The abyss would grind you to dust."',
+      delay: 3000 },
+  ], (function() {
+    var choices = [];
+    if (isStrong) {
+      choices.push({ text: '請求渡河', textEn: 'Request passage across', action: function() { loadNode('r0_ferryman_challenge'); } });
+    } else {
+      choices.push({ text: '（能力不足）我會變得更強再回來', textEn: '(Not strong enough) I will return stronger', action: function() {
+        notify(L('需要總屬性 ≥ 25 且等級 ≥ 5', 'Requires total stats ≥ 25 and level ≥ 5'));
+        loadNode('r0_look');
+      }});
+    }
+    choices.push({ text: '詢問渡江人的身分', textEn: 'Ask about the ferryman\'s identity', action: function() { loadNode('r0_ferryman_lore'); } });
+    choices.push({ text: '離開河岸', textEn: 'Leave the riverbank', action: function() { loadNode('r0_look'); } });
+    return choices;
+  })(), { label: L('冥河渡江人', 'The Ferryman') });
+});
+
+registerNode('r0_ferryman_lore', () => {
+  autoExplore([
+    { tag: '你', tagColor: 'tag-info',
+      text: '「你是什麼人？為什麼在這裡？」',
+      textEn: '"Who are you? Why are you here?"',
+      delay: 2000 },
+    { tag: '渡江人', tagColor: 'tag-npc',
+      text: '「我？我是這條河最早的過客。也是最後的。」',
+      textEn: '"Me? I was the first to cross this river. And the last."',
+      delay: 2800 },
+    { tag: '渡江人', tagColor: 'tag-npc',
+      text: '「在石化瘟疫出現之前，礦工們就已經挖到了這條河。」',
+      textEn: '"Long before the Stone Plague, the miners dug down to this river."',
+      delay: 2800 },
+    { tag: '渡江人', tagColor: 'tag-npc',
+      text: '「他們把我留在這裡看守渡口。然後——就再也沒有人回來過。」',
+      textEn: '"They left me here to guard the crossing. Then — no one ever came back."',
+      delay: 3000 },
+    { tag: '渡江人', tagColor: 'tag-npc',
+      text: '「石化瘟疫從對岸蔓延上來。那些被獻祭的人——」',
+      textEn: '"The Stone Plague spread from the other shore. Those who were sacrificed —"',
+      delay: 2800 },
+    { tag: '渡江人', tagColor: 'tag-npc',
+      text: '他指向河岸上的屍體。',
+      textEn: 'He gestures toward the corpses on the bank.',
+      delay: 2000 },
+    { tag: '渡江人', tagColor: 'tag-npc',
+      text: '「都是試圖渡河、卻被深淵吞噬的人。」',
+      textEn: '"All tried to cross. All were consumed by the abyss."',
+      delay: 2800 },
+    { tag: '渡江人', tagColor: 'tag-npc',
+      text: '「我不會阻止任何人。但我只渡有資格的人。」',
+      textEn: '"I won\'t stop anyone. But I only ferry those who are worthy."',
+      delay: 2800 },
+    { tag: '渡江人', tagColor: 'tag-npc',
+      html: '「資格只有一個——<b>你必須承受得住深淵的凝視。</b>」',
+      htmlEn: '"There is but one qualification — <b>you must endure the gaze of the abyss.</b>"',
+      delay: 3000 },
+  ], [
+    { text: '我已經準備好了', textEn: 'I am ready', action: function() { loadNode('r0_ferryman_meet'); } },
+    { text: '離開河岸', textEn: 'Leave the riverbank', action: function() { loadNode('r0_look'); } },
+  ], { label: L('渡江人的故事', 'The Ferryman\'s Tale') });
+});
+
+registerNode('r0_ferryman_challenge', () => {
+  autoExplore([
+    { tag: '渡江人', tagColor: 'tag-npc',
+      text: '「既然你要渡河——那就接受深淵的試煉吧。」',
+      textEn: '"If you wish to cross — then face the trial of the abyss."',
+      delay: 2500 },
+    { tag: '渡江人', tagColor: 'tag-npc',
+      text: '他伸出石化的右手，按在你的額頭上。',
+      textEn: 'He presses his petrified right hand against your forehead.',
+      delay: 2500 },
+    { tag: '系統', tagColor: 'tag-system',
+      text: L('意志檢定（WIL）—— DC 10', 'Willpower Check (WIL) — DC 10'),
+      delay: 2000 },
+    { tag: '檢定', tagColor: 'tag-info',
+      text: L('成功率：' + checkRate('wil', 10) + '%', 'Success rate: ' + checkRate('wil', 10) + '%'),
+      delay: 1500 },
+  ], [
+    { text: '承受深淵的凝視', textEn: 'Endure the gaze of the abyss', action: function() {
+      var result = statCheck('wil', 10);
+      if (result === 'crit') {
+        sfx.pass();
+        notify(L('大成功！', 'Critical Success!'));
+        loadNode('r0_ferryman_descent');
+      } else if (result === 'pass') {
+        sfx.pass();
+        notify(L('檢定成功！', 'Check Passed!'));
+        loadNode('r0_ferryman_descent');
+      } else {
+        sfx.fail();
+        changePetri(8);
+        changeHp(-15);
+        notify(L('檢定失敗……石化度 +8%，HP -15', 'Check Failed... Petri +8%, HP -15'));
+        loadNode('r0_ferryman_fail');
+      }
+    }},
+    { text: '還沒準備好……', textEn: 'Not ready yet...', action: function() { loadNode('r0_ferryman_meet'); } },
+  ], { label: L('深淵試煉', 'Trial of the Abyss') });
+});
+
+registerNode('r0_ferryman_fail', () => {
+  autoExplore([
+    { tag: '感知', tagColor: 'tag-petri',
+      text: '一股巨大的壓力從額頭灌入——你的意識在剎那間被撕裂。',
+      textEn: 'Immense pressure floods through your forehead — your consciousness tears apart in an instant.',
+      delay: 2800 },
+    { tag: '感知', tagColor: 'tag-warn',
+      text: '你看見了深淵——無盡的黑暗中，無數石化的靈魂在哀嚎。',
+      textEn: 'You see the abyss — in endless darkness, countless petrified souls wailing.',
+      delay: 3000 },
+    { tag: '感知', tagColor: 'tag-petri',
+      text: '你的左手急速石化，冰冷感蔓延到肩膀——',
+      textEn: 'Your left hand petrifies rapidly, the cold spreading to your shoulder —',
+      delay: 2500 },
+    { tag: '渡江人', tagColor: 'tag-npc',
+      text: '渡江人收回了手。你跌坐在地上，大口喘氣。',
+      textEn: 'The ferryman withdraws his hand. You collapse, gasping.',
+      delay: 2500 },
+    { tag: '渡江人', tagColor: 'tag-npc',
+      text: '「……還差一點。你的意志還不夠堅定。」',
+      textEn: '"...Almost. Your will is not yet firm enough."',
+      delay: 2800 },
+    { tag: '渡江人', tagColor: 'tag-npc',
+      text: '「去吧。變得更強，再回來找我。我哪裡也不會去。」',
+      textEn: '"Go. Grow stronger, then return. I will be here."',
+      delay: 2800 },
+  ], [
+    { text: '回到祭獻坑', textEn: 'Return to the Sacrificial Pit', action: function() { loadNode('r0_look'); } },
+  ], { label: L('試煉失敗', 'Trial Failed') });
+});
+
+registerNode('r0_ferryman_descent', () => {
+  state.flags.ferrymanPassed = true;
+  autoExplore([
+    { tag: '感知', tagColor: 'tag-petri',
+      text: '深淵的凝視灌入你的腦海——',
+      textEn: 'The gaze of the abyss floods your mind —',
+      delay: 2500 },
+    { tag: '感知', tagColor: 'tag-sense',
+      text: '你看見了黑暗。比任何黑暗都更深邃的黑暗。',
+      textEn: 'You see darkness. A darkness deeper than any other.',
+      delay: 2800 },
+    { tag: '感知', tagColor: 'tag-sense',
+      text: '然後——黑暗退去了。你的額頭上留下一個冰涼的印記。',
+      textEn: 'Then — the darkness recedes. A cold mark remains on your forehead.',
+      delay: 2800 },
+    { tag: '渡江人', tagColor: 'tag-npc',
+      text: '「……你承受住了。」渡江人的聲音中帶著一絲意外。',
+      textEn: '"...You endured." A hint of surprise in the ferryman\'s voice.',
+      delay: 2800 },
+    { tag: '渡江人', tagColor: 'tag-npc',
+      text: '「上船吧。我送你去深淵的另一邊。」',
+      textEn: '"Board the vessel. I will take you to the other side of the abyss."',
+      delay: 2500 },
+    { art: `<pre class="ascii-art" style="color:#7a9aaa;">
+    ·    ✦    ·    ✦    ·    ✦    ·
+  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  ~~~                                  ~~~
+  ~~   ╭──────────────────────╮        ~~
+  ~~   │  ╱▔╲        ╱▔╲     │        ~~
+  ~~   │ │ ◉│    ☆  │  │     │        ~~
+  ~~   │  ╲▁╱   │    ╲▁╱     │        ~~
+  ~~   │        ─┤──          │        ~~
+  ~~   │         │            │        ~~
+  ~~   ╰────╥────╨────────────╯        ~~
+  ~~~~~~~~~╱╱╲~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  ~~~~~~~~╱╱  ╲~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  ~~~   ▼  ▼  ▼   更  深  處  ▼  ▼  ▼  ~~~
+  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+</pre>`, artEn: `<pre class="ascii-art" style="color:#7a9aaa;">
+    ·    ✦    ·    ✦    ·    ✦    ·
+  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  ~~~                                  ~~~
+  ~~   ╭──────────────────────╮        ~~
+  ~~   │  ╱▔╲        ╱▔╲     │        ~~
+  ~~   │ │ ◉│    ☆  │  │     │        ~~
+  ~~   │  ╲▁╱   │    ╲▁╱     │        ~~
+  ~~   │        ─┤──          │        ~~
+  ~~   │         │            │        ~~
+  ~~   ╰────╥────╨────────────╯        ~~
+  ~~~~~~~~~╱╱╲~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  ~~~~~~~~╱╱  ╲~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  ~~~  ▼  ▼  ▼  T H E  D E E P  ▼  ▼  ▼ ~~~
+  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+</pre>`, delay: 1500 },
+    { tag: '行動', tagColor: 'tag-move',
+      text: '你踏上那艘破舊的木船。船身在黑水中輕輕搖晃。',
+      textEn: 'You step onto the decrepit boat. It sways gently in the black water.',
+      delay: 2500 },
+    { tag: '渡江人', tagColor: 'tag-npc',
+      text: '渡江人站在船尾，用一根長篙撐開了河岸。',
+      textEn: 'The ferryman stands at the stern, pushing off with a long pole.',
+      delay: 2500 },
+    { tag: '環境', tagColor: 'tag-sense',
+      text: '木船緩緩駛入黑暗。河岸上那些屍體的輪廓漸漸消失。',
+      textEn: 'The boat drifts into darkness. The silhouettes of corpses on the bank fade away.',
+      delay: 3000 },
+    { tag: '渡江人', tagColor: 'tag-npc',
+      text: '「河的對岸……是石化瘟疫的源頭。那裡有比你見過的一切都更古老的東西。」',
+      textEn: '"On the other shore... lies the source of the Stone Plague. Things far older than anything you have seen."',
+      delay: 3500 },
+    { tag: '渡江人', tagColor: 'tag-npc',
+      text: '「也許你能找到終結這一切的方法。也許你會成為下一具河岸上的屍體。」',
+      textEn: '"Perhaps you will find a way to end it all. Perhaps you will become the next corpse on the bank."',
+      delay: 3500 },
+    { tag: '環境', tagColor: 'tag-petri',
+      text: '前方的黑暗中，隱約浮現出一個巨大的輪廓……',
+      textEn: 'In the darkness ahead, a vast silhouette slowly takes shape...',
+      delay: 3000 },
+    { tag: '系統', tagColor: 'tag-system',
+      html: '<b>—— 深淵更深處．敬請期待 ——</b>',
+      htmlEn: '<b>—— The Deeper Abyss · Coming Soon ——</b>',
+      delay: 2000 },
+  ], [
+    { text: '返回河岸（暫時結束）', textEn: 'Return to the bank (end of current content)', action: function() {
+      notify(L('冥河渡江人的印記已刻在你的額頭上。', 'The ferryman\'s mark is etched upon your forehead.'));
+      loadNode('r0_look');
+    }},
+  ], { label: L('渡河', 'Crossing the River') });
 });
 
 // ═══════════════════════════════════════════════════
