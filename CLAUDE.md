@@ -75,6 +75,94 @@ assets/
 - 螢（Ying）深度情感劇情線：R1 共眠、R2 噩夢安撫、R3 河邊月光（近告白）
 - 冥河渡江人（隱藏 Post-game 路線）：通關後解鎖，屬性 ≥ 25 + 等級 ≥ 5 + WIL 檢定 DC10
 - 已準備 itch.io 發布（DEV 工具已隱藏）
+- 成就系統（v1.4）：24 個成就，含跨周目成就（全結局收集、和平主義者等）
+- 隨機事件池擴充（v1.4）：每區域 6 隻怪物（+8 新怪物）、12 條巡邏文字、8 條懸疑文字、額外攻擊/反擊/擊敗動詞
+- 5 階石化懲罰系統（v1.5）：石化度 20/40/60/80% 閾值觸發屬性減值 + 最大 HP 壓縮
+- 多周目 New Game+ 系統（v1.6）：詳見下方「New Game+ 系統」
+
+## ✅ 已完成：New Game+ 系統（v1.6）
+
+### 多周目怪物倍率
+
+| 周目 | 怪物倍率 | XP 倍率 | 基礎 HP | 公式 |
+|------|---------|---------|--------|------|
+| 一周目 | 1x | 1x | 50 | — |
+| 二周目 | **2x** | 1.25x | 60 (+10) | `2^1` |
+| 三周目 | **4x** | 1.5x | 70 (+20) | `2^2` |
+| 四周目 | **8x** | 1.75x | 80 (+30) | `2^3` |
+
+**倍率公式**：`Math.pow(2, ngPlusRun)`，其中 `ngPlusRun = globalStats.totalRuns`
+
+### 能力轉換系統
+
+通關後玩家可選擇：
+1. **轉換能力點 → NG+**：將本周目獲得的屬性點儲存為下周目的額外分配點
+2. **繼續探索 → 冥河**：留在當前存檔，挑戰隱藏的冥河渡江人路線
+
+**轉換公式**：`bankedPoints = (STR + AGI + WIL - 9) + max(0, Level - 5)`
+- 能力加點：三圍總和 − 基礎值 9（每項初始 3）
+- 等級獎勵：5 級以後每升 1 級 +1 點
+- 跨周目保留最佳值：`globalStats.bankedPoints = max(舊值, 新值)`
+
+### 屬性分配（角色創建）
+
+| 項目 | 一周目 | NG+ |
+|------|-------|-----|
+| 基礎分配點 | 6 | 6 + bankedPoints |
+| 單項上限 | 9 | **無上限** |
+| 基礎值 | 3/3/3 | 3/3/3 |
+
+### 關鍵變數與 flags
+
+```javascript
+state.flags.ngPlus        // boolean — 是否為 NG+ 周目
+state.flags.ngPlusRun     // number — 第幾次 NG+（1=二周目, 2=三周目...）
+state.flags.ngEndingDawn  // boolean — 前世是否達成黎明結局（其他結局類推）
+globalStats.totalRuns     // number — 總通關次數
+globalStats.bankedPoints  // number — 儲存的轉換點數（最佳值）
+
+// 工具函式
+getNgPlusScale()          // → 1 / 2 / 4 / 8...（怪物倍率）
+scaleEnemyNgPlus(enemy)   // → 返回倍率調整後的敵人淺拷貝
+getBaseMaxHp()            // → 考慮 NG+ 周目和等級的基礎最大 HP
+calculateBankedPoints()   // → 計算當前周目可儲存的點數
+```
+
+### NG+ 劇情變體
+
+- R0 開場：記憶閃回（夢到過去的旅程）
+- R1 螢：「你的眼神很奇怪，好像認識我」
+- R1 老周：模糊的河城記憶
+- R1 灰鶴：骰桌上的似曾相識
+
+## ✅ 已完成：5 階石化懲罰系統（v1.5）
+
+石化度不再只是死亡計時器，而是持續影響戰鬥力的核心機制。
+
+| 階段 | 石化度 | STR | AGI | WIL | 最大HP |
+|------|--------|-----|-----|-----|--------|
+| 0 正常 | 0-19% | — | — | — | 100% |
+| 1 輕微 | 20-39% | -1 | -1 | — | 100% |
+| 2 中度 | 40-59% | -2 | -2 | -1 | 90% |
+| 3 嚴重 | 60-79% | -3 | -3 | -2 | 80% |
+| 4 瀕臨 | 80-99% | -4 | -4 | -3 | 70% |
+
+```javascript
+petriPenalty()           // → { stage, str, agi, wil, maxHpMult, label, labelEn }
+effectiveStat(stat)      // → Math.max(1, state[stat] + penalty)
+// statCheck() 和 checkRate() 自動使用 effectiveStat()
+// changePetri() 跨越閾值時顯示警告 + 動態調整 maxHp
+```
+
+## ✅ 已完成：成就系統（v1.4，achievements.js）
+
+24 個成就，存於獨立 localStorage key `petriabyss_achievements`。
+
+**成就類別**：
+- 探索型：首次戰鬥、首次死亡、抵達各區域、全 NPC 交流
+- 關係型：螢同行、河邊月光、冥河渡江人
+- 挑戰型：和平主義者（0 戰鬥通關）、石之花（石化 ≥80% 存活通關）、極速通關
+- 收集型：全 4 結局收集（跨周目追蹤）、骰子高手
 
 ## 待辦 / 已知問題
 
@@ -295,31 +383,38 @@ if (state.flags.r3PlagueProof)    score += 3;  // 瘟疫起源證據（關鍵）
 
 ## 未來開發方向
 
-### 體驗提升（投入產出比高）
+### 體驗提升（已完成）
 
-- [x] **音效反饋** — `sfx.js` 程序化生成（click/hit/hurt/petri/levelUp/death/item/pass/fail）
+- [x] **音效反饋** — `sfx.js` 程序化生成
 - [x] **打字機效果** — `explore.js` 已內建逐字渲染
-- [x] **存檔槽位** — 3 個手動槽位（存檔/讀取/刪除），存檔碼收進可展開區塊
+- [x] **存檔槽位** — 3 個手動槽位
+- [x] **成就系統** — 24 個成就，跨周目追蹤
+- [x] **隨機事件池** — 每區域 6 怪物、12 巡邏文字
+- [x] **New Game+** — 多周目能力轉換 + 倍率遞增怪物
+- [x] **石化懲罰** — 5 階段屬性減值 + HP 壓縮
 
-### 內容擴展
+### 內容擴展（推薦下一步）
 
-- [x] **場景 ASCII 美術圖補齊** — 98 個劇情節點全部 100% 覆蓋。NPC 肖像各有獨特無框設計（螢/老周/灰鶴/鐵霜/老鑄/清露/銅鐘）。詳見下方「ASCII 美術圖現況」。
-- [ ] **隨機事件池擴充** — 各區域巡邏遭遇和環境描述加更多變體，提高重玩新鮮感
-- [ ] **成就系統** — 追蹤隱藏行為（全程零戰鬥通關、石化度壓在 10% 以下、所有 NPC 都交流過），結局畫面顯示
-- [ ] **New Game+** — 通關後帶部分屬性/物品重玩，解鎖新對話選項或隱藏路線
+- [ ] **冥河深淵（R4+ 新區域）** — 渡江人路線目前只有「敬請期待」，可開發全新區域：古代封印層、石化瘟疫真正起源、最終 Boss。NG+ 高周目玩家的終極挑戰
+- [ ] **NG+ 專屬劇情分歧** — 二周目以上解鎖全新對話選項和隱藏路線（例：直接揭露瘟疫真相給銅鐘、和 Boss 鏽刃談判時提及「上一世」的記憶）
+- [ ] **NPC 好感度系統強化** — 目前好感度只靠 flags 判斷，可改為數值型（0-100），影響 NPC 商店價格、戰鬥支援、專屬結局變體
+- [ ] **裝備系統** — 目前只有 `weaponDmg` flag，可擴展為完整裝備槽（武器/護甲/飾品），各區域 Boss 掉落稀有裝備，NG+ 可繼承
+- [ ] **動態難度調整** — 追蹤玩家的連續死亡/連續勝利，自動微調怪物強度，讓不同技術水準的玩家都有好體驗
 
 ### 技術改善
 
 - [ ] **離線支援 (PWA)** — 加 Service Worker + manifest.json，可「安裝」到手機桌面離線遊玩
 - [ ] **無障礙** — 選項按鈕加 `aria-label`，鍵盤導航優化，高對比模式
 - [ ] **ES Module 重構** — 遷移全域變數到 ES modules，搭配簡單 bundler，改善可維護性
+- [ ] **效能監控** — 高周目（4x+）怪物數值可能導致戰鬥回合過長，考慮加入回合上限或自動結算
 
 ### 傳播 / 社群
 
-- [x] **分享結局卡** — `endcard.js` 身分牌風格收藏卡片（評分/稀有度/ASCII art/NPC 語錄），支援下載/複製
-- [x] **數據統計頁** — `stats.js` 用 localStorage 記錄全域統計（死亡次數、結局分布、戰鬥次數、石化度等），結局後展示
-- [x] **玩家排行榜** — `js/leaderboard.js`，Dreamlo API。詳見下方「玩家排行榜（leaderboard.js）」
+- [x] **分享結局卡** — `endcard.js` 身分牌風格收藏卡片
+- [x] **數據統計頁** — `stats.js` 跨遊玩累計統計
+- [x] **玩家排行榜** — `js/leaderboard.js`，Dreamlo API
 - [ ] **多語言擴展** — 架構已支援 i18n，可加日文或其他社群翻譯
+- [ ] **周目排行榜** — 排行榜加入「周目數」欄位，區分一周目和高周目玩家，展示最高通關周目
 
 ## ✅ 已完成：ASCII 美術圖全覆蓋
 
@@ -426,14 +521,22 @@ clamp(v, lo, hi)            // 限制範圍
 L(zh, en)                   // i18n 選擇
 notify(msg)                 // 彈出 toast 通知（2 秒）
 
-// 屬性檢定
-statCheck(stat, dc)         // → 'crit' | 'pass' | 'fail'（d6 + stat vs DC）
+// 屬性檢定（自動套用石化懲罰）
+statCheck(stat, dc)         // → 'crit' | 'pass' | 'fail'（d6 + effectiveStat vs DC）
 checkRate(stat, dc)         // → 百分比（顯示成功率用）
+effectiveStat(stat)         // → 套用石化懲罰後的屬性值（min 1）
+petriPenalty()              // → { stage, str, agi, wil, maxHpMult }
 
 // HP / 石化度
 changeHp(delta)             // → true 表示死亡
-changePetri(delta)          // → true 表示完全石化
+changePetri(delta)          // → true 表示完全石化（含階段警告 + maxHp 調整）
 changeStat(stat, delta)     // 永久屬性變動
+getBaseMaxHp()              // → 基礎最大 HP（考慮 NG+ 周目和等級）
+
+// NG+ 怪物倍率
+getNgPlusScale()            // → 1 / 2 / 4 / 8...
+scaleEnemyNgPlus(enemy)     // → 倍率調整後的敵人淺拷貝
+calculateBankedPoints()     // → 當前周目可儲存的轉換點數
 
 // 經驗值
 gainXp(amount)              // 含升級處理
