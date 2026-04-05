@@ -18,7 +18,7 @@ var diceGame = (function() {
 
   function renderHidden(count) {
     var s = '';
-    for (var i = 0; i < count; i++) s += '🎲 ';
+    for (var i = 0; i < count; i++) s += '⬡ ';
     return s.trim();
   }
 

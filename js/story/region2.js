@@ -845,7 +845,7 @@ registerNode('r2_camp_chief', () => {
       c.push({ text: '「我準備好了，一起去挑戰巨獸。」', textEn: '"I\'m ready. Let\'s challenge the colossus."', action: () => loadNode('r2_boss_prep') });
     }
     if (state.flags.r2ChengAwake && (state.flags.r2ChengTrainCount || 0) < 3) {
-      c.push({ text: '💪 和承鋼一起訓練', textEn: '💪 Train with Cheng Gang', action: () => loadNode('r2_cheng_train') });
+      c.push({ text: '◆ 和承鋼一起訓練', textEn: '◆ Train with Cheng Gang', action: () => loadNode('r2_cheng_train') });
     }
     c.push({ text: '返回營地', textEn: 'Return to camp', action: () => loadNode('r2_camp') });
     return c;
@@ -2128,33 +2128,33 @@ registerNode('r2_cheng_train', () => {
   // ── Common training intro ──
   steps.push({ art: `<pre class="ascii-art gold">
   ╔═════════════════════════════════╗
-  ║       💪  力 量 訓 練  💪       ║
+  ║    ◆◇◆  力 量 訓 練  ◆◇◆      ║
   ╠═════════════════════════════════╣
   ║                                 ║
-  ║     ╱▔▔╲         ╱▔▔╲         ║
-  ║    │◦  ◦│       │    │        ║
-  ║    │ ══ │       │ ══ │        ║
-  ║     ╲__╱         ╲__╱         ║
-  ║     ╱||╲  ⇄⇄⇄   ╱||╲        ║
-  ║    ╱ || ╲       ╱ || ╲       ║
-  ║    承 鋼          你           ║
+  ║     ╱▔▔╲    ░▓█▓░    ╱▔▔╲    ║
+  ║    │◦  ◦│   ░▓█▓░   │    │   ║
+  ║    │ ══ │───░▓█▓░───│ ══ │   ║
+  ║     ╲__╱    ░▓█▓░    ╲__╱    ║
+  ║     ╱||╲    石  塊    ╱||╲    ║
+  ║    ╱ || ╲           ╱ || ╲   ║
+  ║    承 鋼              你      ║
   ║                                 ║
-  ║     第 ` + (trainCount + 1) + ` / 3 次訓練              ║
+  ║        第 ` + (trainCount + 1) + ` / 3 次訓練           ║
   ╚═════════════════════════════════╝
 </pre>`, artEn: `<pre class="ascii-art gold">
   ╔═════════════════════════════════╗
-  ║     💪  Strength Training  💪   ║
+  ║   ◆◇◆ Strength Training ◆◇◆   ║
   ╠═════════════════════════════════╣
   ║                                 ║
-  ║     ╱▔▔╲         ╱▔▔╲         ║
-  ║    │◦  ◦│       │    │        ║
-  ║    │ ══ │       │ ══ │        ║
-  ║     ╲__╱         ╲__╱         ║
-  ║     ╱||╲  ⇄⇄⇄   ╱||╲        ║
-  ║    ╱ || ╲       ╱ || ╲       ║
-  ║   Cheng           You          ║
+  ║     ╱▔▔╲    ░▓█▓░    ╱▔▔╲    ║
+  ║    │◦  ◦│   ░▓█▓░   │    │   ║
+  ║    │ ══ │───░▓█▓░───│ ══ │   ║
+  ║     ╲__╱    ░▓█▓░    ╲__╱    ║
+  ║     ╱||╲    Stone     ╱||╲    ║
+  ║    ╱ || ╲           ╱ || ╲   ║
+  ║   Cheng              You      ║
   ║    Gang                        ║
-  ║     Session ` + (trainCount + 1) + ` / 3              ║
+  ║        Session ` + (trainCount + 1) + ` / 3             ║
   ╚═════════════════════════════════╝
 </pre>`, delay: 800 });
 
