@@ -228,12 +228,8 @@ registerNode('r0_look', () => {
     }
     c.push({ text: '查看北面攀爬痕跡', textEn: 'Check the climbing marks to the north', action: () => loadNode('r0_climb_check') });
     c.push({ text: '探索南面裂縫', textEn: 'Explore the southern crack', action: () => loadNode('r0_crack') });
-    // Ferryman route — only after all 4 endings achieved
-    if (typeof globalStats !== 'undefined' &&
-        globalStats.endings.dawn > 0 && globalStats.endings.compromise > 0 &&
-        globalStats.endings.lockdown > 0 && globalStats.endings.sacrifice > 0) {
-      c.push({ text: '⚰ 走向深處傳來的低語……', textEn: '⚰ Follow the whispers from below...', action: () => loadNode('r0_ferryman_gate') });
-    }
+    // Ferryman route — always visible, but blocked if no ending achieved
+    c.push({ text: '⚰ 走向深處傳來的低語……', textEn: '⚰ Follow the whispers from below...', action: () => loadNode('r0_ferryman_gate') });
     return c;
   })(), { label: L('觀察環境', 'Observing area') });
 });
@@ -1170,6 +1166,44 @@ registerNode('r0_after_lizard', () => {
 // ═══════════════════════════════════════════════════
 
 registerNode('r0_ferryman_gate', () => {
+  // Check if player has completed at least one ending
+  var hasAnyEnding = typeof globalStats !== 'undefined' &&
+    (globalStats.endings.dawn > 0 || globalStats.endings.compromise > 0 ||
+     globalStats.endings.lockdown > 0 || globalStats.endings.sacrifice > 0);
+
+  if (!hasAnyEnding) {
+    // Blocked — player can see the entrance but cannot proceed
+    autoExplore([
+      { tag: '感知', tagColor: 'tag-sense',
+        text: '你注意到祭獻坑最深處的角落，有一股不尋常的氣流。',
+        textEn: 'You notice an unusual draft in the deepest corner of the Sacrificial Pit.',
+        delay: 2500 },
+      { tag: '探索', tagColor: 'tag-explore',
+        text: '撥開碎石和殘骸，一條向下延伸的窄縫赫然出現。',
+        textEn: 'Pushing aside rubble and remains, a narrow crevice leading downward appears.',
+        delay: 2500 },
+      { tag: '感知', tagColor: 'tag-petri',
+        text: '一股強烈的寒意從裂縫深處湧上來，讓你不由自主地後退一步。',
+        textEn: 'An intense chill surges from the depths of the crevice, forcing you back a step.',
+        delay: 2800 },
+      { tag: '感知', tagColor: 'tag-warn',
+        text: '低語聲在耳邊迴盪……但你無法聽懂任何一個字。',
+        textEn: 'Whispers echo in your ears... but you cannot understand a single word.',
+        delay: 2500 },
+      { tag: '系統', tagColor: 'tag-system',
+        html: '<b>某種力量阻擋了你。你還沒有足夠的經歷來踏入這個地方。</b>',
+        htmlEn: '<b>Something bars your way. You lack the experience to enter this place.</b>',
+        delay: 2500 },
+      { tag: '提示', tagColor: 'tag-info',
+        text: '（也許當你經歷過一次完整的旅程之後，這裡的門才會為你打開。）',
+        textEn: '(Perhaps after completing a full journey, the way will open for you.)',
+        delay: 2000 },
+    ], [
+      { text: '返回', textEn: 'Return', action: function() { loadNode('r0_look'); } },
+    ], { label: L('被封鎖的通道', 'Sealed Passage') });
+    return;
+  }
+
   autoExplore([
     { tag: '感知', tagColor: 'tag-sense',
       text: '你注意到祭獻坑最深處的角落，有一股不尋常的氣流。',
