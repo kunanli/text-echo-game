@@ -103,14 +103,51 @@ function changeHp(delta) {
 }
 
 function changePetri(delta) {
+  var prevPetri = state.petri;
   state.petri = clamp(state.petri + delta, 0, 100);
   if (delta > 0) {
     sfx.petri();
     if (typeof statsTrackPetriEvent === 'function') statsTrackPetriEvent();
+    // Stage threshold warnings (5-stage system: 20/40/60/80)
+    if (prevPetri < 20 && state.petri >= 20) {
+      notify(L('▪ 石化 Lv.1 — 四肢僵硬，力量·敏捷 -1', '▪ Petri Lv.1 — Limbs stiffen, STR·AGI -1'));
+      state.mood = 'petri';
+    }
+    if (prevPetri < 40 && state.petri >= 40) {
+      notify(L('▪▪ 石化 Lv.2 — 紋路蔓延，力量·敏捷 -2，意志 -1，HP上限 -10%', '▪▪ Petri Lv.2 — Stone spreads, STR·AGI -2, WIL -1, Max HP -10%'));
+      state.mood = 'petri';
+    }
+    if (prevPetri < 60 && state.petri >= 60) {
+      notify(L('▪▪▪ 石化 Lv.3 — 半身石化，全屬性大幅下降，HP上限 -20%', '▪▪▪ Petri Lv.3 — Half petrified, severe stat loss, Max HP -20%'));
+      state.mood = 'danger';
+    }
+    if (prevPetri < 80 && state.petri >= 80) {
+      notify(L('▪▪▪▪ 石化 Lv.4 — 瀕臨石化！全屬性崩潰，HP上限 -30%', '▪▪▪▪ Petri Lv.4 — Near death! Stats collapse, Max HP -30%'));
+      state.mood = 'danger';
+    }
+  }
+  // Apply max HP reduction from petri
+  var pen = petriPenalty();
+  if (pen.maxHpMult < 1.0) {
+    var baseMax = state.flags.ngPlus ? 60 : 50;
+    // Account for level-up HP gains: +5 per level above 1
+    baseMax += (state.level - 1) * 5;
+    var newMax = Math.floor(baseMax * pen.maxHpMult);
+    if (state.maxHp > newMax) {
+      state.maxHp = newMax;
+      state.hp = Math.min(state.hp, state.maxHp);
+    }
   }
   if (state.petri >= 100) {
     die(L('你的身體已完全化為冰冷的石頭……', 'Your body has completely turned to cold stone...'));
     return true; // dead
+  }
+  // Restore max HP when petri decreases below threshold
+  if (delta < 0) {
+    var baseMax = state.flags.ngPlus ? 60 : 50;
+    baseMax += (state.level - 1) * 5;
+    var allowedMax = Math.floor(baseMax * pen.maxHpMult);
+    if (state.maxHp < allowedMax) state.maxHp = allowedMax;
   }
   return false;
 }
@@ -119,25 +156,52 @@ function changeStat(stat, delta) {
   state[stat] = Math.max(1, state[stat] + delta);
 }
 
+// ── Petrification Penalty System (5 Stages) ──
+// Stage 0: 0-19%  — no penalty
+// Stage 1: 20-39% — mild stiffness
+// Stage 2: 40-59% — spreading stone
+// Stage 3: 60-79% — heavy petri
+// Stage 4: 80-99% — near death
+// Stage 5: 100%   — full petri (death)
+// Returns { stage, str, agi, wil, maxHpMult, label, labelEn }
+function petriPenalty() {
+  var p = state.petri;
+  if (p >= 80) return { stage: 4, str: -4, agi: -4, wil: -3, maxHpMult: 0.7, label: '瀕臨石化', labelEn: 'Critical Petri' };
+  if (p >= 60) return { stage: 3, str: -3, agi: -3, wil: -2, maxHpMult: 0.8, label: '重度石化', labelEn: 'Severe Petri' };
+  if (p >= 40) return { stage: 2, str: -2, agi: -2, wil: -1, maxHpMult: 0.9, label: '中度石化', labelEn: 'Moderate Petri' };
+  if (p >= 20) return { stage: 1, str: -1, agi: -1, wil: 0,  maxHpMult: 1.0, label: '輕度石化', labelEn: 'Mild Petri' };
+  return { stage: 0, str: 0, agi: 0, wil: 0, maxHpMult: 1.0, label: '', labelEn: '' };
+}
+
+// Get effective stat value (base + petri penalty, min 1)
+function effectiveStat(stat) {
+  var pen = petriPenalty();
+  return Math.max(1, state[stat] + (pen[stat] || 0));
+}
+
 // ── Stat Check System ──
 // Returns 'crit' | 'pass' | 'fail'
 function statCheck(stat, dc) {
   var roll = rng(1, 6);
-  var total = state[stat] + roll;
+  var eff = effectiveStat(stat);
+  var total = eff + roll;
   var result = total >= dc + 3 ? 'crit' : total >= dc ? 'pass' : 'fail';
   var statNames = { str: ['力量', 'STR'], agi: ['敏捷', 'AGI'], wil: ['意志', 'WIL'] };
   var name = state.lang === 'en' ? statNames[stat][1] : statNames[stat][0];
+  var pen = petriPenalty();
+  var penStr = (pen[stat] && pen[stat] < 0) ? (' ' + pen[stat]) : '';
   var sym = result !== 'fail' ? ' >= ' : ' < ';
   var tag = result === 'crit' ? (state.lang === 'en' ? 'CRITICAL!' : '大成功！') : result === 'pass' ? (state.lang === 'en' ? 'Passed!' : '成功！') : (state.lang === 'en' ? 'Failed...' : '失敗……');
   if (result !== 'fail') sfx.pass(); else sfx.fail();
-  notify(name + ' ' + state[stat] + ' + ' + roll + ' = ' + total + sym + dc + '  ' + tag);
+  notify(name + ' ' + state[stat] + penStr + ' + ' + roll + ' = ' + total + sym + dc + '  ' + tag);
   return result;
 }
 
 // Calculate success rate for UI display (percentage)
 function checkRate(stat, dc) {
+  var eff = effectiveStat(stat);
   var s = 0;
-  for (var r = 1; r <= 6; r++) { if (state[stat] + r >= dc) s++; }
+  for (var r = 1; r <= 6; r++) { if (eff + r >= dc) s++; }
   return Math.round(s / 6 * 100);
 }
 

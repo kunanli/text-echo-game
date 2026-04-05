@@ -6,11 +6,14 @@
 function renderStatus() {
   $hp.textContent = state.hp + ' / ' + state.maxHp;
   $barHp.style.width = (state.hp / state.maxHp * 100) + '%';
-  $petri.textContent = state.petri + '%';
+  var pen = typeof petriPenalty === 'function' ? petriPenalty() : { stage: 0, str: 0, agi: 0, wil: 0 };
+  var stageLabel = pen.stage > 0 ? (' Lv.' + pen.stage) : '';
+  $petri.textContent = state.petri + '%' + stageLabel;
   $barPetri.style.width = state.petri + '%';
-  $str.textContent = state.str;
-  $agi.textContent = state.agi;
-  $wil.textContent = state.wil;
+  // Show effective stats with penalty indicator
+  $str.textContent = pen.str < 0 ? state.str + '(' + pen.str + ')' : state.str;
+  $agi.textContent = pen.agi < 0 ? state.agi + '(' + pen.agi + ')' : state.agi;
+  $wil.textContent = pen.wil < 0 ? state.wil + '(' + pen.wil + ')' : state.wil;
   $levelVal.textContent = state.level;
   $xpVal.textContent = state.xp + ' / ' + state.xpToNext;
   $xpBar.style.width = (state.xp / state.xpToNext * 100) + '%';
@@ -96,7 +99,7 @@ function renderStatus() {
   $mstName.textContent = state.name;
   $mstLv.textContent = 'Lv.' + state.level;
   $mstHp.textContent = 'HP ' + state.hp;
-  $mstPetri.textContent = L('石化 ', 'Petri ') + state.petri + '%';
+  $mstPetri.textContent = L('石化 ', 'Petri ') + state.petri + '%' + stageLabel;
   // Show top NPC on mobile
   var $mstNpc = document.getElementById('mst-npc');
   if ($mstNpc && typeof getTopNpc === 'function') {

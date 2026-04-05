@@ -606,17 +606,26 @@ function runPatrolCycle() {
   var monster = monsters[rng(0, monsters.length - 1)];
   var mName = L(monster.name, monster.nameEn);
 
+  // NG+ scaling: 1.5x enemy stats in patrol
+  var ngScale = state.flags.ngPlus ? 1.5 : 1;
+  var mHpMax = Math.floor(monster.hp * ngScale);
+  var mAtkMin = Math.floor(monster.atkMin * ngScale);
+  var mAtkMax = Math.floor(monster.atkMax * ngScale);
+  var mPetriDmg = Math.floor(monster.petriDmg * ngScale);
+  var mXpBase = Math.floor(monster.xp * (ngScale > 1 ? 1.25 : 1));
+
   // Pre-simulate combat
-  var mHp = monster.hp;
+  var mHp = mHpMax;
   var totalDmg = 0, totalPetri = 0, rounds = 0;
   var combatLog = [];
   while (mHp > 0 && rounds < 12) {
     rounds++;
-    var pAtk = rng(Math.max(1, state.str), state.str + 4);
-    var mAtk = rng(monster.atkMin, monster.atkMax);
+    var effStr = typeof effectiveStat === 'function' ? effectiveStat('str') : state.str;
+    var pAtk = rng(Math.max(1, effStr), effStr + 4);
+    var mAtk = rng(mAtkMin, mAtkMax);
     mHp -= pAtk;
     totalDmg += mAtk;
-    totalPetri += monster.petriDmg;
+    totalPetri += mPetriDmg;
 
     var av = ATK_VERBS[rng(0, ATK_VERBS.length - 1)];
     var cv = COUNTER_VERBS[rng(0, COUNTER_VERBS.length - 1)];
@@ -707,7 +716,7 @@ function runPatrolCycle() {
   }
 
   // Result + apply effects
-  var mXp = monster.xp + rng(0, 2);
+  var mXp = mXpBase + rng(0, 2);
   queue.push({ tag: L('結果','Result'), color: 'tag-item',
     text: L('勝利！ HP -' + totalDmg + '  石化 +' + totalPetri + '%  經驗 +' + mXp
             + (npcAid ? '  (' + L(npcAid.name, npcAid.nameEn) + L('的援助！', '\'s aid!') + ')' : ''),

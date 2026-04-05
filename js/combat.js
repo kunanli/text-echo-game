@@ -10,6 +10,19 @@ function startCombat(enemy, onWin, onFlee) {
   ambientAudio.setCombat(true);
   state.flags._runCombats = (state.flags._runCombats || 0) + 1;
   if (typeof statsTrackCombat === 'function') statsTrackCombat();
+  // NG+ scaling: 1.5x enemy stats
+  var ngScale = state.flags.ngPlus ? 1.5 : 1;
+  var scaledEnemy = enemy;
+  if (ngScale > 1) {
+    scaledEnemy = {};
+    for (var k in enemy) { if (enemy.hasOwnProperty(k)) scaledEnemy[k] = enemy[k]; }
+    scaledEnemy.hp = Math.floor(enemy.hp * ngScale);
+    scaledEnemy.atkMin = Math.floor(enemy.atkMin * ngScale);
+    scaledEnemy.atkMax = Math.floor(enemy.atkMax * ngScale);
+    scaledEnemy.petriDmg = Math.floor(enemy.petriDmg * ngScale);
+    scaledEnemy.xp = Math.floor(enemy.xp * 1.25); // bonus XP in NG+
+  }
+  enemy = scaledEnemy;
   let enemyHp = enemy.hp;
   const eName = enemy.name;
   let observed = false;   // next attack deals 2x
@@ -74,11 +87,13 @@ function startCombat(enemy, onWin, onFlee) {
   // ── Attack ──
   function doAttack() {
     var weaponBonus = state.flags.weaponDmg || 0;
-    var baseDmg = rng(3, 6) + Math.floor(state.str * 1.2) + weaponBonus;
+    var effStr = typeof effectiveStat === 'function' ? effectiveStat('str') : state.str;
+    var effAgi = typeof effectiveStat === 'function' ? effectiveStat('agi') : state.agi;
+    var baseDmg = rng(3, 6) + Math.floor(effStr * 1.2) + weaponBonus;
     var dmg = observed ? baseDmg * 2 : baseDmg;
     var wasObserved = observed;
     observed = false;
-    var enemyDmg = Math.max(0, rng(enemy.atkMin, enemy.atkMax) - Math.floor(state.agi * 0.3));
+    var enemyDmg = Math.max(0, rng(enemy.atkMin, enemy.atkMax) - Math.floor(effAgi * 0.3));
     enemyHp -= dmg;
     sfx.hit();
 
@@ -120,7 +135,8 @@ function startCombat(enemy, onWin, onFlee) {
 
   // ── Observe ──
   function doObserve() {
-    var roll = rng(1, 6) + state.agi;
+    var effAgi = typeof effectiveStat === 'function' ? effectiveStat('agi') : state.agi;
+    var roll = rng(1, 6) + effAgi;
     var dc = 7;
     var log;
 
@@ -156,7 +172,8 @@ function startCombat(enemy, onWin, onFlee) {
 
   // ── Commune ──
   function doCommune() {
-    var roll = rng(1, 6) + state.wil;
+    var effWil = typeof effectiveStat === 'function' ? effectiveStat('wil') : state.wil;
+    var roll = rng(1, 6) + effWil;
     var dc = 8;
     var log;
 
