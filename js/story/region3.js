@@ -477,29 +477,33 @@ registerNode('r3_inn', () => {
 registerNode('r3_bell', () => {
   var steps = [];
   steps.push({ art: `<pre class="ascii-art">
-        ╭─────────╮
-        │  ·   ·  │
-        │  ╰─┬─╯  │
-        │   ───   │
-        ╰────┬────╯
-         ╱───┴───╲
-        ╱ ░░░░░░░ ╲
-       │  ░銅 鐘░  │
-       │  ░░░░░░░  │
-        ╲  ██···  ╱  ← 石化右手
-         ╲───────╱
+           ╱╲
+         ╱─══─╲
+        │ ·    · │
+        │  ╰┬─╯  │
+        │   ══   │
+         ╲╱──╲╱
+       ═══╲  │  ╱═══
+      │    ╲ │ ╱    │
+      │銅鐘 ╲│╱  ░▓█│
+      │      │   ▓██│← 石化
+      │  ╭───┴─╮ ░▓█│
+      ╰──│文件簿│──░╯
+    ═════╧═════╧═════
 </pre>`, artEn: `<pre class="ascii-art">
-        ╭─────────╮
-        │  ·   ·  │
-        │  ╰─┬─╯  │
-        │   ───   │
-        ╰────┬────╯
-         ╱───┴───╲
-        ╱ ░░░░░░░ ╲
-       │  ░Bronze░ │
-       │  ░ Bell ░ │
-        ╲  ██···  ╱  ← petrified hand
-         ╲───────╱
+           ╱╲
+         ╱─══─╲
+        │ ·    · │
+        │  ╰┬─╯  │
+        │   ══   │
+         ╲╱──╲╱
+       ═══╲  │  ╱═══
+      │    ╲ │ ╱    │
+      │Bell  ╲│╱  ░▓█│
+      │      │   ▓██│← petri
+      │  ╭───┴─╮ ░▓█│
+      ╰──│ Docs │──░╯
+    ═════╧═════╧═════
 </pre>`, delay: 800 });
   if (!state.flags.r3BellMet) {
     state.flags.r3BellMet = true;
@@ -599,32 +603,32 @@ registerNode('r3_ying_talk', () => {
   var yPo = isMale ? 'her' : 'his';
 
   var steps = [];
-  steps.push({ art: `<pre class="ascii-art">
-        ╭─────────╮
-        │ ✦    ✦  │
-        │  ╰─┬─╯  │
-        │   ╰╯    │
-        ╰────┬────╯
-         ╱───┴───╲
-        ╱  ·˚✦˚·  ╲
-       │   螢 Ying  │
-       │  ˚·发光·˚  │
-        ╲ ┌──────┐╱
-         ╲│ 手冊 │
-          └──────┘
-</pre>`, artEn: `<pre class="ascii-art">
-        ╭─────────╮
-        │ ✦    ✦  │
-        │  ╰─┬─╯  │
-        │   ╰╯    │
-        ╰────┬────╯
-         ╱───┴───╲
-        ╱  ·˚✦˚·  ╲
-       │    Ying    │
-       │  ˚·glow·˚ │
-        ╲ ┌──────┐╱
-         ╲│ Note │
-          └──────┘
+  steps.push({ art: `<pre class="ascii-art cyan">
+           ╲ · ˚
+        ·   ╲╱~~╮
+      ˚    ╭╯○ ○│  ·
+           │ ╰▽╯│
+           ╰─╮ ╭╯╲~~─╮
+          ✦· │╱│   ╲  │
+        ╱──╮ │ │ ✦  ╲─╯
+       │   ╰╮│╱   ·˚ │
+       │  ·✦╰│  螢    │
+        ╲  ˚·│╲  ╭──╮│
+         ╲───│ ╲ │手冊│
+             ╰──╰┴──╯
+</pre>`, artEn: `<pre class="ascii-art cyan">
+           ╲ · ˚
+        ·   ╲╱~~╮
+      ˚    ╭╯○ ○│  ·
+           │ ╰▽╯│
+           ╰─╮ ╭╯╲~~─╮
+          ✦· │╱│   ╲  │
+        ╱──╮ │ │ ✦  ╲─╯
+       │   ╰╮│╱   ·˚ │
+       │  ·✦╰│ Ying   │
+        ╲  ˚·│╲  ╭──╮│
+         ╲───│ ╲ │Note│
+             ╰──╰┴──╯
 </pre>`, delay: 800 });
   // First time — Ying arrives
   if (!state.flags.r3YingArrived) {
@@ -695,32 +699,32 @@ registerNode('r3_ying_inn', () => {
   var yPo = isMale ? 'her' : 'his';
   state.flags.r3YingInn = true;
   autoExplore([
-    { art: `<pre class="ascii-art">
-        ╭─────────╮
-        │ ✦    ✦  │
-        │  ╰─┬─╯  │
-        │   ╰╯    │
-        ╰────┬────╯
-         ╱───┴───╲
-        ╱  ·˚✦˚·  ╲
-       │   螢 Ying  │
-       │  ˚·发光·˚  │
-        ╲ ┌──────┐╱
-         ╲│ 手冊 │
-          └──────┘
-</pre>`, artEn: `<pre class="ascii-art">
-        ╭─────────╮
-        │ ✦    ✦  │
-        │  ╰─┬─╯  │
-        │   ╰╯    │
-        ╰────┬────╯
-         ╱───┴───╲
-        ╱  ·˚✦˚·  ╲
-       │    Ying    │
-       │  ˚·glow·˚ │
-        ╲ ┌──────┐╱
-         ╲│ Note │
-          └──────┘
+    { art: `<pre class="ascii-art cyan">
+           ╲ · ˚
+        ·   ╲╱~~╮
+      ˚    ╭╯○ ○│  ·
+           │ ╰▽╯│
+           ╰─╮ ╭╯╲~~─╮
+          ✦· │╱│   ╲  │
+        ╱──╮ │ │ ✦  ╲─╯
+       │   ╰╮│╱   ·˚ │
+       │  ·✦╰│  螢    │
+        ╲  ˚·│╲  ╭──╮│
+         ╲───│ ╲ │手冊│
+             ╰──╰┴──╯
+</pre>`, artEn: `<pre class="ascii-art cyan">
+           ╲ · ˚
+        ·   ╲╱~~╮
+      ˚    ╭╯○ ○│  ·
+           │ ╰▽╯│
+           ╰─╮ ╭╯╲~~─╮
+          ✦· │╱│   ╲  │
+        ╱──╮ │ │ ✦  ╲─╯
+       │   ╰╮│╱   ·˚ │
+       │  ·✦╰│ Ying   │
+        ╲  ˚·│╲  ╭──╮│
+         ╲───│ ╲ │Note│
+             ╰──╰┴──╯
 </pre>`, delay: 800 },
     { tag: '移動', tagColor: 'tag-move', text: '你帶螢到河畔居吃晚飯。老闆娘端上了兩碗熱騰騰的河魚湯和一盤黑麵包。', textEn: 'You bring Ying to Riverside Lodge for dinner. The landlady serves two bowls of steaming river-fish soup and a plate of black bread.', delay: 2500 },
     { tag: '感知', tagColor: 'tag-sense', text: '螢拿起湯碗，喝了一口。' + yP + '的眼睛瞬間睜大了。', textEn: 'Ying picks up the bowl, takes a sip. ' + yPC + ' eyes widen instantly.', delay: 2200 },
@@ -749,31 +753,33 @@ registerNode('r3_zhou', () => {
   state.flags.r3ZhouMet = true;
   autoExplore([
     { art: `<pre class="ascii-art">
-        ╭─────────╮
-        │  -   -  │
-        │  ╰─┬─╯  │
-        │  ╭───╮  │
-        ╰──┤皺紋├──╯
-         ╱─┴───┴─╲
-        ╱  老  周  ╲
-       │  ░░░░░░░░  │
-       │  ██ 石化手 │
-        ╲   ╱│     ╱
-         ╲─╱─┴──拐╱
-           ░░░ 工具箱
+          ╭───────╮
+         ╱ ─ ╌ ─  ╲
+        │  ⌐=  =╕  │
+        │   ╰──╯   │
+        │  ╰~~~~╯  │
+         ╲╱──┬──╲╱
+      ╱╲╱╱   │   ╲╲╱╲
+     │░░░│  老周  │   │
+     │░▓░│ ╱    ╲ │   │
+     │░▓░╰╱  ╭───╮╲──│
+     │░░░ │  │⚒ 🔧│ ╲│
+      ░▓░ ╰──┴───┴──╯
+       ░     工具台
 </pre>`, artEn: `<pre class="ascii-art">
-        ╭─────────╮
-        │  -   -  │
-        │  ╰─┬─╯  │
-        │  ╭───╮  │
-        ╰──┤lines├─╯
-         ╱─┴───┴─╲
-        ╱ Old Zhou ╲
-       │  ░░░░░░░░  │
-       │  ██ petri  │
-        ╲   ╱│     ╱
-         ╲─╱─┴─crutch
-           ░░░ Toolbox
+          ╭───────╮
+         ╱ ─ ╌ ─  ╲
+        │  ⌐=  =╕  │
+        │   ╰──╯   │
+        │  ╰~~~~╯  │
+         ╲╱──┬──╲╱
+      ╱╲╱╱   │   ╲╲╱╲
+     │░░░│Old Zhou│   │
+     │░▓░│ ╱    ╲ │   │
+     │░▓░╰╱  ╭───╮╲──│
+     │░░░ │  │⚒ 🔧│ ╲│
+      ░▓░ ╰──┴───┴──╯
+       ░    Workbench
 </pre>`, delay: 800 },
     { tag: '遭遇', tagColor: 'tag-explore', text: '你在市場的一角看到了一個坐在木箱上的老人。他的左腿被粗布包裹著，旁邊靠著一根拐杖。', textEn: 'You spot an old man sitting on a crate in a market corner. His left leg is wrapped in rough cloth, a crutch leaning beside him.', delay: 2500 },
     { tag: '感知', tagColor: 'tag-sense', html: '那張飽經風霜的臉——是<b>老周</b>。', htmlEn: 'That weathered face — it\'s <b>Old Zhou</b>.', delay: 2000 },
@@ -832,32 +838,32 @@ registerNode('r3_zhou', () => {
 
 registerNode('r3_crane', () => {
   var steps = [];
-  steps.push({ art: `<pre class="ascii-art">
-        ╭─────────╮
-        │  ˆ   ˆ  │
-        │  ╰─┬─╯  │
-        │   ───   │
-        ╰────┬────╯
-        ╱╲───┴───╱╲
-       ╱斗╲░░░░░╱斗╲
-      ╱ 篷 ╲灰鶴╱ 篷 ╲
-      ╲    ╱░░░░╲    ╱
-       ╲╱╱ ┌────┐╲╲╱
-           │貨物│
-           └────┘
-</pre>`, artEn: `<pre class="ascii-art">
-        ╭─────────╮
-        │  ˆ   ˆ  │
-        │  ╰─┬─╯  │
-        │   ───   │
-        ╰────┬────╯
-        ╱╲───┴───╱╲
-       ╱  ╲░░░░░╱  ╲
-      ╱Grey╲Crane╱loak╲
-      ╲    ╱░░░░╲    ╱
-       ╲╱╱ ┌────┐╲╲╱
-           │Goods│
-           └────┘
+  steps.push({ art: `<pre class="ascii-art gold">
+        ╱════════════╲
+       ╱──────────────╲
+       ╲╱╲  ◉    ◉ ╱╲╱
+         │  ╰──┬╯  │
+         │   ╰═╯   │
+         ╰╮  灰鶴 ╭╯
+       ╱╱╱ ╲──┬──╱ ╲╲╲
+      ╱╱    │  │  │   ╲╲
+     ╱╱     │  │  │    ╲╲
+     ╲╲   ◆─┴──┴──┴─◆  ╱╱
+      ╲╲ │✦ 瓶 ◆ 刃 ✦│╱╱
+        ═╧════════════╧═
+</pre>`, artEn: `<pre class="ascii-art gold">
+        ╱════════════╲
+       ╱──────────────╲
+       ╲╱╲  ◉    ◉ ╱╲╱
+         │  ╰──┬╯  │
+         │   ╰═╯   │
+         ╰╮ Crane  ╭╯
+       ╱╱╱ ╲──┬──╱ ╲╲╲
+      ╱╱    │  │  │   ╲╲
+     ╱╱     │  │  │    ╲╲
+     ╲╲   ◆─┴──┴──┴─◆  ╱╱
+      ╲╲ │✦ Gem ◆ Blade│╱╱
+        ═╧════════════╧═
 </pre>`, delay: 800 });
   if (!state.flags.r3CraneMet3) {
     state.flags.r3CraneMet3 = true;
