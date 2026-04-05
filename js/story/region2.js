@@ -1516,38 +1516,40 @@ registerNode('r2_crane', () => {
   var steps = [];
   if (!state.flags.r2CraneMet) {
     state.flags.r2CraneMet = true;
-    steps.push({ art: `<pre class="ascii-art">
-      ╔═══════════════════════════════╗
-      ║                               ║
-      ║         ╱▔▔▔▔▔╲             ║
-      ║        │ ─   ─ │             ║
-      ║        │  ╲▽╱  │             ║
-      ║         ╲_____╱              ║
-      ║   ╱░░░░░░│   │░░░░░░╲       ║
-      ║  ╱░斗篷░──┤   ├──░斗篷░╲     ║
-      ║ ╱░░░░░░╱ │   │ ╲░░░░░░╲    ║
-      ║  ░░░░░╱  │   │  ╲░░░░░     ║
-      ║         ╔═══════╗            ║
-      ║         ║ 貨 物 ║            ║
-      ║         ╚═══════╝            ║
-      ║      灰鶴 — 行商人            ║
-      ╚═══════════════════════════════╝
-</pre>`, artEn: `<pre class="ascii-art">
-      ╔═══════════════════════════════╗
-      ║                               ║
-      ║         ╱▔▔▔▔▔╲             ║
-      ║        │ ─   ─ │             ║
-      ║        │  ╲▽╱  │             ║
-      ║         ╲_____╱              ║
-      ║   ╱░░░░░░│   │░░░░░░╲       ║
-      ║  ╱░Cloak░──┤   ├──░Cloak░╲   ║
-      ║ ╱░░░░░░╱ │   │ ╲░░░░░░╲    ║
-      ║  ░░░░░╱  │   │  ╲░░░░░     ║
-      ║         ╔═══════╗            ║
-      ║         ║ Wares ║            ║
-      ║         ╚═══════╝            ║
-      ║    Grey Crane — Merchant     ║
-      ╚═══════════════════════════════╝
+    steps.push({ art: `<pre class="ascii-art gold">
+       ·  ˚  灰鶴 — 行商人  ˚  ·
+         ═══════════════════
+        ╱ ·  ˚  ·  ˚  ·  ˚ ╲
+       ╱═══════════════════════╲
+              ╱───────╲
+             │ ─    ─  │
+             │  ╲──╱   │
+              ╲───╱───╱
+         ╱░░░░░│     │░░░░░╲
+        ╱░░░░░─┤     ├─░░░░░╲
+       ╱░░░░░░ │     │ ░░░░░░╲
+      ╱░░░░░░░ │     │ ░░░░░░░╲
+     ╱░░░░░░░░ │     │ ░░░░░░░░╲
+      ·─·─·─ ╭═╧═════╧═╮ ─·─·─·
+             ║ ◆ 貨物 ◆ ║
+             ╰═════════╯
+</pre>`, artEn: `<pre class="ascii-art gold">
+      ·  ˚  Grey Crane — Merchant  ˚  ·
+         ═══════════════════
+        ╱ ·  ˚  ·  ˚  ·  ˚ ╲
+       ╱═══════════════════════╲
+              ╱───────╲
+             │ ─    ─  │
+             │  ╲──╱   │
+              ╲───╱───╱
+         ╱░░░░░│     │░░░░░╲
+        ╱░░░░░─┤     ├─░░░░░╲
+       ╱░░░░░░ │     │ ░░░░░░╲
+      ╱░░░░░░░ │     │ ░░░░░░░╲
+     ╱░░░░░░░░ │     │ ░░░░░░░░╲
+      ·─·─·─ ╭═╧═════╧═╮ ─·─·─·
+             ║ ◆ Wares ◆ ║
+             ╰═════════╯
 </pre>`, delay: 800 });
     steps.push({ tag: '遭遇', tagColor: 'tag-explore', text: '你在營地的角落看到一個熟悉的身影——一件灰色的斗篷，背上的大包裹叮噹作響。', textEn: 'In a camp corner, a familiar figure — a grey cloak, a large pack clinking on the back.', delay: 2500 });
     steps.push({ tag: '遭遇', tagColor: 'tag-explore', html: '「喲——<b>又見面了</b>。」灰鶴轉過身，露出那張永遠帶著商人笑容的臉。', htmlEn: '"Well — <b>we meet again</b>." Grey Crane turns, showing that perpetual merchant\'s grin.', delay: 2500 });
@@ -1687,31 +1689,29 @@ registerNode('r2_zhou_trace', () => {
   state.flags.r2ZhouTrace = true;
   autoExplore([
     { art: `<pre class="ascii-art">
-  ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
-  ▓                                ▓
-  ▓  ┌────────────────────────┐    ▓
-  ▓  │                        │    ▓
-  ▓  │  老周到此一遊          │    ▓
-  ▓  │  往北走了              │    ▓
-  ▓  │  腿快不行了            │    ▓
-  ▓  │  活著就好    → 北      │    ▓
-  ▓  │                        │    ▓
-  ▓  └────────────────────────┘    ▓
-  ▓          ← 刻痕               ▓
-  ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+  ░▓█▓░▓█▓░▓█▓░▓█▓░▓█▓░▓█▓░▓█▓░
+  █  ·  ˚    ·    ˚   ·    ˚   █
+  ▓    ╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱     ▓
+  █   ╱ 老周到此一遊       ╱    █
+  ▓  ╱  往北走了           ╱    ▓
+  █ ╱   腿快不行了         ╱    █
+  ▓╱    活著就好  ──→ 北  ╱     ▓
+  █ ╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱      █
+  ▓       ·  ↑ 刻痕  ·          ▓
+  █  ·  ˚    ·    ˚   ·    ˚   █
+  ░▓█▓░▓█▓░▓█▓░▓█▓░▓█▓░▓█▓░▓█▓░
 </pre>`, artEn: `<pre class="ascii-art">
-  ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
-  ▓                                ▓
-  ▓  ┌────────────────────────┐    ▓
-  ▓  │                        │    ▓
-  ▓  │  Old Zhou was here     │    ▓
-  ▓  │  Headed north          │    ▓
-  ▓  │  Legs giving out       │    ▓
-  ▓  │  Just stay alive → N   │    ▓
-  ▓  │                        │    ▓
-  ▓  └────────────────────────┘    ▓
-  ▓        ← Carved message        ▓
-  ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+  ░▓█▓░▓█▓░▓█▓░▓█▓░▓█▓░▓█▓░▓█▓░
+  █  ·  ˚    ·    ˚   ·    ˚   █
+  ▓    ╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱     ▓
+  █   ╱ Old Zhou was here  ╱    █
+  ▓  ╱  Headed north       ╱    ▓
+  █ ╱   Legs giving out    ╱    █
+  ▓╱    Just stay alive → N╱     ▓
+  █ ╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱      █
+  ▓      · ↑ Carved  ·          ▓
+  █  ·  ˚    ·    ˚   ·    ˚   █
+  ░▓█▓░▓█▓░▓█▓░▓█▓░▓█▓░▓█▓░▓█▓░
 </pre>`, delay: 800 },
     { tag: '探索', tagColor: 'tag-explore', text: '採石台的角落裡，你注意到了一些不尋常的東西——岩壁上刻著字。', textEn: 'In a corner of the quarry platform, you notice something unusual — words carved into the rock wall.', delay: 2200 },
     { tag: '感知', tagColor: 'tag-sense', text: '刻痕很新。不是古代的遺跡——是最近才有人用鑿子刻上去的。', textEn: 'The carvings are fresh. Not ancient ruins — someone chiseled these recently.', delay: 2200 },
