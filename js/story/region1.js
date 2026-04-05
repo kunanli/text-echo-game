@@ -202,8 +202,30 @@ registerNode('r1_forge', () => {
 registerNode('r1_furnace', () => {
   var hasCrystal = hasItem(L('石化結晶', 'Petri Crystal'));
   var hasFlask = hasItem(L('石化水瓶', 'Petri-Water Flask'));
+  var furnaceArt = { art: `<pre class="ascii-art red">
+      ╱▔▔▔▔▔▔▔╲
+     │ ░░░░░░░░ │
+     │ ░░*火*░░ │    ~  ~  ~
+     │ ░░░░░░░░ │   ~ 煙 霧 ~
+      ╲________╱     ~  ~  ~
+         ╱  ╲
+    ════╤════╤════
+        │    │
+   ─────┴────┴─────
+</pre>`, artEn: `<pre class="ascii-art red">
+      ╱▔▔▔▔▔▔▔╲
+     │ ░░░░░░░░ │
+     │ ░░*fire*░ │    ~  ~  ~
+     │ ░░░░░░░░ │   ~ Smoke ~
+      ╲________╱     ~  ~  ~
+         ╱  ╲
+    ════╤════╤════
+        │    │
+   ─────┴────┴─────
+</pre>`, delay: 800 };
   if (hasCrystal || hasFlask) {
     autoExplore([
+      furnaceArt,
       { tag: '行動', tagColor: 'tag-move', text: '你把材料放入熔爐中……', textEn: 'You place materials into the furnace...', delay: 1800 },
       { tag: '環境', tagColor: 'tag-system', text: '火焰舔舐著石化礦物，發出嘶嘶的聲響。', textEn: 'Flames lick at the petrification minerals, hissing loudly.', delay: 2200 },
       { tag: '感知', tagColor: 'tag-sense', text: '灰色的煙霧升起，散發出刺鼻的氣味——你退後幾步。', textEn: 'Grey smoke rises, acrid — you step back.', delay: 2500 },
@@ -219,6 +241,7 @@ registerNode('r1_furnace', () => {
     ], { label: L('使用熔爐', 'Using furnace') });
   } else {
     autoExplore([
+      furnaceArt,
       { tag: '行動', tagColor: 'tag-move', text: '你查看了熔爐。餘火還能用，但你沒有合適的材料。', textEn: 'You check the furnace. Embers remain, but you have no suitable materials.', delay: 2000 },
       { tag: '情報', tagColor: 'tag-info', text: '也許石化結晶或石化之水可以在這裡加工。', textEn: 'Perhaps petrification crystals or water could be processed here.', delay: 2200 },
     ], [
@@ -235,6 +258,27 @@ registerNode('r1_forge_search', () => {
   }
   state.flags.r1ForgeFullSearch = true;
   autoExplore([
+    { art: `<pre class="ascii-art red">
+     ┌──────┐  ┌──────┐  ┌──────┐
+     │ 工具 │  │ 模具 │  │ 礦石 │
+     │ ╳╳╳  │  │ ○□△  │  │ .:*: │
+     └──┬───┘  └──┬───┘  └──┬───┘
+  ──────┴─────────┴─────────┴──────
+     ╔══════╗
+     ║ 手札 ║  ← 灰塵覆蓋
+     ║ ≡≡≡≡ ║
+     ╚══════╝
+</pre>`, artEn: `<pre class="ascii-art red">
+     ┌──────┐  ┌──────┐  ┌──────┐
+     │Tools │  │Molds │  │ Ore  │
+     │ ╳╳╳  │  │ ○□△  │  │ .:*: │
+     └──┬───┘  └──┬───┘  └──┬───┘
+  ──────┴─────────┴─────────┴──────
+     ╔══════╗
+     ║Jrnl. ║  ← dust-covered
+     ║ ≡≡≡≡ ║
+     ╚══════╝
+</pre>`, delay: 800 },
     { tag: '探索', tagColor: 'tag-explore', text: '你仔細翻找鍛造間的各個角落。', textEn: 'You carefully search every corner of the forge.', delay: 2000 },
     { tag: '發現', tagColor: 'tag-item', text: '礦石堆底下藏著一本被灰塵覆蓋的手札。', textEn: 'Beneath the ore pile, a dust-covered journal.', delay: 2200 },
     { tag: '情報', tagColor: 'tag-info', html: '手札上寫道：<b>「守衛的核心在胸口——只有鈍器才能擊碎它。」</b>', htmlEn: 'The journal reads: <b>"The guardian\'s core is in its chest — only blunt weapons can shatter it."</b>', delay: 3000, effect: () => { state.flags.r1GuardHint = true; } },
@@ -329,6 +373,27 @@ registerNode('r1_crystal_items', () => {
   }
   state.flags.r1CrystalItemsTaken = true;
   autoExplore([
+    { art: `<pre class="ascii-art purple">
+    .:*~*:.    .:*~*:.    .:*~*:.
+   *~*~*~*~*  *~*~*~*~*  *~*~*~*~*
+  *~*  ╔══╗ *~* ┌──┐ *~* ╱▔▔╲  *~*
+  *~*  ║盾║ *~* │瓶│ *~* │??│  *~*
+  *~*  ╚══╝ *~* └──┘ *~* ╲__╱  *~*
+   *~*~*~*~*  *~*~*~*~*  *~*~*~*~*
+    ':.*~*.'    ':.*~*.'    ':.*~*.'
+  ────────────────────────────────
+    石 化 結 晶 中 的 遺 物
+</pre>`, artEn: `<pre class="ascii-art purple">
+    .:*~*:.    .:*~*:.    .:*~*:.
+   *~*~*~*~*  *~*~*~*~*  *~*~*~*~*
+  *~*  ╔══╗ *~* ┌──┐ *~* ╱▔▔╲  *~*
+  *~*  ║☗ ║ *~* │☕│ *~* │??│  *~*
+  *~*  ╚══╝ *~* └──┘ *~* ╲__╱  *~*
+   *~*~*~*~*  *~*~*~*~*  *~*~*~*~*
+    ':.*~*.'    ':.*~*.'    ':.*~*.'
+  ────────────────────────────────
+    Relics in Petrified Crystal
+</pre>`, delay: 800 },
     { tag: '探索', tagColor: 'tag-explore', text: '你小心翼翼地在結晶叢中翻找那些被石化的物品。', textEn: 'You carefully search through the petrified objects among the crystals.', delay: 2000 },
     { tag: '石化', tagColor: 'tag-petri', text: '每靠近一步，石化氣息就更加濃烈……', textEn: 'With every step closer, the petrification grows more intense...', delay: 2200 },
     { tag: '發現', tagColor: 'tag-item', text: '你找到了一面半石化的小型盾牌——邊緣已經灰化，但中央還算結實。', textEn: 'You find a half-petrified small shield — edges grey, but the center is solid.', delay: 2500 },
@@ -414,6 +479,33 @@ registerNode('r1_guard_fight', () => {
       gainXp(25);
       notify(L('力量 +2，經驗 +25', 'STR +2, XP +25'));
       autoExplore([
+        { art: `<pre class="ascii-art red">
+       ╱▔▔▔▔▔▔▔╲
+      │ ▓▓ ◈◈ ▓▓ │
+      │ ▓▓▓▓▓▓▓▓ │    ✦ 核心碎裂 ✦
+       ╲________╱
+    ▓▓▓▓│      │▓▓▓▓
+   ▓▓▓──┤  ↯↯  ├──▓▓▓
+  ▓▓▓╱  │      │  ╲▓▓▓
+       ╱╱╲    ╱╲╲
+      ╱╱  ╲  ╱  ╲╲
+     ▓▓   ▓▓▓▓   ▓▓
+  ═══════════════════════
+    石 脈 守 衛 · 已 擊 敗
+</pre>`, artEn: `<pre class="ascii-art red">
+       ╱▔▔▔▔▔▔▔╲
+      │ ▓▓ ◈◈ ▓▓ │
+      │ ▓▓▓▓▓▓▓▓ │    ✦ Core shattered ✦
+       ╲________╱
+    ▓▓▓▓│      │▓▓▓▓
+   ▓▓▓──┤  ↯↯  ├──▓▓▓
+  ▓▓▓╱  │      │  ╲▓▓▓
+       ╱╱╲    ╱╲╲
+      ╱╱  ╲  ╱  ╲╲
+     ▓▓   ▓▓▓▓   ▓▓
+  ═══════════════════════
+   Vein Guardian · Defeated
+</pre>`, delay: 800 },
         { tag: '勝利', tagColor: 'tag-explore', text: '守衛轟然倒地，石化碎片四散飛濺。', textEn: 'The guardian crashes to the ground, petrified fragments scattering.', delay: 2000 },
         { tag: '發現', tagColor: 'tag-item', html: '它胸口的核心碎裂了，露出裡面一塊<b>守衛核心石</b>。', htmlEn: 'Its chest core cracks open, revealing a <b>Guardian Core Stone</b>.', delay: 2200, effect: () => addItem(L('守衛核心石', 'Guardian Core Stone')) },
         { tag: '情報', tagColor: 'tag-info', text: '通往迴廊深處的道路打開了。', textEn: 'The path deeper into the corridor is now open.', delay: 1800 },
@@ -432,6 +524,33 @@ registerNode('r1_guard_fight', () => {
 registerNode('r1_guard_weak', () => {
   state.flags.r1GuardDefeated = true;
   autoExplore([
+    { art: `<pre class="ascii-art red">
+       ╱▔▔▔▔▔▔▔╲
+      │ ▓▓ ◈◈ ▓▓ │
+      │ ▓▓▓▓▓▓▓▓ │
+       ╲___╱╲___╱
+    ▓▓▓▓│  ✦✦  │▓▓▓▓   ← 核心弱點
+   ▓▓▓──┤ (◆◆) ├──▓▓▓
+  ▓▓▓╱  │      │  ╲▓▓▓
+       ╱ ╲    ╱ ╲
+      ╱   ╲  ╱   ╲
+     ▓▓▓  ▓▓▓▓  ▓▓▓
+  ═══════════════════════
+    石 脈 守 衛 · 弱 點
+</pre>`, artEn: `<pre class="ascii-art red">
+       ╱▔▔▔▔▔▔▔╲
+      │ ▓▓ ◈◈ ▓▓ │
+      │ ▓▓▓▓▓▓▓▓ │
+       ╲___╱╲___╱
+    ▓▓▓▓│  ✦✦  │▓▓▓▓   ← Core weak point
+   ▓▓▓──┤ (◆◆) ├──▓▓▓
+  ▓▓▓╱  │      │  ╲▓▓▓
+       ╱ ╲    ╱ ╲
+      ╱   ╲  ╱   ╲
+     ▓▓▓  ▓▓▓▓  ▓▓▓
+  ═══════════════════════
+   Vein Guardian · Weakness
+</pre>`, delay: 800 },
     { tag: '行動', tagColor: 'tag-combat', text: '你握緊鍛造鐵錘，瞄準守衛胸口的核心——', textEn: 'You grip the Forged Hammer, aiming for the core in the guardian\'s chest —', delay: 1800 },
     { tag: '戰鬥', tagColor: 'tag-combat', text: '你衝上前，在守衛揮拳之前，用盡全力砸向那顆發光的石頭！', textEn: 'You charge in and smash the glowing stone with all your might before it can swing!', delay: 2200 },
     { tag: '戰鬥', tagColor: 'tag-combat', text: '「喀啦——！」核心應聲碎裂！', textEn: '"CRACK—!" The core shatters!', delay: 1500 },
@@ -445,9 +564,31 @@ registerNode('r1_guard_weak', () => {
 
 registerNode('r1_guard_sneak', () => {
   var r = statCheck('agi', 10);
+  var sneakArt = { art: `<pre class="ascii-art">
+  ║░░░░░░░░░░░░░░░░░░░░░░░░░░░░║
+  ║    ╱▔▔▔▔▔▔▔╲               ║
+  ║   │ ▓▓◈◈▓▓  │    ·  ·  ·   ║
+  ║    ╲_______╱      · _o_ ·   ║
+  ║   ▓▓│    │▓▓    · ╱ │ ╲ ·  ║
+  ║  ▓▓─┤    ├─▓▓     · 你 ·   ║
+  ║     ╱╲  ╱╲           ↓      ║
+  ║    ▓▓  ▓▓  ▓▓   ─→ 陰影    ║
+  ║░░░░░░░░░░░░░░░░░░░░░░░░░░░░║
+</pre>`, artEn: `<pre class="ascii-art">
+  ║░░░░░░░░░░░░░░░░░░░░░░░░░░░░║
+  ║    ╱▔▔▔▔▔▔▔╲               ║
+  ║   │ ▓▓◈◈▓▓  │    ·  ·  ·   ║
+  ║    ╲_______╱      · _o_ ·   ║
+  ║   ▓▓│    │▓▓    · ╱ │ ╲ ·  ║
+  ║  ▓▓─┤    ├─▓▓     · You·   ║
+  ║     ╱╲  ╱╲           ↓      ║
+  ║    ▓▓  ▓▓  ▓▓   → Shadow   ║
+  ║░░░░░░░░░░░░░░░░░░░░░░░░░░░░║
+</pre>`, delay: 800 };
   if (r === 'crit') {
     state.flags.r1GuardDefeated = true;
     autoExplore([
+      sneakArt,
       { tag: '大成功', tagColor: 'tag-move', text: '你觀察守衛的巡邏路線——找到了完美的時機！', textEn: 'You study the guardian\'s patrol — and find the perfect moment!', delay: 2000 },
       { tag: '行動', tagColor: 'tag-move', text: '你如同一陣清風般無聲滑過，守衛完全沒有察覺。', textEn: 'You glide past like a breeze — the guardian notices nothing.', delay: 1800 },
       { tag: '成功', tagColor: 'tag-explore', text: '不僅毫髮無傷，你還順手從守衛身上掰下了一塊有用的礦石。', textEn: 'Not only unscathed, you even pry a useful mineral off the guardian.', delay: 2000, effect: () => { changeStat('agi', 1); gainXp(20); } },
@@ -457,6 +598,7 @@ registerNode('r1_guard_sneak', () => {
   } else if (r === 'pass') {
     state.flags.r1GuardDefeated = true;
     autoExplore([
+      sneakArt,
       { tag: '潛行', tagColor: 'tag-move', text: '你觀察守衛的巡邏路線——它的動作非常緩慢且有規律。', textEn: 'You study the guardian\'s patrol — its movements are extremely slow and predictable.', delay: 2000 },
       { tag: '行動', tagColor: 'tag-move', text: '在它轉身的瞬間，你閃身鑽進了旁邊的縫隙！', textEn: 'The moment it turns, you dart through the gap beside it!', delay: 1800 },
       { tag: '感知', tagColor: 'tag-sense', text: '肩膀擦過它石化的手臂——一陣刺痛傳來。', textEn: 'Your shoulder grazes its petrified arm — a sharp sting.', delay: 2000 },
@@ -468,6 +610,7 @@ registerNode('r1_guard_sneak', () => {
     changePetri(4);
     changeHp(-6);
     autoExplore([
+      sneakArt,
       { tag: '潛行', tagColor: 'tag-move', text: '你嘗試從縫隙溜過去……', textEn: 'You try to slip through the gap...', delay: 1500 },
       { tag: '失敗', tagColor: 'tag-warn', text: '守衛突然轉身——巨大的石拳朝你揮來！', textEn: 'The guardian suddenly turns — a massive stone fist swings at you!', delay: 1800 },
       { tag: '傷害', tagColor: 'tag-warn', text: '你勉強閃過致命一擊，但被擦到了肩膀。', textEn: 'You barely dodge the lethal blow, but it clips your shoulder.', delay: 2000 },
@@ -484,6 +627,33 @@ registerNode('r1_deep', () => {
   var firstVisit = !state.flags.r1DeepVisited;
   state.flags.r1DeepVisited = true;
   var steps = [];
+  steps.push({ art: `<pre class="ascii-art blue">
+  ═══╦═══════════════════════════╦═══
+  ░░░║  .:*~*:.      .:*~*:.    ║░░░
+  ░░░║ *~*~*~*~*    *~*~*~*~*   ║░░░
+  ░░░║  .:*~*:.      .:*~*:.    ║░░░
+  ░░░║                           ║░░░
+  ░░░║    ══════╤══════          ║░░░
+  ░░░║          │  ╱▔▔▔▔╲       ║░░░
+  ░░░║    ──────┤  │ 大門 │      ║░░░
+  ░░░║    宿舍  │  ╲____╱       ║░░░
+  ░░░║          │                ║░░░
+  ═══╩══════════╧════════════════╩═══
+        迴 廊 深 處 · 分 叉 路
+</pre>`, artEn: `<pre class="ascii-art blue">
+  ═══╦═══════════════════════════╦═══
+  ░░░║  .:*~*:.      .:*~*:.    ║░░░
+  ░░░║ *~*~*~*~*    *~*~*~*~*   ║░░░
+  ░░░║  .:*~*:.      .:*~*:.    ║░░░
+  ░░░║                           ║░░░
+  ░░░║    ══════╤══════          ║░░░
+  ░░░║          │  ╱▔▔▔▔╲       ║░░░
+  ░░░║    ──────┤  │ Gate │      ║░░░
+  ░░░║  Quarters│  ╲____╱       ║░░░
+  ░░░║          │                ║░░░
+  ═══╩══════════╧════════════════╩═══
+      Deep Corridor · The Fork
+</pre>`, delay: 800 });
   if (firstVisit) {
     steps.push({ tag: '移動', tagColor: 'tag-move', text: '你沿著鐵軌深入迴廊。', textEn: 'You follow the rails deeper into the corridor.', delay: 2000 });
     steps.push({ tag: '感知', tagColor: 'tag-sense', text: '這一段的礦脈更加粗大，藍色冷光照亮了整條走廊。', textEn: 'The ore veins here are thicker, blue light illuminating the entire corridor.', delay: 2500 });
@@ -702,6 +872,27 @@ registerNode('r1_survivor_bread', () => {
   state.flags.r1SurvivorFed = true;
   removeItem(L('黑麵包', 'Black Bread'));
   autoExplore([
+    { art: `<pre class="ascii-art">
+        ╱▔▔▔▔▔╲
+       │ ─   ─ │
+       │  ╲_╱  │
+        ╲_____╱
+   ░░░░░░│   │░░░░░░
+  ░░░░░──┤   ├──░░░░░
+ ░░░░░╱  │   │  ╲░░░░░
+       ══╧═══╧══
+    老 周 · 倖 存 者
+</pre>`, artEn: `<pre class="ascii-art">
+        ╱▔▔▔▔▔╲
+       │ ─   ─ │
+       │  ╲_╱  │
+        ╲_____╱
+   ░░░░░░│   │░░░░░░
+  ░░░░░──┤   ├──░░░░░
+ ░░░░░╱  │   │  ╲░░░░░
+       ══╧═══╧══
+  Old Zhou · Survivor
+</pre>`, delay: 800 },
     { tag: '行動', tagColor: 'tag-move', text: '你從包裡掏出那塊乾硬的黑麵包，遞了過去。', textEn: 'You pull out the stale black bread and offer it to him.', delay: 1800 },
     { tag: '感知', tagColor: 'tag-sense', text: '老周愣了一下——然後他的眼眶紅了。', textEn: 'Old Zhou freezes — then his eyes redden.', delay: 2500 },
     { tag: '情報', tagColor: 'tag-info', text: '「多久了……多久沒吃過正經東西了……」他接過麵包，手在發抖。', textEn: '"How long... how long since I\'ve had real food..." He takes the bread with trembling hands.', delay: 3000 },
@@ -716,6 +907,27 @@ registerNode('r1_survivor_bread', () => {
 
 registerNode('r1_survivor_reward', () => {
   autoExplore([
+    { art: `<pre class="ascii-art">
+        ╱▔▔▔▔▔╲
+       │ ─   ─ │
+       │  ╲_╱  │
+        ╲_____╱
+   ░░░░░░│   │░░░░░░
+  ░░░░░──┤   ├──░░░░░
+ ░░░░░╱  │   │  ╲░░░░░
+       ══╧═══╧══
+    老 周 · 倖 存 者
+</pre>`, artEn: `<pre class="ascii-art">
+        ╱▔▔▔▔▔╲
+       │ ─   ─ │
+       │  ╲_╱  │
+        ╲_____╱
+   ░░░░░░│   │░░░░░░
+  ░░░░░──┤   ├──░░░░░
+ ░░░░░╱  │   │  ╲░░░░░
+       ══╧═══╧══
+  Old Zhou · Survivor
+</pre>`, delay: 800 },
     { tag: '情報', tagColor: 'tag-info', text: '老周從床墊底下摸出一個油紙包。', textEn: 'Old Zhou pulls an oilskin pouch from under the mattress.', delay: 1800 },
     { tag: '物品', tagColor: 'tag-item', html: '裡面是一塊包裹完好的<b>礦工口糧</b>——壓縮的堅果和蜂蜜混合物。', htmlEn: 'Inside — a well-preserved <b>Miner\'s Ration</b>, compressed nuts and honey.', delay: 2200, effect: () => addItem(L('礦工口糧', 'Miner\'s Ration')) },
     { tag: '情報', tagColor: 'tag-info', text: '「這是我最後的存糧。你比我更需要它——你還有路要走。」', textEn: '"My last supplies. You need it more than I do — you still have a road ahead."', delay: 2800 },
@@ -737,6 +949,27 @@ registerNode('r1_survivor_reward', () => {
 
 registerNode('r1_survivor_info', () => {
   autoExplore([
+    { art: `<pre class="ascii-art">
+        ╱▔▔▔▔▔╲
+       │ ─   ─ │
+       │  ╲_╱  │
+        ╲_____╱
+   ░░░░░░│   │░░░░░░
+  ░░░░░──┤   ├──░░░░░
+ ░░░░░╱  │   │  ╲░░░░░
+       ══╧═══╧══
+    老 周 · 倖 存 者
+</pre>`, artEn: `<pre class="ascii-art">
+        ╱▔▔▔▔▔╲
+       │ ─   ─ │
+       │  ╲_╱  │
+        ╲_____╱
+   ░░░░░░│   │░░░░░░
+  ░░░░░──┤   ├──░░░░░
+ ░░░░░╱  │   │  ╲░░░░░
+       ══╧═══╧══
+  Old Zhou · Survivor
+</pre>`, delay: 800 },
     { tag: '情報', tagColor: 'tag-info', text: '老周警惕地看著你，但還是開口了。', textEn: 'Old Zhou watches you warily, but speaks.', delay: 1800 },
     { tag: '情報', tagColor: 'tag-info', text: '「迴廊裡的守衛……那東西以前是人。是監工 K 造出來的戰爭機械。」', textEn: '"The guardian in the corridor... that thing used to be human. A war machine built by Overseer K."', delay: 2800 },
     { tag: '情報', tagColor: 'tag-info', text: '「石化瘟疫爆發後，它也被感染了。但和其他人不同——它沒有停下來，反而更兇猛了。」', textEn: '"After the plague hit, it got infected too. But unlike the others — it didn\'t stop. It got fiercer."', delay: 3000 },
@@ -770,6 +1003,27 @@ registerNode('r1_survivor_talk', () => {
   var helped = state.flags.r1SurvivorHelped;
   var trust = fed || helped || state.flags.r1SurvivorFullTrust;
   var steps = [];
+  steps.push({ art: `<pre class="ascii-art">
+        ╱▔▔▔▔▔╲
+       │ ─   ─ │
+       │  ╲_╱  │
+        ╲_____╱
+   ░░░░░░│   │░░░░░░
+  ░░░░░──┤   ├──░░░░░
+ ░░░░░╱  │   │  ╲░░░░░
+       ══╧═══╧══
+    老 周 · 倖 存 者
+</pre>`, artEn: `<pre class="ascii-art">
+        ╱▔▔▔▔▔╲
+       │ ─   ─ │
+       │  ╲_╱  │
+        ╲_____╱
+   ░░░░░░│   │░░░░░░
+  ░░░░░──┤   ├──░░░░░
+ ░░░░░╱  │   │  ╲░░░░░
+       ══╧═══╧══
+  Old Zhou · Survivor
+</pre>`, delay: 800 });
   if (trust) {
     steps.push({ tag: '遭遇', tagColor: 'tag-explore', text: '老周看到你回來，露出了笑容。', textEn: 'Old Zhou sees you return and smiles.', delay: 1500 });
     if (fed && !state.flags.r1ZhouToldHotSpring) {
@@ -874,6 +1128,31 @@ registerNode('r1_wanderer', () => {
 
 registerNode('r1_wanderer_lore', () => {
   autoExplore([
+    { art: `<pre class="ascii-art gold">
+       ╱▔▔▔▔╲
+      │ ─  ─ │  ⌒
+      │  △   │╱
+       ╲___╱╱
+      ╱│   │╲   ╭──╮
+     ╱ │   │ ╲  │囊│
+    ╱  │   │  ╲ ╰┬─╯
+       │   │   ╲ │
+      ╱ ╲ ╱ ╲  ╲╯
+      ═══════════
+    灰 鶴 · 流 浪 者
+</pre>`, artEn: `<pre class="ascii-art gold">
+       ╱▔▔▔▔╲
+      │ ─  ─ │  ⌒
+      │  △   │╱
+       ╲___╱╱
+      ╱│   │╲   ╭──╮
+     ╱ │   │ ╲  │Pack│
+    ╱  │   │  ╲ ╰┬─╯
+       │   │   ╲ │
+      ╱ ╲ ╱ ╲  ╲╯
+      ═══════════
+  Grey Crane · Wanderer
+</pre>`, delay: 800 },
     { tag: '情報', tagColor: 'tag-info', text: '灰鶴的笑容消失了。她沉默了一會兒。', textEn: 'Grey Crane\'s smile fades. She\'s silent for a moment.', delay: 2200 },
     { tag: '情報', tagColor: 'tag-info', text: '「……因為我見過上一個。」', textEn: '"...because I saw the last one."', delay: 2500 },
     { tag: '情報', tagColor: 'tag-info', text: '「十年前。長老們抓了一個女孩，說她的血能平息瘟疫。他們把她浸入熱泉。」', textEn: '"Ten years ago. The elders took a girl, said her blood could quell the plague. They submerged her in the hot spring."', delay: 3200 },
@@ -908,6 +1187,31 @@ registerNode('r1_wanderer_trade', () => {
   var hasScale = hasItem(L('蜥蜴鱗片', 'Lizard Scale'));
   var hasPureCrystal = hasItem(L('純淨石化結晶', 'Pure Petri Crystal'));
   autoExplore([
+    { art: `<pre class="ascii-art gold">
+       ╱▔▔▔▔╲
+      │ ─  ─ │  ⌒
+      │  △   │╱
+       ╲___╱╱
+      ╱│   │╲   ╭──╮
+     ╱ │   │ ╲  │囊│
+    ╱  │   │  ╲ ╰┬─╯
+       │   │   ╲ │
+      ╱ ╲ ╱ ╲  ╲╯
+      ═══════════
+    灰 鶴 · 流 浪 者
+</pre>`, artEn: `<pre class="ascii-art gold">
+       ╱▔▔▔▔╲
+      │ ─  ─ │  ⌒
+      │  △   │╱
+       ╲___╱╱
+      ╱│   │╲   ╭──╮
+     ╱ │   │ ╲  │Pack│
+    ╱  │   │  ╲ ╰┬─╯
+       │   │   ╲ │
+      ╱ ╲ ╱ ╲  ╲╯
+      ═══════════
+  Grey Crane · Wanderer
+</pre>`, delay: 800 },
     { tag: '情報', tagColor: 'tag-info', text: '灰鶴解開行囊，裡面裝滿了各種從礦道中搜刮來的物資。', textEn: 'Grey Crane opens her pack, filled with scavenged supplies from the mines.', delay: 2000 },
     { tag: '感知', tagColor: 'tag-sense', text: '「我不收錢——這裡的錢幣除了扔人以外沒什麼用處。」', textEn: '"I don\'t take coins — money\'s only good for throwing at people down here."', delay: 2200 },
     { tag: '情報', tagColor: 'tag-info', text: '「但如果你有食物或者稀有材料，我們可以交換。」', textEn: '"But if you have food or rare materials, we can trade."', delay: 2000 },
@@ -1165,6 +1469,31 @@ registerNode('r1_ying_share', () => {
   var yingPronoun = isMale ? L('她', 'she') : L('他', 'he');
   var yingPronounCap = isMale ? 'She' : 'He';
   autoExplore([
+    { art: `<pre class="ascii-art cyan">
+        ╱▔▔▔▔▔╲
+       │ °   ° │
+       │  ‿‿‿  │
+        ╲_____╱
+     ─────┤ ├─────
+    ╱     │ │     ╲  ╭──╮
+   ╱      │ │      ╲ │冊│
+          │ │       ╰┬─╯
+         ╱   ╲       │
+        ═══════
+       螢  ·  記錄員
+</pre>`, artEn: `<pre class="ascii-art cyan">
+        ╱▔▔▔▔▔╲
+       │ °   ° │
+       │  ‿‿‿  │
+        ╲_____╱
+     ─────┤ ├─────
+    ╱     │ │     ╲  ╭──╮
+   ╱      │ │      ╲ │冊│
+          │ │       ╰┬─╯
+         ╱   ╲       │
+        ═══════
+     Ying · Chronicler
+</pre>`, delay: 800 },
     { tag: '情報', tagColor: 'tag-info', text: '螢在洞室的地面上攤開手冊。你湊近一看——上面密密麻麻寫滿了文字和圖表。', textEn: 'Ying spreads the notebook on the chamber floor. You lean in — it\'s packed with text and diagrams.', delay: 2800 },
     { tag: '感知', tagColor: 'tag-sense', text: '你們的距離很近。你能聞到' + yingPronoun + '身上的墨水味，混著礦石的冷冽氣息。', textEn: 'You\'re very close. You catch the scent of ink on ' + (isMale ? 'her' : 'him') + ', mingled with the crisp smell of mineral stone.', delay: 2800 },
     { tag: '情報', tagColor: 'tag-info', html: '螢指著一段文字：「<b>石化瘟疫最早的記錄可以追溯到三百年前。</b>但那時它只是一種稀有的「石骨病」，只影響極少數人。」', htmlEn: 'Ying points to a passage: "<b>The earliest plague records date back three hundred years.</b> But then it was just a rare \'Stone-Bone Disease,\' affecting very few."', delay: 3500 },
@@ -1208,6 +1537,31 @@ registerNode('r1_ying_talk', () => {
   var companion = state.flags.r1YingCompanion;
 
   var steps = [];
+  steps.push({ art: `<pre class="ascii-art cyan">
+        ╱▔▔▔▔▔╲
+       │ °   ° │
+       │  ‿‿‿  │
+        ╲_____╱
+     ─────┤ ├─────
+    ╱     │ │     ╲  ╭──╮
+   ╱      │ │      ╲ │冊│
+          │ │       ╰┬─╯
+         ╱   ╲       │
+        ═══════
+       螢  ·  記錄員
+</pre>`, artEn: `<pre class="ascii-art cyan">
+        ╱▔▔▔▔▔╲
+       │ °   ° │
+       │  ‿‿‿  │
+        ╲_____╱
+     ─────┤ ├─────
+    ╱     │ │     ╲  ╭──╮
+   ╱      │ │      ╲ │冊│
+          │ │       ╰┬─╯
+         ╱   ╲       │
+        ═══════
+     Ying · Chronicler
+</pre>`, delay: 800 });
   steps.push({ tag: '移動', tagColor: 'tag-move', text: '你走進螢藏身的窄隧道。', textEn: 'You enter the narrow tunnel where Ying hides.', delay: 1500 });
 
   if (companion) {
@@ -1267,6 +1621,31 @@ registerNode('r1_ying_herb', () => {
   state.flags.r1YingHerb = true;
   removeItem(L('乾燥草藥', 'Dried Herbs'));
   autoExplore([
+    { art: `<pre class="ascii-art cyan">
+        ╱▔▔▔▔▔╲
+       │ °   ° │
+       │  ‿‿‿  │
+        ╲_____╱
+     ─────┤ ├─────
+    ╱     │ │     ╲  ╭──╮
+   ╱      │ │      ╲ │冊│
+          │ │       ╰┬─╯
+         ╱   ╲       │
+        ═══════
+       螢  ·  記錄員
+</pre>`, artEn: `<pre class="ascii-art cyan">
+        ╱▔▔▔▔▔╲
+       │ °   ° │
+       │  ‿‿‿  │
+        ╲_____╱
+     ─────┤ ├─────
+    ╱     │ │     ╲  ╭──╮
+   ╱      │ │      ╲ │冊│
+          │ │       ╰┬─╯
+         ╱   ╲       │
+        ═══════
+     Ying · Chronicler
+</pre>`, delay: 800 },
     { tag: '行動', tagColor: 'tag-move', text: '「讓我看看。」你拿出乾燥草藥，走到螢身邊。', textEn: '"Let me see." You take out the dried herbs and step closer to Ying.', delay: 2000 },
     { tag: '感知', tagColor: 'tag-sense', text: '螢下意識地退了一步，但隧道很窄——' + yingPronoun + '的後背貼上了岩壁。', textEn: 'Ying instinctively steps back, but the tunnel is narrow — ' + (isMale ? 'her' : 'his') + ' back presses against the rock wall.', delay: 2800 },
     { tag: '情報', tagColor: 'tag-info', text: '「你脖子後面有一塊石化紋路在擴散。讓我處理一下。」', textEn: '"There\'s a petrification pattern spreading behind your neck. Let me treat it."', delay: 2500 },
@@ -1299,9 +1678,36 @@ registerNode('r1_ying_chat', () => {
   var yingPronoun = isMale ? L('她', 'she') : L('他', 'he');
   var yingPronounCap = isMale ? 'She' : 'He';
 
+  var yingArt = { art: `<pre class="ascii-art cyan">
+        ╱▔▔▔▔▔╲
+       │ °   ° │
+       │  ‿‿‿  │
+        ╲_____╱
+     ─────┤ ├─────
+    ╱     │ │     ╲  ╭──╮
+   ╱      │ │      ╲ │冊│
+          │ │       ╰┬─╯
+         ╱   ╲       │
+        ═══════
+       螢  ·  記錄員
+</pre>`, artEn: `<pre class="ascii-art cyan">
+        ╱▔▔▔▔▔╲
+       │ °   ° │
+       │  ‿‿‿  │
+        ╲_____╱
+     ─────┤ ├─────
+    ╱     │ │     ╲  ╭──╮
+   ╱      │ │      ╲ │冊│
+          │ │       ╰┬─╯
+         ╱   ╲       │
+        ═══════
+     Ying · Chronicler
+</pre>`, delay: 800 };
+
   if (state.flags.r1YingChat2) {
     // Third+ chat: comfortable silence
     autoExplore([
+      yingArt,
       { tag: '感知', tagColor: 'tag-sense', text: '你坐在螢旁邊。' + yingPronoun + '在寫字，你在休息。', textEn: 'You sit beside Ying. ' + yingPronounCap + ' writes, you rest.', delay: 2000 },
       { tag: '環境', tagColor: 'tag-system', text: '筆尖的沙沙聲在安靜的隧道裡意外地令人安心。', textEn: 'The scratching of pen on paper is unexpectedly comforting in the quiet tunnel.', delay: 2500 },
       { tag: '感知', tagColor: 'tag-sense', text: '螢忽然停筆，歪頭看了你一眼。', textEn: 'Ying suddenly stops writing and glances at you sideways.', delay: 2200 },
@@ -1324,6 +1730,7 @@ registerNode('r1_ying_chat', () => {
     // Second chat
     state.flags.r1YingChat2 = true;
     autoExplore([
+      yingArt,
       { tag: '情報', tagColor: 'tag-info', text: '「你以前……在地表崩潰之前是做什麼的？」螢問你。', textEn: '"Before... before the surface collapsed, what did you do?" Ying asks.', delay: 2500 },
       { tag: '記憶', tagColor: 'tag-system', text: '你努力回想。但那些記憶模糊得像隔著一層灰色的霧。', textEn: 'You try to remember. But those memories are hazy, like looking through a grey fog.', delay: 2500 },
       { tag: '情報', tagColor: 'tag-info', text: '「記不起來也沒關係。」螢看出了你的困惑。', textEn: '"It\'s okay if you can\'t remember." Ying sees your confusion.', delay: 2200 },
@@ -1343,6 +1750,7 @@ registerNode('r1_ying_chat', () => {
     // First chat
     state.flags.r1YingChat1 = true;
     autoExplore([
+      yingArt,
       { tag: '情報', tagColor: 'tag-info', text: '「螢——這個名字是誰取的？」', textEn: '"Ying — who gave you that name?"', delay: 2000 },
       { tag: '情報', tagColor: 'tag-info', text: '螢停下了筆，想了想。', textEn: 'Ying stops writing and thinks.', delay: 2000 },
       { tag: '情報', tagColor: 'tag-info', text: '「我師父。記錄院的老院長。他說——」', textEn: '"My mentor. The old head of the Chronicle Hall. He said —"', delay: 2500 },
