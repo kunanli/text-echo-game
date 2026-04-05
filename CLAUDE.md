@@ -75,6 +75,175 @@ assets/
 - [ ] 語音旁白：尋找更好的 TTS 方案（Fish Audio / ElevenLabs / Kokoro）替換 Web Speech API
 - [ ] `voice.js` 保留完整 API 介面（speak/cancel/toggle 等），目前為 no-op，方便未來接入新 TTS
 
+## 劇情節點索引（Story Node Index）
+
+全遊戲共約 90+ 個劇情節點，分佈在 4 個區域 + 1 條隱藏路線。
+修改劇情時請參照此索引定位節點，並維持節點 ID 命名慣例 `r{region}_{描述}`。
+
+### 整體流程
+
+```
+R0 祭獻坑 → R1 石脈迴廊 → R2 大採石場 → R3 河城渡口 → 4 結局
+     ↓ (隱藏路線，需破關 1 次)
+  冥河渡江人 → 深淵更深處（待開發）
+```
+
+### R0 — 祭獻坑（教學區）`region0.js`
+
+| 節點 ID | 類型 | 說明 | NPC / Boss |
+|---------|------|------|-----------|
+| `r0_start` | 開場 | 玩家甦醒，發現石化感染，揭示「大上升」目標 | — |
+| `r0_body` | 線性 | 檢查身體，了解石化程度（+AGI 或 +WIL） | — |
+| `r0_look` | **中樞** | 觀察環境，分歧至屍體/石像/攀爬/裂縫/冥河入口 | — |
+| `r0_patrol` | 戰鬥 | 坑底巡邏練等 | R0 怪物池 |
+| `r0_corpse` | 探索 | 搜索半石化屍體，獲得碎石匕首 | — |
+| `r0_statues` | 探索 | 調查石化人形群，獲得黑麵包 | — |
+| `r0_whisper` | 探索 | 石像間的神祕低語 | — |
+| `r0_ritual` | 探索 | 古老祭獻儀式現場 | — |
+| `r0_hidden` | 物品 | 隱藏物資緩存 | — |
+| `r0_rest` | 休息 | 靠牆休息 + 記憶閃回 | — |
+| `r0_crack` | 分歧 | 南面裂縫（通往水源 / 石化水瓶） | — |
+| `r0_climb_check` | 分歧 | 決定攀爬方式（STR / AGI / 替代） | — |
+| `r0_climb_str` | 檢定 | 力量攀爬（STR 檢定） | — |
+| `r0_climb_alt` | 替代 | 微光石照明繞路 | — |
+| `r0_tunnel` | **Boss** | 對抗石化蜥蜴 | 石化蜥蜴 |
+| `r0_after_lizard` | 過渡 | 擊敗蜥蜴後，發現通往 R1 的石門 | — |
+| `r0_path` | 捷徑 | 直接尋找出路（跳過探索） | — |
+
+**隱藏路線 — 冥河渡江人（需破關 ≥1 次）：**
+
+| 節點 ID | 類型 | 說明 | NPC |
+|---------|------|------|-----|
+| `r0_ferryman_gate` | 門檻 | 發現冥河入口，未破關者被擋住 | — |
+| `r0_ferryman_meet` | NPC | 遇見渡江人，判斷玩家是否夠強（屬性≥25, Lv≥5） | 冥河渡江人 |
+| `r0_ferryman_lore` | 對話 | 渡江人講述冥河與石化瘟疫起源 | 冥河渡江人 |
+| `r0_ferryman_challenge` | 檢定 | WIL DC10 試煉「深淵的凝視」 | 冥河渡江人 |
+| `r0_ferryman_fail` | 失敗 | 試煉失敗，石化度+8%、HP-15 | 冥河渡江人 |
+| `r0_ferryman_descent` | 成功 | 登船渡河（flag: `ferrymanPassed`），敬請期待 | 冥河渡江人 |
+
+### R1 — 石脈迴廊 `region1.js`
+
+| 節點 ID | 類型 | 說明 | NPC / Boss |
+|---------|------|------|-----------|
+| `r1_start` | 開場 | 進入廢棄礦坑 | — |
+| `r1_look` | **中樞** | 四向分歧：北(鍛造)、東(守衛)、西(礦脈)、南(返回) | — |
+| `r1_forge` | 探索 | 廢棄鍛造間，獲得鍛造鐵錘 | — |
+| `r1_furnace` | 製造 | 使用熔爐製作抗石化護符 | — |
+| `r1_forge_search` | 物品 | 搜索鍛造間角落 | — |
+| `r1_crystal` | 探索 | 西面結晶礦脈 | — |
+| `r1_crystal_items` | 物品 | 取出嵌在結晶中的物品 | — |
+| `r1_guard_check` | 過渡 | 前往東面走廊 | — |
+| `r1_guard_fight` | **Boss** | 對抗石脈守衛 | 石脈守衛 |
+| `r1_guard_weak` | 勝利 | 擊敗守衛，獲得守衛核心石 | — |
+| `r1_guard_sneak` | 檢定 | 潛行繞過守衛（AGI 檢定） | — |
+| `r1_deep` | 探索 | 沿鐵軌深入迴廊 | — |
+| `r1_quarters` | 探索 | 礦工宿舍生活遺跡 | — |
+| `r1_rest` | 休息 | 宿舍內休息恢復 | — |
+| `r1_survivor` | NPC | 遇見倖存礦工老周 | 老周 |
+| `r1_survivor_bread` | 關係 | 給老周黑麵包 | 老周 |
+| `r1_survivor_reward` | 獎勵 | 老周回報獎勵 | 老周 |
+| `r1_survivor_info` | 情報 | 老周提供地底資訊 | 老周 |
+| `r1_survivor_talk` | 對話 | 多次拜訪老周的對話分支 | 老周 |
+| `r1_wanderer` | NPC | 遇見流浪商人灰鶴（首次登場） | 灰鶴 |
+| `r1_wanderer_lore` | 劇情 | 灰鶴講述古代地底文明 | 灰鶴 |
+| `r1_wanderer_trade` | 交易 | 與灰鶴以物易物 | 灰鶴 |
+| `r1_ying_encounter` | NPC | 追趕身影，遇見記錄員螢（首次登場） | 螢 |
+| `r1_ying_truth` | 關係 | 告訴螢自己是爐灶少女 | 螢 |
+| `r1_ying_alone` | 關係 | 問螢為何獨行 | 螢 |
+| `r1_ying_silent` | 關係 | 保持沉默的回應 | 螢 |
+| `r1_ying_share` | 關係 | 分享目標（flag: `r1YingCompanion`） | 螢 |
+| `r1_ying_talk` | 對話 | 多次對話分支 | 螢 |
+| `r1_ying_herb` | 浪漫 | 一起採集草藥 | 螢 |
+| `r1_ying_chat` | 關係 | 輕鬆聊天加深羈絆 | 螢 |
+| `r1_gate` | 門檻 | 通往 R2 的大門（需守衛核心石） | — |
+| `r1_gate_open` | 過渡 | 開門進入 R2 | — |
+| `r1_patrol` | 戰鬥 | 迴廊巡邏練等 | R1 怪物池 |
+
+### R2 — 大採石場 `region2.js`
+
+| 節點 ID | 類型 | 說明 | NPC / Boss |
+|---------|------|------|-----------|
+| `r2_start` | 開場 | 進入巨大採石場 | — |
+| `r2_look` | **中樞** | 俯瞰全景，螢若同行則在此抵達 | (螢) |
+| `r2_quarry_floor` | 探索 | 採石台區域 | — |
+| `r2_crystal_harvest` | 採集 | 採集高品質結晶（STR 檢定） | — |
+| `r2_crystal_deep` | 後果 | 過度採集導致石化加劇 | — |
+| `r2_machine` | 探索 | 調查石化戰爭機械 + 工程師筆記 | — |
+| `r2_machine_activate` | 解謎 | 啟動機械核心，獲得機甲控制鍵 | — |
+| `r2_bridge` | 解謎 | 通往營地的斷橋（3 種解法） | — |
+| `r2_bridge_fix` | 解法 | 用繩索修橋 | — |
+| `r2_bridge_swing` | 檢定 | 盪過斷橋（AGI） | — |
+| `r2_bridge_jump` | 檢定 | 跳過斷橋（STR） | — |
+| `r2_camp` | 據點 | 倖存者營地（flag: `r2CampVisited`） | 多 NPC |
+| `r2_camp_chief` | NPC | 營地首領——鐵霜 | 鐵霜 |
+| `r2_camp_smith` | NPC | 鐵匠老鑄——修補護甲 | 老鑄 |
+| `r2_camp_medic` | NPC | 醫師清露——治療 + 復活石 + 淨化液 | 清露 |
+| `r2_rest` | 休息 | 營火旁休息 + 記憶場景 | — |
+| `r2_boss_prep` | 準備 | Boss 前準備（螢送行） | (螢) |
+| `r2_boss` | **Boss** | 對抗石化巨像 | 石化巨像 |
+| `r2_gate` | 過渡 | 通往 R3 的上升通道 | — |
+| `r2_ying_talk` | 對話 | 與螢的 R2 對話分支 | 螢 |
+| `r2_ying_seal` | 劇情 | 螢講述封印石室 | 螢 |
+| `r2_ying_night` | 浪漫 | 營火邊的夜間場景 | 螢 |
+| `r2_ying_promise` | 浪漫 | Boss 前的承諾 | 螢 |
+| `r2_crane` | NPC | 灰鶴再登場——交易 + 吹牛骰 | 灰鶴 |
+| `r2_zhou_trace` | 線索 | 發現老周蹤跡 | — |
+| `r2_patrol` | 戰鬥 | 採石場巡邏練等 | R2 怪物池 |
+
+### R3 — 河城渡口（含 4 結局）`region3.js`
+
+| 節點 ID | 類型 | 說明 | NPC / Boss |
+|---------|------|------|-----------|
+| `r3_start` | 開場 | 抵達地底城市，通過碼頭哨兵 | 哨兵 |
+| `r3_look` | **中樞** | 三大區域分歧：碼頭 / 市場 / 議會廳 | — |
+| `r3_dock` | 探索 | 碼頭——與水手、商人互動 | — |
+| `r3_market` | 探索 | 市場——購物 + 收集情報 | — |
+| `r3_council` | 據點 | 議會廳——守衛 + 進入銅鐘辦公室 | 守衛 |
+| `r3_inn` | 休息 | 河畔客棧——休息 + 存檔點 | — |
+| `r3_bell` | **NPC** | 銅鐘（首次見面 / 回報） | 銅鐘 |
+| `r3_ying_talk` | 對話 | 螢的 R3 對話分支 | 螢 |
+| `r3_ying_inn` | 浪漫 | 客棧晚宴——重要情節節點 | 螢 |
+| `r3_zhou` | NPC | 老周再會 | 老周 |
+| `r3_crane` | NPC | 灰鶴的 R3 登場——取得證詞 + 吹牛骰 | 灰鶴 |
+| `r3_quest_check` | 任務 | 回報銅鐘——檢查 3 個任務完成度 | 銅鐘 |
+| `r3_boss_prep` | 準備 | 最終 Boss 準備（3 種策略） | — |
+| `r3_boss` | **Boss** | 3 種方式：潛行 / 戰鬥 / 說服 | 鏽刃 |
+| `r3_testimony` | 劇情 | 玩家在議會前作證 | 議會 5 人 |
+| `r3_vote` | **分歧** | 議會投票——根據 score 決定結局 | 議會 |
+| `r3_ending_dawn` | 結局A | 🌅 黎明——最佳結局（score≥12 + 瘟疫證據） | — |
+| `r3_ending_compromise` | 結局B | 🤝 妥協——中立結局（score≥8） | — |
+| `r3_ending_lockdown` | 結局C | 🔒 封鎖——壞結局（score<8） | — |
+| `r3_ending_sacrifice` | 結局D | 💀 犧牲——石化結局（高石化度 + 瘟疫證據） | — |
+| `r3_epilogue` | 尾聲 | 根據結局 + NPC 關係展示不同尾聲 | 全 NPC |
+| `r3_patrol` | 戰鬥 | 渡口巡邏練等 | R3 怪物池 |
+
+### NPC 角色索引
+
+| 角色 | 性別 | 首次登場 | 出現區域 | 好感度等級 | 關鍵 flags |
+|------|------|---------|---------|-----------|-----------|
+| 螢 Ying | 配合主角 | R1 `r1_ying_encounter` | R1→R2→R3 | 5 | `r1YingCompanion`, `r2YingPromise` |
+| 老周 Old Zhou | 男 | R1 `r1_survivor` | R1→R3 | 3 | `r1SurvivorMet`, `r3ZhouMet` |
+| 灰鶴 Grey Crane | **女** | R1 `r1_wanderer` | R1→R2→R3 | 5 | `r1WandererMet`, `r2CraneMet`, `r3CraneTestimony` |
+| 鐵霜 Iron Frost | 女 | R2 `r2_camp_chief` | R2 | 3 | `r2CampVisited` |
+| 老鑄 Old Cast | 男 | R2 `r2_camp_smith` | R2 | 3 | `r2SmithVisited` |
+| 清露 Dew | 女 | R2 `r2_camp_medic` | R2 | 3 | `r2MedicHealed`, `r2MedicElixir` |
+| 銅鐘 Bronze Bell | 女 | R3 `r3_bell` | R3 | 3 | `r3BellMet`, `r3BellAlliance`, `r3BellQuest` |
+| 冥河渡江人 Ferryman | 男 | R0 `r0_ferryman_meet` | R0(隱藏) | — | `ferrymanPassed` |
+
+### 結局 score 計算（`r3_vote` 節點）
+
+```
+var score = 0;
+if (state.level >= 5)             score += 2;  // 等級夠高
+if (state.flags.r3CraneTestimony) score += 2;  // 灰鶴作證
+if (state.flags.r1YingCompanion)  score += 1;  // 螢同行
+if (state.flags.r3BossMethod === 'sneak') score += 1; // 潛行過 Boss
+if (hasItem("Ying's Charm"))      score += 1;  // 持有螢的護身符
+if (state.flags.r3ZhouMet)        score += 1;  // 與老周重逢
+if (state.flags.r3PlagueProof)    score += 3;  // 瘟疫起源證據（關鍵）
+// 結局判定：≥12+proof→黎明  ≥8→妥協  <8→封鎖  高石化+proof→犧牲
+```
+
 ## ✅ 已完成：結局卡片重製 v1.1（endcard.js）
 
 身分牌風格收藏卡片，450×740 canvas。
