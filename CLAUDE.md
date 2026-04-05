@@ -69,6 +69,11 @@ assets/
 - 玩家排行榜（Dreamlo API）：自動提交分數，首頁+結局可查看排名
 - 難度 v1.1：所有怪物攻擊/石化傷害 ×2，復活需消耗「復活石」道具（R0/R1/R2 各一顆）
 - Game Over 流程：占卜師 ASCII art 揭露 → 結局卡展示 → 排行榜
+- 「從頭開始」按鈕也會先顯示結局卡，再重置遊戲
+- 初始 HP 調整為 50（原為 100），提升難度
+- 性別適配稱號：男性角色為「爐灶少年」(Hearth-Youth)，女性為「爐灶少女」(Hearth-Maiden)
+- 螢（Ying）深度情感劇情線：R1 共眠、R2 噩夢安撫、R3 河邊月光（近告白）
+- 冥河渡江人（隱藏 Post-game 路線）：通關後解鎖，屬性 ≥ 25 + 等級 ≥ 5 + WIL 檢定 DC10
 - 已準備 itch.io 發布（DEV 工具已隱藏）
 
 ## 待辦 / 已知問題
@@ -120,7 +125,7 @@ R0 祭獻坑 → R1 石脈迴廊 → R2 大採石場 → R3 河城渡口 → 4 �
 | `r0_ferryman_lore` | 對話 | 渡江人講述冥河與石化瘟疫起源 | 冥河渡江人 |
 | `r0_ferryman_challenge` | 檢定 | WIL DC10 試煉「深淵的凝視」 | 冥河渡江人 |
 | `r0_ferryman_fail` | 失敗 | 試煉失敗，石化度+8%、HP-15 | 冥河渡江人 |
-| `r0_ferryman_descent` | 成功 | 登船渡河（flag: `ferrymanPassed`），敬請期待 | 冥河渡江人 |
+| `r0_ferryman_descent` | 成功 | 登船渡河（flag: `ferrymanPassed`，STR/AGI/WIL+1, HP+20, 石化-15%, 獲得深淵渡河令），敬請期待 | 冥河渡江人 |
 
 ### R1 — 石脈迴廊 `region1.js`
 
@@ -149,13 +154,14 @@ R0 祭獻坑 → R1 石脈迴廊 → R2 大採石場 → R3 河城渡口 → 4 �
 | `r1_wanderer_lore` | 劇情 | 灰鶴講述古代地底文明 | 灰鶴 |
 | `r1_wanderer_trade` | 交易 | 與灰鶴以物易物 | 灰鶴 |
 | `r1_ying_encounter` | NPC | 追趕身影，遇見記錄員螢（首次登場） | 螢 |
-| `r1_ying_truth` | 關係 | 告訴螢自己是爐灶少女 | 螢 |
+| `r1_ying_truth` | 關係 | 告訴螢自己是爐灶少年/少女（性別適配） | 螢 |
 | `r1_ying_alone` | 關係 | 問螢為何獨行 | 螢 |
 | `r1_ying_silent` | 關係 | 保持沉默的回應 | 螢 |
 | `r1_ying_share` | 關係 | 分享目標（flag: `r1YingCompanion`） | 螢 |
 | `r1_ying_talk` | 對話 | 多次對話分支 | 螢 |
 | `r1_ying_herb` | 浪漫 | 一起採集草藥 | 螢 |
 | `r1_ying_chat` | 關係 | 輕鬆聊天加深羈絆 | 螢 |
+| `r1_ying_warmth` | 浪漫 | 共眠取暖——螢靠在肩上入睡（HP+20, 石化-8%, WIL+1） | 螢 |
 | `r1_gate` | 門檻 | 通往 R2 的大門（需守衛核心石） | — |
 | `r1_gate_open` | 過渡 | 開門進入 R2 | — |
 | `r1_patrol` | 戰鬥 | 迴廊巡邏練等 | R1 怪物池 |
@@ -187,6 +193,7 @@ R0 祭獻坑 → R1 石脈迴廊 → R2 大採石場 → R3 河城渡口 → 4 �
 | `r2_ying_seal` | 劇情 | 螢講述封印石室 | 螢 |
 | `r2_ying_night` | 浪漫 | 營火邊的夜間場景 | 螢 |
 | `r2_ying_promise` | 浪漫 | Boss 前的承諾 | 螢 |
+| `r2_ying_nightmare` | 浪漫 | 螢的噩夢——安撫（抱緊/低語兩條分支，HP+25, 石化-10%, WIL+1） | 螢 |
 | `r2_crane` | NPC | 灰鶴再登場——交易 + 吹牛骰 | 灰鶴 |
 | `r2_zhou_trace` | 線索 | 發現老周蹤跡 | — |
 | `r2_ancient_tunnel` | **隱藏** | 古代科學密道（需饒恕 Boss + 承鋼通行碼），獲得瘟疫起源報告 | 承鋼 |
@@ -205,6 +212,7 @@ R0 祭獻坑 → R1 石脈迴廊 → R2 大採石場 → R3 河城渡口 → 4 �
 | `r3_bell` | **NPC** | 銅鐘（首次見面 / 回報） | 銅鐘 |
 | `r3_ying_talk` | 對話 | 螢的 R3 對話分支 | 螢 |
 | `r3_ying_inn` | 浪漫 | 客棧晚宴——重要情節節點 | 螢 |
+| `r3_ying_river` | 浪漫 | 河邊月光近告白——牽手/筆記本兩條分支（HP+30, 石化-12%, WIL+2） | 螢 |
 | `r3_zhou` | NPC | 老周再會 | 老周 |
 | `r3_crane` | NPC | 灰鶴的 R3 登場——取得證詞 + 吹牛骰 | 灰鶴 |
 | `r3_quest_check` | 任務 | 回報銅鐘——檢查 3 個任務完成度 | 銅鐘 |
@@ -223,7 +231,7 @@ R0 祭獻坑 → R1 石脈迴廊 → R2 大採石場 → R3 河城渡口 → 4 �
 
 | 角色 | 性別 | 首次登場 | 出現區域 | 好感度等級 | 關鍵 flags |
 |------|------|---------|---------|-----------|-----------|
-| 螢 Ying | 配合主角 | R1 `r1_ying_encounter` | R1→R2→R3 | 5 | `r1YingCompanion`, `r2YingPromise` |
+| 螢 Ying | 配合主角 | R1 `r1_ying_encounter` | R1→R2→R3 | 5 | `r1YingCompanion`, `r1YingWarmth`, `r2YingPromise`, `r2YingNightmare`, `r3YingRiver` |
 | 老周 Old Zhou | 男 | R1 `r1_survivor` | R1→R3 | 3 | `r1SurvivorMet`, `r3ZhouMet` |
 | 灰鶴 Grey Crane | **女** | R1 `r1_wanderer` | R1→R2→R3 | 5 | `r1WandererMet`, `r2CraneMet`, `r3CraneTestimony` |
 | 鐵霜 Iron Frost | 女 | R2 `r2_camp_chief` | R2 | 3 | `r2CampVisited`, `r2BossSpared`, `r2ReunionSeen` |
@@ -321,10 +329,10 @@ if (state.flags.r3PlagueProof)    score += 3;  // 瘟疫起源證據（關鍵）
 
 | 區域 | 節點總數 | 覆蓋率 |
 |------|---------|--------|
-| R0 祭獻坑 | 17 | 100% |
-| R1 石脈迴廊 | 33 | 100% |
-| R2 大採石場 | 26 | 100% |
-| R3 河城渡口 | 22 | 100% |
+| R0 祭獻坑 | 17 (+6 隱藏) | 100% |
+| R1 石脈迴廊 | 34 | 100% |
+| R2 大採石場 | 27 | 100% |
+| R3 河城渡口 | 23 | 100% |
 
 ### NPC 肖像設計
 
@@ -356,7 +364,7 @@ if (state.flags.r3PlagueProof)    score += 3;  // 瘟疫起源證據（關鍵）
 ```javascript
 state = {
   name: '旅者', sex: 'male',
-  hp: 100, maxHp: 100, petri: 0,    // petri: 0-100，到 100 即石化死亡
+  hp: 50, maxHp: 50, petri: 0,      // petri: 0-100，到 100 即石化死亡
   str: 5, agi: 5, wil: 5,           // 三圍屬性
   xp: 0, level: 1, xpToNext: 20,
   inventory: [],                      // 物品名稱陣列
