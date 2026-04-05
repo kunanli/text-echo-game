@@ -228,6 +228,13 @@ registerNode('r0_look', () => {
     }
     c.push({ text: '查看北面攀爬痕跡', textEn: 'Check the climbing marks to the north', action: () => loadNode('r0_climb_check') });
     c.push({ text: '探索南面裂縫', textEn: 'Explore the southern crack', action: () => loadNode('r0_crack') });
+    // Post-game: hidden passage to the deeper abyss (requires at least one clear)
+    var hasCleared = (typeof globalStats !== 'undefined') &&
+      globalStats.endings && (globalStats.endings.dawn > 0 || globalStats.endings.compromise > 0 ||
+      globalStats.endings.lockdown > 0 || globalStats.endings.sacrifice > 0);
+    if (hasCleared) {
+      c.push({ text: '……地面上有一條向下的裂痕，散發著冰冷的氣息', textEn: '...A downward fissure in the ground, radiating freezing air', action: () => loadNode('r0_abyss_gate') });
+    }
     return c;
   })(), { label: L('觀察環境', 'Observing area') });
 });
@@ -1198,4 +1205,297 @@ registerNode('r0_path', () => {
     { text: '先仔細觀察環境再說', textEn: 'Survey the area first', action: () => loadNode('r0_look') },
     { text: '不管了，直接爬', textEn: 'Forget it, just climb', action: () => loadNode('r0_climb_str') },
   ], { label: L('尋找出路', 'Finding exit') });
+});
+
+// ═══════════════════════════════════════════════════
+//  Post-game — 深淵入口 (Abyss Gate)
+// ═══════════════════════════════════════════════════
+
+registerNode('r0_abyss_gate', () => {
+  autoExplore([
+    { tag: '環境', tagColor: 'tag-system',
+      text: '你沿著祭獻坑底部的一道裂縫向下攀爬，空氣愈來愈稀薄，愈來愈冷。',
+      textEn: 'You descend through a fissure at the bottom of the Sacrificial Pit. The air grows thin and cold.',
+      delay: 3000 },
+    { tag: '感知', tagColor: 'tag-sense',
+      text: '腳下的岩壁變得濕滑，指尖觸碰到的不是石頭——是骨頭。',
+      textEn: 'The rock beneath your feet turns slick. What your fingers touch is not stone — it is bone.',
+      delay: 3000 },
+    { art: `<pre class="ascii-art">
+        ·  ˚  ·     ˚  ·     ˚  ·  ˚
+    ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+    ▓  ☠  ░░  ☠  ░░░  ☠  ░░  ☠  ░░  ▓
+    ▓ ░/|\\░░░/|\\░░░░░/|\\░░░/|\\░░░░░ ▓
+    ▓ ░/ \\░░░/ \\░░░░░/ \\░░░/ \\░░░░░ ▓
+    ▓░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░▓
+    ▓  ☠ ░░ ☠   ☠ ░░░ ☠   ☠ ░░ ☠   ▓
+    ▓ /|\\░░/|\\ /|\\░░░/|\\ /|\\░░/|\\  ▓
+    ▓ / \\░░/ \\ / \\░░░/ \\ / \\░░/ \\  ▓
+    ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+    ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+    █  骸  骨  之  道  ·  三  百  年  █
+    ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+       ~  ~  ~  ~ 冥  河 ~  ~  ~  ~
+       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+</pre>`, artEn: `<pre class="ascii-art">
+        ·  ˚  ·     ˚  ·     ˚  ·  ˚
+    ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+    ▓  ☠  ░░  ☠  ░░░  ☠  ░░  ☠  ░░  ▓
+    ▓ ░/|\\░░░/|\\░░░░░/|\\░░░/|\\░░░░░ ▓
+    ▓ ░/ \\░░░/ \\░░░░░/ \\░░░/ \\░░░░░ ▓
+    ▓░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░▓
+    ▓  ☠ ░░ ☠   ☠ ░░░ ☠   ☠ ░░ ☠   ▓
+    ▓ /|\\░░/|\\ /|\\░░░/|\\ /|\\░░/|\\  ▓
+    ▓ / \\░░/ \\ / \\░░░/ \\ / \\░░/ \\  ▓
+    ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+    ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+    █  P A S S A G E  O F  B O N E S  █
+    ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+       ~  ~  ~  ~  STYX  ~  ~  ~  ~
+       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+</pre>` },
+    { tag: '死寂', tagColor: 'tag-petri',
+      text: '通道兩側嵌滿了人骨——三百年來被投入祭獻坑的爐灶' + (state.sex === 'male' ? '少年' : '少女') + '們。',
+      textEn: 'The walls are embedded with human remains — three hundred years of sacrificed ' + (state.sex === 'male' ? 'boys' : 'girls') + ' thrown into the pit.',
+      delay: 3500 },
+    { tag: '死寂', tagColor: 'tag-petri',
+      text: '他們的臉凝固在痛苦中，有些人的手仍然向上伸展，彷彿至死都在攀爬。',
+      textEn: 'Their faces are frozen in agony. Some still reach upward, as if clawing for escape even in death.',
+      delay: 3500 },
+    { tag: '感知', tagColor: 'tag-sense',
+      text: '通道盡頭，一條漆黑的地下河在寂靜中流淌。河邊有一座石砌碼頭。',
+      textEn: 'At the passage\'s end, a black underground river flows in silence. A stone dock sits at its edge.',
+      delay: 3000 },
+    { tag: '警告', tagColor: 'tag-warn',
+      text: '碼頭旁佇立著一個高大的蒙面身影——披著破爛長袍，手握一根石杆。擺渡人。',
+      textEn: 'A tall, hooded figure stands beside the dock — draped in tattered robes, gripping a stone pole. The Ferryman.',
+      delay: 3500 },
+  ], [
+    { text: '接近擺渡人', textEn: 'Approach the Ferryman', action: () => loadNode('r0_ferryman') },
+    { text: '這裡太危險了，回頭', textEn: 'Too dangerous — retreat', action: () => loadNode('r0_look') },
+  ], { label: L('深淵之門', 'Abyss Gate') });
+});
+
+// ═══════════════════════════════════════════════════
+//  Post-game — 擺渡人 (The Ferryman)
+// ═══════════════════════════════════════════════════
+
+registerNode('r0_ferryman', () => {
+  var totalStats = state.str + state.agi + state.wil;
+  var isStrong = totalStats >= 20 && state.level >= 5;
+
+  var steps = [
+    { art: `<pre class="ascii-art">
+              ˚    ·    ˚
+                 _____
+                / · · \\
+               |  ▓▓▓  |
+               |  ▓▓▓  |
+          _____|_______|_____
+         /     |       |     \\
+        /  ░░  |  ▓▓▓  |  ░░  \\
+       |  ░░░  |  ▓▓▓  |  ░░░  |
+       |  ░░░  |  ▓▓▓  |  ░░░  |
+       |  ░░   |  ▓▓▓  |   ░░  |
+        \\      |  ▓▓▓  |      /
+         \\     |   |   |     /
+          \\    |   |   |    /
+           \\   |   |   |   /
+    ~~~~~~~~\\~~|~~~|~~~|~~/~~~~~~~~
+    ~ ~ ~ ~ ~\\|___|___|/ ~ ~ ~ ~ ~
+    ~~~~ ~ ═══════════════ ~ ~ ~~~~
+    ~ ~ ~ ═══  石  筏  ═══ ~ ~ ~ ~
+    ~~~~~~~~═══════════════~~~~~~~~
+</pre>`, artEn: `<pre class="ascii-art">
+              ˚    ·    ˚
+                 _____
+                / · · \\
+               |  ▓▓▓  |
+               |  ▓▓▓  |
+          _____|_______|_____
+         /     |       |     \\
+        /  ░░  |  ▓▓▓  |  ░░  \\
+       |  ░░░  |  ▓▓▓  |  ░░░  |
+       |  ░░░  |  ▓▓▓  |  ░░░  |
+       |  ░░   |  ▓▓▓  |   ░░  |
+        \\      |  ▓▓▓  |      /
+         \\     |   |   |     /
+          \\    |   |   |    /
+           \\   |   |   |   /
+    ~~~~~~~~\\~~|~~~|~~~|~~/~~~~~~~~
+    ~ ~ ~ ~ ~\\|___|___|/ ~ ~ ~ ~ ~
+    ~~~~ ~ ═══════════════ ~ ~ ~~~~
+    ~ ~ ~ ═══ STONE RAFT ═══ ~ ~ ~
+    ~~~~~~~~═══════════════~~~~~~~~
+</pre>` },
+    { tag: '對話', tagColor: 'tag-info',
+      text: '擺渡人緩緩轉過身來。兜帽下看不見面容，只有兩點幽暗的微光。',
+      textEn: 'The Ferryman turns slowly. Beneath the hood there is no face — only two faint points of dim light.',
+      delay: 3000 },
+    { tag: '對話', tagColor: 'tag-info',
+      text: '「……三百年。三百年我擺渡亡者。沉入深淵的祭品，一個接一個。」',
+      textEn: '"...Three hundred years. Three hundred years I have ferried the dead. Sacrifices sinking into the abyss, one after another."',
+      delay: 3500 },
+    { tag: '對話', tagColor: 'tag-info',
+      text: '「你……是活的。」他的聲音像石頭在水底磨擦。「但你夠強嗎？能面對下方的一切嗎？」',
+      textEn: '"You... are alive." His voice grinds like stone beneath water. "But are you strong enough to face what lies below?"',
+      delay: 3500 },
+  ];
+
+  if (!isStrong) {
+    steps.push(
+      { tag: '判定', tagColor: 'tag-warn',
+        text: '擺渡人審視著你——力量、敏捷、意志的總和不足 20，或等級未達 5。你尚未準備好。',
+        textEn: 'The Ferryman examines you — your combined STR + AGI + WIL is below 20, or your level is under 5. You are not ready.',
+        delay: 3000 },
+      { tag: '對話', tagColor: 'tag-info',
+        text: '「你還不夠格。深淵會將你整個吞噬。回去——變得更強，再來。」',
+        textEn: '"You are not ready. The abyss would swallow you whole. Go back — grow stronger, and return."',
+        delay: 3500 }
+    );
+    autoExplore(steps, [
+      { text: '回到祭獻坑', textEn: 'Return to the Sacrificial Pit', action: () => loadNode('r0_look') },
+    ], { label: L('擺渡人', 'The Ferryman') });
+  } else {
+    steps.push(
+      { tag: '判定', tagColor: 'tag-warn',
+        text: '擺渡人向你點了點頭。「也許吧……但先讓我看看你的意志。」',
+        textEn: 'The Ferryman nods slowly. "Perhaps... but first, let me test your will."',
+        delay: 3000 },
+      { tag: '檢定', tagColor: 'tag-warn',
+        text: L('他指向黑水深處。你凝視深淵——深淵也在凝視你。（WIL 檢定 DC12）',
+               'He points into the black depths. You stare into the abyss — and the abyss stares back. (WIL check DC12)'),
+        textEn: 'He points into the black depths. You stare into the abyss — and the abyss stares back. (WIL check DC12)',
+        delay: 3500 }
+    );
+
+    // Perform the check and branch into result steps
+    var result = statCheck('wil', 12);
+    if (result === 'crit') {
+      sfx.pass();
+      changeStat('wil', 2);
+      steps.push({ tag: '結果', tagColor: 'tag-system',
+        text: '你的目光堅定如鐵，深淵在你面前退卻。擺渡人罕見地發出了低沉的笑聲。「了不起。」（WIL +2）',
+        textEn: 'Your gaze is iron. The abyss recoils before you. The Ferryman lets out a rare, low laugh. "Impressive." (WIL +2)',
+        delay: 3500 });
+    } else if (result === 'pass') {
+      sfx.pass();
+      steps.push({ tag: '結果', tagColor: 'tag-system',
+        text: '你咬緊牙關，沒有移開視線。擺渡人沉默地點了點頭。',
+        textEn: 'You clench your jaw and hold your gaze. The Ferryman nods silently.',
+        delay: 3500 });
+    } else {
+      sfx.fail();
+      changePetri(5);
+      steps.push({ tag: '結果', tagColor: 'tag-warn',
+        text: '你退縮了。黑暗的寒意侵入骨髓，石化感在體內蔓延。（石化度 +5）但擺渡人依然讓開了路。',
+        textEn: 'You flinch. The cold of the darkness seeps into your bones, petrification spreading within. (Petri +5) But the Ferryman steps aside regardless.',
+        delay: 3500 });
+    }
+
+    autoExplore(steps, [
+      { text: '登上石筏', textEn: 'Board the stone raft', action: () => loadNode('r0_abyss_descent') },
+      { text: '……還是回去吧', textEn: '...Better head back', action: () => loadNode('r0_look') },
+    ], { label: L('擺渡人', 'The Ferryman') });
+  }
+});
+
+// ═══════════════════════════════════════════════════
+//  Post-game — 深淵渡河 (Abyss Descent)
+// ═══════════════════════════════════════════════════
+
+registerNode('r0_abyss_descent', () => {
+  autoExplore([
+    { tag: '行動', tagColor: 'tag-move',
+      text: '你踏上石筏。擺渡人將石杆插入黑水，無聲地推離碼頭。',
+      textEn: 'You step onto the stone raft. The Ferryman plunges his pole into the black water and pushes off in silence.',
+      delay: 3000 },
+    { tag: '環境', tagColor: 'tag-system',
+      text: '完全的黑暗。冰冷。唯一的聲音是水滴落在石頭上的回響。',
+      textEn: 'Total darkness. Biting cold. The only sound is the echo of water dripping on stone.',
+      delay: 3500 },
+    { art: `<pre class="ascii-art">
+    ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+    ░░                                  ░░
+    ░░   ·    ˚    ·    ˚    ·    ˚    ░░
+    ░░                                  ░░
+    ░░    ☠       ☠           ☠        ░░
+    ░░   /|\\     /|\\         /|\\       ░░
+    ~~╌~~╌~~╌~~╌~~╌~~╌~~╌~~╌~~╌~~╌~~╌~~╌~
+    ~ ~ ═══════════════════════ ~ ~ ~ ~ ~
+    ~ ~ ║  ▓    ·    ○    · ║ ~ ~ ~ ~ ~ ~
+    ~ ~ ║  ▓    ·  你/妳  · ║ ~ ~ ~ ~ ~ ~
+    ~ ~ ═══════════════════════ ~ ~ ~ ~ ~
+    ~~╌~~╌~~╌~~╌~~╌~~╌~~╌~~╌~~╌~~╌~~╌~~╌~
+    ░░   /|\\         ☠       /|\\       ░░
+    ░░    ☠         /|\\       ☠        ░░
+    ░░                                  ░░
+    ░░   ·    ˚    ·    ˚    ·    ˚    ░░
+    ░░                                  ░░
+    ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+</pre>`, artEn: `<pre class="ascii-art">
+    ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+    ░░                                  ░░
+    ░░   ·    ˚    ·    ˚    ·    ˚    ░░
+    ░░                                  ░░
+    ░░    ☠       ☠           ☠        ░░
+    ░░   /|\\     /|\\         /|\\       ░░
+    ~~╌~~╌~~╌~~╌~~╌~~╌~~╌~~╌~~╌~~╌~~╌~~╌~
+    ~ ~ ═══════════════════════ ~ ~ ~ ~ ~
+    ~ ~ ║  ▓    ·    ○    · ║ ~ ~ ~ ~ ~ ~
+    ~ ~ ║  ▓    ·   YOU   · ║ ~ ~ ~ ~ ~ ~
+    ~ ~ ═══════════════════════ ~ ~ ~ ~ ~
+    ~~╌~~╌~~╌~~╌~~╌~~╌~~╌~~╌~~╌~~╌~~╌~~╌~
+    ░░   /|\\         ☠       /|\\       ░░
+    ░░    ☠         /|\\       ☠        ░░
+    ░░                                  ░░
+    ░░   ·    ˚    ·    ˚    ·    ˚    ░░
+    ░░                                  ░░
+    ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+</pre>` },
+    { tag: '死寂', tagColor: 'tag-petri',
+      text: '水面下隱約可見石化的人影——沉入河底的祭品，凝固在溺亡的最後一刻。',
+      textEn: 'Beneath the water\'s surface, petrified figures are faintly visible — sacrifices sunken to the riverbed, frozen in their final drowning moments.',
+      delay: 3500 },
+    { tag: '對話', tagColor: 'tag-info',
+      text: '「下方……是第一封印。」擺渡人的聲音在黑暗中迴盪。「石疫的源頭。一切的開端。」',
+      textEn: '"Below... lies the First Seal." The Ferryman\'s voice echoes through the darkness. "The origin of the plague. Where it all began."',
+      delay: 3500 },
+    { tag: '對話', tagColor: 'tag-info',
+      text: '「三百年前有人打破了封印。三百年後，也許有人能重新封上。也許。」',
+      textEn: '"Three hundred years ago someone broke the Seal. Three hundred years later, perhaps someone can reseal it. Perhaps."',
+      delay: 3500 },
+    { tag: '環境', tagColor: 'tag-system',
+      text: '石筏緩緩靠岸。一座由黑曜石雕成的古碼頭在幽光中浮現。',
+      textEn: 'The raft drifts to a halt. An ancient dock carved from obsidian materializes in the faint glow.',
+      delay: 3000 },
+    { tag: '發現', tagColor: 'tag-sense',
+      text: '碼頭盡頭是一扇巨大的石門，表面刻滿了古老的符文。封印完好無損——但隱隱散發著不祥的脈動。',
+      textEn: 'At the dock\'s end stands a massive stone gate, its surface carved with ancient runes. The seal is intact — yet it pulses with an ominous rhythm.',
+      delay: 3500 },
+    { tag: '系統', tagColor: 'tag-system',
+      text: L('（未完待續……深淵探索將在未來更新中開放）',
+             '(To be continued... Deeper Abyss exploration coming in a future update)'),
+      textEn: '(To be continued... Deeper Abyss exploration coming in a future update)',
+      delay: 4000,
+      effect: function() {
+        state.flags.r0AbyssDescent = true;
+        changeStat('str', 1);
+        changeStat('agi', 1);
+        changeStat('wil', 1);
+        changeHp(20);
+        changePetri(-15);
+        addItem(L('深淵渡河令', 'Abyss Ferry Token'));
+        sfx.item();
+      }
+    },
+    { tag: '物品', tagColor: 'tag-item',
+      text: '擺渡人遞給你一枚冰冷的石牌——深淵渡河令。「留著它。也許有一天你會需要再來。」（STR +1, AGI +1, WIL +1, HP +20, 石化度 -15）',
+      textEn: 'The Ferryman hands you a cold stone token — the Abyss Ferry Token. "Keep it. Perhaps one day you will need to return." (STR +1, AGI +1, WIL +1, HP +20, Petri -15)',
+      delay: 3500 },
+  ], [
+    { text: '返回地表', textEn: 'Return to the surface', action: () => loadNode('r0_look') },
+  ], { label: L('深淵渡河', 'Abyss Descent') });
 });
