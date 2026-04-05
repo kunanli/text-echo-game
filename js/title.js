@@ -178,7 +178,8 @@ function updateAllocUI() {
     var stat = btn.dataset.stat;
     var dir = parseInt(btn.dataset.dir);
     if (dir === 1) {
-      btn.disabled = getAllocUsed() >= totalPts || allocStats[stat] >= ALLOC_MAX;
+      var max = _ngPlusMode ? (ALLOC_BASE + totalPts) : ALLOC_MAX;
+      btn.disabled = getAllocUsed() >= totalPts || allocStats[stat] >= max;
     } else {
       btn.disabled = allocStats[stat] <= ALLOC_BASE;
     }
