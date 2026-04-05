@@ -49,6 +49,7 @@ document.getElementById('phase-splash').addEventListener('click', function(e) {
   // If clicked the continue/chapter button, let their own listeners handle it
   if (e.target.id === 'continue-btn' || e.target.closest('#continue-btn') ||
       e.target.id === 'chapter-btn' || e.target.closest('#chapter-btn') ||
+      e.target.id === 'ngplus-btn' || e.target.closest('#ngplus-btn') ||
       e.target.id === 'title-leaderboard-btn' || e.target.closest('#title-leaderboard-btn')) {
     return;
   }
@@ -78,11 +79,71 @@ document.getElementById('phase-splash').addEventListener('click', function(e) {
   }
 })();
 
+// ── New Game+ button ──
+var _ngPlusMode = false;
+// Auto-trigger NG+ if redirected from epilogue
+(function() {
+  try {
+    if (localStorage.getItem('petriabyss_ngplus_pending') === '1') {
+      localStorage.removeItem('petriabyss_ngplus_pending');
+      _ngPlusMode = true;
+      // Skip splash, go straight to language select after a brief delay
+      setTimeout(function() { showPhase('phase-lang'); }, 400);
+    }
+  } catch (e) {}
+})();
+(function() {
+  var ngBtn = document.getElementById('ngplus-btn');
+  if (!ngBtn) return;
+  // Show NG+ button only if player has completed the game at least once
+  if (typeof globalStats !== 'undefined' && globalStats.totalRuns > 0) {
+    ngBtn.style.display = '';
+    // Peek saved language for button text
+    try {
+      var json = localStorage.getItem(SAVE_KEY);
+      if (json) {
+        var d = JSON.parse(json);
+        if (d.lang !== 'en') ngBtn.textContent = '新 遊 戲 +';
+      }
+    } catch (e) {}
+    // Also check if no save exists but stats show completion
+    if (!hasSave()) {
+      try {
+        var statsJson = localStorage.getItem('petriabyss_global_stats');
+        if (statsJson) {
+          var s = JSON.parse(statsJson);
+          // No saved language to peek — use default
+        }
+      } catch (e) {}
+    }
+  }
+  ngBtn.addEventListener('touchstart', splashWarmup, { passive: true });
+  ngBtn.addEventListener('click', function(e) {
+    e.stopPropagation();
+    splashWarmup();
+    _ngPlusMode = true;
+    showPhase('phase-lang');
+  });
+})();
+
 // ── Phase 2: Language selection ──
 document.querySelectorAll('.lang-btn').forEach(function(btn) {
   btn.addEventListener('click', function() {
     state.lang = btn.dataset.lang;
     applyLang();
+    // NG+ bonus stat points
+    if (_ngPlusMode) {
+      ngPlusAllocBonus = 3;
+      // Show NG+ indicator on character creation
+      var label = document.getElementById('label-stat-alloc');
+      if (label) label.textContent = state.lang === 'en' ? 'STATS  [NG+ BONUS: +3]' : '能 力 分 配  [NG+ 加成：+3]';
+    } else {
+      ngPlusAllocBonus = 0;
+    }
+    allocStats.str = ALLOC_BASE;
+    allocStats.agi = ALLOC_BASE;
+    allocStats.wil = ALLOC_BASE;
+    updateAllocUI();
     showPhase('phase-create');
   });
 });
@@ -92,22 +153,26 @@ const allocStats = { str: 3, agi: 3, wil: 3 };
 const ALLOC_BASE = 3;
 const ALLOC_MAX = 9;
 const ALLOC_POINTS = 6;
+var ngPlusAllocBonus = 0;
 
 function getAllocUsed() {
   return (allocStats.str - ALLOC_BASE) + (allocStats.agi - ALLOC_BASE) + (allocStats.wil - ALLOC_BASE);
 }
 
+function getTotalAllocPoints() { return ALLOC_POINTS + ngPlusAllocBonus; }
+
 function updateAllocUI() {
+  var totalPts = getTotalAllocPoints();
   document.getElementById('alloc-str').textContent = allocStats.str;
   document.getElementById('alloc-agi').textContent = allocStats.agi;
   document.getElementById('alloc-wil').textContent = allocStats.wil;
-  document.getElementById('alloc-remain').textContent = ALLOC_POINTS - getAllocUsed();
+  document.getElementById('alloc-remain').textContent = totalPts - getAllocUsed();
 
   document.querySelectorAll('.stat-alloc-btn').forEach(function(btn) {
     var stat = btn.dataset.stat;
     var dir = parseInt(btn.dataset.dir);
     if (dir === 1) {
-      btn.disabled = getAllocUsed() >= ALLOC_POINTS || allocStats[stat] >= ALLOC_MAX;
+      btn.disabled = getAllocUsed() >= totalPts || allocStats[stat] >= ALLOC_MAX;
     } else {
       btn.disabled = allocStats[stat] <= ALLOC_BASE;
     }
@@ -120,7 +185,7 @@ document.querySelectorAll('.stat-alloc-btn').forEach(function(btn) {
     var dir = parseInt(btn.dataset.dir);
     var newVal = allocStats[stat] + dir;
     if (newVal < ALLOC_BASE || newVal > ALLOC_MAX) return;
-    if (dir === 1 && getAllocUsed() >= ALLOC_POINTS) return;
+    if (dir === 1 && getAllocUsed() >= getTotalAllocPoints()) return;
     allocStats[stat] = newVal;
     updateAllocUI();
   });
@@ -163,6 +228,22 @@ function startGame() {
   state.str = allocStats.str;
   state.agi = allocStats.agi;
   state.wil = allocStats.wil;
+
+  // ── New Game+ bonuses ──
+  if (_ngPlusMode) {
+    state.flags.ngPlus = true;
+    state.flags.ngPlusRun = (typeof globalStats !== 'undefined' ? globalStats.totalRuns : 1);
+    state.maxHp = 60;
+    state.hp = 60;
+    // Record which endings were achieved previously
+    if (typeof globalStats !== 'undefined') {
+      if (globalStats.endings.dawn > 0) state.flags.ngEndingDawn = true;
+      if (globalStats.endings.compromise > 0) state.flags.ngEndingCompromise = true;
+      if (globalStats.endings.lockdown > 0) state.flags.ngEndingLockdown = true;
+      if (globalStats.endings.sacrifice > 0) state.flags.ngEndingSacrifice = true;
+    }
+    _ngPlusMode = false;
+  }
 
   var titleScreen = document.getElementById('title-screen');
   titleScreen.classList.add('hidden');

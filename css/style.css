@@ -1014,6 +1014,23 @@
     border-color: #d4a843 !important;
     color: #d4a843 !important;
   }
+  .ngplus-btn {
+    border-color: #e8d080 !important;
+    color: #e8d080 !important;
+    text-shadow: 0 0 8px rgba(232,208,128,.4);
+    animation: ngplus-glow 2.5s ease-in-out infinite;
+  }
+  .ngplus-btn:hover {
+    background: #1a1a2e !important;
+    color: #ffe8a0 !important;
+    border-color: #ffe8a0 !important;
+    text-shadow: 0 0 14px rgba(255,232,160,.6);
+  }
+  @keyframes ngplus-glow {
+    0%, 100% { box-shadow: 0 0 4px rgba(232,208,128,.15); }
+    50% { box-shadow: 0 0 12px rgba(232,208,128,.35); }
+  }
+
   .title-lb-btn {
     font-size: .9rem !important;
     padding: 10px 36px !important;

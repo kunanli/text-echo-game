@@ -145,6 +145,8 @@ var SEED_FLAGS = [
   'r1YingMet','r1YingTrustUp','r1YingCompanion','r1YingHerb','r1YingFed',
   'r1YingLore1','r1YingLore2',
   'giftZhou','giftCrane','giftYing','giftFrost','giftCast','giftDew','giftBell',
+  // New Game+
+  'ngPlus','ngEndingDawn','ngEndingCompromise','ngEndingLockdown','ngEndingSacrifice',
 ];
 
 var B36 = '0123456789abcdefghijklmnopqrstuvwxyz';

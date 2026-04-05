@@ -878,7 +878,9 @@ registerNode('r1_survivor', () => {
     { tag: '感知', tagColor: 'tag-sense', text: '他看著你，石化的右眼中映出一絲複雜的光芒——驚訝、警惕、和一絲久違的……希望。', textEn: 'He stares at you, a complex light in his stone-veined eye — surprise, wariness, and a trace of... hope.', delay: 3000 },
     { tag: '情報', tagColor: 'tag-info', text: '「你……也是從坑底爬上來的？」他的聲音沙啞，像是很久沒有說過話。', textEn: '"You... climbed up from the pit too?" His voice is hoarse, as if unused for a long time.', delay: 2800 },
     { tag: '情報', tagColor: 'tag-info', text: '「我叫老周。第三班的礦工。瘟疫爆發那天，我躲進了通風管道……一直躲到現在。」', textEn: '"Name\'s Old Zhou. Crew 3 miner. When the plague broke out, I hid in the ventilation shaft... been hiding ever since."', delay: 3200 },
-  ], (function() {
+  ].concat(state.flags.ngPlus ? [
+    { tag: '記憶', tagColor: 'tag-petri', text: '你恍惚間想起了什麼——似乎在另一段生命中，你們曾在河城重逢過。', textEn: 'A hazy memory surfaces — in another life, you met again in River City.', delay: 2500 },
+  ] : []), (function() {
     var c = [];
     if (hasItem(L('黑麵包', 'Black Bread'))) {
       c.push({ text: '把黑麵包分給他', textEn: 'Share the black bread with him', action: () => loadNode('r1_survivor_bread') });
@@ -1137,7 +1139,9 @@ registerNode('r1_wanderer', () => {
     { tag: '感知', tagColor: 'tag-sense', text: '她背著一個鼓鼓囊囊的行囊，裡面發出各種叮叮噹噹的聲響。', textEn: 'She carries a bulging pack that clinks and clatters with every step.', delay: 2200 },
     { tag: '情報', tagColor: 'tag-info', html: '「看你的樣子，是從坑底爬上來的？<b>你是「爐灶' + (state.sex === 'male' ? '少年' : '少女') + '」嗎？</b>」', htmlEn: '"By the look of you, climbed up from the pit? <b>Are you the \'' + (state.sex === 'male' ? 'Hearth-Youth' : 'Hearth-Maiden') + '\'?</b>"', delay: 3000 },
     { tag: '感知', tagColor: 'tag-sense', text: '這個詞再次刺痛了你的記憶。她怎麼會知道？', textEn: 'The word stings your memory again. How does she know?', delay: 2500 },
-  ], [
+  ].concat(state.flags.ngPlus ? [
+    { tag: '記憶', tagColor: 'tag-petri', text: '她的臉……那道斗篷下的疤痕……你確定你在某處見過她。也許是在骰子桌旁。', textEn: 'Her face... that scar beneath the cloak... you\'re certain you\'ve met before. Perhaps at a dice table.', delay: 2800 },
+  ] : []), [
     { text: '你怎麼知道「爐灶' + (state.sex === 'male' ? '少年' : '少女') + '」？', textEn: 'How do you know about the "' + (state.sex === 'male' ? 'Hearth-Youth' : 'Hearth-Maiden') + '"?', action: () => loadNode('r1_wanderer_lore') },
     { text: '你有什麼東西可以交易嗎？', textEn: 'Do you have anything to trade?', action: () => loadNode('r1_wanderer_trade') },
     { text: '保持警惕，沉默不語', textEn: 'Stay silent and on guard', action: () => {
@@ -1345,7 +1349,10 @@ registerNode('r1_ying_encounter', () => {
     { tag: '感知', tagColor: 'tag-sense', text: yingPronoun + '低頭看了看手中的手冊，像是在保護什麼珍貴的東西。', textEn: (isMale ? 'She' : 'He') + ' glances down at the notebook, as if guarding something precious.', delay: 2500 },
     { tag: '情報', tagColor: 'tag-info', html: '「<b>但我偷偷抄了一份。</b>關於瘟疫起源的記錄……至少是碎片。我一直在這些礦道裡補全它。」', htmlEn: '"<b>But I secretly copied some.</b> Records about the plague\'s origin... fragments, at least. I\'ve been filling in the gaps in these tunnels."', delay: 3500 },
     { tag: '感知', tagColor: 'tag-sense', text: yingPronoun + '的眼睛在礦脈的藍光中顯得格外明亮——那是一種執著的、不肯熄滅的光。', textEn: (isMale ? 'Her' : 'His') + ' eyes catch the blue glow of the ore veins — burning with a stubborn, unquenchable light.', delay: 3000 },
-  ], [
+  ].concat(state.flags.ngPlus ? [
+    { tag: '記憶', tagColor: 'tag-petri', text: '一股強烈的既視感湧上心頭——你見過' + yingPronoun + '。在某個不屬於這裡的記憶中。', textEn: 'A powerful sense of déjà vu hits — you\'ve seen ' + (isMale ? 'her' : 'him') + ' before. In a memory that doesn\'t belong here.', delay: 2800 },
+    { tag: '感知', tagColor: 'tag-sense', text: yingPronoun + '似乎也察覺到了什麼，微微皺眉：「……你的眼神很奇怪。好像……認識我？」', textEn: (isMale ? 'She' : 'He') + ' seems to notice something too, frowning slightly: "...Your eyes are strange. As if... you know me?"', delay: 3000 },
+  ] : []), [
     { text: '我叫' + state.name + '，我也在找瘟疫的真相', textEn: 'I\'m ' + state.name + '. I\'m searching for the truth too', action: () => loadNode('r1_ying_truth') },
     { text: '這裡很危險，你怎麼一個人？', textEn: 'It\'s dangerous here. Why are you alone?', action: () => loadNode('r1_ying_alone') },
     { text: '保持沉默，點了點頭', textEn: 'Stay silent and nod', action: () => loadNode('r1_ying_silent') },

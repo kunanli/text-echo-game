@@ -6,9 +6,20 @@
 
 registerNode('r0_start', () => {
   state.region = 0;
-  autoExplore([
-    { tag: '系統', tagColor: 'tag-system', text: '意識逐漸恢復……', textEn: 'Consciousness slowly returning...', delay: 2500 },
-    { tag: '系統', tagColor: 'tag-system', text: '正在載入感官……', textEn: 'Senses loading...', delay: 2000 },
+  var isNgPlus = state.flags.ngPlus;
+  var ngSteps = [];
+  if (isNgPlus) {
+    ngSteps = [
+      { tag: '系統', tagColor: 'tag-system', text: '意識逐漸恢復……不，是「再次」恢復。', textEn: 'Consciousness returning... no, returning *again*.', delay: 2500 },
+      { tag: '系統', tagColor: 'tag-system', text: '正在載入感官……一切都如此熟悉。', textEn: 'Senses loading... everything feels familiar.', delay: 2000 },
+    ];
+  } else {
+    ngSteps = [
+      { tag: '系統', tagColor: 'tag-system', text: '意識逐漸恢復……', textEn: 'Consciousness slowly returning...', delay: 2500 },
+      { tag: '系統', tagColor: 'tag-system', text: '正在載入感官……', textEn: 'Senses loading...', delay: 2000 },
+    ];
+  }
+  autoExplore(ngSteps.concat([
     { art: `<pre class="ascii-art">
   .    ·        ✦        .              ·    .     ✦
        .    .        .        ·    .        .
@@ -75,12 +86,21 @@ registerNode('r0_start', () => {
     { tag: '情報', tagColor: 'tag-info', text: '被石化瘟疫感染、不再有利用價值的人，都會被丟到這裡。', textEn: 'Those consumed by the Stone Plague, no longer of use, are cast down here.', delay: 2500 },
     { tag: '情報', tagColor: 'tag-info', text: '自從礦工們挖穿了地底的封印，這場瘟疫就再也沒有停過。', textEn: 'Ever since the miners breached the seal deep underground, the plague has never stopped.', delay: 2800 },
     { tag: '環境', tagColor: 'tag-system', text: '遠處傳來石塊掉落的聲音。不——是挖掘聲。某些東西仍在無休止地鑿穿岩壁。', textEn: 'The sound of falling stones echoes in the distance. No — digging. Something still tunnels endlessly through rock.', delay: 2800 },
-    { tag: '決意', tagColor: 'tag-info', text: '你知道——你必須向上攀升。大上升。', textEn: 'You know — you must climb upward. The Great Ascent.', delay: 2000 },
-  ], [
+    { tag: '決意', tagColor: 'tag-info', text: isNgPlus
+        ? '你知道——你必須再次向上攀升。但這次，你知道前方等著什麼。'
+        : '你知道——你必須向上攀升。大上升。',
+      textEn: isNgPlus
+        ? 'You know — you must ascend again. But this time, you know what lies ahead.'
+        : 'You know — you must climb upward. The Great Ascent.',
+      delay: 2000 },
+  ].concat(isNgPlus ? [
+    { tag: '記憶', tagColor: 'tag-petri', text: '模糊的記憶碎片在腦海中閃過——某座城市、某條河、某些面孔……', textEn: 'Fragmented memories flash through your mind — a city, a river, familiar faces...', delay: 2800 },
+    { tag: '記憶', tagColor: 'tag-petri', text: '你的身體比上次更強壯。也許，這就是輪迴的饋贈。', textEn: 'Your body feels stronger than before. Perhaps this is the gift of the cycle.', delay: 2500 },
+  ] : [])), [
     { text: '檢查自己的身體', textEn: 'Examine your body', action: () => loadNode('r0_body') },
     { text: '觀察周圍環境', textEn: 'Survey your surroundings', action: () => loadNode('r0_look') },
     { text: '直接尋找出路', textEn: 'Search for an exit', action: () => loadNode('r0_path') },
-  ], { label: L('正在甦醒', 'Awakening') });
+  ], { label: L(isNgPlus ? '再次甦醒' : '正在甦醒', isNgPlus ? 'Awakening Again' : 'Awakening') });
 });
 
 registerNode('r0_body', () => {

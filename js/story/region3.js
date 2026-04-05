@@ -1795,6 +1795,12 @@ registerNode('r3_epilogue', () => {
       deleteSave();
       location.reload();
     }},
+    { text: 'NEW GAME+（帶著記憶重新開始）', textEn: 'NEW GAME+ (Start over with memories)', action: () => {
+      deleteSave();
+      // Set flag so title screen auto-enters NG+ mode
+      try { localStorage.setItem('petriabyss_ngplus_pending', '1'); } catch(e) {}
+      location.reload();
+    }},
     { text: '留在河城（自由探索）', textEn: 'Stay in River City (free explore)', action: () => loadNode('r3_look') },
   ], { label: L('尾聲', 'Epilogue') });
 });
