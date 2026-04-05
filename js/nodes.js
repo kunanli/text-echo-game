@@ -67,13 +67,29 @@ function revive() {
 
 $revive.addEventListener('click', revive);
 
-// Restart from beginning
+// Restart from beginning — show endcard first if no revival stone
 var $restartBtn = document.getElementById('restart-btn');
 if ($restartBtn) {
   $restartBtn.addEventListener('click', function() {
     $deathOv.classList.remove('active');
-    if (typeof localStorage !== 'undefined') localStorage.removeItem('petriabyss_save');
-    location.reload();
+    // Show endcard before restarting
+    if (typeof showEndCard === 'function') {
+      showEndCard();
+      var $ecOverlay = document.getElementById('endcard-overlay');
+      var $ecClose = document.getElementById('endcard-close-btn');
+      if ($ecClose) {
+        var origClose = $ecClose.onclick;
+        $ecClose.onclick = function() {
+          if (origClose) origClose();
+          $ecOverlay.classList.remove('active');
+          if (typeof localStorage !== 'undefined') localStorage.removeItem('petriabyss_save');
+          location.reload();
+        };
+      }
+    } else {
+      if (typeof localStorage !== 'undefined') localStorage.removeItem('petriabyss_save');
+      location.reload();
+    }
   });
 }
 
