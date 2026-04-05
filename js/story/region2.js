@@ -844,6 +844,9 @@ registerNode('r2_camp_chief', () => {
     if (state.flags.r2MachineCore && !state.flags.r2BossDefeated) {
       c.push({ text: '「我準備好了，一起去挑戰巨獸。」', textEn: '"I\'m ready. Let\'s challenge the colossus."', action: () => loadNode('r2_boss_prep') });
     }
+    if (state.flags.r2ChengAwake && (state.flags.r2ChengTrainCount || 0) < 3) {
+      c.push({ text: '💪 和承鋼一起訓練', textEn: '💪 Train with Cheng Gang', action: () => loadNode('r2_cheng_train') });
+    }
     c.push({ text: '返回營地', textEn: 'Return to camp', action: () => loadNode('r2_camp') });
     return c;
   })(), { label: L('與鐵霜對話', 'Talking to Iron Frost') });
@@ -2101,4 +2104,124 @@ registerNode('r2_ancient_tunnel', () => {
       { text: '返回採石場', textEn: 'Return to the quarry', action: () => loadNode('r2_look') },
     ], { label: L('古代科學密道', 'Ancient Science Passage') });
   }
+});
+
+// ═══════════════════════════════════════════════════
+//  Cheng Gang Strength Training — 承鋼力量訓練
+//  Session 1: ~15s, Session 2: ~30s, Session 3: ~60s
+//  STR +1 per session, stories about camp life & love
+// ═══════════════════════════════════════════════════
+
+registerNode('r2_cheng_train', () => {
+  var trainCount = state.flags.r2ChengTrainCount || 0;
+
+  if (trainCount >= 3) {
+    autoExplore([
+      { tag: '情報', tagColor: 'tag-info', text: '承鋼搖了搖頭：「你已經足夠強了。剩下的路——要靠你自己的力量走完。」', textEn: 'Cheng Gang shakes his head: "You\'re strong enough. The rest of the road — you\'ll walk it on your own strength."', delay: 2500 },
+    ], [
+      { text: '返回營地', textEn: 'Return to camp', action: () => loadNode('r2_camp') },
+    ], { label: L('訓練完成', 'Training complete') });
+    return;
+  }
+
+  var steps = [];
+  // ── Common training intro ──
+  steps.push({ art: `<pre class="ascii-art gold">
+  ╔═════════════════════════════════╗
+  ║       💪  力 量 訓 練  💪       ║
+  ╠═════════════════════════════════╣
+  ║                                 ║
+  ║     ╱▔▔╲         ╱▔▔╲         ║
+  ║    │◦  ◦│       │    │        ║
+  ║    │ ══ │       │ ══ │        ║
+  ║     ╲__╱         ╲__╱         ║
+  ║     ╱||╲  ⇄⇄⇄   ╱||╲        ║
+  ║    ╱ || ╲       ╱ || ╲       ║
+  ║    承 鋼          你           ║
+  ║                                 ║
+  ║     第 ` + (trainCount + 1) + ` / 3 次訓練              ║
+  ╚═════════════════════════════════╝
+</pre>`, artEn: `<pre class="ascii-art gold">
+  ╔═════════════════════════════════╗
+  ║     💪  Strength Training  💪   ║
+  ╠═════════════════════════════════╣
+  ║                                 ║
+  ║     ╱▔▔╲         ╱▔▔╲         ║
+  ║    │◦  ◦│       │    │        ║
+  ║    │ ══ │       │ ══ │        ║
+  ║     ╲__╱         ╲__╱         ║
+  ║     ╱||╲  ⇄⇄⇄   ╱||╲        ║
+  ║    ╱ || ╲       ╱ || ╲       ║
+  ║   Cheng           You          ║
+  ║    Gang                        ║
+  ║     Session ` + (trainCount + 1) + ` / 3              ║
+  ╚═════════════════════════════════╝
+</pre>`, delay: 800 });
+
+  if (trainCount === 0) {
+    // ═══ Session 1 (~15s): The Camp — A quick warm-up and glimpse of camp origins ═══
+    steps.push({ tag: '訓練', tagColor: 'tag-combat', text: '承鋼扶著牆壁站了起來——他的腿還在發抖，但眼神堅定。「來。先從搬石頭開始。」', textEn: 'Cheng Gang pulls himself up against the wall — legs still shaking, eyes resolute. "Come. Start with lifting stones."', delay: 2500 });
+    steps.push({ tag: '訓練', tagColor: 'tag-combat', text: '你蹲下身，雙手抱住石塊。承鋼在旁邊做著同樣的動作——只是他的石塊小了一號。', textEn: 'You squat and grip a boulder. Cheng Gang mirrors the motion — though his stone is a size smaller.', delay: 2500 });
+    steps.push({ tag: '情報', tagColor: 'tag-info', text: '「知道這個營地是怎麼建起來的嗎？」他一邊舉石頭，一邊喘著氣。「五十個人——什麼都沒有。擠在黑暗裡發抖。」', textEn: '"Know how this camp was built?" He pants between lifts. "Fifty people — nothing at all. Shivering in the dark."', delay: 3000 });
+    steps.push({ tag: '訓練', tagColor: 'tag-combat', text: '你把石塊舉過頭頂，手臂在燃燒。承鋼點了點頭：「保持住——十秒。」', textEn: 'You hoist the boulder overhead, arms burning. Cheng Gang nods: "Hold it — ten seconds."', delay: 2800 });
+    steps.push({ tag: '情報', tagColor: 'tag-info', text: '「老鑄把碎石堆成了爐灶。一個叫春雷的礦工赤手空拳劈開石壁做窩棚。我們就是這麼活下來的——每一塊石頭，兩個人一起搬。」', textEn: '"Old Cast piled rubble into a forge. A miner named Spring Thunder split the wall bare-handed for shelter. That\'s how we survived — every stone, carried by two."', delay: 3500 });
+    steps.push({ tag: '訓練', tagColor: 'tag-combat', text: '你把石塊重重放下。雙臂在顫抖——但確實比開始的時候更有力了。', textEn: 'You set the boulder down heavily. Arms trembling — but undeniably stronger than before.', delay: 2200 });
+    steps.push({ tag: '系統', tagColor: 'tag-system', html: '<b>訓練結束。</b>你感覺到自己的上肢力量有了明顯提升。', htmlEn: '<b>Training complete.</b> You feel a clear improvement in your upper body strength.', delay: 2000,
+      effect: function() { changeStat('str', 1); state.flags.r2ChengTrainCount = 1; sfx.pass(); notify(L('STR +1（訓練 1/3）', 'STR +1 (Training 1/3)')); }
+    });
+  } else if (trainCount === 1) {
+    // ═══ Session 2 (~30s): The Love — How he and Iron Frost fell for each other ═══
+    steps.push({ tag: '訓練', tagColor: 'tag-combat', text: '承鋼今天的氣色好了不少。他搬來了兩塊更大的石頭，還找了一根鐵棍。「今天練推舉。」', textEn: 'Cheng Gang looks much better today. He\'s brought two larger stones and an iron bar. "Today we do presses."', delay: 2800 });
+    steps.push({ tag: '訓練', tagColor: 'tag-combat', text: '你把沉重的鐵棍架上肩膀。石頭的重量壓得你膝蓋微彎——但你穩住了。', textEn: 'You hoist the heavy bar onto your shoulders. The stones\' weight buckles your knees — but you hold steady.', delay: 2500 });
+    steps.push({ tag: '感知', tagColor: 'tag-sense', text: '承鋼看著你的動作，眼神有些恍惚：「你知道嗎——鐵霜第一次注意到我，也是在訓練場上。」', textEn: 'Cheng Gang watches your form, eyes distant: "You know — Iron Frost first noticed me on the training grounds."', delay: 3000 });
+    steps.push({ tag: '情報', tagColor: 'tag-info', text: '「那時候她剛當上守備軍副指揮。我只是個菜鳥機甲駕駛員。」他笑了。「她嫌我太瘦。」', textEn: '"She had just made deputy garrison commander. I was a rookie mech pilot." He laughs. "She said I was too thin."', delay: 3000 });
+    steps.push({ tag: '訓練', tagColor: 'tag-combat', text: '「推上去——慢慢放下來。好。再一次。」承鋼一邊指導，一邊繼續說。', textEn: '"Push up — lower slowly. Good. Again." Cheng Gang coaches while continuing his story.', delay: 2500 });
+    steps.push({ tag: '情報', tagColor: 'tag-info', text: '「她親自給我加訓。每天天不亮就把我從床上拖起來——跑步、舉重、格鬥。整整三個月，全身上下沒有不痛的地方。」', textEn: '"She personally added extra training. Dragged me out of bed before dawn — running, lifting, sparring. Three months, every part of me ached."', delay: 3500 });
+    steps.push({ tag: '感知', tagColor: 'tag-sense', text: '他的表情變得柔軟：「然後有一天晚上，我在訓練場摔斷了肋骨。」', textEn: 'His expression softens: "Then one night, I broke a rib on the training grounds."', delay: 2800 });
+    steps.push({ tag: '訓練', tagColor: 'tag-combat', text: '你咬著牙又推了一組。汗水順著額頭流進眼睛，但你沒有停下來。', textEn: 'You push through another set, teeth clenched. Sweat runs into your eyes, but you don\'t stop.', delay: 2500 });
+    steps.push({ tag: '情報', tagColor: 'tag-info', text: '「她跑來醫務室，對著醫生吼了一頓——說是訓練強度太大。其實是她自己安排的。」', textEn: '"She rushed to the infirmary, yelled at the medic — said the intensity was too high. It was her own regimen."', delay: 3000 });
+    steps.push({ tag: '情報', tagColor: 'tag-info', text: '「然後她坐在我床邊——一句話都沒說。就那樣坐了一整夜。」', textEn: '"Then she sat by my bed — didn\'t say a word. Just sat there the entire night."', delay: 3000 });
+    steps.push({ tag: '情報', tagColor: 'tag-info', text: '「第二天早上枕頭邊放了一壺熱粥。她從來不會做飯——那碗粥鹹得要命。」承鋼笑出了聲。', textEn: '"Next morning, a pot of porridge by my pillow. She never cooked — salty as hell." Cheng Gang laughs aloud.', delay: 3000 });
+    steps.push({ tag: '感知', tagColor: 'tag-sense', text: '他低下頭，聲音很輕：「那是我第一次覺得，她的力量不只是用來打仗的。」', textEn: 'He lowers his head, voice quiet: "That was the first time I felt her strength wasn\'t just for fighting."', delay: 3000 });
+    steps.push({ tag: '訓練', tagColor: 'tag-combat', text: '「好——最後一組。吸氣——推上去！」他的聲音突然嚴厲。你吼了一聲，把鐵棍推到最高點。', textEn: '"Last set. Inhale — push!" His voice turns sharp. You roar and drive the bar to its apex.', delay: 2800 });
+    steps.push({ tag: '系統', tagColor: 'tag-system', html: '<b>訓練結束。</b>你的肩膀和核心肌群更加結實了。', htmlEn: '<b>Training complete.</b> Your shoulders and core feel considerably more solid.', delay: 2000,
+      effect: function() { changeStat('str', 1); state.flags.r2ChengTrainCount = 2; sfx.pass(); notify(L('STR +1（訓練 2/3）', 'STR +1 (Training 2/3)')); }
+    });
+  } else {
+    // ═══ Session 3 (~60s): The Sacrifice — The plague, piloting Mech 3, becoming the Colossus ═══
+    steps.push({ tag: '訓練', tagColor: 'tag-combat', text: '承鋼今天能自己走到訓練場了。他甚至帶來了一面石板——比之前的石頭重了一倍。', textEn: 'Cheng Gang walks to the training ground on his own today. He even brings a stone slab — twice the previous weight.', delay: 2800 });
+    steps.push({ tag: '訓練', tagColor: 'tag-combat', text: '「最後一次。今天——我們練的是極限。」', textEn: '"Last session. Today — we push limits."', delay: 2200 });
+    steps.push({ tag: '訓練', tagColor: 'tag-combat', text: '他讓你把石板背在背上，然後深蹲——一下、兩下、三下。你感覺脊椎在咯吱作響。', textEn: 'He has you carry the slab on your back, then squat — one, two, three. Your spine creaks.', delay: 3000 });
+    steps.push({ tag: '感知', tagColor: 'tag-sense', text: '承鋼的表情沉了下來。今天的他——比前兩天更安靜。', textEn: 'Cheng Gang\'s expression darkens. Today, he\'s quieter than before.', delay: 2500 });
+    steps.push({ tag: '情報', tagColor: 'tag-info', text: '「……你想聽最後的故事嗎？」他看著遠方。「瘟疫爆發那天的事。」', textEn: '"...Want to hear the last story?" He stares into the distance. "What happened the day the plague broke out."', delay: 3000 });
+    steps.push({ tag: '情報', tagColor: 'tag-info', text: '「那天早上一切都很正常。我和鐵霜在食堂吃早飯——她還嫌我筷子拿得不好看。」', textEn: '"That morning, everything was normal. Iron Frost and I were eating breakfast — she was criticizing how I hold my chopsticks."', delay: 3200 });
+    steps.push({ tag: '情報', tagColor: 'tag-info', text: '「然後警報響了。地底水系突然變色——所有接觸過水源的人，身上開始長出石紋。」', textEn: '"Then the alarms went off. The underground water turned color — everyone who\'d touched it began growing stone lines."', delay: 3200 });
+    steps.push({ tag: '訓練', tagColor: 'tag-combat', text: '「蹲下去——再起來。不要停。」他的聲音有些沙啞。你照做了，腿在發抖。', textEn: '"Down — up. Don\'t stop." His voice rasps. You obey, legs trembling.', delay: 2500 });
+    steps.push({ tag: '情報', tagColor: 'tag-info', text: '「鐵霜反應很快。她十分鐘內就下了三道命令：封鎖水源、疏散平民、武裝部隊集結。」', textEn: '"Iron Frost reacted fast. Three orders in ten minutes: seal the water, evacuate civilians, assemble the armed forces."', delay: 3200 });
+    steps.push({ tag: '情報', tagColor: 'tag-info', text: '「但通道被石化巨獸群堵住了——已經變異的生物正在往營地方向移動。五十條命，就堵在死路裡。」', textEn: '"But the passages were blocked by petrified beasts — mutated creatures moving toward camp. Fifty lives, trapped in a dead end."', delay: 3500 });
+    steps.push({ tag: '感知', tagColor: 'tag-sense', text: '承鋼停了一下，深吸一口氣，然後繼續。', textEn: 'Cheng Gang pauses, takes a deep breath, then continues.', delay: 2000 });
+    steps.push({ tag: '情報', tagColor: 'tag-info', text: '「三號戰甲——那是我們最後的防線。唯一一台還能運作的戰爭機械。」', textEn: '"Mech Unit No.3 — our last line of defense. The only war machine still operational."', delay: 2800 });
+    steps.push({ tag: '情報', tagColor: 'tag-info', text: '「我自願上了駕駛座。不是因為勇敢——是因為除了我，沒人會開那東西。」', textEn: '"I volunteered for the pilot seat. Not out of bravery — I was the only one who knew how to operate it."', delay: 3000 });
+    steps.push({ tag: '訓練', tagColor: 'tag-combat', text: '你的腿在燃燒。石板壓在背上，每一次下蹲都像是極限。但承鋼的故事讓你忘記了痛。', textEn: 'Your legs burn. The slab weighs on your back, every squat feels like the limit. But his story makes you forget the pain.', delay: 3000 });
+    steps.push({ tag: '情報', tagColor: 'tag-info', text: '「鐵霜站在機甲下面，仰頭看著我。她沒有攔我——她知道必須有人去。」', textEn: '"Iron Frost stood beneath the mech, looking up. She didn\'t stop me — she knew someone had to go."', delay: 3000 });
+    steps.push({ tag: '感知', tagColor: 'tag-sense', text: '承鋼的手在顫抖——不是因為疲勞。', textEn: 'Cheng Gang\'s hands tremble — not from fatigue.', delay: 2000 });
+    steps.push({ tag: '情報', tagColor: 'tag-info', text: '「她只說了一句話——」他的聲音微微發顫。「『回來。』」', textEn: '"She said just one thing—" His voice wavers. "\'Come back.\'"', delay: 3000 });
+    steps.push({ tag: '情報', tagColor: 'tag-info', text: '「我駕著機甲衝進了獸群。一隻、兩隻、十隻——我全部碾碎了。通道清了。人們跑了出去。」', textEn: '"I drove the mech into the swarm. One, two, ten — crushed them all. The passage cleared. People ran through."', delay: 3200 });
+    steps.push({ tag: '訓練', tagColor: 'tag-combat', text: '你放下石板，大口喘氣。但承鋼站在原地不動，眼睛看著自己的手。', textEn: 'You set the slab down, gasping. But Cheng Gang stands motionless, staring at his hands.', delay: 2500 });
+    steps.push({ tag: '情報', tagColor: 'tag-info', text: '「但石化因子——從那些巨獸的血液裡滲進了機甲的裂縫。滲進了我的皮膚。」', textEn: '"But the petrification factor seeped through the mech\'s cracks from the beasts\' blood. Into my skin."', delay: 3000 });
+    steps.push({ tag: '情報', tagColor: 'tag-info', text: '「我感覺自己的手指變硬了。然後是手臂。然後是——意識開始模糊。」', textEn: '"I felt my fingers stiffen. Then my arms. Then — consciousness began to blur."', delay: 3000 });
+    steps.push({ tag: '情報', tagColor: 'tag-info', text: '「最後一個念頭是——我沒能回去。我沒能兌現那個承諾。」', textEn: '"My last thought was — I couldn\'t make it back. I couldn\'t keep that promise."', delay: 3000 });
+    steps.push({ tag: '感知', tagColor: 'tag-sense', text: '沉默了很長一段時間。營地的風吹過來，帶著營火的煙味。遠處有人在唱歌。', textEn: 'A long silence. Wind from the camp carries woodsmoke. Someone is singing in the distance.', delay: 3500 });
+    steps.push({ tag: '情報', tagColor: 'tag-info', text: '「……但你把我喚醒了。」他轉過頭看你，眼眶泛紅。「三年的噩夢——結束了。」', textEn: '"...But you woke me." He turns to you, eyes reddening. "Three years of nightmares — over."', delay: 3000 });
+    steps.push({ tag: '訓練', tagColor: 'tag-combat', text: '「最後一組。來——和我一起。」他也拿起了一塊石頭。兩個人並肩蹲下，又站起來。', textEn: '"One last set. Come — with me." He picks up a stone too. Side by side, you squat and rise together.', delay: 3000 });
+    steps.push({ tag: '感知', tagColor: 'tag-sense', text: '你們一起完成了最後十下。放下石頭的時候，他的手搭上了你的肩膀。', textEn: 'You finish the last ten reps together. As you set down the stones, his hand rests on your shoulder.', delay: 2800 });
+    steps.push({ tag: '情報', tagColor: 'tag-info', text: '「你比我強。」承鋼說。「不只是力量——是那種……不放棄任何人的堅持。」', textEn: '"You\'re stronger than me." Cheng Gang says. "Not just in strength — it\'s that... refusal to give up on anyone."', delay: 3000 });
+    steps.push({ tag: '系統', tagColor: 'tag-system', html: '<b>最終訓練結束。</b>你的身體已經脫胎換骨。承鋼的故事，也成為了你力量的一部分。', htmlEn: '<b>Final training complete.</b> Your body has been transformed. Cheng Gang\'s story has become part of your strength.', delay: 2500,
+      effect: function() { changeStat('str', 1); state.flags.r2ChengTrainCount = 3; sfx.pass(); notify(L('STR +1（訓練 3/3 完成！）', 'STR +1 (Training 3/3 complete!)')); }
+    });
+  }
+
+  autoExplore(steps, [
+    { text: '返回營地', textEn: 'Return to camp', action: () => loadNode('r2_camp') },
+  ], { label: L('力量訓練 ' + (trainCount + 1) + '/3', 'Strength Training ' + (trainCount + 1) + '/3') });
 });
