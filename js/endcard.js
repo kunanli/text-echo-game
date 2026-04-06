@@ -1,7 +1,7 @@
 // ══ Ending Card Generator — Collectible Card ══
 
-var ENDCARD_W = 450;
-var ENDCARD_H = 740;
+var ENDCARD_W = 500;
+var ENDCARD_H = 769;
 
 var ENDING_META = {
   dawn:       { zh: '黎明', en: 'DAWN',       type: '曙光者',  typeEn: 'DAWNBRINGER', color: '#60c8e0' },
