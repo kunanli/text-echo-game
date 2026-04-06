@@ -305,11 +305,10 @@ function generateEndCard() {
   //  CHARACTER ART (pixel portrait or ASCII fallback)
   // ═════════════════════════════════
   curY += 32;
-  var _pixelImg = (typeof npcPortrait !== 'undefined') ? npcPortrait.getImage('player_' + ending) : null;
+  var _pixelImg = (typeof npcPortrait !== 'undefined') ? npcPortrait.getImage(npcPortrait.playerId()) : null;
   if (_pixelImg) {
     // Draw pixel portrait centered, scaled to fit
-    var pxW = 120, pxH = Math.round((_pixelImg.height / _pixelImg.width) * pxW);
-    if (pxH > 200) { pxH = 200; pxW = Math.round((_pixelImg.width / _pixelImg.height) * pxH); }
+    var pxW = 160, pxH = 160;
     ctx.imageSmoothingEnabled = false;  // keep pixel-crisp
     ctx.drawImage(_pixelImg, (ENDCARD_W - pxW) / 2, curY, pxW, pxH);
     curY += pxH + 20;

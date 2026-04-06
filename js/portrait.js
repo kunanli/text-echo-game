@@ -8,8 +8,12 @@ var npcPortrait = (function() {
 
   // ── NPC portrait registry ──
   // 每位 NPC 對應一張半身像素圖（黑白動漫風）
-  // 圖片放在 assets/npc/ 目錄下，128×256 px PNG
+  // 圖片放在 assets/npc/ 目錄下，256×256 px PNG
   var PORTRAITS = {
+    // 主角（依性別）
+    player_male:   { file: 'player_male.png',   zh: '主角',       en: 'Player',      color: ''       },
+    player_female: { file: 'player_female.png', zh: '主角',       en: 'Player',      color: ''       },
+    // NPC
     ying:     { file: 'ying.png',     zh: '螢',       en: 'Ying',        color: 'cyan'   },
     zhou:     { file: 'zhou.png',     zh: '老周',     en: 'Old Zhou',    color: 'gold'   },
     crane:    { file: 'crane.png',    zh: '灰鶴',     en: 'Grey Crane',  color: 'gold'   },
@@ -22,7 +26,7 @@ var npcPortrait = (function() {
 
   var BASE_PATH = 'assets/npc/';
 
-  // 預載入快取（key = npcId, value = Image element or null）
+  // 預載入快取（key = portraitId, value = Image element or null）
   var _cache = {};
   var _failedSet = {};  // 載入失敗的 ID，避免重試
 
@@ -49,7 +53,12 @@ var npcPortrait = (function() {
     return !!_cache[id];
   }
 
-  // ── 生成 NPC 肖像 HTML（用於 art 欄位） ──
+  // ── 便利：取得當前主角的 portrait ID ──
+  function playerId() {
+    return 'player_' + (state.sex === 'female' ? 'female' : 'male');
+  }
+
+  // ── 生成肖像 HTML（用於 art 欄位） ──
   // 圖片已載入 → 回傳 <img> HTML
   // 圖片未載入或不存在 → 回傳 null（呼叫端用 || 語法 fallback 到 ASCII art）
   function html(id, opts) {
@@ -75,6 +84,11 @@ var npcPortrait = (function() {
     '</div>';
   }
 
+  // ── 主角肖像（自動依性別選擇） ──
+  function playerHtml(opts) {
+    return html(playerId(), opts);
+  }
+
   // ── 用於 endcard.js canvas 繪製 ──
   // 回傳 Image element（已載入），或 null
   function getImage(id) {
@@ -83,7 +97,7 @@ var npcPortrait = (function() {
   }
 
   // ── 便利函式：生成 art 欄位，自動 fallback ──
-  // 用法：art: npcPortrait.art('ying', { subtitle: '記錄員' }) || `<pre class="ascii-art cyan">...</pre>`
+  // 用法：art: npcPortrait.art('ying', { subtitle: '記錄員' }) || `<pre>...</pre>`
   function art(id, opts) {
     return html(id, opts);
   }
@@ -93,13 +107,15 @@ var npcPortrait = (function() {
     PORTRAITS: PORTRAITS,
     preloadAll: preloadAll,
     isReady: isReady,
+    playerId: playerId,
+    playerHtml: playerHtml,
     html: html,
     art: art,
     getImage: getImage,
   };
 })();
 
-// 頁面載入後預載入所有 NPC 肖像
+// 頁面載入後預載入所有肖像
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', npcPortrait.preloadAll);
 } else {
