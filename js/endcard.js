@@ -316,52 +316,52 @@ function generateEndCard() {
   }
 
   // ═════════════════════════════════
-  //  TEXT OVERLAY — all in bottom 30%
+  //  TEXT OVERLAY — bottom area
   // ═════════════════════════════════
   var curY = Math.floor(ENDCARD_H * 0.68);
 
   // ── Player name + ending type ──
   ctx.shadowColor = 'rgba(0,0,0,0.9)';
-  ctx.shadowBlur = 6;
-  ctx.font = 'bold 20px "Courier New", monospace';
+  ctx.shadowBlur = 8;
+  ctx.font = 'bold 32px "Courier New", monospace';
   ctx.fillStyle = '#e8e8f0';
   ctx.textAlign = 'left';
   ctx.fillText(state.name, pad, curY);
 
   ctx.textAlign = 'right';
-  ctx.font = 'bold 14px "Courier New", monospace';
+  ctx.font = 'bold 22px "Courier New", monospace';
   ctx.fillStyle = meta.color;
   ctx.fillText(en ? meta.typeEn : meta.type, ENDCARD_W - pad, curY);
   ctx.shadowBlur = 0;
 
-  // ── Stats: compact single row per stat ──
-  curY += 20;
+  // ── Stats: compact single row ──
+  curY += 32;
   var statDefs = [
     { label: 'STR', val: state.str },
     { label: 'AGI', val: state.agi },
     { label: 'WIL', val: state.wil },
   ];
-  ctx.font = '11px "Courier New", monospace';
+  ctx.font = '18px "Courier New", monospace';
   ctx.textAlign = 'left';
   ctx.shadowColor = 'rgba(0,0,0,0.7)';
-  ctx.shadowBlur = 3;
+  ctx.shadowBlur = 4;
   var statStr = '';
   for (var si = 0; si < statDefs.length; si++) {
-    statStr += statDefs[si].label + ' ' + statDefs[si].val + '   ';
+    statStr += statDefs[si].label + ' ' + statDefs[si].val + '  ';
   }
-  statStr += 'Lv.' + state.level + '   ' + (en ? 'PETRI ' : '石化 ') + state.petri + '%';
+  statStr += 'Lv.' + state.level + '  ' + (en ? 'PETRI ' : '石化 ') + state.petri + '%';
   ctx.fillStyle = '#9a9aaa';
   ctx.fillText(statStr, pad, curY);
   ctx.shadowBlur = 0;
 
   // ── Score (large, right side) ──
-  curY += 28;
-  ctx.font = 'bold 36px "Courier New", monospace';
+  curY += 42;
+  ctx.font = 'bold 52px "Courier New", monospace';
   ctx.fillStyle = rarity.color;
   ctx.textAlign = 'right';
   if (rarity.stars >= 4) {
     ctx.shadowColor = rarity.color;
-    ctx.shadowBlur = 12;
+    ctx.shadowBlur = 16;
   }
   ctx.fillText('' + totalScore, ENDCARD_W - pad, curY);
   ctx.shadowBlur = 0;
@@ -369,7 +369,7 @@ function generateEndCard() {
   // Stars + rarity (left of score)
   var stars = '';
   for (var i = 0; i < rarity.stars; i++) stars += '★';
-  ctx.font = '12px "Courier New", monospace';
+  ctx.font = '20px "Courier New", monospace';
   ctx.textAlign = 'left';
   ctx.fillStyle = rarity.color;
   ctx.shadowColor = 'rgba(0,0,0,0.8)';
@@ -380,9 +380,9 @@ function generateEndCard() {
   // ═════════════════════════════════
   //  FOOTER: time + url
   // ═════════════════════════════════
-  var footerY = ENDCARD_H - 28;
+  var footerY = ENDCARD_H - 30;
   ctx.textAlign = 'left';
-  ctx.font = '9px "Courier New", monospace';
+  ctx.font = '14px "Courier New", monospace';
   ctx.fillStyle = '#5a5a6a';
   ctx.fillText('petriabyss.itch.io', pad, footerY);
 
