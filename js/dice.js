@@ -128,10 +128,11 @@ var diceGame = (function() {
     { zh: '灰鶴挑了挑眉，把金幣推過來：「新手運罷了。」', en: 'Grey Crane raises an eyebrow, pushing the coins over: "Beginner\'s luck."' },
   ];
   var CRANE_LOSE_LINES_TIER2 = [
-    { zh: '灰鶴嘆了口氣，把金幣推過來時手指不自覺地碰到了你的手背：「……你還真有兩下子。」', en: 'Grey Crane sighs, her fingers brushing your hand as she pushes the coins over: "...You\'re actually good."' },
-    { zh: '灰鶴搖了搖頭，身子微微前傾，斗篷的領口隨著動作鬆開了些：「行吧，這把算你的。」', en: 'Grey Crane shakes her head, leaning forward slightly — her cloak\'s collar loosens with the motion: "Fine, this one\'s yours."' },
-    { zh: '「又輸了……」灰鶴煩躁地把頭髮撥到耳後，露出頸側一道淡淡的舊傷疤：「再來。」', en: '"Lost again..." Grey Crane irritably tucks her hair behind her ear, revealing a faint scar along her neck: "Again."' },
-    { zh: '灰鶴灌了一口酒，酒液從嘴角淌下，她用食指慢慢抹去：「你的運氣不會一直這麼好。」', en: 'Grey Crane takes a swig, liquor trickling from the corner of her mouth. She wipes it slowly with one finger: "Your luck won\'t hold forever."' },
+    { zh: '灰鶴嘆了口氣，把金幣推過來時手指不自覺地碰到了你的手背——然後沒有收回去，指尖在你的指關節上慢慢滑了一下：「……你還真有兩下子。」', en: 'Grey Crane sighs, her fingers brushing your hand as she pushes the coins over — then not pulling back, fingertips sliding slowly across your knuckles: "...You\'re actually good."' },
+    { zh: '灰鶴搖了搖頭，身子微微前傾，斗篷的領口隨著動作鬆開了些，你能看見鎖骨下方細膩的皮膚和一條若隱若現的刀疤：「行吧，這把算你的。」她的目光從你的手移到你的臉上，慢慢地，像在品嚐什麼。', en: 'Grey Crane shakes her head, leaning forward — her cloak\'s collar loosens, revealing fine skin below her collarbone and a faint scar: "Fine, this one\'s yours." Her gaze slides from your hands to your face, slowly, as if savoring something.' },
+    { zh: '「又輸了……」灰鶴煩躁地把頭髮撥到耳後，露出頸側一道淡淡的舊傷疤。她的膝蓋在桌子底下碰了碰你的腿，沒有移開：「再來。」', en: '"Lost again..." Grey Crane irritably tucks her hair behind her ear, revealing a faint scar along her neck. Her knee bumps yours under the table and stays there: "Again."' },
+    { zh: '灰鶴灌了一口酒，酒液從嘴角淌下，她用食指慢慢抹去，然後把那根沾著酒的手指放在唇邊舔了一下，眼睛始終盯著你：「你的運氣不會一直這麼好。」', en: 'Grey Crane takes a swig, liquor trickling from the corner of her mouth. She wipes it slowly with one finger, then licks the liquor off it — eyes locked on you the whole time: "Your luck won\'t hold forever."' },
+    { zh: '灰鶴輸得有點不耐煩了。她把金幣扔過來，身子往你的方向靠了靠，斗篷底下的肩線在燭光裡顯得格外纖細：「你是不是故意在贏我？想看我著急的樣子？」她壓低嗓音，帶著點沙啞的笑意。', en: 'Grey Crane\'s getting impatient. She tosses the coins over and leans toward you, the line of her shoulders under the cloak looking impossibly delicate in candlelight: "Are you winning on purpose? Want to see me flustered?" Her voice drops low, tinged with husky amusement.' },
   ];
   var CRANE_LOSE_LINES_TIER3 = [
     { zh: '灰鶴仰頭灌了一口酒，喉結微動，幾滴酒液沿著下巴滑落：「……你是來搶劫我的吧？」', en: 'Grey Crane tilts her head back for a swig, throat moving — a few drops trail down her chin: "...Are you here to rob me?"' },
