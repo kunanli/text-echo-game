@@ -481,11 +481,21 @@ var R3_PATROL_TEXTS = [
   { text: '碼頭的木板在你腳下發出不安的嘎吱聲，河水在下方黑暗中湧動。', textEn: 'Dock planks creak nervously beneath you, dark water surging below.' },
 ];
 
-// Region-aware helpers
+// ── Register pools into centralized registry (from registry.js) ──
+registerMonsterPool(0, R0_MONSTERS);
+registerMonsterPool(1, R1_MONSTERS);
+registerMonsterPool(2, R2_MONSTERS);
+registerMonsterPool(3, R3_MONSTERS);
+registerPatrolTexts(0, R0_PATROL_TEXTS);
+registerPatrolTexts(1, R1_PATROL_TEXTS);
+registerPatrolTexts(2, R2_PATROL_TEXTS);
+registerPatrolTexts(3, R3_PATROL_TEXTS);
+
+// Region-aware helpers — now delegate to registry for R4+ extensibility
 var PATROL_TEXTS = R0_PATROL_TEXTS; // kept for backwards compat
-function getPatrolMonsters() { return state.region >= 3 ? R3_MONSTERS : state.region >= 2 ? R2_MONSTERS : state.region >= 1 ? R1_MONSTERS : R0_MONSTERS; }
-function getPatrolTexts() { return state.region >= 3 ? R3_PATROL_TEXTS : state.region >= 2 ? R2_PATROL_TEXTS : state.region >= 1 ? R1_PATROL_TEXTS : R0_PATROL_TEXTS; }
-function getPatrolReturnNode() { return state.region >= 3 ? 'r3_look' : state.region >= 2 ? 'r2_look' : state.region >= 1 ? 'r1_look' : 'r0_look'; }
+function getPatrolMonsters() { return getMonsterPool(); }
+function getPatrolTexts()    { return getPatrolTextPool(); }
+function getPatrolReturnNode() { return getHubNode(); }
 
 var patrolActive = false;
 var patrolTimers = [];
@@ -599,8 +609,124 @@ var DEFEAT_VERBS = [
   { zh: '——石化紋路爆發！粉碎了', en: ' — petrification surges! Shattered ' },
 ];
 
+// ── Narrative Event Engine ──
+// Runs a registered patrol event instead of combat (25% chance per cycle).
+// Events use the same queue/processNext pattern as combat for consistent UX.
+function runNarrativeEvent(evt) {
+  var queue = [];
+
+  // 1-2 patrol flavor lines (same as combat preamble)
+  var patrolPool = getPatrolTexts();
+  var p = patrolPool[rng(0, patrolPool.length - 1)];
+  queue.push({ tag: L('巡邏','Patrol'), color: 'tag-move',
+    text: L(p.text, p.textEn), delay: rng(1500, 2300) });
+
+  // Event builds its own steps into the queue
+  evt.buildQueue(queue);
+
+  // Process queue (mirrors combat processNext)
+  var qi = 0;
+  function processNext() {
+    if (!patrolActive) return;
+    if (qi >= queue.length) {
+      // Event finished — resume patrol cycle
+      patrolTimers.push(setTimeout(runPatrolCycle, 1500));
+      return;
+    }
+    var step = queue[qi++];
+
+    // If step has choices, pause auto-advance and show buttons
+    if (step.choices) {
+      // Render the prompt text first
+      if (step.text) {
+        patrolAppend(step.tag || L('事件','Event'), step.color || 'tag-info',
+          step.text || '', false);
+      }
+      // Show choice buttons (replace the stop button temporarily)
+      $choices.innerHTML = '';
+      currentChoices = [];
+      var en = state.lang === 'en';
+      for (var c = 0; c < step.choices.length; c++) {
+        (function(choice) {
+          var btn = document.createElement('button');
+          btn.className = 'choice-btn';
+          btn.textContent = en ? choice.textEn : choice.text;
+          btn.addEventListener('click', function() {
+            sfx.click();
+            // Restore stop-patrol button
+            $choices.innerHTML = '';
+            currentChoices = [];
+            var stopBtn = document.createElement('button');
+            stopBtn.className = 'choice-btn';
+            stopBtn.textContent = L('停下腳步', 'Stop and rest');
+            stopBtn.addEventListener('click', stopPatrol);
+            $choices.appendChild(stopBtn);
+            // Execute choice action
+            if (choice.action) choice.action();
+            // If choice doesn't handle continuation itself, resume queue
+            if (!choice.pauseQueue) {
+              patrolTimers.push(setTimeout(processNext, 800));
+            }
+          });
+          $choices.appendChild(btn);
+        })(step.choices[c]);
+      }
+      // Add stop-patrol option alongside choices
+      var stopBtn2 = document.createElement('button');
+      stopBtn2.className = 'choice-btn';
+      stopBtn2.textContent = L('停下腳步', 'Stop and rest');
+      stopBtn2.addEventListener('click', stopPatrol);
+      $choices.appendChild(stopBtn2);
+      return; // Wait for player choice
+    }
+
+    function renderAndContinue() {
+      if (!patrolActive) return;
+      if (step.sfx) { try { sfx[step.sfx](); } catch(e) {} }
+      if (step.effect) { try { step.effect(); } catch(e) {} }
+      if (!patrolActive || state.hp <= 0 || state.petri >= 100) return;
+      if (step.art) {
+        if (typeof step.art === 'string') {
+          // HTML art string
+          var div = document.createElement('div');
+          div.innerHTML = step.art;
+          $story.appendChild(div);
+          $story.scrollTop = $story.scrollHeight;
+        } else {
+          patrolAppendArt(step.art, step.artClass || '');
+        }
+      } else if (step.html) {
+        patrolAppend(step.tag, step.color, step.html, true);
+      } else if (step.text) {
+        patrolAppend(step.tag, step.color, step.text, false);
+      }
+      patrolTimers.push(setTimeout(processNext, step.delay || 1500));
+    }
+
+    if (step.pending) {
+      showPending();
+      patrolTimers.push(setTimeout(function() {
+        removePending();
+        renderAndContinue();
+      }, 650));
+    } else {
+      renderAndContinue();
+    }
+  }
+  processNext();
+}
+
 function runPatrolCycle() {
   if (!patrolActive) return;
+
+  // ── 25% chance to trigger a narrative event instead of combat ──
+  var available = getAvailablePatrolEvents();
+  if (available.length > 0 && Math.random() < 0.25) {
+    var evt = available[rng(0, available.length - 1)];
+    state.flags[evt.flag] = true; // mark as triggered (once per playthrough)
+    runNarrativeEvent(evt);
+    return;
+  }
 
   var monsters = getPatrolMonsters();
   var monster = monsters[rng(0, monsters.length - 1)];
