@@ -1161,6 +1161,7 @@ registerNode('r3_quest_check', () => {
   if (state.flags.r3YingEvidence) questsDone++; // Quest 3: plague origin (Ying working on it)
 
   var steps = [];
+  steps.push({ art: npcPortrait.art('bell', { subtitle: '議員' }), artEn: npcPortrait.art('bell', { subtitle: 'Councilor' }), delay: 800 });
   steps.push({ art: `<pre class="ascii-art">
   ╔═══════════════════════════╗
   ║     任 務 進 度            ║
@@ -1233,6 +1234,7 @@ registerNode('r3_quest_check', () => {
 // ── Boss Prep ──
 registerNode('r3_boss_prep', () => {
   var steps = [];
+  steps.push({ art: npcPortrait.art('bell', { subtitle: '議員' }), artEn: npcPortrait.art('bell', { subtitle: 'Councilor' }), delay: 800 });
   steps.push({ art: `<pre class="ascii-art">
   ╔═══════════════════════════════╗
   ║       決 戰 前 夕              ║

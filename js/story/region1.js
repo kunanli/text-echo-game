@@ -1805,6 +1805,7 @@ registerNode('r1_ying_warmth', () => {
   state.flags.r1YingWarmth = true;
 
   autoExplore([
+    { art: npcPortrait.art('ying', { subtitle: '記錄員' }), artEn: npcPortrait.art('ying', { subtitle: 'Chronicler' }), delay: 800 },
     { tag: '環境', tagColor: 'tag-system', text: '礦道深處的溫度越來越低。你的呼吸在空氣中凝成白霧。', textEn: 'The temperature drops deeper in the mines. Your breath forms white mist in the air.', delay: 2200 },
     { tag: '感知', tagColor: 'tag-sense', text: '螢縮在牆角，手冊抱在胸前，嘴唇微微發紫。' + yingPronoun + '在發抖，卻還在堅持寫字。', textEn: 'Ying huddles in the corner, notebook clutched to ' + yPo + ' chest, lips tinged blue. ' + yingPronounCap + '\'s shivering but still writing.', delay: 2800 },
     { tag: '感知', tagColor: 'tag-sense', text: '你注意到' + yingPronoun + '的筆跡已經歪歪扭扭——手指凍得快握不住筆了。', textEn: 'You notice ' + yPo + ' handwriting has gone wobbly — fingers too cold to hold the pen steady.', delay: 2500 },

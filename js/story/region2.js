@@ -2217,6 +2217,7 @@ registerNode('r2_cheng_train', () => {
 
   if (trainCount >= 3) {
     autoExplore([
+      { art: npcPortrait.art('cheng', { subtitle: '研究員' }), artEn: npcPortrait.art('cheng', { subtitle: 'Researcher' }), delay: 800 },
       { tag: '情報', tagColor: 'tag-info', text: '承鋼搖了搖頭：「你已經足夠強了。剩下的路——要靠你自己的力量走完。」', textEn: 'Cheng Gang shakes his head: "You\'re strong enough. The rest of the road — you\'ll walk it on your own strength."', delay: 2500 },
     ], [
       { text: '返回營地', textEn: 'Return to camp', action: () => loadNode('r2_camp') },
@@ -2226,6 +2227,7 @@ registerNode('r2_cheng_train', () => {
 
   var steps = [];
   // ── Common training intro ──
+  steps.push({ art: npcPortrait.art('cheng', { subtitle: '研究員' }), artEn: npcPortrait.art('cheng', { subtitle: 'Researcher' }), delay: 800 });
   steps.push({ art: `<pre class="ascii-art gold">
   ╔═════════════════════════════════╗
   ║    ◆◇◆  力 量 訓 練  ◆◇◆      ║

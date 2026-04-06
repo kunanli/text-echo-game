@@ -1412,6 +1412,7 @@ registerNode('r0_ferryman_meet', () => {
 
 registerNode('r0_ferryman_lore', () => {
   autoExplore([
+    { art: npcPortrait.art('ferryman', { subtitle: '冥河渡江人' }), artEn: npcPortrait.art('ferryman', { subtitle: 'Ferryman' }), delay: 800 },
     { tag: '你', tagColor: 'tag-info',
       text: '「你是什麼人？為什麼在這裡？」',
       textEn: '"Who are you? Why are you here?"',
@@ -1456,6 +1457,7 @@ registerNode('r0_ferryman_lore', () => {
 
 registerNode('r0_ferryman_challenge', () => {
   autoExplore([
+    { art: npcPortrait.art('ferryman', { subtitle: '冥河渡江人' }), artEn: npcPortrait.art('ferryman', { subtitle: 'Ferryman' }), delay: 800 },
     { tag: '渡江人', tagColor: 'tag-npc',
       text: '「既然你要渡河——那就接受深淵的試煉吧。」',
       textEn: '"If you wish to cross — then face the trial of the abyss."',
@@ -1496,6 +1498,7 @@ registerNode('r0_ferryman_challenge', () => {
 
 registerNode('r0_ferryman_fail', () => {
   autoExplore([
+    { art: npcPortrait.art('ferryman', { subtitle: '冥河渡江人' }), artEn: npcPortrait.art('ferryman', { subtitle: 'Ferryman' }), delay: 800 },
     { tag: '感知', tagColor: 'tag-petri',
       text: '一股巨大的壓力從額頭灌入——你的意識在剎那間被撕裂。',
       textEn: 'Immense pressure floods through your forehead — your consciousness tears apart in an instant.',
@@ -1528,6 +1531,7 @@ registerNode('r0_ferryman_fail', () => {
 registerNode('r0_ferryman_descent', () => {
   state.flags.ferrymanPassed = true;
   autoExplore([
+    { art: npcPortrait.art('ferryman', { subtitle: '冥河渡江人' }), artEn: npcPortrait.art('ferryman', { subtitle: 'Ferryman' }), delay: 800 },
     { tag: '感知', tagColor: 'tag-petri',
       text: '深淵的凝視灌入你的腦海——',
       textEn: 'The gaze of the abyss floods your mind —',
