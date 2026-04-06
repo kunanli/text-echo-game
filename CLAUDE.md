@@ -1022,6 +1022,7 @@ function runNarrativeEvent(evt) {
 | `crane.png` | 灰鶴 | 行商人，gold 光暈 |
 | `frost.png` | 鐵霜 | 營地首領 |
 | `cast.png` | 老鑄 | 鐵匠 |
+| `cheng.png` | 承鋼 | 研究員，鐵霜的伴侶 |
 | `dew.png` | 清露 | 醫師，cyan 光暈 |
 | `bell.png` | 銅鐘 | 議會代表 |
 | `ferryman.png` | 冥河渡江人 | 隱藏 NPC，purple 光暈 |

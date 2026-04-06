@@ -19,6 +19,7 @@ var npcPortrait = (function() {
     crane:    { file: 'crane.png',    zh: '灰鶴',     en: 'Grey Crane',  color: 'gold'   },
     frost:    { file: 'frost.png',    zh: '鐵霜',     en: 'Iron Frost',  color: ''       },
     cast:     { file: 'cast.png',     zh: '老鑄',     en: 'Old Cast',    color: ''       },
+    cheng:    { file: 'cheng.png',    zh: '承鋼',     en: 'Cheng Gang',  color: ''       },
     dew:      { file: 'dew.png',      zh: '清露',     en: 'Dew',         color: 'cyan'   },
     bell:     { file: 'bell.png',     zh: '銅鐘',     en: 'Bronze Bell', color: ''       },
     ferryman: { file: 'ferryman.png', zh: '冥河渡江人', en: 'Ferryman',  color: 'purple' },
