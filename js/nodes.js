@@ -157,7 +157,7 @@ function startGameOverSequence() {
   autoExplore(steps, [
     { text: '查看石碑', textEn: 'View the stone tablet', action: function() {
       if (typeof showEndCard === 'function') showEndCard();
-      // After endcard is closed, show leaderboard
+      // After endcard is closed, show leaderboard then restart options
       var $ecOverlay = document.getElementById('endcard-overlay');
       var $ecClose = document.getElementById('endcard-close-btn');
       if ($ecClose) {
@@ -166,12 +166,50 @@ function startGameOverSequence() {
           if (origClose) origClose();
           $ecOverlay.classList.remove('active');
           setTimeout(function() {
-            if (typeof showLeaderboard === 'function') showLeaderboard();
+            showDeathRestartChoices();
           }, 300);
         };
       }
     }},
   ], { label: L('命運揭示', 'Fate Revealed') });
+}
+
+function showDeathRestartChoices() {
+  var choices = [
+    { text: '查看排行榜', textEn: 'View Leaderboard', action: function() {
+      if (typeof showLeaderboard === 'function') {
+        showLeaderboard();
+        // Hook leaderboard close to re-show choices
+        var $lbClose = document.getElementById('leaderboard-close-btn');
+        if ($lbClose) {
+          var origLbClose = $lbClose.onclick;
+          $lbClose.onclick = function() {
+            if (origLbClose) origLbClose();
+            setTimeout(function() { showDeathRestartChoices(); }, 200);
+          };
+        }
+      }
+    }},
+    { text: '再看一次石碑', textEn: 'View Stone Tablet Again', action: function() {
+      if (typeof showEndCard === 'function') {
+        showEndCard();
+        var $ecClose = document.getElementById('endcard-close-btn');
+        if ($ecClose) {
+          var origClose = $ecClose.onclick;
+          $ecClose.onclick = function() {
+            if (origClose) origClose();
+            document.getElementById('endcard-overlay').classList.remove('active');
+            setTimeout(function() { showDeathRestartChoices(); }, 200);
+          };
+        }
+      }
+    }},
+    { text: '從頭開始', textEn: 'Start Over', action: function() {
+      if (typeof localStorage !== 'undefined') localStorage.removeItem(SAVE_KEY);
+      location.reload();
+    }},
+  ];
+  showChoices(choices);
 }
 
 function regionStartNode() {

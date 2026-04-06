@@ -1044,7 +1044,7 @@ registerNode('r0_tunnel', () => {
   ], [
     { text: '戰鬥', textEn: 'Fight', action: () => {
       startCombat(
-        { name: lizardName, hp: 30, atkMin: 8, atkMax: 18, petriDmg: 6, desc: lizardDesc },
+        { name: lizardName, hp: 30, atkMin: 8, atkMax: 18, petriDmg: 6, xp: 15, desc: lizardDesc },
         () => { changeStat('str', 1); notify(L('力量 +1', 'STR +1')); loadNode('r0_after_lizard'); },
         () => {
           changePetri(5);
