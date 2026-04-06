@@ -2,6 +2,9 @@
 
 // ─── Death / Revive ───
 function die(msg) {
+  // Track consecutive deaths for mercy system
+  state.flags._consecutiveDeaths = (state.flags._consecutiveDeaths || 0) + 1;
+
   // Stop patrol if active
   patrolActive = false;
   clearPatrolTimers();

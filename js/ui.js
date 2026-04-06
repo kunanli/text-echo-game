@@ -23,6 +23,21 @@ function renderStatus() {
   } else {
     $region.textContent = '第' + '一二三四'[state.region] + '層 — ' + getRegion(state.region);
   }
+  // NG+ cycle indicator
+  var $cycleRow = document.getElementById('cycle-row');
+  if ($cycleRow) {
+    if (state.flags.ngPlus) {
+      var run = state.flags.ngPlusRun || 1;
+      var scale = Math.pow(2, run);
+      var cycleNames = ['', '二周目', '三周目', '四周目'];
+      document.getElementById('stat-cycle').textContent = state.lang === 'en'
+        ? 'Cycle ' + (run + 1) + ' (' + scale + 'x)'
+        : (cycleNames[run] || (run + 1) + '周目') + '（' + scale + '倍）';
+      $cycleRow.style.display = '';
+    } else {
+      $cycleRow.style.display = 'none';
+    }
+  }
 
   // Gold display
   var $goldRow = document.getElementById('gold-row');

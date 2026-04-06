@@ -686,6 +686,12 @@ registerNode('r2_camp', () => {
 registerNode('r2_camp_chief', () => {
   var steps = [];
 
+  // NG+ memory: recognizing Iron Frost
+  if (state.flags.ngPlus) {
+    steps.push({ tag: '記憶', tagColor: 'tag-petri', text: '你一踏進營地，腦海中忽然浮現出一個畫面——這個高大的女人，石錘，還有那隻石化的手臂。', textEn: 'The moment you step into camp, a vision flashes — this tall woman, her stone hammer, that petrified arm.', delay: 2500 });
+    steps.push({ tag: '記憶', tagColor: 'tag-petri', text: '你叫得出她的名字。鐵霜。但你不知道為什麼。', textEn: 'You know her name. Iron Frost. But you don\'t know why.', delay: 2200 });
+  }
+
   // ── Phase 1: First reunion — Iron Frost tenderly caring for unconscious man ──
   if (state.flags.r2BossSpared && !state.flags.r2ReunionSeen) {
     state.flags.r2ReunionSeen = true;
@@ -1108,7 +1114,13 @@ registerNode('r2_boss_prep', () => {
       yingSteps.push({ tag: '感知', tagColor: 'tag-sense', text: '螢在人群後面看著你出發。' + yP + '的嘴唇動了動，但最終什麼都沒說。', textEn: 'Ying watches from the back as you set out. ' + yPC + ' lips move, but no words come.', delay: 2500 });
     }
   }
-  autoExplore([
+  // NG+ memory: déjà vu before boss
+  var ngBossSteps = [];
+  if (state.flags.ngPlus) {
+    ngBossSteps.push({ tag: '記憶', tagColor: 'tag-petri', text: '巨像。你在夢裡見過它。那不是夢——是上一世的記憶。', textEn: 'The Colossus. You\'ve seen it in dreams. Not dreams — memories of a past life.', delay: 2500 });
+    ngBossSteps.push({ tag: '記憶', tagColor: 'tag-petri', text: '你知道它的弱點在哪裡。你知道它會在第幾回合暴怒。這次，你做好了準備。', textEn: 'You know where its weakness lies. You know which round it rages. This time, you\'re prepared.', delay: 2800 });
+  }
+  autoExplore(ngBossSteps.concat([
     { art: `<pre class="ascii-art red">
   ╔═══════════════════════════════════╗
   ║         ⚠  作 戰 準 備  ⚠        ║
@@ -1145,7 +1157,7 @@ registerNode('r2_boss_prep', () => {
     { tag: '情報', tagColor: 'tag-info', text: '「記住——那頭巨獸是半人半機甲的存在。普通攻擊對它的外殼效果很差。」', textEn: '"Remember — that colossus is half-human, half-mech. Normal attacks barely scratch its shell."', delay: 2800 },
     { tag: '情報', tagColor: 'tag-info', html: '「你有機甲控制鍵——<b>在戰鬥中找到它胸口的核心接口，插入控制鍵就能讓它短路。</b>」', htmlEn: '"You have the mech control key — <b>find the core port on its chest during battle. Insert the key to short-circuit it.</b>"', delay: 3000 },
     { tag: '情報', tagColor: 'tag-info', text: '「但在那之前，你得先打穿它的護甲……準備好了嗎？」', textEn: '"But first you need to break through its armor... Are you ready?"', delay: 2500 },
-  ].concat(yingSteps), [
+  ]).concat(yingSteps), [
     { text: '出發！', textEn: 'Let\'s go!', action: () => loadNode('r2_boss') },
     { text: '再準備一下', textEn: 'I need more preparation', action: () => loadNode('r2_camp') },
   ], { label: L('作戰準備', 'Battle preparations') });
@@ -1353,6 +1365,14 @@ registerNode('r2_ying_talk', () => {
   var yPo = isMale ? 'her' : 'his';
 
   var steps = [];
+
+  // NG+ memory: deeper connection with Ying
+  if (state.flags.ngPlus && !state.flags._r2YingNgTalk) {
+    state.flags._r2YingNgTalk = true;
+    steps.push({ tag: '記憶', tagColor: 'tag-petri', text: '看著螢翻閱筆記本的側臉，一種無法言說的熟悉感湧上心頭。你記得這個畫面——' + yP + '寫字時微微歪頭的習慣，筆尖在紙上的沙沙聲。', textEn: 'Watching Ying flip through ' + yPo + ' notebook in profile, an inexplicable familiarity surges up. You remember this — the way ' + yP + ' tilts ' + yPo + ' head while writing, the scratch of pen on paper.', delay: 3000 });
+    steps.push({ tag: '感知', tagColor: 'tag-sense', text: '螢忽然停下筆，看向你。「你又在用那種奇怪的眼神看我了。」', textEn: 'Ying suddenly stops writing and looks at you. "You\'re looking at me with that strange expression again."', delay: 2500 });
+    steps.push({ tag: '感知', tagColor: 'tag-sense', text: '你移開視線。有些話還沒到能說出口的時候。', textEn: 'You look away. Some things aren\'t ready to be spoken yet.', delay: 2200 });
+  }
   steps.push({ art: `<pre class="ascii-art cyan">
        ·✦· 螢 — 記錄員少女 ·✦·
                ╭───╮

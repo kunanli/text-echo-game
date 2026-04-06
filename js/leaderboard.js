@@ -25,8 +25,11 @@ var LEADERBOARD = {
       seconds = Math.floor((Date.now() - globalStats.currentRunStartMs) / 1000);
     }
     // Dreamlo add: /lb/{privateKey}/add/{name}/{score}/{seconds}/{ending}
+    // Append cycle info to ending text for leaderboard display
+    var cycle = state.flags.ngPlusRun || 0;
+    var endingText = ending + (cycle > 0 ? '|c' + (cycle + 1) : '');
     var safeName = encodeURIComponent(name.replace(/[\/\\\?&]/g, '_'));
-    var url = this.baseUrl + '/' + this.privateKey + '/add/' + safeName + '/' + score + '/' + seconds + '/' + ending;
+    var url = this.baseUrl + '/' + this.privateKey + '/add/' + safeName + '/' + score + '/' + seconds + '/' + endingText;
     console.log('[Leaderboard] submit →', url);
     fetch(url).then(function(r) {
       console.log('[Leaderboard] submit status:', r.status);
@@ -128,7 +131,7 @@ function showLeaderboard() {
     };
 
     var html = '<table class="lb-table">';
-    html += '<tr class="lb-header"><th>#</th><th>' + L('玩家', 'Player') + '</th><th>' + L('卡片', 'Card') + '</th><th>' + L('稀有度', 'Rarity') + '</th></tr>';
+    html += '<tr class="lb-header"><th>#</th><th>' + L('玩家', 'Player') + '</th><th>' + L('卡片', 'Card') + '</th><th>' + L('周目', 'Cycle') + '</th><th>' + L('稀有度', 'Rarity') + '</th></tr>';
 
     for (var i = 0; i < entries.length; i++) {
       var e = entries[i];
@@ -136,8 +139,16 @@ function showLeaderboard() {
       var rarity = (typeof getRarity === 'function') ? getRarity(e.score) : null;
       var rarityName = rarity ? (en ? rarity.en : rarity.zh) : '--';
       var rarityColor = rarity ? rarity.color : '#6a6a7a';
-      var card = endingCards[e.ending];
+      // Parse ending|cycle format
+      var endingParts = (e.ending || '').split('|');
+      var endingKey = endingParts[0];
+      var cycleNum = 1;
+      if (endingParts[1] && endingParts[1].charAt(0) === 'c') {
+        cycleNum = parseInt(endingParts[1].substring(1)) || 1;
+      }
+      var card = endingCards[endingKey];
       var cardName = card ? (en ? card.en : card.zh) : '--';
+      var cycleLabel = cycleNum > 1 ? (en ? 'C' + cycleNum : cycleNum + '周') : '-';
       var stars = rarity ? '' : '';
       for (var si = 0; si < (rarity ? rarity.stars : 0); si++) stars += '★';
 
@@ -145,6 +156,7 @@ function showLeaderboard() {
       html += '<td class="lb-rank">' + (i + 1) + '</td>';
       html += '<td class="lb-name">' + e.name + '</td>';
       html += '<td class="lb-card">' + cardName + '</td>';
+      html += '<td class="lb-cycle" style="color:#e8d080">' + cycleLabel + '</td>';
       html += '<td class="lb-rarity" style="color:' + rarityColor + '"><span class="lb-stars">' + stars + '</span> ' + rarityName + '</td>';
       html += '</tr>';
     }

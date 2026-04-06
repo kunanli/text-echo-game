@@ -513,6 +513,11 @@ registerNode('r3_bell', () => {
 </pre>`, delay: 800 });
   if (!state.flags.r3BellMet) {
     state.flags.r3BellMet = true;
+    // NG+ memory: recognizing Bronze Bell
+    if (state.flags.ngPlus) {
+      steps.push({ tag: '記憶', tagColor: 'tag-petri', text: '你還沒走進房間，就已經知道裡面坐的是誰——銅鐘。那個石化了右手卻依然握筆不停的女人。', textEn: 'Before entering, you already know who sits inside — Bronze Bell. The woman whose right hand turned to stone yet never stopped writing.', delay: 2800 });
+      steps.push({ tag: '記憶', tagColor: 'tag-petri', text: '上一世，她是你最重要的盟友。或者最大的障礙。這取決於你怎麼做。', textEn: 'In your past life, she was your greatest ally. Or greatest obstacle. It depended on your choices.', delay: 2500 });
+    }
     steps.push({ tag: '移動', tagColor: 'tag-move', text: '你走進議會廳右側走廊盡頭的房間。門半開著。', textEn: 'You enter the room at the end of the right corridor. The door is ajar.', delay: 2000 });
     steps.push({ tag: '感知', tagColor: 'tag-sense', text: '房間不大，堆滿了文件和地圖。靠窗的桌子旁坐著一個人。', textEn: 'A small room packed with documents and maps. Someone sits at a desk by the window.', delay: 2200 });
     steps.push({ tag: '感知', tagColor: 'tag-sense', html: '那是一個四十多歲的女人——但她的存在感遠比年齡所暗示的更加強烈。', htmlEn: 'A woman in her forties — but her presence is far more commanding than her age suggests.', delay: 2800 });
@@ -1287,6 +1292,11 @@ registerNode('r3_boss', () => {
 </pre>`, delay: 800 });
   steps.push({ tag: '遭遇', tagColor: 'tag-combat', html: '一個高大的男人擋在門前。全身鏽蝕的鎧甲，手中握著一把缺了口的長劍——<b>守衛隊長鏽刃</b>。', htmlEn: 'A tall man blocks the door. Rust-eaten armor, a chipped longsword in hand — <b>Guard Captain Rust Blade</b>.', delay: 2800 });
   steps.push({ tag: '遭遇', tagColor: 'tag-combat', text: '「外來者——你不屬於這裡。我不會讓你踏進這扇門。」', textEn: '"Outsider — you don\'t belong here. I won\'t let you through that door."', delay: 2500 });
+  // NG+ memory: remembering Rust Blade
+  if (state.flags.ngPlus) {
+    steps.push({ tag: '記憶', tagColor: 'tag-petri', text: '你凝視著鏽刃的眼睛。上一世的記憶在腦海中重疊——你記得他的每一招，記得他鎧甲下的疲憊，記得他其實不想傷害任何人。', textEn: 'You stare into Rust Blade\'s eyes. Memories of a past life overlap — you remember every move, the weariness beneath his armor, how he never truly wanted to hurt anyone.', delay: 3200 });
+    steps.push({ tag: '記憶', tagColor: 'tag-petri', text: '「我們不是第一次見面了，隊長。」你平靜地說。鏽刃的瞳孔微微縮了一下。', textEn: '"This isn\'t our first meeting, Captain." you say calmly. Rust Blade\'s pupils contract slightly.', delay: 2800 });
+  }
 
   // High AGI allows sneaking past
   if (state.agi >= 10) {
@@ -1362,6 +1372,7 @@ registerNode('r3_vote', () => {
   if (state.flags.r3BossMethod === 'sneak') score += 1;
   if (hasItem(L('螢的護身符', 'Ying\'s Charm'))) score += 1;
   if (state.flags.r3ZhouMet) score += 1;
+  if (state.flags.ngPlus) score += 2; // NG+ past-life testimony bonus
   // Store score for ending determination
   state.flags.r3VoteScore = score;
 
@@ -1440,6 +1451,12 @@ registerNode('r3_testimony', () => {
   steps.push({ tag: '行動', tagColor: 'tag-move', text: '你站在議會桌前，深吸一口氣。', textEn: 'You stand before the Council table and take a deep breath.', delay: 2000 });
   steps.push({ tag: '行動', tagColor: 'tag-move', text: '「我從最底層的祭獻坑爬上來。經過石脈迴廊、大採石場，一路到這裡。」', textEn: '"I climbed from the Sacrificial Pit at the very bottom. Through the Vein Corridor, the Great Quarry, all the way here."', delay: 3000 });
   steps.push({ tag: '行動', tagColor: 'tag-move', text: '「下面還有人在活著——還有人在希望著有一天能上來。」', textEn: '"People below are still alive — still hoping to someday make it up."', delay: 2800 });
+
+  // NG+ memory: citing past-life knowledge in testimony
+  if (state.flags.ngPlus) {
+    steps.push({ tag: '記憶', tagColor: 'tag-petri', text: '你深吸一口氣，讓上一世的記憶流進話語中——你說出了只有親歷者才知道的細節：封印石室的位置、各層之間的生態鏈、甚至瘟疫擴散的季節規律。', textEn: 'You take a deep breath, letting memories of your past life flow into your words — details only a witness could know: the seal chamber\'s location, the ecosystem between levels, even the seasonal pattern of plague spread.', delay: 3500 });
+    steps.push({ tag: '感知', tagColor: 'tag-sense', text: '議員們面面相覷。你一個從底層爬上來的人，怎麼可能知道這些？', textEn: 'The council members exchange glances. How could someone who climbed from the bottom know all this?', delay: 2500 });
+  }
 
   // Conditional evidence
   if (state.flags.r3PlagueProof) {

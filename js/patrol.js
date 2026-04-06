@@ -619,10 +619,12 @@ function runPatrolCycle() {
   var totalDmg = 0, totalPetri = 0, rounds = 0;
   var combatLog = [];
   var effStr = effectiveStat('str');
+  var mercy = (typeof getMercyReduction === 'function') ? getMercyReduction() : 0;
   while (mHp > 0 && rounds < 12) {
     rounds++;
     var pAtk = rng(Math.max(1, effStr), effStr + 4);
     var mAtk = rng(mAtkMin, mAtkMax);
+    if (mercy > 0) mAtk = Math.max(1, Math.floor(mAtk * (1 - mercy)));
     mHp -= pAtk;
     totalDmg += mAtk;
     totalPetri += mPetriDmg;

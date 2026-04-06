@@ -239,6 +239,16 @@ function checkLabel(text, textEn, stat, dc) {
   return label + ' [' + name + ' DC' + dc + ' — ' + rate + '%]';
 }
 
+// Mercy system: reduce incoming damage after consecutive deaths
+// 3+ deaths → 20% reduction, 5+ → 35%, 7+ → 50% (cap)
+function getMercyReduction() {
+  var deaths = state.flags._consecutiveDeaths || 0;
+  if (deaths >= 7) return 0.5;
+  if (deaths >= 5) return 0.35;
+  if (deaths >= 3) return 0.2;
+  return 0;
+}
+
 // Calculate NG+ banked points from current run stats
 // Stat bonus: earned points above base (3+3+3=9)
 // Level bonus: each level above 5 gives +1

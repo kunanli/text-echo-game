@@ -37,6 +37,8 @@ function startCombat(enemy, onWin, onFlee) {
     var statusLine = '';
     if (observed) statusLine += ' <span class="cl-observe">' + L('[觀察中·下次2x]', '[OBSERVED·2x next]') + '</span>';
     if (empathy > 0) statusLine += ' <span class="cl-empathy">' + L('[共鳴 ' + empathy + '/' + empathyGoal + ']', '[Empathy ' + empathy + '/' + empathyGoal + ']') + '</span>';
+    var mercyPct = getMercyReduction();
+    if (mercyPct > 0) statusLine += ' <span style="color:#7ad" title="' + L('連續死亡減傷', 'Mercy: death streak reduction') + '">' + L('[慈悲 -' + Math.round(mercyPct * 100) + '%]', '[Mercy -' + Math.round(mercyPct * 100) + '%]') + '</span>';
 
     var text = '<pre class="ascii-art red">'
       + '\n  \u2554\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2557'
@@ -77,7 +79,9 @@ function startCombat(enemy, onWin, onFlee) {
     var dmg = observed ? baseDmg * 2 : baseDmg;
     var wasObserved = observed;
     observed = false;
-    var enemyDmg = Math.max(0, rng(enemy.atkMin, enemy.atkMax) - Math.floor(effAgi * 0.3));
+    var rawEnemyDmg = Math.max(0, rng(enemy.atkMin, enemy.atkMax) - Math.floor(effAgi * 0.3));
+    var mercy = getMercyReduction();
+    var enemyDmg = mercy > 0 ? Math.max(1, Math.floor(rawEnemyDmg * (1 - mercy))) : rawEnemyDmg;
     enemyHp -= dmg;
     sfx.hit();
 
@@ -91,6 +95,7 @@ function startCombat(enemy, onWin, onFlee) {
     if (enemyHp <= 0) {
       sfx.pass();
       state.flags._lastCombatSpared = false;
+      state.flags._consecutiveDeaths = 0; // reset mercy on win
       log += '<div class="combat-log combat-log-enemy">'
         + '<span class="cl-tag cl-enemy">' + L('【' + eName + '】', '[' + eName + ']') + '</span> '
         + L('被擊敗了！', 'has been defeated!')
@@ -137,7 +142,9 @@ function startCombat(enemy, onWin, onFlee) {
         + L('趁你觀察的間隙發起攻擊——但你及時閃開了。', 'Lunges at you during observation — but you dodge in time.')
         + '</div>';
     } else {
-      var enemyDmg = Math.max(1, rng(enemy.atkMin, enemy.atkMax));
+      var rawObsDmg = Math.max(1, rng(enemy.atkMin, enemy.atkMax));
+      var mercyObs = getMercyReduction();
+      var enemyDmg = mercyObs > 0 ? Math.max(1, Math.floor(rawObsDmg * (1 - mercyObs))) : rawObsDmg;
       changeHp(-enemyDmg);
       sfx.fail();
       sfx.hurt();
@@ -174,6 +181,7 @@ function startCombat(enemy, onWin, onFlee) {
       if (empathy >= empathyGoal) {
         // Spare the enemy — peaceful resolution
         state.flags._lastCombatSpared = true;
+        state.flags._consecutiveDeaths = 0; // reset mercy on spare
         sfx.item();
         var spareText = enemy.spareText
           || { zh: eName + ' 的眼中閃過一絲清明，它緩緩後退，消失在陰影中……', en: eName + '\'s eyes flicker with clarity. It slowly backs away into the shadows...' };
@@ -207,9 +215,11 @@ function startCombat(enemy, onWin, onFlee) {
         + '</div>';
     }
 
-    // Enemy still attacks (lighter if empathy > 0)
+    // Enemy still attacks (lighter if empathy > 0, mercy reduction if consecutive deaths)
     var atkReduction = empathy > 0 ? Math.floor(empathy * 1.5) : 0;
-    var enemyDmg = Math.max(0, rng(enemy.atkMin, enemy.atkMax) - atkReduction);
+    var rawCDmg = Math.max(0, rng(enemy.atkMin, enemy.atkMax) - atkReduction);
+    var mercyC = getMercyReduction();
+    var enemyDmg = mercyC > 0 ? Math.max(0, Math.floor(rawCDmg * (1 - mercyC))) : rawCDmg;
     if (enemyDmg > 0) {
       changeHp(-enemyDmg);
       sfx.hurt();
