@@ -245,19 +245,9 @@ function _doHoodSway() {
   }, 300);
 }
 
-function renderAvatar() {
-  var mood = getAvatarMood();
+var _avatarPixelOk = null; // null=untested, true=pixel, false=ascii
 
-  // Try pixel portrait first
-  if (typeof npcPortrait !== 'undefined' && npcPortrait.isReady(npcPortrait.playerId())) {
-    var info = npcPortrait.PORTRAITS[npcPortrait.playerId()];
-    $avatarBox.innerHTML = '<img src="assets/npc/' + info.file + '" class="avatar-pixel" alt="avatar">';
-    $avatarBox.className = 'avatar-box avatar-box-pixel mood-' + mood;
-    stopIdleAnim();
-    return;
-  }
-
-  // ASCII fallback
+function _renderAsciiAvatar(mood) {
   var art = AVATAR[state.sex] && AVATAR[state.sex][mood];
   if (!art) art = AVATAR.male.normal;
   var text = art.join('\n');
@@ -270,4 +260,46 @@ function renderAvatar() {
   $avatarBox.className = 'avatar-box mood-' + mood;
 
   startIdleAnim();
+}
+
+function renderAvatar() {
+  var mood = getAvatarMood();
+
+  // Already confirmed no pixel portrait
+  if (_avatarPixelOk === false) { _renderAsciiAvatar(mood); return; }
+
+  // Try pixel portrait
+  if (typeof npcPortrait !== 'undefined') {
+    var pid = npcPortrait.playerId();
+    var info = npcPortrait.PORTRAITS[pid];
+    if (info) {
+      if (_avatarPixelOk === true) {
+        // Already confirmed working, just update mood
+        $avatarBox.innerHTML = '<img src="assets/npc/' + info.file + '" class="avatar-pixel" alt="avatar">';
+        $avatarBox.className = 'avatar-box avatar-box-pixel mood-' + mood;
+        stopIdleAnim();
+        return;
+      }
+      // First attempt: test if image loads
+      var img = new Image();
+      img.onload = function() {
+        _avatarPixelOk = true;
+        img.className = 'avatar-pixel';
+        img.alt = 'avatar';
+        $avatarBox.innerHTML = '';
+        $avatarBox.appendChild(img);
+        $avatarBox.className = 'avatar-box avatar-box-pixel mood-' + mood;
+        stopIdleAnim();
+      };
+      img.onerror = function() {
+        _avatarPixelOk = false;
+        _renderAsciiAvatar(mood);
+      };
+      img.src = 'assets/npc/' + info.file;
+      return;
+    }
+  }
+
+  _avatarPixelOk = false;
+  _renderAsciiAvatar(mood);
 }
