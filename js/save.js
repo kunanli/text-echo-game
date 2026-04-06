@@ -147,6 +147,9 @@ var SEED_FLAGS = [
   'giftZhou','giftCrane','giftYing','giftFrost','giftCast','giftDew','giftBell',
   // New Game+
   'ngPlus','ngEndingDawn','ngEndingCompromise','ngEndingLockdown','ngEndingSacrifice',
+  // v1.8 — additional story flags
+  'r2BossSpared','r2ChengAwake','r2ReunionSeen',
+  'r1YingWarmth','r2YingNightmare','r3YingRiver',
 ];
 
 var B36 = '0123456789abcdefghijklmnopqrstuvwxyz';

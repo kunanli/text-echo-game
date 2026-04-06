@@ -20,6 +20,7 @@ function addItem(name) {
     state.inventory.push(name);
     sfx.item();
     notify(L('獲得物品：', 'Acquired: ') + name);
+    if (typeof tryAutoEquip === 'function') tryAutoEquip(name);
   }
 }
 
@@ -169,10 +170,11 @@ function petriPenalty() {
   return { stage: 0, str: 0, agi: 0, wil: 0, maxHpMult: 1.0, label: '', labelEn: '' };
 }
 
-// Get effective stat value (base + petri penalty, min 1)
+// Get effective stat value (base + petri penalty + equipment bonus, min 1)
 function effectiveStat(stat) {
   var pen = petriPenalty();
-  return Math.max(1, state[stat] + (pen[stat] || 0));
+  var eqBonus = (typeof getEquipStats === 'function') ? (getEquipStats()[stat] || 0) : 0;
+  return Math.max(1, state[stat] + (pen[stat] || 0) + eqBonus);
 }
 
 // Base max HP before petri reduction (accounts for NG+ run and level)

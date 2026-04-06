@@ -505,6 +505,21 @@
     font-size: .85rem;
     border-bottom: none;
   }
+  .equip-row {
+    padding: 3px 0;
+    font-size: .85rem;
+    border-bottom: 1px solid #141420;
+  }
+  .equip-slot {
+    color: #6a6a8a;
+    margin-right: 6px;
+  }
+  .equip-slot::after { content: ":"; }
+  .equip-bonus {
+    color: #7ad;
+    font-size: .78rem;
+    margin-left: 4px;
+  }
 
   /* ── Death Overlay ── */
   .death-overlay {
@@ -1522,6 +1537,12 @@
   }
   .npc-heart-full  { color: #e06080; }
   .npc-heart-empty { color: #2a2a3a; }
+  .npc-num {
+    font-size: .68rem;
+    color: #a080c0;
+    margin-left: 4px;
+    opacity: .8;
+  }
   .npc-gift-btn {
     background: none;
     border: 1px solid #6a4a8a;

@@ -67,6 +67,39 @@ function renderStatus() {
     }).join('');
   }
 
+  // Equipment display
+  var $equipList = document.getElementById('equip-list');
+  if ($equipList && typeof getEquipped === 'function') {
+    var slots = [
+      { key: 'weapon', zh: '武器', en: 'Weapon' },
+      { key: 'armor',  zh: '護甲', en: 'Armor' },
+      { key: 'acc',    zh: '飾品', en: 'Accessory' }
+    ];
+    var ehtml = '';
+    var hasAny = false;
+    for (var si = 0; si < slots.length; si++) {
+      var s = slots[si];
+      var equipped = getEquipped(s.key);
+      if (equipped) {
+        hasAny = true;
+        var rarity = (typeof getItemRarity === 'function') ? getItemRarity(equipped) : 'common';
+        var data = (typeof getEquipData === 'function') ? getEquipData(equipped) : null;
+        var bonus = '';
+        if (data) {
+          if (data.dmg) bonus = ' +' + data.dmg + L('傷害', ' DMG');
+          if (data.def) bonus = ' -' + data.def + '%' + L('傷害', ' DMG');
+          if (data.label) bonus = ' ' + (state.lang === 'en' ? data.labelEn : data.label);
+        }
+        ehtml += '<div class="equip-row"><span class="equip-slot">' + (state.lang === 'en' ? s.en : s.zh) + '</span> <span class="rarity-' + rarity + '">' + equipped + '</span><span class="equip-bonus">' + bonus + '</span></div>';
+      }
+    }
+    var $equipSection = document.getElementById('equip-section');
+    if ($equipSection) {
+      $equipSection.style.display = hasAny ? '' : 'none';
+      $equipList.innerHTML = ehtml;
+    }
+  }
+
   // NPC Affinity display
   if (typeof getAllNpcAffinity === 'function') {
     var npcList = getAllNpcAffinity();
@@ -91,9 +124,11 @@ function renderStatus() {
         } else if (typeof isGiftClaimed === 'function' && isGiftClaimed(npc.id)) {
           giftHtml = '<span class="npc-gift-claimed">✓</span>';
         }
+        var numLabel = npc.num != null ? '<span class="npc-num">' + npc.num + '%</span>' : '';
         html += '<div class="npc-row">'
           + '<span class="npc-name">' + (state.lang === 'en' ? npc.nameEn : npc.name) + '</span>'
           + '<span class="npc-hearts">' + hearts + '</span>'
+          + numLabel
           + giftHtml
           + '</div>';
       }

@@ -72,7 +72,8 @@ function startCombat(enemy, onWin, onFlee) {
 
   // ── Attack ──
   function doAttack() {
-    var weaponBonus = state.flags.weaponDmg || 0;
+    var eqStats = (typeof getEquipStats === 'function') ? getEquipStats() : { dmg: 0, def: 0, petriResist: 0 };
+    var weaponBonus = (state.flags.weaponDmg || 0) + eqStats.dmg;
     var effStr = effectiveStat('str');
     var effAgi = effectiveStat('agi');
     var baseDmg = rng(3, 6) + Math.floor(effStr * 1.2) + weaponBonus;
@@ -80,8 +81,10 @@ function startCombat(enemy, onWin, onFlee) {
     var wasObserved = observed;
     observed = false;
     var rawEnemyDmg = Math.max(0, rng(enemy.atkMin, enemy.atkMax) - Math.floor(effAgi * 0.3));
+    var armorDef = eqStats.def / 100; // armor % reduction
     var mercy = getMercyReduction();
-    var enemyDmg = mercy > 0 ? Math.max(1, Math.floor(rawEnemyDmg * (1 - mercy))) : rawEnemyDmg;
+    var totalReduction = Math.min(0.7, armorDef + mercy); // cap at 70%
+    var enemyDmg = totalReduction > 0 ? Math.max(1, Math.floor(rawEnemyDmg * (1 - totalReduction))) : rawEnemyDmg;
     enemyHp -= dmg;
     sfx.hit();
 
@@ -109,13 +112,14 @@ function startCombat(enemy, onWin, onFlee) {
     }
 
     var dead = changeHp(-enemyDmg);
-    if (!dead && enemy.petriDmg) dead = changePetri(enemy.petriDmg);
+    var petriDmg = enemy.petriDmg ? Math.max(0, enemy.petriDmg - eqStats.petriResist) : 0;
+    if (!dead && petriDmg > 0) dead = changePetri(petriDmg);
     sfx.hurt();
     if (enemy.petriDmg) sfx.petri();
     log += '<div class="combat-log combat-log-enemy">'
       + '<span class="cl-tag cl-enemy">' + L('【' + eName + '】', '[' + eName + ']') + '</span> '
       + L('反擊，造成 ' + enemyDmg + ' 點傷害。', 'Strikes back! ' + enemyDmg + ' damage.')
-      + (enemy.petriDmg ? ' <span class="cl-petri">' + L('石化 +' + enemy.petriDmg + '%', 'Petri +' + enemy.petriDmg + '%') + '</span>' : '')
+      + (petriDmg > 0 ? ' <span class="cl-petri">' + L('石化 +' + petriDmg + '%', 'Petri +' + petriDmg + '%') + '</span>' : '')
       + '</div>';
 
     if (dead) return;

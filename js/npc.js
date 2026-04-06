@@ -58,6 +58,86 @@ function getItemRarity(itemName) {
   return ITEM_RARITY[itemName] || 'common';
 }
 
+// ── Equipment System ──
+// 3 slots: weapon, armor, accessory. Auto-equip best on pickup.
+var EQUIP_DATA = {
+  // Weapons (slot: 'weapon', dmg: attack bonus)
+  '碎石匕首':          { slot: 'weapon', dmg: 1 },
+  'Stone Dagger':       { slot: 'weapon', dmg: 1 },
+  '鍛造鐵錘':          { slot: 'weapon', dmg: 2 },
+  'Forged Hammer':      { slot: 'weapon', dmg: 2 },
+  '黑曜石短刀':        { slot: 'weapon', dmg: 3 },
+  'Obsidian Knife':     { slot: 'weapon', dmg: 3 },
+  '精鍛戰鋤':          { slot: 'weapon', dmg: 4 },
+  'Masterwork War Pick':{ slot: 'weapon', dmg: 4 },
+  '鐵霜的指揮佩刀':    { slot: 'weapon', dmg: 5 },
+  "Iron Frost's Command Saber": { slot: 'weapon', dmg: 5 },
+  '灰鶴的祕藏匕首':    { slot: 'weapon', dmg: 6 },
+  "Grey Crane's Hidden Blade": { slot: 'weapon', dmg: 6 },
+  // Armor (slot: 'armor', def: damage reduction %)
+  '皮甲碎片':          { slot: 'armor', def: 10 },
+  'Leather Scrap':      { slot: 'armor', def: 10 },
+  '石鱗護腕':          { slot: 'armor', def: 15 },
+  'Stone-Scale Bracer': { slot: 'armor', def: 15 },
+  '精鍛強化甲':        { slot: 'armor', def: 20 },
+  'Master-forged Armor':{ slot: 'armor', def: 20 },
+  // Accessories (slot: 'acc', special bonuses)
+  '抗石化護符':          { slot: 'acc', petriResist: 1, label: '-1石化', labelEn: '-1 Petri' },
+  'Anti-Petri Amulet':   { slot: 'acc', petriResist: 1, label: '-1石化', labelEn: '-1 Petri' },
+  '螢的護身符':          { slot: 'acc', petriResist: 2, label: '-2石化', labelEn: '-2 Petri' },
+  "Ying's Charm":        { slot: 'acc', petriResist: 2, label: '-2石化', labelEn: '-2 Petri' },
+  '老周的護石':          { slot: 'acc', petriResist: 1, wil: 1, label: '意志+1 石化-1', labelEn: 'WIL+1 Petri-1' },
+  "Zhou's Ward Stone":   { slot: 'acc', petriResist: 1, wil: 1, label: 'WIL+1 Petri-1', labelEn: 'WIL+1 Petri-1' },
+  '螢的手繪護符':        { slot: 'acc', petriResist: 3, label: '-3石化', labelEn: '-3 Petri' },
+  "Ying's Hand-drawn Charm": { slot: 'acc', petriResist: 3, label: '-3石化', labelEn: '-3 Petri' },
+  '銅鐘的議事令牌':      { slot: 'acc', wil: 2, label: '意志+2', labelEn: 'WIL+2' },
+  "Bronze Bell's Council Token": { slot: 'acc', wil: 2, label: 'WIL+2', labelEn: 'WIL+2' },
+};
+
+function getEquipData(itemName) { return EQUIP_DATA[itemName] || null; }
+
+// Get currently equipped item for a slot
+function getEquipped(slot) { return state.flags['equip_' + slot] || ''; }
+
+// Get total equipment bonuses
+function getEquipStats() {
+  var r = { dmg: 0, def: 0, petriResist: 0, str: 0, agi: 0, wil: 0 };
+  var slots = ['weapon', 'armor', 'acc'];
+  for (var i = 0; i < slots.length; i++) {
+    var name = state.flags['equip_' + slots[i]];
+    if (!name) continue;
+    var d = EQUIP_DATA[name];
+    if (!d) continue;
+    if (d.dmg) r.dmg += d.dmg;
+    if (d.def) r.def += d.def;
+    if (d.petriResist) r.petriResist += d.petriResist;
+    if (d.str) r.str += d.str;
+    if (d.agi) r.agi += d.agi;
+    if (d.wil) r.wil += d.wil;
+  }
+  return r;
+}
+
+// Auto-equip item if it's better than current. Called from addItem.
+function tryAutoEquip(itemName) {
+  var data = EQUIP_DATA[itemName];
+  if (!data) return;
+  var slot = data.slot;
+  var current = state.flags['equip_' + slot];
+  var currentData = current ? EQUIP_DATA[current] : null;
+  // Compare: weapon by dmg, armor by def, acc by petriResist then wil
+  var dominated = false;
+  if (slot === 'weapon') dominated = !currentData || (data.dmg || 0) > (currentData.dmg || 0);
+  else if (slot === 'armor') dominated = !currentData || (data.def || 0) > (currentData.def || 0);
+  else dominated = !currentData || (data.petriResist || 0) > (currentData.petriResist || 0);
+  if (dominated) {
+    state.flags['equip_' + slot] = itemName;
+    var slotNames = { weapon: ['武器', 'Weapon'], armor: ['護甲', 'Armor'], acc: ['飾品', 'Accessory'] };
+    var sn = slotNames[slot];
+    notify(L('裝備：' + itemName + '（' + sn[0] + '）', 'Equipped: ' + itemName + ' (' + sn[1] + ')'));
+  }
+}
+
 // ── NPC Definitions ──
 var NPC_DEFS = {
   zhou: {
@@ -182,7 +262,28 @@ var NPC_DEFS = {
 
 var NPC_IDS = ['zhou', 'crane', 'ying', 'frost', 'cast', 'dew', 'bell'];
 
-// ── Affinity Computation ──
+// ── Affinity Computation (0-100 numerical) ──
+// Each flag gives (100 / maxAffinity) points. Micro-bonuses from npcAff_xxx flags.
+function getNpcAffinityNum(id) {
+  var def = NPC_DEFS[id];
+  if (!def) return 0;
+  var flagPoints = 0;
+  for (var i = 0; i < def.affinityFlags.length; i++) {
+    if (state.flags[def.affinityFlags[i]]) flagPoints++;
+  }
+  var perFlag = Math.floor(100 / def.maxAffinity);
+  var base = Math.min(flagPoints * perFlag, 100);
+  var micro = state.flags['npcAff_' + id] || 0;
+  return Math.min(100, base + micro);
+}
+
+// Add micro-affinity points to an NPC (from conversations, gifts, etc.)
+function addNpcAffinity(id, amount) {
+  var key = 'npcAff_' + id;
+  state.flags[key] = Math.min(100, (state.flags[key] || 0) + amount);
+}
+
+// Legacy heart-based count (still used for gift/max checks)
 function getNpcAffinity(id) {
   var def = NPC_DEFS[id];
   if (!def) return 0;
@@ -241,10 +342,10 @@ function getAllNpcAffinity() {
     var aff = getNpcAffinity(id);
     if (aff > 0) {
       var def = NPC_DEFS[id];
-      list.push({ id: id, name: def.name, nameEn: def.nameEn, affinity: aff, max: def.maxAffinity });
+      list.push({ id: id, name: def.name, nameEn: def.nameEn, affinity: aff, max: def.maxAffinity, num: getNpcAffinityNum(id) });
     }
   }
-  list.sort(function(a, b) { return b.affinity - a.affinity; });
+  list.sort(function(a, b) { return b.num - a.num || b.affinity - a.affinity; });
   return list;
 }
 
@@ -370,7 +471,7 @@ var NPC_PATROL_AID = {
 };
 
 // Roll for NPC patrol aid. Returns null or {id, name, nameEn, text, apply}.
-// Chance scales with affinity: (affinity / max) * 30%
+// Chance scales with numerical affinity (0-100): 10% base + up to 25% bonus
 function rollPatrolAid() {
   var candidates = [];
   for (var i = 0; i < NPC_IDS.length; i++) {
@@ -380,16 +481,17 @@ function rollPatrolAid() {
     if (aid.regions.indexOf(state.region) === -1) continue;
     var aff = getNpcAffinity(id);
     if (aff < aid.minAffinity) continue;
-    candidates.push({ id: id, affinity: aff, max: getNpcMaxAffinity(id), aid: aid });
+    var num = getNpcAffinityNum(id);
+    candidates.push({ id: id, affinity: aff, num: num, aid: aid });
   }
   if (candidates.length === 0) return null;
 
-  // Pick highest affinity candidate (ties broken randomly)
-  candidates.sort(function(a, b) { return b.affinity - a.affinity || (Math.random() - 0.5); });
+  // Pick highest numerical affinity candidate (ties broken randomly)
+  candidates.sort(function(a, b) { return b.num - a.num || (Math.random() - 0.5); });
   var pick = candidates[0];
 
-  // Chance: (affinity / max) * 30%, minimum 10% at minAffinity
-  var chance = (pick.affinity / pick.max) * 0.30;
+  // Chance: 10% base + (num/100) * 25% bonus = 10-35% range
+  var chance = 0.10 + (pick.num / 100) * 0.25;
   if (Math.random() > chance) return null;
 
   var def = NPC_DEFS[pick.id];
