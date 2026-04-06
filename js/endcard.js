@@ -255,79 +255,111 @@ function generateEndCard() {
   var meta = ENDING_META[ending] || ENDING_META.lockdown;
   var totalScore = calculateEndScore();
   var rarity = getRarity(totalScore);
-  var pad = 52;
+  var pad = 32;
 
-  // ── Background ──
+  // ── Background: full-bleed character art ──
   ctx.fillStyle = '#0d0d15';
   ctx.fillRect(0, 0, ENDCARD_W, ENDCARD_H);
 
-  // ── Rounded border ──
-  _roundRect(ctx, 10, 10, ENDCARD_W - 20, ENDCARD_H - 20, 18);
-  ctx.strokeStyle = rarity.color;
-  ctx.globalAlpha = 0.45;
-  ctx.lineWidth = 2.5;
-  ctx.stroke();
-  ctx.globalAlpha = 1;
-
-  // Inner fill
-  _roundRect(ctx, 12, 12, ENDCARD_W - 24, ENDCARD_H - 24, 16);
-  ctx.fillStyle = '#101018';
-  ctx.fill();
-
-  // Subtle top glow
-  var glow = ctx.createLinearGradient(0, 10, 0, 120);
-  glow.addColorStop(0, rarity.color);
-  glow.addColorStop(1, 'rgba(0,0,0,0)');
-  ctx.globalAlpha = 0.035;
-  ctx.fillStyle = glow;
-  _roundRect(ctx, 12, 12, ENDCARD_W - 24, 120, 16);
-  ctx.fill();
-  ctx.globalAlpha = 1;
-
-  // ═════════════════════════════════
-  //  TOP BAR: stars + rarity / type
-  // ═════════════════════════════════
-  var curY = 44;
-
-  var stars = '';
-  for (var i = 0; i < rarity.stars; i++) stars += '★';
-  ctx.font = 'bold 15px "Courier New", monospace';
-  ctx.textAlign = 'left';
-  ctx.fillStyle = rarity.color;
-  ctx.fillText(stars + '  ' + (en ? rarity.en : rarity.zh), pad, curY);
-
-  ctx.textAlign = 'right';
-  ctx.font = '13px "Courier New", monospace';
-  ctx.fillStyle = rarity.color;
-  ctx.fillText(en ? meta.typeEn : meta.type, ENDCARD_W - pad, curY);
-
-  // ═════════════════════════════════
-  //  CHARACTER ART (pixel portrait or ASCII fallback)
-  // ═════════════════════════════════
-  curY += 32;
-  var _pixelImg = (typeof npcPortrait !== 'undefined') ? npcPortrait.getImage(npcPortrait.playerId()) : null;
+  // Try ending-specific art first, then player portrait fallback
+  var _pixelImg = null;
+  if (typeof npcPortrait !== 'undefined') {
+    var endcardId = 'endcard_' + ending + '_' + (state.sex === 'female' ? 'female' : 'male');
+    _pixelImg = npcPortrait.getImage(endcardId) || npcPortrait.getImage(npcPortrait.playerId());
+  }
   if (_pixelImg) {
-    // Draw pixel portrait centered, scaled to fit
-    var pxW = 160, pxH = 160;
-    ctx.imageSmoothingEnabled = false;  // keep pixel-crisp
-    ctx.drawImage(_pixelImg, (ENDCARD_W - pxW) / 2, curY, pxW, pxH);
-    curY += pxH + 20;
+    // Draw pixel portrait as full background (cover mode)
+    var imgRatio = _pixelImg.width / _pixelImg.height;
+    var canvasRatio = ENDCARD_W / ENDCARD_H;
+    var drawW, drawH, drawX, drawY;
+    if (imgRatio > canvasRatio) {
+      drawH = ENDCARD_H;
+      drawW = drawH * imgRatio;
+      drawX = (ENDCARD_W - drawW) / 2;
+      drawY = 0;
+    } else {
+      drawW = ENDCARD_W;
+      drawH = drawW / imgRatio;
+      drawX = 0;
+      drawY = 0; // align top
+    }
+    ctx.imageSmoothingEnabled = false;
+    ctx.drawImage(_pixelImg, drawX, drawY, drawW, drawH);
+
+    // Dark gradient overlay: transparent at top, dark at bottom (for text readability)
+    var overlay = ctx.createLinearGradient(0, 0, 0, ENDCARD_H);
+    overlay.addColorStop(0, 'rgba(13,13,21,0.15)');
+    overlay.addColorStop(0.35, 'rgba(13,13,21,0.4)');
+    overlay.addColorStop(0.55, 'rgba(13,13,21,0.75)');
+    overlay.addColorStop(1, 'rgba(13,13,21,0.95)');
+    ctx.fillStyle = overlay;
+    ctx.fillRect(0, 0, ENDCARD_W, ENDCARD_H);
   } else {
-    // ASCII art fallback
+    // ASCII art fallback (no pixel image)
     var artSet = ENDCARD_ART[ending] || ENDCARD_ART.lockdown;
     var art = artSet[state.sex] || artSet.male;
     ctx.font = '14px "Courier New", monospace';
     ctx.fillStyle = '#9898a8';
     ctx.textAlign = 'left';
     for (var ai = 0; ai < art.length; ai++) {
-      ctx.fillText(art[ai], pad + 24, curY + ai * 17);
+      ctx.fillText(art[ai], pad + 40, 80 + ai * 17);
     }
-    curY += art.length * 17 + 28;
+    // Dark overlay for bottom half
+    var overlay2 = ctx.createLinearGradient(0, 250, 0, ENDCARD_H);
+    overlay2.addColorStop(0, 'rgba(13,13,21,0)');
+    overlay2.addColorStop(0.3, 'rgba(13,13,21,0.85)');
+    overlay2.addColorStop(1, 'rgba(13,13,21,0.95)');
+    ctx.fillStyle = overlay2;
+    ctx.fillRect(0, 250, ENDCARD_W, ENDCARD_H - 250);
   }
+
+  // ── Rounded border (rarity color) ──
+  _roundRect(ctx, 8, 8, ENDCARD_W - 16, ENDCARD_H - 16, 14);
+  ctx.strokeStyle = rarity.color;
+  ctx.globalAlpha = 0.5;
+  ctx.lineWidth = 2.5;
+  ctx.stroke();
+  ctx.globalAlpha = 1;
+
+  // ── Rarity glow at top ──
+  var glow = ctx.createLinearGradient(0, 0, 0, 80);
+  glow.addColorStop(0, rarity.color);
+  glow.addColorStop(1, 'rgba(0,0,0,0)');
+  ctx.globalAlpha = 0.06;
+  ctx.fillStyle = glow;
+  ctx.fillRect(8, 8, ENDCARD_W - 16, 80);
+  ctx.globalAlpha = 1;
+
+  // ═════════════════════════════════
+  //  TOP BAR: stars + rarity / ending type
+  // ═════════════════════════════════
+  var curY = 36;
+
+  var stars = '';
+  for (var i = 0; i < rarity.stars; i++) stars += '★';
+  ctx.font = 'bold 14px "Courier New", monospace';
+  ctx.textAlign = 'left';
+  ctx.fillStyle = rarity.color;
+  ctx.shadowColor = 'rgba(0,0,0,0.8)';
+  ctx.shadowBlur = 4;
+  ctx.fillText(stars + '  ' + (en ? rarity.en : rarity.zh), pad, curY);
+
+  ctx.textAlign = 'right';
+  ctx.font = '13px "Courier New", monospace';
+  ctx.fillStyle = rarity.color;
+  ctx.fillText(en ? meta.typeEn : meta.type, ENDCARD_W - pad, curY);
+  ctx.shadowBlur = 0;
+
+  // ═════════════════════════════════
+  //  All text starts in the lower half (over dark overlay)
+  // ═════════════════════════════════
+  curY = ENDCARD_H * 0.48;
 
   // ═════════════════════════════════
   //  PLAYER NAME (large, prominent)
   // ═════════════════════════════════
+  ctx.shadowColor = 'rgba(0,0,0,0.8)';
+  ctx.shadowBlur = 6;
   ctx.font = 'bold 22px "Courier New", monospace';
   ctx.fillStyle = '#e8e8f0';
   ctx.textAlign = 'left';
@@ -335,8 +367,9 @@ function generateEndCard() {
 
   var nameW = ctx.measureText(state.name).width;
   ctx.font = '14px sans-serif';
-  ctx.fillStyle = '#5a5a6a';
+  ctx.fillStyle = '#8a8a9a';
   ctx.fillText(state.sex === 'female' ? '♀' : '♂', pad + nameW + 8, curY);
+  ctx.shadowBlur = 0;
 
   // ═════════════════════════════════
   //  FLAVOR TEXT
@@ -345,12 +378,15 @@ function generateEndCard() {
   var flavor = ENDING_FLAVOR[ending] || ENDING_FLAVOR.lockdown;
   var flavorRaw = en ? flavor.en : flavor.zh;
   ctx.font = '11px "Courier New", monospace';
-  ctx.fillStyle = '#555568';
+  ctx.fillStyle = '#8a8a9a';
   ctx.textAlign = 'left';
+  ctx.shadowColor = 'rgba(0,0,0,0.7)';
+  ctx.shadowBlur = 3;
   var flavorLines = _wrapText(ctx, flavorRaw, ENDCARD_W - pad * 2);
   for (var fi = 0; fi < flavorLines.length; fi++) {
     ctx.fillText(flavorLines[fi], pad, curY + fi * 16);
   }
+  ctx.shadowBlur = 0;
   curY += flavorLines.length * 16 + 18;
 
   // ═════════════════════════════════
@@ -378,15 +414,18 @@ function generateEndCard() {
     // Label
     ctx.font = '11px "Courier New", monospace';
     ctx.textAlign = 'left';
-    ctx.fillStyle = '#555568';
+    ctx.fillStyle = '#9a9aaa';
+    ctx.shadowColor = 'rgba(0,0,0,0.6)';
+    ctx.shadowBlur = 2;
     ctx.fillText(en ? sd.en : sd.zh, pad, sy + barH / 2 + 4);
+    ctx.shadowBlur = 0;
 
     // Progress bar
     _drawStatBar(ctx, barX, sy, sd.val, sd.max, barW, barH);
 
     // Number (left-aligned after bar)
     ctx.textAlign = 'left';
-    ctx.fillStyle = '#6a6a7a';
+    ctx.fillStyle = '#9a9aaa';
     ctx.font = '11px "Courier New", monospace';
     ctx.fillText('' + sd.val, barX + barW + 10, sy + barH / 2 + 4);
   }
@@ -415,7 +454,7 @@ function generateEndCard() {
   if (hlItems.length > 0) {
     ctx.font = '10px "Courier New", monospace';
     ctx.textAlign = 'left';
-    ctx.fillStyle = '#3a3a4a';
+    ctx.fillStyle = '#7a7a8a';
     ctx.fillText(en ? 'highlights' : '成就亮點', pad, curY + 6);
 
     ctx.font = '11px "Courier New", monospace';
@@ -430,7 +469,7 @@ function generateEndCard() {
 
   ctx.font = '10px "Courier New", monospace';
   ctx.textAlign = 'right';
-  ctx.fillStyle = '#3a3a4a';
+  ctx.fillStyle = '#7a7a8a';
   ctx.fillText(en ? 'score' : '評分', ENDCARD_W - pad, scoreBlockY + 6);
 
   ctx.font = 'bold 32px "Courier New", monospace';
@@ -497,12 +536,12 @@ function generateEndCard() {
 
     // Border box
     _roundRect(ctx, boxX, curY, boxW, boxH, 6);
-    ctx.strokeStyle = '#2a2a3a';
+    ctx.strokeStyle = '#4a4a5a';
     ctx.lineWidth = 1;
     ctx.stroke();
 
     // Quote text
-    ctx.fillStyle = '#4a4a5a';
+    ctx.fillStyle = '#8a8a9a';
     ctx.textAlign = 'left';
     for (var qi = 0; qi < quoteLines.length; qi++) {
       ctx.fillText(quoteLines[qi], boxX + qPad, curY + qPad + 12 + qi * 15);
@@ -510,7 +549,7 @@ function generateEndCard() {
 
     // NPC name
     ctx.font = '10px "Courier New", monospace';
-    ctx.fillStyle = '#3a3a4a';
+    ctx.fillStyle = '#6a6a7a';
     ctx.fillText(nameStr, boxX + qPad, curY + qPad + 12 + quoteLines.length * 15 + 12);
   }
 
@@ -520,7 +559,7 @@ function generateEndCard() {
   var footerY = ENDCARD_H - 36;
   ctx.textAlign = 'left';
   ctx.font = '9px "Courier New", monospace';
-  ctx.fillStyle = '#2a2a3a';
+  ctx.fillStyle = '#5a5a6a';
   ctx.fillText('petriabyss.itch.io', pad, footerY);
 
   ctx.textAlign = 'right';
