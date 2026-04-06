@@ -23,6 +23,11 @@ var npcPortrait = (function() {
     dew:      { file: 'dew.png',      zh: '清露',     en: 'Dew',         color: 'cyan'   },
     bell:     { file: 'bell.png',     zh: '銅鐘',     en: 'Bronze Bell', color: ''       },
     ferryman: { file: 'ferryman.png', zh: '冥河渡江人', en: 'Ferryman',  color: 'purple' },
+    // 次要 NPC（待生成圖片）
+    captain:  { file: 'captain.png',  zh: '老船長',    en: 'Captain',     color: ''       },
+    vendor:   { file: 'vendor.png',   zh: '老婦人',    en: 'Vendor',      color: ''       },
+    landlady: { file: 'landlady.png', zh: '老闆娘',    en: 'Landlady',    color: ''       },
+    guard:    { file: 'guard.png',    zh: '守衛',      en: 'Guard',       color: ''       },
   };
 
   var BASE_PATH = 'assets/npc/';

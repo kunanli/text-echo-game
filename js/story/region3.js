@@ -206,6 +206,7 @@ registerNode('r3_dock', () => {
       c.push({ text: '和老船長聊聊', textEn: 'Talk to the captain', action: () => {
         state.flags.r3CaptainTalked = true;
         autoExplore([
+          { art: npcPortrait.art('captain', { subtitle: '老船長' }), artEn: npcPortrait.art('captain', { subtitle: 'Captain' }), delay: 800 },
           { tag: '情報', tagColor: 'tag-info', text: '老船長吐了口煙：「我在這條河上跑了二十年。以前渡口可熱鬧了——上面來的商隊，下面來的礦工，日日夜夜。」', textEn: 'The captain exhales smoke: "Sailed this river twenty years. The docks used to bustle — caravans from above, miners from below, day and night."', delay: 3000 },
           { tag: '情報', tagColor: 'tag-info', text: '「自從石化瘟疫擴散後，上游的路早就斷了。現在渡船只能在城內兩岸來回。」', textEn: '"Since the plague spread, the upstream route collapsed long ago. Now ferries only run between the two banks."', delay: 3000 },
           { tag: '情報', tagColor: 'tag-info', html: '「你要在這裡混，記住兩件事：第一，別惹<b>渡口議會</b>。第二，找<b>銅鐘</b>。」', htmlEn: '"To survive here, remember two things: don\'t cross the <b>Ferry Council</b>, and find <b>Bronze Bell</b>."', delay: 2800 },
@@ -293,6 +294,7 @@ registerNode('r3_market', () => {
       c.push({ text: '打聽消息', textEn: 'Gather intel', action: () => {
         state.flags.r3MarketRumor = true;
         autoExplore([
+          { art: npcPortrait.art('vendor', { subtitle: '水果攤' }), artEn: npcPortrait.art('vendor', { subtitle: 'Vendor' }), delay: 800 },
           { tag: '情報', tagColor: 'tag-info', text: '你向一個賣水果的老婦人打聽情況。', textEn: 'You ask a fruit vendor for information.', delay: 2000 },
           { tag: '情報', tagColor: 'tag-info', text: '「議會有五個人。」老婦人壓低了聲音。「鐵匠行的鉛錘、漁幫的黑鰭、商會的玉秤、守衛隊長鏽刃——還有銅鐘。」', textEn: '"Five on the Council." The old woman lowers her voice. "Lead Hammer of the Smiths, Black Fin of the Fishers, Jade Scale of the Merchants, Guard Captain Rust Blade — and Bronze Bell."', delay: 3500 },
           { tag: '情報', tagColor: 'tag-info', html: '「其他四個都想封鎖通道、趕走外來者。只有<b>銅鐘</b>一直在替下面的人說話。」', htmlEn: '"The other four want to seal the passages and expel outsiders. Only <b>Bronze Bell</b> speaks for the people below."', delay: 3000 },
@@ -358,6 +360,7 @@ registerNode('r3_council', () => {
   steps.push({ tag: '移動', tagColor: 'tag-move', text: '議會廳建在河流東岸的一座石砌建築裡。門口站著兩個全副武裝的守衛。', textEn: 'The Council Hall is a stone building on the east bank. Two fully armed guards stand at the entrance.', delay: 2500 });
 
   if (!state.flags.r3CouncilEntry) {
+    steps.push({ art: npcPortrait.art('guard', { subtitle: '守衛' }), artEn: npcPortrait.art('guard', { subtitle: 'Guard' }), delay: 800 });
     steps.push({ tag: '感知', tagColor: 'tag-sense', text: '守衛攔住了你：「議會廳不對外開放。你有什麼事？」', textEn: 'A guard blocks you: "Council Hall is closed to the public. State your business."', delay: 2500 });
     if (state.flags.r3MarketRumor || state.flags.r3CaptainTalked) {
       steps.push({ tag: '行動', tagColor: 'tag-move', text: '你提到了銅鐘的名字。守衛的態度微微放鬆了一些。', textEn: 'You mention Bronze Bell\'s name. The guard\'s posture relaxes slightly.', delay: 2200 });
@@ -438,6 +441,7 @@ registerNode('r3_inn', () => {
   steps.push({ tag: '感知', tagColor: 'tag-sense', text: '推開門，一股酒香和烤肉的味道迎面而來。大廳裡坐著十幾個人在喝酒。', textEn: 'You push open the door to the scent of ale and roasted meat. A dozen people drink in the hall.', delay: 2500 });
 
   if (!state.flags.r3InnFirstVisit) {
+    steps.push({ art: npcPortrait.art('landlady', { subtitle: '老闆娘' }), artEn: npcPortrait.art('landlady', { subtitle: 'Landlady' }), delay: 800 });
     steps.push({ tag: '情報', tagColor: 'tag-info', text: '老闆娘是個壯碩的女人，圍著油膩的圍裙。她看了你一眼：「住宿還是喝酒？」', textEn: 'The landlady is a sturdy woman in a greasy apron. She eyes you: "Room or drink?"', delay: 2500 });
     steps.push({ tag: '情報', tagColor: 'tag-info', text: '「看你的樣子，兩個都需要。」她沒等你回答就遞過來一碗熱湯。', textEn: '"By the looks of you, both." She hands you a bowl of hot soup without waiting for an answer.', delay: 2500 });
   } else {
@@ -539,6 +543,7 @@ registerNode('r3_bell', () => {
 
     if (bv === 2) {
       // Visit 2: the gaze becomes deliberate — you can no longer pretend you imagined it
+      steps.push({ art: npcPortrait.art('bell', { subtitle: '議員' }), artEn: npcPortrait.art('bell', { subtitle: 'Councilor' }), delay: 800 });
       steps.push({ tag: '移動', tagColor: 'tag-move', text: '銅鐘還是坐在那張堆滿文件的桌子旁。看到你來，她放下筆，身子微微後靠。', textEn: 'Bronze Bell sits at her document-laden desk. Seeing you, she puts down her pen and leans back.', delay: 2200 });
       steps.push({ tag: '感知', tagColor: 'tag-sense', text: '這次她看你的方式不一樣了。', textEn: 'This time she looks at you differently.', delay: 1800 });
       steps.push({ tag: '感知', tagColor: 'tag-sense', text: '她的視線從你的臉開始，慢慢滑到你的肩膀——停了一下——然後繼續往下，胸口，腰線。那種打量的方式不像是在評估一個人的戰鬥力。', textEn: 'Her gaze starts at your face, slides slowly to your shoulders — pauses — then continues down. Chest. Waistline. That\'s not how you assess someone\'s combat ability.', delay: 3200 });
@@ -546,6 +551,7 @@ registerNode('r3_bell', () => {
       steps.push({ tag: '情報', tagColor: 'tag-info', text: '「有什麼進展？」她的聲音低沉而從容，帶著某種你上次沒注意到的——滿意。', textEn: '"Any progress?" Her voice is low, unhurried, carrying something you didn\'t catch before — satisfaction.', delay: 2500 });
     } else if (bv === 3) {
       // Visit 3: physical proximity — she closes the distance
+      steps.push({ art: npcPortrait.art('bell', { subtitle: '議員' }), artEn: npcPortrait.art('bell', { subtitle: 'Councilor' }), delay: 800 });
       steps.push({ tag: '移動', tagColor: 'tag-move', text: '你推開門。銅鐘不在桌旁——她站在窗邊，逆光裡只看得見她挺拔的輪廓。', textEn: 'You push the door open. Bronze Bell isn\'t at her desk — she stands by the window, backlit into a silhouette of her upright frame.', delay: 2500 });
       steps.push({ tag: '感知', tagColor: 'tag-sense', text: '「來了。」她轉過身。不知道是不是光線的關係，她的琥珀色眼睛看起來比往常更亮。', textEn: '"You\'re here." She turns. Maybe it\'s the light, but her amber eyes seem brighter than usual.', delay: 2500 });
       steps.push({ tag: '感知', tagColor: 'tag-sense', text: '她走過來——步伐從容，但目的性很強。她在你面前停下，比你高半個頭。你聞到了墨水和茶葉的氣味——還有某種更溫暖的、屬於她的體溫。', textEn: 'She walks over — unhurried but purposeful. She stops in front of you, half a head taller. You catch the scent of ink and tea — and something warmer, something that\'s simply her.', delay: 3200 });
@@ -554,6 +560,7 @@ registerNode('r3_bell', () => {
       steps.push({ tag: '感知', tagColor: 'tag-sense', text: '「……石化沒有繼續蔓延。不錯。」她鬆開手，退了半步——但那半步的距離依然近得不合常理。她看著你的眼神帶著一絲不容錯認的笑意：「看來你比我預期的……耐久。」', textEn: '"...The petrification hasn\'t spread. Good." She lets go and half-steps back — but that half-step still leaves her unreasonably close. Her eyes carry an unmistakable gleam of amusement: "You\'re more... durable than I expected."', delay: 3500 });
     } else {
       // Visit 4+: established dynamic — she's openly possessive
+      steps.push({ art: npcPortrait.art('bell', { subtitle: '議員' }), artEn: npcPortrait.art('bell', { subtitle: 'Councilor' }), delay: 800 });
       steps.push({ tag: '移動', tagColor: 'tag-move', text: '銅鐘看到你走進來，放下筆，往椅背上一靠。她的嘴角已經不再遮掩那個弧度了。', textEn: 'Bronze Bell sees you enter, puts down her pen, and leans back. She no longer hides that curve of her lips.', delay: 2500 });
       steps.push({ tag: '感知', tagColor: 'tag-sense', text: '「我的人回來了。」她的聲音帶著一種理所當然的佔有感。琥珀色的眼睛從你的頭頂慢慢掃到腳底，然後回來——像在清點自己的財產一樣仔細。', textEn: '"My person returns." Her voice carries a matter-of-fact possessiveness. Amber eyes sweep from your head slowly down to your feet, then back — as thorough as tallying her own property.', delay: 3200 });
       steps.push({ tag: '感知', tagColor: 'tag-sense', text: '那種打量的方式讓你覺得自己的衣服少穿了一層。但你已經開始習慣了。或者說——開始期待了。', textEn: 'The way she looks at you makes you feel a layer of clothing lighter. But you\'re getting used to it. Or perhaps — starting to look forward to it.', delay: 2800 });

@@ -1122,6 +1122,7 @@ registerNode('r2_boss_prep', () => {
     ngBossSteps.push({ tag: '記憶', tagColor: 'tag-petri', text: '你知道它的弱點在哪裡。你知道它會在第幾回合暴怒。這次，你做好了準備。', textEn: 'You know where its weakness lies. You know which round it rages. This time, you\'re prepared.', delay: 2800 });
   }
   autoExplore(ngBossSteps.concat([
+    { art: npcPortrait.art('frost', { subtitle: '營地隊長' }), artEn: npcPortrait.art('frost', { subtitle: 'Leader' }), delay: 800 },
     { art: `<pre class="ascii-art red">
   ╔═══════════════════════════════════╗
   ║         ⚠  作 戰 準 備  ⚠        ║
