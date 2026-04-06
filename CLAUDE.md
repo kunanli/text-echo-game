@@ -1007,6 +1007,53 @@ function runNarrativeEvent(evt) {
 - NPC 肖像使用無框開放式設計（不要用 ╔══╗ 方框包圍）
 - 同一 NPC 跨區域復用同一肖像設計，保持視覺一致性
 
+### 像素肖像系統（方案 B：NPC 像素圖 + 場景/怪物 ASCII art）
+
+**架構**：`js/portrait.js` 提供 `npcPortrait.art(id, opts)` API，圖片存在時顯示像素圖，不存在時自動 fallback 到 ASCII art。場景和怪物維持原有 ASCII art 不變。
+
+#### 檔名規範（`assets/npc/` 目錄）
+
+| 檔名 | 角色 | 說明 |
+|------|------|------|
+| `player_male.png` | 主角（男） | 男性主角半身像 |
+| `player_female.png` | 主角（女） | 女性主角半身像 |
+| `ying.png` | 螢 | 記錄員，cyan 光暈 |
+| `zhou.png` | 老周 | 倖存礦工，gold 光暈 |
+| `crane.png` | 灰鶴 | 行商人，gold 光暈 |
+| `frost.png` | 鐵霜 | 營地首領 |
+| `cast.png` | 老鑄 | 鐵匠 |
+| `dew.png` | 清露 | 醫師，cyan 光暈 |
+| `bell.png` | 銅鐘 | 議會代表 |
+| `ferryman.png` | 冥河渡江人 | 隱藏 NPC，purple 光暈 |
+
+#### 圖片規格
+
+- **尺寸**：256×256 px（正方形）
+- **格式**：PNG，透明背景
+- **風格**：半身動漫像素風格，黑白灰階
+- **生成工具**：Recraft（pixel art style, black and white）
+- **CSS 渲染**：`image-rendering: pixelated`，頁面顯示 160×160 px（手機 120×120 px）
+
+#### 程式碼用法
+
+```javascript
+// NPC 肖像（自動 fallback ASCII art）
+{ art: npcPortrait.art('ying', { subtitle: '記錄員' }) || `<pre class="ascii-art cyan">...</pre>`,
+  artEn: npcPortrait.art('ying', { subtitle: 'Chronicler' }) || `<pre class="ascii-art cyan">...</pre>` }
+
+// 主角肖像（自動依 state.sex 選擇 male/female）
+{ art: npcPortrait.playerHtml({ subtitle: '爐灶少年' }) || `<pre class="ascii-art">...</pre>` }
+
+// endcard.js canvas 繪製
+var img = npcPortrait.getImage('ying');  // → Image element or null
+```
+
+#### 新增角色時
+
+1. 在 `js/portrait.js` 的 `PORTRAITS` 物件中新增條目
+2. 將 256×256 PNG 放入 `assets/npc/` 目錄
+3. 在故事節點中使用 `npcPortrait.art('id') || \`ASCII fallback\`` 模式
+
 ## API 速查表
 
 ### 狀態物件 (`state.js`)
