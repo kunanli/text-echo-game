@@ -58,13 +58,9 @@ function revive() {
   notify(L('復活石碎裂——你從石殼中掙脫！（復活次數：' + state.deathCount + '）', 'Revival Stone shatters — you break free! (Deaths: ' + state.deathCount + ')'));
   renderStatus();
   // Return to a safe node — avoid reloading combat/patrol/tunnel nodes
-  var REVIVE_SAFE = { 'r0_tunnel': 'r0_climb_check', 'r1_guard_fight': 'r1_look', 'r1_guard_check': 'r1_look', 'r2_boss': 'r2_camp', 'r2_boss_prep': 'r2_camp', 'r3_patrol': 'r3_look', 'r3_boss': 'r3_council', 'r3_boss_prep': 'r3_council' };
-  var safeNode = state.node;
-  if (REVIVE_SAFE[safeNode]) {
-    safeNode = REVIVE_SAFE[safeNode];
-  } else if (!safeNode || !nodes[safeNode] || safeNode.includes('combat') || safeNode.includes('guard_fight') || safeNode.includes('patrol') || safeNode.includes('tunnel')) {
-    safeNode = regionStartNode();
-  }
+  // Uses extensible safe-revive map from registry.js
+  var safeNode = getSafeReviveNode(state.node);
+  if (!safeNode || !nodes[safeNode]) safeNode = regionStartNode();
   loadNode(safeNode);
 }
 
@@ -122,13 +118,7 @@ function startGameOverSequence() {
     '     ╱    ╰─────╯    ╲',
   ];
 
-  var regionNames = [
-    L('祭獻坑', 'Sacrificial Pit'),
-    L('石脈迴廊', 'Vein Corridor'),
-    L('大採石場', 'Great Quarry'),
-    L('河城渡口', 'River City Ferry'),
-  ];
-  var regionName = regionNames[state.region] || regionNames[0];
+  var regionName = getRegionName(state.region);
 
   var lines = [
     { zh: '「……又一個旅者倒下了。」', en: '"...Another traveler has fallen."' },
@@ -213,13 +203,19 @@ function showDeathRestartChoices() {
 }
 
 function regionStartNode() {
-  return ['r0_start','r1_start','r2_start','r3_start'][state.region] || 'r0_start';
+  return getStartNode(state.region);
 }
 
 // ─── Node System ───
 const nodes = {};
 
-function registerNode(id, fn) { nodes[id] = fn; }
+// registerNode(id, fn [, meta])
+// meta is optional: { region, type, npc, npcs, tags }
+// When provided, also registers node metadata in registry.js
+function registerNode(id, fn, meta) {
+  nodes[id] = fn;
+  if (meta) registerNodeMeta(id, meta);
+}
 
 function loadNode(id) {
   state.node = id;
@@ -243,17 +239,11 @@ registerNode('chapter_select', function() {
   var en = state.lang === 'en';
   var devUnlocked = state.flags._devUnlockAll;
 
-  // Use the shared CHAPTERS array from title.js
-  var chData = typeof CHAPTERS !== 'undefined' ? CHAPTERS : [
-    { id: 0, zh: '祭獻坑',   en: 'Sacrificial Pit',  node: 'r0_look', icon: '†',
-      loreZh: '你從滾燙的熱泉中醒來……', loreEn: 'You awaken in a scalding hot spring...' },
-    { id: 1, zh: '石脈迴廊', en: 'Vein Corridor',    node: 'r1_look', icon: '◇',
-      loreZh: '石壁間流動著發光的礦脈……', loreEn: 'Glowing veins pulse through the stone walls...' },
-    { id: 2, zh: '大採石場', en: 'Great Quarry',     node: 'r2_look', icon: '⛏',
-      loreZh: '巨大的採石場向深淵敞開……', loreEn: 'A massive quarry yawns open toward the abyss...' },
-    { id: 3, zh: '河城渡口', en: 'River City Ferry', node: 'r3_look', icon: '⚓',
-      loreZh: '地底河流匯聚之處……', loreEn: 'Where underground rivers converge...' },
-  ];
+  // Use CHAPTERS from title.js if loaded, else build from REGION_CONFIG (registry.js)
+  var chData = typeof CHAPTERS !== 'undefined' ? CHAPTERS : REGION_CONFIG.filter(Boolean).map(function(r) {
+    return { id: r.id, zh: r.zh, en: r.en, node: r.hub, icon: r.icon,
+      loreZh: '', loreEn: '' };
+  });
 
   // ── Enlarged ASCII map ──
   var lines = [];
