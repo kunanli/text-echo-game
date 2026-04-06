@@ -13,6 +13,7 @@ const state = {
   region: 0,         // 0=祭獻坑, 1=石脈迴廊, 2=大採石場, 3=河城渡口
   node: 'start',
   flags: {},
+  skills: [],            // unlocked combat skill IDs (NG+ only)
   deathCount: 0,
   lang: 'zh',
   mood: 'normal',    // avatar mood: normal, happy, hurt, danger, petri, combat
