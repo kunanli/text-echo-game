@@ -38,8 +38,8 @@ var ENDING_FLAVOR = {
 var RARITY_TIERS = [
   { min: 85, zh: '傳說', en: 'LEGENDARY', color: '#d4a843', stars: 5 },
   { min: 70, zh: '史詩', en: 'EPIC',      color: '#9a5ac8', stars: 4 },
-  { min: 50, zh: '稀有', en: 'RARE',      color: '#4a8ac8', stars: 3 },
-  { min: 30, zh: '精良', en: 'UNCOMMON',   color: '#4a9e4a', stars: 2 },
+  { min: 55, zh: '稀有', en: 'RARE',      color: '#4a8ac8', stars: 3 },
+  { min: 40, zh: '精良', en: 'UNCOMMON',   color: '#4a9e4a', stars: 2 },
   { min: 0,  zh: '普通', en: 'COMMON',     color: '#6a6a7a', stars: 1 },
 ];
 
@@ -323,31 +323,60 @@ function generateEndCard() {
   // ═════════════════════════════════
   //  TEXT OVERLAY — bottom area
   // ═════════════════════════════════
-  var curY = Math.floor(ENDCARD_H * 0.68);
+  var curY = Math.floor(ENDCARD_H * 0.64);
 
   var cx = ENDCARD_W / 2;
 
-  // ── Player name (centered) ──
+  // ── Ending title (centered, top of text area) ──
   ctx.shadowColor = 'rgba(0,0,0,0.9)';
   ctx.shadowBlur = 8;
-  ctx.font = 'bold 32px "Courier New", monospace';
-  ctx.fillStyle = '#e8e8f0';
-  ctx.textAlign = 'center';
-  ctx.fillText(state.name, cx, curY);
-  ctx.shadowBlur = 0;
-
-  // ── Ending type (centered, below name) ──
-  curY += 30;
-  ctx.shadowColor = 'rgba(0,0,0,0.9)';
-  ctx.shadowBlur = 6;
-  ctx.font = 'bold 22px "Courier New", monospace';
+  ctx.font = 'bold 28px "Courier New", monospace';
   ctx.fillStyle = meta.color;
   ctx.textAlign = 'center';
   ctx.fillText(en ? meta.typeEn : meta.type, cx, curY);
   ctx.shadowBlur = 0;
 
+  // ── Death quote (random, only for death ending) ──
+  var isDeath = !state.flags.r3Ending;
+  if (isDeath) {
+    var deathQuotes = en ? [
+      '"The stone remembers what the flesh forgets."',
+      '"Another name lost to the deep."',
+      '"The abyss collects its toll — in silence."',
+      '"Not all who descend are meant to rise."',
+      '"Your story ends here. The stone will tell it."',
+      '"The last thing you felt was the cold creeping upward."',
+      '"Even the bravest become monuments in the end."',
+      '"The darkness does not mourn. It simply waits."',
+    ] : [
+      '「石頭記住了肉體遺忘的一切。」',
+      '「又一個名字消失在深淵裡。」',
+      '「深淵收取它的代價——無聲無息。」',
+      '「並非所有下行者都註定上升。」',
+      '「你的故事在此結束。石頭會替你述說。」',
+      '「你最後感受到的，是從腳底蔓延的冰冷。」',
+      '「即使是最勇敢的人，最終也會變成紀念碑。」',
+      '「黑暗不會哀悼。它只是等待。」',
+    ];
+    var quote = deathQuotes[Math.floor(Math.random() * deathQuotes.length)];
+    curY += 30;
+    ctx.font = '14px "Courier New", monospace';
+    ctx.fillStyle = '#8a8a9a';
+    ctx.textAlign = 'center';
+    ctx.shadowColor = 'rgba(0,0,0,0.8)';
+    ctx.shadowBlur = 4;
+    var quoteLines = _wrapText(ctx, quote, ENDCARD_W - pad * 2);
+    for (var qi = 0; qi < quoteLines.length; qi++) {
+      ctx.fillText(quoteLines[qi], cx, curY + qi * 20);
+    }
+    ctx.shadowBlur = 0;
+    curY += quoteLines.length * 20 + 10;
+  } else {
+    curY += 10;
+  }
+
   // ── Stats (centered) ──
-  curY += 30;
+  curY += 20;
   var statDefs = [
     { label: 'STR', val: state.str },
     { label: 'AGI', val: state.agi },
