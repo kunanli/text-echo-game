@@ -315,36 +315,12 @@ function generateEndCard() {
     ctx.fillRect(0, 250, ENDCARD_W, ENDCARD_H - 250);
   }
 
-  // No extra border — tarot art already has ornate frame
+  // ═════════════════════════════════
+  //  TEXT OVERLAY — all in bottom 30%
+  // ═════════════════════════════════
+  var curY = Math.floor(ENDCARD_H * 0.68);
 
-  // ═════════════════════════════════
-  //  TOP BAR: stars + rarity / ending type (inside tarot border)
-  // ═════════════════════════════════
-  var curY = 32;
-
-  var stars = '';
-  for (var i = 0; i < rarity.stars; i++) stars += '★';
-  ctx.font = 'bold 13px "Courier New", monospace';
-  ctx.textAlign = 'left';
-  ctx.fillStyle = rarity.color;
-  ctx.shadowColor = 'rgba(0,0,0,0.9)';
-  ctx.shadowBlur = 5;
-  ctx.fillText(stars + '  ' + (en ? rarity.en : rarity.zh), pad + 8, curY);
-
-  ctx.textAlign = 'right';
-  ctx.font = '12px "Courier New", monospace';
-  ctx.fillStyle = rarity.color;
-  ctx.fillText(en ? meta.typeEn : meta.type, ENDCARD_W - pad - 8, curY);
-  ctx.shadowBlur = 0;
-
-  // ═════════════════════════════════
-  //  All text starts at 58% (below tarot art main visual)
-  // ═════════════════════════════════
-  curY = Math.floor(ENDCARD_H * 0.58);
-
-  // ═════════════════════════════════
-  //  PLAYER NAME (large, prominent)
-  // ═════════════════════════════════
+  // ── Player name + ending type ──
   ctx.shadowColor = 'rgba(0,0,0,0.9)';
   ctx.shadowBlur = 6;
   ctx.font = 'bold 20px "Courier New", monospace';
@@ -352,204 +328,59 @@ function generateEndCard() {
   ctx.textAlign = 'left';
   ctx.fillText(state.name, pad, curY);
 
-  var nameW = ctx.measureText(state.name).width;
-  ctx.font = '13px sans-serif';
-  ctx.fillStyle = '#8a8a9a';
-  ctx.fillText(state.sex === 'female' ? '♀' : '♂', pad + nameW + 8, curY);
-
-  // Ending title on the right
   ctx.textAlign = 'right';
   ctx.font = 'bold 14px "Courier New", monospace';
   ctx.fillStyle = meta.color;
   ctx.fillText(en ? meta.typeEn : meta.type, ENDCARD_W - pad, curY);
   ctx.shadowBlur = 0;
 
-  // ═════════════════════════════════
-  //  FLAVOR TEXT
-  // ═════════════════════════════════
-  curY += 18;
-  var flavor = ENDING_FLAVOR[ending] || ENDING_FLAVOR.lockdown;
-  var flavorRaw = en ? flavor.en : flavor.zh;
+  // ── Stats: compact single row per stat ──
+  curY += 20;
+  var statDefs = [
+    { label: 'STR', val: state.str },
+    { label: 'AGI', val: state.agi },
+    { label: 'WIL', val: state.wil },
+  ];
   ctx.font = '11px "Courier New", monospace';
-  ctx.fillStyle = '#8a8a9a';
   ctx.textAlign = 'left';
   ctx.shadowColor = 'rgba(0,0,0,0.7)';
   ctx.shadowBlur = 3;
-  var flavorLines = _wrapText(ctx, flavorRaw, ENDCARD_W - pad * 2);
-  for (var fi = 0; fi < flavorLines.length; fi++) {
-    ctx.fillText(flavorLines[fi], pad, curY + fi * 16);
-  }
-  ctx.shadowBlur = 0;
-  curY += flavorLines.length * 16 + 12;
-
-  // ═════════════════════════════════
-  //  STATS — pixel blocks (1 block = 1 point)
-  // ═════════════════════════════════
-  var statDefs = [
-    { zh: '力量',   en: 'STR',   val: state.str, max: 15 },
-    { zh: '敏捷',   en: 'AGI',   val: state.agi, max: 15 },
-    { zh: '意志',   en: 'WIL',   val: state.wil, max: 15 },
-    { zh: '石化度', en: 'PETRI', val: state.petri, max: 100 },
-    { zh: '深度',   en: 'DEPTH', val: state.level, max: 10 },
-  ];
-
-  var barH = 6;
-  var labelColW = en ? 56 : 50;
-  var numColW = 36;
-  var barX = pad + labelColW;
-  var barW = Math.floor((ENDCARD_W - pad * 2 - labelColW - numColW) / 2);
-  var rowH = barH + 16;
-
+  var statStr = '';
   for (var si = 0; si < statDefs.length; si++) {
-    var sd = statDefs[si];
-    var sy = curY + si * rowH;
-
-    // Label
-    ctx.font = '11px "Courier New", monospace';
-    ctx.textAlign = 'left';
-    ctx.fillStyle = '#9a9aaa';
-    ctx.shadowColor = 'rgba(0,0,0,0.6)';
-    ctx.shadowBlur = 2;
-    ctx.fillText(en ? sd.en : sd.zh, pad, sy + barH / 2 + 4);
-    ctx.shadowBlur = 0;
-
-    // Progress bar
-    _drawStatBar(ctx, barX, sy, sd.val, sd.max, barW, barH);
-
-    // Number (left-aligned after bar)
-    ctx.textAlign = 'left';
-    ctx.fillStyle = '#9a9aaa';
-    ctx.font = '11px "Courier New", monospace';
-    ctx.fillText('' + sd.val, barX + barW + 10, sy + barH / 2 + 4);
+    statStr += statDefs[si].label + ' ' + statDefs[si].val + '   ';
   }
-  curY += statDefs.length * rowH + 8;
+  statStr += 'Lv.' + state.level + '   ' + (en ? 'PETRI ' : '石化 ') + state.petri + '%';
+  ctx.fillStyle = '#9a9aaa';
+  ctx.fillText(statStr, pad, curY);
+  ctx.shadowBlur = 0;
 
-  // ═════════════════════════════════
-  //  BOTTOM: highlights (left) + score (right)
-  // ═════════════════════════════════
-  // Highlights: sorted by rarity (highest first), show top 3
-  var hlAll = [];
-  if (state.deathCount === 0)          hlAll.push({ text: en ? 'Deathless Run'    : '零死亡通關', color: '#d4a843', rank: 5 });
-  if (!state.flags._runCombats)        hlAll.push({ text: en ? 'Pacifist Run'     : '不戰通關',   color: '#d4a843', rank: 5 });
-  if (state.petri <= 10)               hlAll.push({ text: en ? 'Stone Resistant'  : '抗石化體質', color: '#9a5ac8', rank: 4 });
-  if (state.petri >= 60)               hlAll.push({ text: en ? 'Stone Bloom'      : '石中花',     color: '#9a5ac8', rank: 4 });
-  if (state.flags.r3BossMethod==='persuade') hlAll.push({ text: en ? 'Peacemaker' : '和平使者',   color: '#60c8e0', rank: 3 });
-  if (state.flags.r2BossSpared)        hlAll.push({ text: en ? 'Merciful Heart'   : '慈悲之心',   color: '#60c8e0', rank: 3 });
-  if (state.flags.r3CraneTestimony)    hlAll.push({ text: en ? 'Crane Testified'  : '灰鶴作證',   color: '#4a8ac8', rank: 3 });
-  if (state.flags.r3PlagueProof)       hlAll.push({ text: en ? 'Plague Proof'     : '瘟疫證據',   color: '#4a8ac8', rank: 3 });
-  if (state.flags.r3YingRiver)         hlAll.push({ text: en ? 'Moonlit Promise'  : '月下相守',   color: '#c06090', rank: 3 });
-  if (state.flags.ferrymanPassed)      hlAll.push({ text: en ? 'Styx Crosser'     : '冥河渡者',   color: '#9a5ac8', rank: 4 });
-  if (state.flags.r1YingCompanion)     hlAll.push({ text: en ? 'Ying\'s Companion': '螢的同伴',   color: '#4a9e4a', rank: 2 });
-  hlAll.sort(function(a, b) { return b.rank - a.rank; });
-  var hlItems = hlAll.slice(0, 3);
-
-  // Highlights on left side
-  if (hlItems.length > 0) {
-    ctx.font = '10px "Courier New", monospace';
-    ctx.textAlign = 'left';
-    ctx.fillStyle = '#7a7a8a';
-    ctx.fillText(en ? 'highlights' : '成就亮點', pad, curY + 6);
-
-    ctx.font = '11px "Courier New", monospace';
-    for (var hi = 0; hi < hlItems.length; hi++) {
-      ctx.fillStyle = hlItems[hi].color;
-      ctx.fillText('· ' + hlItems[hi].text, pad, curY + 24 + hi * 18);
-    }
-  }
-
-  // Score on right side (vertically centered with highlights)
-  var scoreBlockY = curY + (hlItems.length > 0 ? 10 : 0);
-
-  ctx.font = '10px "Courier New", monospace';
-  ctx.textAlign = 'right';
-  ctx.fillStyle = '#7a7a8a';
-  ctx.fillText(en ? 'score' : '評分', ENDCARD_W - pad, scoreBlockY + 6);
-
-  ctx.font = 'bold 32px "Courier New", monospace';
+  // ── Score (large, right side) ──
+  curY += 28;
+  ctx.font = 'bold 36px "Courier New", monospace';
   ctx.fillStyle = rarity.color;
+  ctx.textAlign = 'right';
   if (rarity.stars >= 4) {
     ctx.shadowColor = rarity.color;
     ctx.shadowBlur = 12;
   }
-  ctx.textAlign = 'right';
-  ctx.fillText('' + totalScore, ENDCARD_W - pad, scoreBlockY + 40);
+  ctx.fillText('' + totalScore, ENDCARD_W - pad, curY);
   ctx.shadowBlur = 0;
 
-  curY += Math.max(hlItems.length * 18 + 20, 40) + 10;
-
-  // ═════════════════════════════════
-  //  NPC FAREWELL QUOTE
-  // ═════════════════════════════════
-  var npcQuotes = [
-    { key: 'ying', flags: ['r1YingTrustUp','r1YingCompanion','r2YingNight','r2YingLore4','r3YingInn'], max: 5,
-      name: '螢', nameEn: 'Ying',
-      zh: '「說好了要幫我校對的，笨蛋。」', en: '"You promised to proofread for me, idiot."' },
-    { key: 'zhou', flags: ['r1SurvivorMet','r1SurvivorFed','r1SurvivorFullTrust','r2ZhouTrace','r3ZhouMet'], max: 5,
-      name: '老周', nameEn: 'Old Zhou',
-      zh: '「帶著這塊石頭，比我有用。」', en: '"Take this stone. It\'ll serve you better than me."' },
-    { key: 'crane', flags: ['r1WandererMet','r1WandererLore','r2CraneMet','r2CraneLore','r3CraneTestimony'], max: 5,
-      name: '灰鶴', nameEn: 'Grey Crane',
-      zh: '「別弄丟了，我可沒第二把。」', en: '"Don\'t lose it. I don\'t have a spare."' },
-    { key: 'bell', flags: ['r3BellMet','r3BellAlliance','r3BellQuest'], max: 3,
-      name: '銅鐘', nameEn: 'Bronze Bell',
-      zh: '「通道不會封鎖。永遠不會。」', en: '"The passages won\'t be sealed. Ever."' },
-    { key: 'frost', flags: ['r2ChiefTalked','r2BossDefeated','r3BellAlliance'], max: 3,
-      name: '鐵霜', nameEn: 'Iron Frost',
-      zh: '「你比我更需要這把刀。」', en: '"You need this blade more than I do."' },
-    { key: 'dew', flags: ['r2CampVisited','r2MedicHealed','r2MedicElixir'], max: 3,
-      name: '清露', nameEn: 'Dew',
-      zh: '「你撐到現在……比我更值得活下去。」', en: '"You\'ve lasted this long... you deserve to live."' },
-    { key: 'cast', flags: ['r2CampVisited','r2PickaxeUpgraded','r2ArmorUpgraded'], max: 3,
-      name: '老鑄', nameEn: 'Old Cast',
-      zh: '「……最後一件了。用最好的料。」', en: '"...Last one. Best materials."' },
-  ];
-
-  // Find NPC with highest affinity
-  var bestNpc = null;
-  var bestAff = 0;
-  for (var ni = 0; ni < npcQuotes.length; ni++) {
-    var nq = npcQuotes[ni];
-    var aff = 0;
-    for (var fi = 0; fi < nq.flags.length; fi++) {
-      if (state.flags[nq.flags[fi]]) aff++;
-    }
-    if (aff > bestAff) { bestAff = aff; bestNpc = nq; }
-  }
-
-  if (bestNpc && bestAff > 0) {
-    var qPad = 14;
-    var quoteText = en ? bestNpc.en : bestNpc.zh;
-    ctx.font = '11px "Courier New", monospace';
-    var quoteLines = _wrapText(ctx, quoteText, ENDCARD_W - pad * 2 - qPad * 2);
-    var nameStr = '— ' + (en ? bestNpc.nameEn : bestNpc.name);
-
-    var boxH = qPad + quoteLines.length * 15 + 8 + 14 + qPad;
-    var boxX = pad;
-    var boxW = ENDCARD_W - pad * 2;
-
-    // Border box
-    _roundRect(ctx, boxX, curY, boxW, boxH, 6);
-    ctx.strokeStyle = '#4a4a5a';
-    ctx.lineWidth = 1;
-    ctx.stroke();
-
-    // Quote text
-    ctx.fillStyle = '#8a8a9a';
-    ctx.textAlign = 'left';
-    for (var qi = 0; qi < quoteLines.length; qi++) {
-      ctx.fillText(quoteLines[qi], boxX + qPad, curY + qPad + 12 + qi * 15);
-    }
-
-    // NPC name
-    ctx.font = '10px "Courier New", monospace';
-    ctx.fillStyle = '#6a6a7a';
-    ctx.fillText(nameStr, boxX + qPad, curY + qPad + 12 + quoteLines.length * 15 + 12);
-  }
+  // Stars + rarity (left of score)
+  var stars = '';
+  for (var i = 0; i < rarity.stars; i++) stars += '★';
+  ctx.font = '12px "Courier New", monospace';
+  ctx.textAlign = 'left';
+  ctx.fillStyle = rarity.color;
+  ctx.shadowColor = 'rgba(0,0,0,0.8)';
+  ctx.shadowBlur = 4;
+  ctx.fillText(stars + ' ' + (en ? rarity.en : rarity.zh), pad, curY);
+  ctx.shadowBlur = 0;
 
   // ═════════════════════════════════
   //  FOOTER: time + url
   // ═════════════════════════════════
-  var footerY = ENDCARD_H - 36;
+  var footerY = ENDCARD_H - 28;
   ctx.textAlign = 'left';
   ctx.font = '9px "Courier New", monospace';
   ctx.fillStyle = '#5a5a6a';
