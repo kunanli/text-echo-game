@@ -837,6 +837,9 @@ registerNode('r2_camp_chief', () => {
     steps.push({ tag: '情報', tagColor: 'tag-info', text: '「我們原本有五十人。現在……只剩十二個。」', textEn: '"We started with fifty. Now... only twelve remain."', delay: 2500 });
     steps.push({ tag: '情報', tagColor: 'tag-info', text: '「上升通道是通往地表的唯一出路。但通道入口被一隻石化巨獸盤踞著。」', textEn: '"The ascent shaft is the only way to the surface. But a Petrified Colossus guards the entrance."', delay: 2800 });
     steps.push({ tag: '情報', tagColor: 'tag-info', html: '「那東西曾是我們的同伴——<b>第三號戰甲的駕駛員</b>。他和機甲一起被石化了，變成了怪物。」', htmlEn: '"That thing was once one of us — <b>the pilot of Mech Unit No.3</b>. He and the mech petrified together, becoming a monster."', delay: 3000 });
+    steps.push({ tag: '感知', tagColor: 'tag-sense', text: '鐵霜說到這裡時停了下來。她的右手不自覺地握緊了——不是握石錘的那種握法，而是像在握住某個人的手。', textEn: 'Iron Frost pauses here. Her right hand clenches unconsciously — not the way she grips her hammer, but as if holding someone\'s hand.', delay: 3000 });
+    steps.push({ tag: '情報', tagColor: 'tag-info', html: '「他叫承鋼。」她的聲音突然低了下去。「他是……我很重要的人。<b>我相信他還在那頭巨獸裡面。還活著。</b>」', htmlEn: '"His name was Cheng Gang." Her voice drops. "He was... someone very important to me. <b>I believe he\'s still inside that colossus. Still alive.</b>"', delay: 3500 });
+    steps.push({ tag: '感知', tagColor: 'tag-sense', text: '她抬起頭看著你，鐵灰色的眼睛裡閃過一絲從未見過的脆弱：「如果有辦法的話——拜託你，不要殺他。」', textEn: 'She looks up at you, a flash of vulnerability you\'ve never seen in those iron-grey eyes: "If there\'s a way — please, don\'t kill him."', delay: 3000 });
   } else if (state.flags.r2ChengAwake) {
     steps.push({ tag: '情報', tagColor: 'tag-info', text: '承鋼靠在床上，鐵霜坐在旁邊幫他換藥。看見你進來，兩人都抬起了頭。', textEn: 'Cheng Gang leans in bed while Iron Frost changes his dressings. Both look up as you enter.', delay: 2500 });
     steps.push({ tag: '感知', tagColor: 'tag-sense', text: '承鋼朝你點了點頭：「找到密道了嗎？小心裡面。」', textEn: 'Cheng Gang nods at you: "Found the passage? Be careful in there."', delay: 2000 });
@@ -1158,6 +1161,8 @@ registerNode('r2_boss_prep', () => {
     { tag: '情報', tagColor: 'tag-info', text: '「好。我帶兩個最好的戰士跟你一起去。其他人留下守營地。」', textEn: '"Good. I\'ll take two of our best fighters with you. The rest guard the camp."', delay: 2500 },
     { tag: '情報', tagColor: 'tag-info', text: '「記住——那頭巨獸是半人半機甲的存在。普通攻擊對它的外殼效果很差。」', textEn: '"Remember — that colossus is half-human, half-mech. Normal attacks barely scratch its shell."', delay: 2800 },
     { tag: '情報', tagColor: 'tag-info', html: '「你有機甲控制鍵——<b>在戰鬥中找到它胸口的核心接口，插入控制鍵就能讓它短路。</b>」', htmlEn: '"You have the mech control key — <b>find the core port on its chest during battle. Insert the key to short-circuit it.</b>"', delay: 3000 },
+    { tag: '感知', tagColor: 'tag-sense', text: '鐵霜頓了一下，石化的手指微微發顫。她別過臉，但你還是聽見了她壓低的聲音——', textEn: 'Iron Frost hesitates, her petrified fingers trembling slightly. She turns away, but you still catch her lowered voice —', delay: 2500 },
+    { tag: '情報', tagColor: 'tag-info', html: '「……<b>如果你能在戰鬥中跟他交流，讓他想起自己是誰——也許就不用殺他。</b>拜託了。」', htmlEn: '"...<b>If you can commune with him during the fight, help him remember who he is — maybe you won\'t have to kill him.</b> Please."', delay: 3500 },
     { tag: '情報', tagColor: 'tag-info', text: '「但在那之前，你得先打穿它的護甲……準備好了嗎？」', textEn: '"But first you need to break through its armor... Are you ready?"', delay: 2500 },
   ]).concat(yingSteps), [
     { text: '出發！', textEn: 'Let\'s go!', action: () => loadNode('r2_boss') },
