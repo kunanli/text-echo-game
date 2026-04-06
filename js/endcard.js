@@ -264,8 +264,7 @@ function generateEndCard() {
   // Try ending-specific art first, then player portrait fallback
   var _pixelImg = null;
   if (typeof npcPortrait !== 'undefined') {
-    var endcardId = 'endcard_' + ending + '_' + (state.sex === 'female' ? 'female' : 'male');
-    _pixelImg = npcPortrait.getImage(endcardId) || npcPortrait.getImage(npcPortrait.playerId());
+    _pixelImg = npcPortrait.getImage('endcard_' + ending) || npcPortrait.getImage(npcPortrait.playerId());
   }
   if (_pixelImg) {
     // Draw pixel portrait as full background (cover mode)

@@ -23,15 +23,11 @@ var npcPortrait = (function() {
     dew:      { file: 'dew.png',      zh: '清露',     en: 'Dew',         color: 'cyan'   },
     bell:     { file: 'bell.png',     zh: '銅鐘',     en: 'Bronze Bell', color: ''       },
     ferryman: { file: 'ferryman.png', zh: '冥河渡江人', en: 'Ferryman',  color: 'purple' },
-    // 結局卡背景（4 結局 × 2 性別）
-    endcard_dawn_male:       { file: 'endcard_dawn_male.png',       zh: '黎明', en: 'Dawn',       color: '' },
-    endcard_dawn_female:     { file: 'endcard_dawn_female.png',     zh: '黎明', en: 'Dawn',       color: '' },
-    endcard_sacrifice_male:  { file: 'endcard_sacrifice_male.png',  zh: '犧牲', en: 'Sacrifice',  color: '' },
-    endcard_sacrifice_female:{ file: 'endcard_sacrifice_female.png',zh: '犧牲', en: 'Sacrifice',  color: '' },
-    endcard_compromise_male: { file: 'endcard_compromise_male.png', zh: '妥協', en: 'Compromise', color: '' },
-    endcard_compromise_female:{ file:'endcard_compromise_female.png',zh: '妥協', en: 'Compromise', color: '' },
-    endcard_lockdown_male:   { file: 'endcard_lockdown_male.png',   zh: '封鎖', en: 'Lockdown',   color: '' },
-    endcard_lockdown_female: { file: 'endcard_lockdown_female.png', zh: '封鎖', en: 'Lockdown',   color: '' },
+    // 結局卡背景（4 結局，不分性別）
+    endcard_dawn:       { file: 'endcard_dawn.png',       zh: '黎明', en: 'Dawn',       color: '' },
+    endcard_sacrifice:  { file: 'endcard_sacrifice.png',  zh: '犧牲', en: 'Sacrifice',  color: '' },
+    endcard_compromise: { file: 'endcard_compromise.png', zh: '妥協', en: 'Compromise', color: '' },
+    endcard_lockdown:   { file: 'endcard_lockdown.png',   zh: '封鎖', en: 'Lockdown',   color: '' },
     // 次要 NPC（待生成圖片）
     captain:  { file: 'captain.png',  zh: '老船長',    en: 'Captain',     color: ''       },
     vendor:   { file: 'vendor.png',   zh: '老婦人',    en: 'Vendor',      color: ''       },
