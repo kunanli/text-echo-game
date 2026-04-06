@@ -904,14 +904,14 @@ registerNode('r3_zhou', () => {
       ░▓░ ╰──┴───┴──╯
        ░    Workbench
 </pre>`, delay: 800 },
-    { tag: '遭遇', tagColor: 'tag-explore', text: '你在市場的一角看到了一個坐在木箱上的老人。他的左腿被粗布包裹著，旁邊靠著一根拐杖。', textEn: 'You spot an old man sitting on a crate in a market corner. His left leg is wrapped in rough cloth, a crutch leaning beside him.', delay: 2500 },
-    { tag: '感知', tagColor: 'tag-sense', html: '那張飽經風霜的臉——是<b>老周</b>。', htmlEn: 'That weathered face — it\'s <b>Old Zhou</b>.', delay: 2000 },
-    { tag: '情報', tagColor: 'tag-info', text: '老周看到你的瞬間，渾濁的眼睛亮了一下。他努力站起來，拐杖差點滑倒。', textEn: 'Old Zhou\'s cloudy eyes brighten the moment he sees you. He struggles to stand, crutch nearly slipping.', delay: 2800 },
-    { tag: '情報', tagColor: 'tag-info', text: '「你這小子——！我就知道你能活著上來！」', textEn: '"Kid — ! I knew you\'d make it up here alive!"', delay: 2500 },
-    { tag: '感知', tagColor: 'tag-sense', text: '他用力拍了拍你的肩膀。他的手已經石化到了手肘，硬邦邦的，但拍得很用力。', textEn: 'He slaps your shoulder hard. His hand is petrified to the elbow — hard as rock, but the slap is full of force.', delay: 2800 },
-    { tag: '情報', tagColor: 'tag-info', text: '「腿不太行了。」老周坐回箱子上，拍了拍左腿。「石化從腳開始往上爬。走不了多遠了。」', textEn: '"Leg\'s giving out." Old Zhou sits back down, patting his left leg. "Petri\'s creeping up from the foot. Can\'t walk far."', delay: 3000 },
-    { tag: '情報', tagColor: 'tag-info', text: '「不過——老周不是等死的人。」他從箱子後面拉出一個工具包。「我在這裡修工具。總還能做點事。」', textEn: '"But — Old Zhou doesn\'t wait to die." He pulls out a tool kit from behind the crate. "I fix tools here. Still useful."', delay: 3000 },
-    { tag: '感知', tagColor: 'tag-sense', text: '老周的臉上帶著你見過的最頑強的笑容。他還活著。這就夠了。', textEn: 'Old Zhou wears the most stubborn smile you\'ve ever seen. He\'s alive. That\'s enough.', delay: 2500 },
+    { tag: '遭遇', tagColor: 'tag-explore', text: '你在市場的一角看到了一個坐在木箱上的男人。他的左腿被粗布包裹著，旁邊靠著一根拐杖。比在迴廊見面時瘦了一些，但精神反而更好了。', textEn: 'You spot a man sitting on a crate in a market corner. His left leg is wrapped in rough cloth, a crutch leaning beside him. Thinner than when you met in the corridor, but his spirits seem better.', delay: 2500 },
+    { tag: '感知', tagColor: 'tag-sense', html: '他轉過頭——那張右半邊石化的臉，左半邊卻依然輪廓分明、線條深刻。是<b>老周</b>。', htmlEn: 'He turns — that face, petrified on the right but still sharp-featured and deep-lined on the left. It\'s <b>Old Zhou</b>.', delay: 2000 },
+    { tag: '情報', tagColor: 'tag-info', text: '老周看到你的瞬間，那隻完好的深棕色眼睛亮了起來——像是黑暗中突然劃亮了一根火柴。他努力站起來，拐杖差點滑倒。', textEn: 'Old Zhou\'s good eye — deep brown — lights up the moment he sees you, like a match struck in darkness. He struggles to stand, crutch nearly slipping.', delay: 2800 },
+    { tag: '情報', tagColor: 'tag-info', text: '「你這小子——！我就知道你能活著上來！」他的笑容很大。白了一些的鬢角和頑強的笑容，讓他看上去像是某部冒險小說裡走出來的男人。', textEn: '"Kid — ! I knew you\'d make it up here alive!" His smile is wide. The silver-touched temples and stubborn grin make him look like a man stepped out of an adventure novel.', delay: 2800 },
+    { tag: '感知', tagColor: 'tag-sense', text: '他用力拍了拍你的肩膀——那隻完好的手掌心溫熱，虎口的老繭粗糙地蹭過你的衣料。石化的另一隻手環在身側，硬邦邦的，但他毫不在意。', textEn: 'He slaps your shoulder hard — his good hand\'s palm warm, the callused pad between thumb and forefinger rough against your clothes. His petrified other hand hangs at his side, hard as rock, but he doesn\'t seem to care.', delay: 3000 },
+    { tag: '情報', tagColor: 'tag-info', text: '「腿不太行了。」老周坐回箱子上，拍了拍左腿。寬大的礦工外套從肩頭滑落了一些，露出結實的臂膀和沿著二頭肌蔓延的石化紋路。「石化從腳開始往上爬。走不了多遠了。」', textEn: '"Leg\'s giving out." Old Zhou sits back down, patting his left leg. His oversized miner\'s jacket slips off one shoulder, revealing a solid arm with petrification veins creeping along the bicep. "Petri\'s creeping up from the foot. Can\'t walk far."', delay: 3200 },
+    { tag: '情報', tagColor: 'tag-info', text: '「不過——老周不是等死的人。」他從箱子後面拉出一個工具包，隨手把袖子捲到手肘。前臂上粗礦的疤痕和石化紋路交錯在一起。「我在這裡修工具。總還能做點事。」', textEn: '"But — Old Zhou doesn\'t wait to die." He pulls out a tool kit from behind the crate, rolling his sleeves to the elbows. Rough scars and petrification lines crisscross his forearms. "I fix tools here. Still useful."', delay: 3200 },
+    { tag: '感知', tagColor: 'tag-sense', text: '老周的臉上帶著你見過的最頑強的笑容。即使半邊身體都在石化，他的眼神裡依然有一種不屈的溫暖。他還活著。這就夠了。', textEn: 'Old Zhou wears the most stubborn smile you\'ve ever seen. Even with half his body petrifying, his eyes still hold an unyielding warmth. He\'s alive. That\'s enough.', delay: 2800 },
   ], (function() {
     var c = [];
     if (!state.flags.r3ZhouUpgrade) {
