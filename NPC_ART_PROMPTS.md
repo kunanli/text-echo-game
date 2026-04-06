@@ -145,7 +145,50 @@ pixel art, dark fantasy, half-body portrait, armored guard soldier, full helmet 
 |------|------|------|
 | NPC | 512×256 px | 故事節點肖像（2:1 寬幅） |
 | 主角 | 256×256 px | UI 面板頭像（1:1 正方形） |
-| 格式 | PNG | 透明或黑色背景 |
+| 結局卡 | 500×769 px | 塔羅牌風格全幅背景 |
+| 格式 | PNG | 黑色背景 |
+
+---
+
+## 結局卡塔羅牌背景 Prompt
+
+結局卡使用精緻塔羅牌邊框 + 角色特寫，尺寸 500×769 px。
+
+**黎明 endcard_dawn.png — 螢**
+```
+pixel art, dark fantasy, ornate tarot card border frame with geometric patterns, beautiful young girl with ponytail standing in light, holding open notebook to chest, eyes looking upward with hope, stone vein marks fading from her skin, light particles floating around her, decorative corner ornaments, solid black background, strictly monochrome, absolutely no color, black and white only, 4-shade grayscale, visible pixel grid, no anti-aliasing
+```
+
+**犧牲 endcard_sacrifice.png — 老周**
+```
+pixel art, dark fantasy, ornate tarot card border frame with geometric patterns, ruggedly handsome middle-aged man with mining lamp, half face cracked stone texture, sitting alone holding small glowing stone in both hands offering it forward, worn coat, strong jawline, solemn noble expression, decorative corner ornaments, solid black background, strictly monochrome, absolutely no color, black and white only, 4-shade grayscale, visible pixel grid, no anti-aliasing
+```
+
+**妥協 endcard_compromise.png — 銅鐘（韓風御姐）**
+```
+pixel art, dark fantasy, ornate tarot card border frame with geometric patterns, beautiful voluptuous woman with sharp jawline and elegant features, long hair loose flowing over one shoulder, leaning back in chair with legs crossed, petrified right hand resting on knee, left hand touching her own neck, ornate robe draped loosely off one shoulder exposing collarbone, looking at viewer with confident seductive half smile, lamplight on face, decorative corner ornaments, solid black background, strictly monochrome, absolutely no color, black and white only, 4-shade grayscale, visible pixel grid, no anti-aliasing
+```
+
+**封鎖 endcard_lockdown.png — 鐵霜（韓風美女戰士）**
+```
+pixel art, dark fantasy, ornate tarot card border frame with geometric patterns, beautiful woman with sharp facial features and high cheekbones, short stylish cropped hair swept to one side, exposed toned shoulders and collarbone, sleeveless armor open at chest, petrified left arm gripping stone hammer resting on shoulder, standing before sealed gate with chains, fierce confident gaze at viewer, wind blowing, decorative corner ornaments, solid black background, strictly monochrome, absolutely no color, black and white only, 4-shade grayscale, visible pixel grid, no anti-aliasing
+```
+
+**死亡 endcard_death.png — 占卜師（韓風帥哥）**
+```
+pixel art, dark fantasy, ornate tarot card border frame with geometric patterns, young handsome man with long silky hair, hooded robe open showing chest, holding glowing crystal ball close to face, mysterious seductive gaze looking at viewer, stone fragments floating around crystal ball, ornate earring catching light, decorative corner ornaments, solid black background, strictly monochrome, absolutely no color, black and white only, 4-shade grayscale, visible pixel grid, no anti-aliasing
+```
+
+---
+
+## Game Over NPC Prompt
+
+**占卜師 diviner.png（韓風帥哥）**
+```
+pixel art, dark fantasy, half-body portrait, young handsome man with sharp jawline and high cheekbones, long silky hair parted in middle falling past shoulders, hooded dark robe loosely open revealing toned chest and collarbone, holding glowing crystal ball with slender fingers, mysterious seductive half smile, ornate earring, stone vein marks on exposed neck, solid black background, strictly monochrome, absolutely no color, black and white only, 4-shade grayscale, visible pixel grid, no anti-aliasing
+```
+
+---
 
 ### 加入遊戲步驟
 

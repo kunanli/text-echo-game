@@ -41,9 +41,22 @@ js/
     region1.js      # 石脈迴廊
     region2.js      # 大採石場
     region3.js      # 河城渡口（含 4 結局）
+  portrait.js       # NPC 像素肖像系統（預載入、fallback、HTML 生成）
+  story/
+    region0.js      # 祭獻坑（教學區）
+    region1.js      # 石脈迴廊
+    region2.js      # 大採石場
+    region3.js      # 河城渡口（含 4 結局）
 assets/
   banner.svg        # itch.io 用橫幅
   cover.svg         # 封面圖
+  npc/              # NPC 像素肖像（黑白 pixel art, 512×256 或 256×256）
+    player_male.png, player_female.png  # 主角
+    ying.png, zhou.png, crane.png ...   # NPC 肖像
+    diviner.png                         # 占卜師（Game Over）
+    endcard_dawn.png, endcard_sacrifice.png,
+    endcard_compromise.png, endcard_lockdown.png,
+    endcard_death.png                   # 結局卡塔羅牌背景（500×769）
 ```
 
 ## 開發慣例
@@ -59,17 +72,17 @@ assets/
 
 ## 目前狀態
 
-- 4 個區域全部完成，含 4 種結局
+- 4 個區域全部完成，含 4 種結局 + 死亡結局卡
 - 吹牛骰小遊戲（R2/R3 灰鶴），含金幣系統、作弊（AGI/WIL 判定）、武器獎勵
 - 語音旁白功能已停用（Web Speech API 品質不足），UI 按鈕已隱藏
 - 環境音：4 區域獨立音景 + 戰鬥/巡邏高強度層，自動切換
 - 程序化音效（sfx.js）：9 種事件音效
 - 存檔系統：auto-save + 3 個手動槽位 + Base64 存檔碼
-- 結局卡（v1.1）：身分牌風格收藏卡片（450×740 canvas），含半身 ASCII art、評分系統、5 級稀有度、進度條能力值、成就亮點（top 3）、NPC 留言，支援下載/複製分享
+- 結局卡（v2.0）：塔羅牌風格全幅背景美術 + 居中文字疊層（500×769 canvas），5 種結局（黎明/犧牲/妥協/封鎖/死亡）各有專屬塔羅牌美術
 - 全域統計：跨遊玩累計數據（死亡、結局分布、戰鬥、石化度等），結局後展示
 - 玩家排行榜（Dreamlo API）：自動提交分數，首頁+結局可查看排名
 - 難度 v1.1：所有怪物攻擊/石化傷害 ×2，復活需消耗「復活石」道具（R0/R1/R2 各一顆）
-- Game Over 流程：占卜師 ASCII art 揭露 → 結局卡展示 → 排行榜
+- Game Over 流程：占卜師像素肖像揭露 → 死亡結局卡展示 → 排行榜
 - 「從頭開始」按鈕也會先顯示結局卡，再重置遊戲
 - 初始 HP 調整為 50（原為 100），提升難度
 - 性別適配稱號：男性角色為「爐灶少年」(Hearth-Youth)，女性為「爐灶少女」(Hearth-Maiden)
@@ -81,6 +94,11 @@ assets/
 - 5 階石化懲罰系統（v1.5）：石化度 20/40/60/80% 閾值觸發屬性減值 + 最大 HP 壓縮
 - 多周目 New Game+ 系統（v1.6）：詳見下方「New Game+ 系統」
 - 戰鬥技能解鎖系統（v1.9）：NG+ 限定，10 個技能分 3 階，機率觸發 + 保底，詳見下方「戰鬥技能系統」
+- NPC 像素肖像系統（v2.0）：方案 B 混合模式，NPC 用黑白像素圖、場景/怪物保留 ASCII art
+- UI 面板主角像素頭像（v2.0）：自動依性別顯示，心情 CSS 濾鏡
+- 章節跳轉修正（v2.0）：`state.maxRegion` 追蹤最高到達區域，跳回不會丟失進度
+- 鐵霜承鋼劇情引導（v2.0）：Boss 戰前暗示玩家用交流饒恕，解鎖承鋼支線
+- 全頁面禁止文字選取（v2.0）：防止電腦端點擊全選
 
 ## ✅ 已完成：New Game+ 系統（v1.6）
 
@@ -345,19 +363,23 @@ if (state.flags.r3PlagueProof)    score += 3;  // 瘟疫起源證據（關鍵）
 // 結局判定：≥12+proof→黎明  ≥8→妥協  <8→封鎖  高石化+proof→犧牲
 ```
 
-## ✅ 已完成：結局卡片重製 v1.1（endcard.js）
+## ✅ 已完成：結局卡片重製 v2.0（endcard.js）
 
-身分牌風格收藏卡片，450×740 canvas。
+塔羅牌風格全幅背景美術 + 居中文字疊層，500×769 canvas。
+
+**5 種結局卡**：黎明（螢）、犧牲（老周）、妥協（銅鐘）、封鎖（鐵霜）、死亡（占卜師）。
+每種結局有專屬塔羅牌像素美術（`assets/npc/endcard_*.png`），黑白韓風。
 
 **卡片佈局（由上到下）**：
-1. 星級 + 稀有度等級（左）/ 結局身分稱號（右，顏色 = 稀有度色）
-2. 半身 ASCII art（4 結局 × 2 性別 = 8 套，12 行）
-3. 角色名 + 性別符號
-4. 結局描述文字（自動換行）
-5. 能力值進度條（STR/AGI/WIL/PETRI/DEPTH）+ 數值
-6. 成就亮點（top 3，依稀有度排序著色）+ 評分（右側大字）
-7. NPC 留言（好感度最高的 NPC 經典台詞，圓角外框）
-8. 底部：網址 + 遊玩時間
+1. 全幅塔羅牌美術背景（佔 70%）
+2. 漸層遮罩（上方透明 → 下方深色）
+3. 角色名（居中大字）
+4. 結局稱號（居中，結局色）
+5. 一行屬性（STR AGI WIL Lv. 石化%）
+6. 評分數字（居中特大）+ 星級稀有度
+7. 底部：網址 + 遊玩時間
+
+**結局判定**：通關結局用 `state.flags.r3Ending`（dawn/sacrifice/compromise/lockdown），一般死亡用 `death`。
 
 **評分 & 稀有度**：`calculateEndScore()` 綜合屬性、等級、道具、NPC 關係、進程旗標、死亡/石化/結局加成。5 級稀有度：普通(<30)、精良(30-49)、稀有(50-69)、史詩(70-84)、傳說(≥85)。
 
@@ -986,17 +1008,24 @@ function runNarrativeEvent(evt) {
 
 ### NPC 肖像設計
 
-每個 NPC 有獨特無框（frameless）肖像，跨區域復用同一角色設計：
+每個 NPC 有像素肖像（`portrait.js`），圖片存在時優先顯示，否則 fallback 到 ASCII art：
 
-| 角色 | 視覺特徵 | 色彩 | 出現次數 |
-|------|---------|------|---------|
-| 螢 Ying | 嬌小身形、飄逸馬尾、✦ 石化發光紋路、手持筆記本 | cyan | 13 處 |
-| 老周 Old Zhou | 壯碩礦工、半邊 ░ 石化紋理、礦燈、不對稱造型 | gold | 5 處 |
-| 灰鶴 Grey Crane | 纖細身形、灰色斗篷、纖腰、刀疤手臂、酒瓶、商人貨物 | gold | 4 處 |
-| 鐵霜 Iron Frost | 魁梧戰士、█ 石化左臂、石錘 | — | 1 處 |
-| 老鑄 Old Cast | 矮壯鐵匠、石化雙手 ░、鐵砧 | — | 1 處 |
-| 清露 Dew | 專注眼神、防石化面罩、✚ 十字、纖手（手腕灰紋）、藥箱 + 手套 | cyan | 1 處 |
-| 銅鐘 Bronze Bell | 高挑豐腴、◆頭冠、寬肩挺背、石化右手握筆、文件簿 | — | 1 處 |
+| 角色 | 像素圖 | 色彩光暈 | 出現次數 |
+|------|--------|---------|---------|
+| 螢 Ying | ying.png | cyan | 14 處 |
+| 老周 Old Zhou | zhou.png | gold | 6 處 |
+| 灰鶴 Grey Crane | crane.png | gold | 5 處 |
+| 鐵霜 Iron Frost | frost.png | — | 2 處 |
+| 老鑄 Old Cast | cast.png | — | 1 處 |
+| 承鋼 Cheng Gang | cheng.png | — | 2 處 |
+| 清露 Dew | dew.png | cyan | 1 處 |
+| 銅鐘 Bronze Bell | bell.png | — | 5 處 |
+| 冥河渡江人 Ferryman | ferryman.png | purple | 5 處 |
+| 占卜師 Diviner | diviner.png | purple | 1 處（Game Over） |
+| 老船長 Captain | captain.png | — | 1 處 |
+| 賣水果老婦人 Vendor | vendor.png | — | 1 處 |
+| 河畔居老闆娘 Landlady | landlady.png | — | 1 處 |
+| 守衛 Guard | guard.png | — | 1 處 |
 
 ### 美術風格指引（新增內容時參考）
 
@@ -1007,33 +1036,64 @@ function runNarrativeEvent(evt) {
 - NPC 肖像使用無框開放式設計（不要用 ╔══╗ 方框包圍）
 - 同一 NPC 跨區域復用同一肖像設計，保持視覺一致性
 
-### 像素肖像系統（方案 B：NPC 像素圖 + 場景/怪物 ASCII art）
+### 像素肖像系統（v2.0 方案 B：NPC 像素圖 + 場景/怪物 ASCII art）
 
 **架構**：`js/portrait.js` 提供 `npcPortrait.art(id, opts)` API，圖片存在時顯示像素圖，不存在時自動 fallback 到 ASCII art。場景和怪物維持原有 ASCII art 不變。
 
+**詳細 Recraft prompt 指南**：參見 `NPC_ART_PROMPTS.md`
+
 #### 檔名規範（`assets/npc/` 目錄）
 
-| 檔名 | 角色 | 說明 |
+**主角：**
+
+| 檔名 | 角色 | 尺寸 |
 |------|------|------|
-| `player_male.png` | 主角（男） | 男性主角半身像 |
-| `player_female.png` | 主角（女） | 女性主角半身像 |
-| `ying.png` | 螢 | 記錄員，cyan 光暈 |
-| `zhou.png` | 老周 | 倖存礦工，gold 光暈 |
-| `crane.png` | 灰鶴 | 行商人，gold 光暈 |
-| `frost.png` | 鐵霜 | 營地首領 |
-| `cast.png` | 老鑄 | 鐵匠 |
-| `cheng.png` | 承鋼 | 研究員，鐵霜的伴侶 |
-| `dew.png` | 清露 | 醫師，cyan 光暈 |
-| `bell.png` | 銅鐘 | 議會代表 |
-| `ferryman.png` | 冥河渡江人 | 隱藏 NPC，purple 光暈 |
+| `player_male.png` | 主角（男） | 256×256 |
+| `player_female.png` | 主角（女） | 256×256 |
+
+**主要 NPC：**
+
+| 檔名 | 角色 | 說明 | 尺寸 |
+|------|------|------|------|
+| `ying.png` | 螢 | 記錄員，cyan 光暈 | 512×256 |
+| `zhou.png` | 老周 | 倖存礦工，gold 光暈 | 512×256 |
+| `crane.png` | 灰鶴 | 行商人，gold 光暈 | 512×256 |
+| `frost.png` | 鐵霜 | 營地首領 | 512×256 |
+| `cast.png` | 老鑄 | 鐵匠 | 512×256 |
+| `cheng.png` | 承鋼 | 研究員，鐵霜的伴侶 | 512×256 |
+| `dew.png` | 清露 | 醫師，cyan 光暈 | 512×256 |
+| `bell.png` | 銅鐘 | 議會代表 | 512×256 |
+| `ferryman.png` | 冥河渡江人 | 隱藏 NPC，purple 光暈 | 512×256 |
+| `diviner.png` | 占卜師 | Game Over NPC，purple 光暈 | 512×256 |
+
+**次要 NPC：**
+
+| 檔名 | 角色 | 尺寸 |
+|------|------|------|
+| `captain.png` | 老船長 | 512×256 |
+| `vendor.png` | 賣水果老婦人 | 512×256 |
+| `landlady.png` | 河畔居老闆娘 | 512×256 |
+| `guard.png` | 議會廳守衛 | 512×256 |
+
+**結局卡塔羅牌背景：**
+
+| 檔名 | 結局 | 角色 | 尺寸 |
+|------|------|------|------|
+| `endcard_dawn.png` | 黎明 | 螢 | 500×769 |
+| `endcard_sacrifice.png` | 犧牲 | 老周 | 500×769 |
+| `endcard_compromise.png` | 妥協 | 銅鐘 | 500×769 |
+| `endcard_lockdown.png` | 封鎖 | 鐵霜 | 500×769 |
+| `endcard_death.png` | 死亡 | 占卜師 | 500×769 |
 
 #### 圖片規格
 
-- **尺寸**：256×256 px（正方形）
-- **格式**：PNG，透明背景
-- **風格**：半身動漫像素風格，黑白灰階
-- **生成工具**：Recraft（pixel art style, black and white）
-- **CSS 渲染**：`image-rendering: pixelated`，頁面顯示 160×160 px（手機 120×120 px）
+- **NPC 肖像**：512×256 px（2:1 寬幅），黑白 pixel art，黑底
+- **主角肖像**：256×256 px（1:1 正方形），用於 UI 面板頭像
+- **結局卡背景**：500×769 px（塔羅牌直式），含精緻邊框
+- **格式**：PNG，黑色背景
+- **風格**：pixel art, dark fantasy, 4-shade grayscale (black/dark-grey/light-grey/white)
+- **生成工具**：Recraft（pixel art style），用灰鶴（crane.png）作為 style reference
+- **CSS 渲染**：滿版寬度，radial-gradient 邊緣融合遮罩
 
 #### 程式碼用法
 
@@ -1047,13 +1107,17 @@ function runNarrativeEvent(evt) {
 
 // endcard.js canvas 繪製
 var img = npcPortrait.getImage('ying');  // → Image element or null
+
+// UI 面板頭像（avatar.js 自動處理）
+// renderAvatar() 自動檢測像素圖，fallback ASCII 表情動畫
 ```
 
 #### 新增角色時
 
 1. 在 `js/portrait.js` 的 `PORTRAITS` 物件中新增條目
-2. 將 256×256 PNG 放入 `assets/npc/` 目錄
-3. 在故事節點中使用 `npcPortrait.art('id') || \`ASCII fallback\`` 模式
+2. 將 PNG 放入 `assets/npc/` 目錄（尺寸按上方規格）
+3. 在故事節點中使用 `npcPortrait.art('id', { subtitle: '稱號' }) || \`ASCII fallback\``
+4. 用 `NPC_ART_PROMPTS.md` 中的統一模板生成 Recraft prompt
 
 ## API 速查表
 
@@ -1066,7 +1130,8 @@ state = {
   str: 5, agi: 5, wil: 5,           // 三圍屬性
   xp: 0, level: 1, xpToNext: 20,
   inventory: [],                      // 物品名稱陣列
-  region: 0, node: 'start',          // 目前位置
+  region: 0, maxRegion: 0,            // 目前位置 / 到達過的最高區域
+  node: 'start',
   flags: {},                          // 劇情進度旗標（任意 key-value）
   deathCount: 0, lang: 'zh',
   mood: 'normal'  // normal|happy|hurt|danger|petri|combat（影響 avatar 表情）
