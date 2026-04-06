@@ -885,6 +885,25 @@
     display: inline-block;
     text-align: left;
   }
+  /* Pixel portrait mode */
+  .avatar-box-pixel {
+    padding: 0;
+    min-height: auto;
+    background: transparent;
+    border: none;
+  }
+  .avatar-box-pixel::before { display: none; }
+  .avatar-pixel {
+    display: block;
+    width: 100%;
+    height: auto;
+    image-rendering: auto;
+    border-radius: 6px;
+  }
+  .avatar-box-pixel.mood-hurt .avatar-pixel   { filter: sepia(.3) saturate(.5); }
+  .avatar-box-pixel.mood-danger .avatar-pixel { filter: sepia(.5) hue-rotate(-20deg) saturate(.6); }
+  .avatar-box-pixel.mood-petri .avatar-pixel  { filter: saturate(0) brightness(.8) contrast(1.2); }
+  .avatar-box-pixel.mood-combat .avatar-pixel { filter: contrast(1.15) brightness(1.05); }
   .avatar-box.mood-happy  { color: #8aaa6a; border-color: #2a3a2a; }
   .avatar-box.mood-normal { color: #8a8a9a; }
   .avatar-box.mood-hurt   { color: #b07040; border-color: #3a2a1a; }

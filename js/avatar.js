@@ -247,6 +247,17 @@ function _doHoodSway() {
 
 function renderAvatar() {
   var mood = getAvatarMood();
+
+  // Try pixel portrait first
+  if (typeof npcPortrait !== 'undefined' && npcPortrait.isReady(npcPortrait.playerId())) {
+    var info = npcPortrait.PORTRAITS[npcPortrait.playerId()];
+    $avatarBox.innerHTML = '<img src="assets/npc/' + info.file + '" class="avatar-pixel" alt="avatar">';
+    $avatarBox.className = 'avatar-box avatar-box-pixel mood-' + mood;
+    stopIdleAnim();
+    return;
+  }
+
+  // ASCII fallback
   var art = AVATAR[state.sex] && AVATAR[state.sex][mood];
   if (!art) art = AVATAR.male.normal;
   var text = art.join('\n');
