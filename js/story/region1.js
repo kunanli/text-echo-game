@@ -1366,7 +1366,7 @@ registerNode('r1_ying_truth', () => {
   var yingPronounCap = isMale ? 'She' : 'He';
   state.flags.r1YingTrustUp = true;
   autoExplore([
-    { art: `<pre class="ascii-art cyan">
+    { art: npcPortrait.art('ying', { subtitle: '記錄員' }) || `<pre class="ascii-art cyan">
          ·  ✦  ·
       ╲ ╲│╱ ╱     ～╮
        ╲ ╭─╮ ╱   ╭─╯
@@ -1378,7 +1378,7 @@ registerNode('r1_ying_truth', () => {
         ╱  ╲ ╰──╯
       ╱╱    ╲╲
       螢  ·  記錄員
-</pre>`, artEn: `<pre class="ascii-art cyan">
+</pre>`, artEn: npcPortrait.art('ying', { subtitle: 'Chronicler' }) || `<pre class="ascii-art cyan">
          ·  ✦  ·
       ╲ ╲│╱ ╱     ～╮
        ╲ ╭─╮ ╱   ╭─╯
@@ -1410,7 +1410,7 @@ registerNode('r1_ying_alone', () => {
   var yingPronoun = isMale ? L('她', 'she') : L('他', 'he');
   var yingPronounCap = isMale ? 'She' : 'He';
   autoExplore([
-    { art: `<pre class="ascii-art cyan">
+    { art: npcPortrait.art('ying', { subtitle: '記錄員' }) || `<pre class="ascii-art cyan">
          ·  ✦  ·
       ╲ ╲│╱ ╱     ～╮
        ╲ ╭─╮ ╱   ╭─╯
@@ -1422,7 +1422,7 @@ registerNode('r1_ying_alone', () => {
         ╱  ╲ ╰──╯
       ╱╱    ╲╲
       螢  ·  記錄員
-</pre>`, artEn: `<pre class="ascii-art cyan">
+</pre>`, artEn: npcPortrait.art('ying', { subtitle: 'Chronicler' }) || `<pre class="ascii-art cyan">
          ·  ✦  ·
       ╲ ╲│╱ ╱     ～╮
        ╲ ╭─╮ ╱   ╭─╯
@@ -1452,7 +1452,7 @@ registerNode('r1_ying_silent', () => {
   var isMale = state.sex === 'male';
   var yingPronoun = isMale ? L('她', 'she') : L('他', 'he');
   autoExplore([
-    { art: `<pre class="ascii-art cyan">
+    { art: npcPortrait.art('ying', { subtitle: '記錄員' }) || `<pre class="ascii-art cyan">
          ·  ✦  ·
       ╲ ╲│╱ ╱     ～╮
        ╲ ╭─╮ ╱   ╭─╯
@@ -1464,7 +1464,7 @@ registerNode('r1_ying_silent', () => {
         ╱  ╲ ╰──╯
       ╱╱    ╲╲
       螢  ·  記錄員
-</pre>`, artEn: `<pre class="ascii-art cyan">
+</pre>`, artEn: npcPortrait.art('ying', { subtitle: 'Chronicler' }) || `<pre class="ascii-art cyan">
          ·  ✦  ·
       ╲ ╲│╱ ╱     ～╮
        ╲ ╭─╮ ╱   ╭─╯
@@ -1493,7 +1493,7 @@ registerNode('r1_ying_share', () => {
   var yingPronoun = isMale ? L('她', 'she') : L('他', 'he');
   var yingPronounCap = isMale ? 'She' : 'He';
   autoExplore([
-    { art: `<pre class="ascii-art cyan">
+    { art: npcPortrait.art('ying', { subtitle: '記錄員' }) || `<pre class="ascii-art cyan">
          ·  ✦  ·
       ╲ ╲│╱ ╱     ～╮
        ╲ ╭─╮ ╱   ╭─╯
@@ -1505,7 +1505,7 @@ registerNode('r1_ying_share', () => {
         ╱  ╲ ╰──╯
       ╱╱    ╲╲
       螢  ·  記錄員
-</pre>`, artEn: `<pre class="ascii-art cyan">
+</pre>`, artEn: npcPortrait.art('ying', { subtitle: 'Chronicler' }) || `<pre class="ascii-art cyan">
          ·  ✦  ·
       ╲ ╲│╱ ╱     ～╮
        ╲ ╭─╮ ╱   ╭─╯
@@ -1561,7 +1561,7 @@ registerNode('r1_ying_talk', () => {
   var companion = state.flags.r1YingCompanion;
 
   var steps = [];
-  steps.push({ art: `<pre class="ascii-art cyan">
+  steps.push({ art: npcPortrait.art('ying', { subtitle: '記錄員' }) || `<pre class="ascii-art cyan">
          ·  ✦  ·
       ╲ ╲│╱ ╱     ～╮
        ╲ ╭─╮ ╱   ╭─╯
@@ -1573,7 +1573,7 @@ registerNode('r1_ying_talk', () => {
         ╱  ╲ ╰──╯
       ╱╱    ╲╲
       螢  ·  記錄員
-</pre>`, artEn: `<pre class="ascii-art cyan">
+</pre>`, artEn: npcPortrait.art('ying', { subtitle: 'Chronicler' }) || `<pre class="ascii-art cyan">
          ·  ✦  ·
       ╲ ╲│╱ ╱     ～╮
        ╲ ╭─╮ ╱   ╭─╯
@@ -1648,7 +1648,7 @@ registerNode('r1_ying_herb', () => {
   state.flags.r1YingHerb = true;
   removeItem(L('乾燥草藥', 'Dried Herbs'));
   autoExplore([
-    { art: `<pre class="ascii-art cyan">
+    { art: npcPortrait.art('ying', { subtitle: '記錄員' }) || `<pre class="ascii-art cyan">
          ·  ✦  ·
       ╲ ╲│╱ ╱     ～╮
        ╲ ╭─╮ ╱   ╭─╯
@@ -1660,7 +1660,7 @@ registerNode('r1_ying_herb', () => {
         ╱  ╲ ╰──╯
       ╱╱    ╲╲
       螢  ·  記錄員
-</pre>`, artEn: `<pre class="ascii-art cyan">
+</pre>`, artEn: npcPortrait.art('ying', { subtitle: 'Chronicler' }) || `<pre class="ascii-art cyan">
          ·  ✦  ·
       ╲ ╲│╱ ╱     ～╮
        ╲ ╭─╮ ╱   ╭─╯
@@ -1705,7 +1705,7 @@ registerNode('r1_ying_chat', () => {
   var yingPronoun = isMale ? L('她', 'she') : L('他', 'he');
   var yingPronounCap = isMale ? 'She' : 'He';
 
-  var yingArt = { art: `<pre class="ascii-art cyan">
+  var yingArt = { art: npcPortrait.art('ying', { subtitle: '記錄員' }) || `<pre class="ascii-art cyan">
          ·  ✦  ·
       ╲ ╲│╱ ╱     ～╮
        ╲ ╭─╮ ╱   ╭─╯
@@ -1717,7 +1717,7 @@ registerNode('r1_ying_chat', () => {
         ╱  ╲ ╰──╯
       ╱╱    ╲╲
       螢  ·  記錄員
-</pre>`, artEn: `<pre class="ascii-art cyan">
+</pre>`, artEn: npcPortrait.art('ying', { subtitle: 'Chronicler' }) || `<pre class="ascii-art cyan">
          ·  ✦  ·
       ╲ ╲│╱ ╱     ～╮
        ╲ ╭─╮ ╱   ╭─╯
