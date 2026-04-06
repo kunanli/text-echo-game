@@ -1192,7 +1192,7 @@ registerNode('r0_ferryman_gate', () => {
      globalStats.endings.lockdown > 0 || globalStats.endings.sacrifice > 0);
 
   if (!hasAnyEnding) {
-    // Blocked — player can see the entrance but cannot proceed
+    // Not yet completed a run — warn player, but let them choose
     autoExplore([
       { tag: '感知', tagColor: 'tag-sense',
         text: '你注意到祭獻坑最深處的角落，有一股不尋常的氣流。',
@@ -1207,20 +1207,37 @@ registerNode('r0_ferryman_gate', () => {
         textEn: 'An intense chill surges from the depths of the crevice, forcing you back a step.',
         delay: 2800 },
       { tag: '感知', tagColor: 'tag-warn',
-        text: '低語聲在耳邊迴盪……但你無法聽懂任何一個字。',
-        textEn: 'Whispers echo in your ears... but you cannot understand a single word.',
+        text: '低語聲在耳邊迴盪……你的骨頭在共鳴。每一步都像是在踩著自己的墓碑。',
+        textEn: 'Whispers echo in your ears... your bones resonate. Each step feels like treading on your own gravestone.',
         delay: 2500 },
-      { tag: '系統', tagColor: 'tag-system',
-        html: '<b>某種力量阻擋了你。你還沒有足夠的經歷來踏入這個地方。</b>',
-        htmlEn: '<b>Something bars your way. You lack the experience to enter this place.</b>',
+      { tag: '警告', tagColor: 'tag-warn',
+        html: '<b>直覺告訴你——踏入這裡的人，不會再回來。</b>',
+        htmlEn: '<b>Instinct screams — those who enter here do not return.</b>',
         delay: 2500 },
-      { tag: '提示', tagColor: 'tag-info',
-        text: '（也許當你經歷過一次完整的旅程之後，這裡的門才會為你打開。）',
-        textEn: '(Perhaps after completing a full journey, the way will open for you.)',
-        delay: 2000 },
     ], [
-      { text: '返回', textEn: 'Return', action: function() { loadNode('r0_look'); } },
-    ], { label: L('被封鎖的通道', 'Sealed Passage') });
+      { text: '⚠ 不顧一切踏入深淵', textEn: '⚠ Step into the abyss regardless', action: function() {
+        autoExplore([
+          { tag: '行動', tagColor: 'tag-move',
+            text: '你深吸一口氣，踏進了裂縫。',
+            textEn: 'You take a deep breath and step into the crevice.',
+            delay: 2000 },
+          { tag: '感知', tagColor: 'tag-petri',
+            text: '黑暗瞬間吞噬了你。低語聲變成了咆哮——',
+            textEn: 'Darkness swallows you instantly. The whispers become a roar —',
+            delay: 2500 },
+          { tag: '感知', tagColor: 'tag-petri',
+            text: '石化從腳底開始蔓延，以你從未見過的速度。你甚至來不及尖叫。',
+            textEn: 'Petrification spreads from your feet at a speed you\'ve never seen. You don\'t even have time to scream.',
+            delay: 3000 },
+          { tag: '系統', tagColor: 'tag-warn',
+            html: '<b>深淵不會憐憫不夠格的挑戰者。</b>',
+            htmlEn: '<b>The abyss shows no mercy to unworthy challengers.</b>',
+            delay: 2500,
+            effect: function() { changePetri(100); } },
+        ], [], { label: L('深淵的審判', 'Judgment of the Abyss') });
+      }},
+      { text: '……還是算了', textEn: '...Better not', action: function() { loadNode('r0_look'); } },
+    ], { label: L('深淵低語', 'Whispers from the Deep') });
     return;
   }
 
