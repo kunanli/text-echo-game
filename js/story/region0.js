@@ -1315,7 +1315,7 @@ registerNode('r0_ferryman_meet', () => {
   var isStrong = totalStat >= 25 && state.level >= 5;
 
   autoExplore([
-    { art: `<pre class="ascii-art" style="color:#7a9aaa;">
+    { art: npcPortrait.art('ferryman', { subtitle: '冥河渡江人' }) || `<pre class="ascii-art" style="color:#7a9aaa;">
             ·  ✦  ·
            ╱ ▔▔▔▔▔ ╲
           │  ◉    ◉  │
@@ -1334,7 +1334,7 @@ registerNode('r0_ferryman_meet', () => {
     ~~~~~~╱╱╱~~~~~~~╲╲╲~~~~~~
     ~~~ 冥 河 渡 江 人 ~~~
     ~~~~~~~~~~~~~~~~~~~~~~~~~~
-</pre>`, artEn: `<pre class="ascii-art" style="color:#7a9aaa;">
+</pre>`, artEn: npcPortrait.art('ferryman', { subtitle: 'Ferryman' }) || `<pre class="ascii-art" style="color:#7a9aaa;">
             ·  ✦  ·
            ╱ ▔▔▔▔▔ ╲
           │  ◉    ◉  │

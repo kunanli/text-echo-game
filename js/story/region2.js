@@ -748,7 +748,7 @@ registerNode('r2_camp_chief', () => {
   // ── Phase 2: Return later — Cheng Gang awakens, gives passcode ──
   if (state.flags.r2BossSpared && state.flags.r2ReunionSeen && !state.flags.r2ChengAwake) {
     state.flags.r2ChengAwake = true;
-    steps.push({ art: `<pre class="ascii-art gold">
+    steps.push({ art: npcPortrait.art('cheng', { subtitle: '甦醒' }) || `<pre class="ascii-art gold">
       ˚  ·  ˚  甦醒  ˚  ·  ˚
 
           ╱─────────╲
@@ -762,7 +762,7 @@ registerNode('r2_camp_chief', () => {
   █████████│ ░░░░░░░ │      │ ╱  ╲  │
     ·█·█·█·│         │      │╱    ╲ │
      鐵 霜              承鋼（已甦醒）
-</pre>`, artEn: `<pre class="ascii-art gold">
+</pre>`, artEn: npcPortrait.art('cheng', { subtitle: 'Awakening' }) || `<pre class="ascii-art gold">
       ˚  ·  ˚  Awakening  ˚  ·  ˚
 
           ╱─────────╲
