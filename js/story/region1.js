@@ -1310,7 +1310,7 @@ registerNode('r1_ying_encounter', () => {
     { tag: '感知', tagColor: 'tag-sense', text: '腳步聲停了。', textEn: 'The footsteps stop.', delay: 2000 },
     { tag: '遭遇', tagColor: 'tag-combat', text: '「別再跟了——」', textEn: '"Stop following me—"', delay: 1800 },
     { tag: '感知', tagColor: 'tag-sense', text: '一道清亮但帶著緊張的聲音從前方傳來。', textEn: 'A clear but tense voice rings out from ahead.', delay: 2000 },
-    { art: `<pre class="ascii-art cyan">
+    { art: npcPortrait.art('ying', { subtitle: '記錄員' }) || `<pre class="ascii-art cyan">
           ·  ✦  ·
        ╲ ╲│╱ ╱
         ╲ ╭─╮ ╱      ～～╮
@@ -1325,7 +1325,7 @@ registerNode('r1_ying_encounter', () => {
          ╱    ╲
        ╱╱      ╲╲
       螢  ——  記 錄 員
-</pre>`, artEn: `<pre class="ascii-art cyan">
+</pre>`, artEn: npcPortrait.art('ying', { subtitle: 'Chronicler' }) || `<pre class="ascii-art cyan">
           ·  ✦  ·
        ╲ ╲│╱ ╱
         ╲ ╭─╮ ╱      ～～╮

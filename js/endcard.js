@@ -302,18 +302,29 @@ function generateEndCard() {
   ctx.fillText(en ? meta.typeEn : meta.type, ENDCARD_W - pad, curY);
 
   // ═════════════════════════════════
-  //  ASCII ART
+  //  CHARACTER ART (pixel portrait or ASCII fallback)
   // ═════════════════════════════════
   curY += 32;
-  var artSet = ENDCARD_ART[ending] || ENDCARD_ART.lockdown;
-  var art = artSet[state.sex] || artSet.male;
-  ctx.font = '14px "Courier New", monospace';
-  ctx.fillStyle = '#9898a8';
-  ctx.textAlign = 'left';
-  for (var ai = 0; ai < art.length; ai++) {
-    ctx.fillText(art[ai], pad + 24, curY + ai * 17);
+  var _pixelImg = (typeof npcPortrait !== 'undefined') ? npcPortrait.getImage('player_' + ending) : null;
+  if (_pixelImg) {
+    // Draw pixel portrait centered, scaled to fit
+    var pxW = 120, pxH = Math.round((_pixelImg.height / _pixelImg.width) * pxW);
+    if (pxH > 200) { pxH = 200; pxW = Math.round((_pixelImg.width / _pixelImg.height) * pxH); }
+    ctx.imageSmoothingEnabled = false;  // keep pixel-crisp
+    ctx.drawImage(_pixelImg, (ENDCARD_W - pxW) / 2, curY, pxW, pxH);
+    curY += pxH + 20;
+  } else {
+    // ASCII art fallback
+    var artSet = ENDCARD_ART[ending] || ENDCARD_ART.lockdown;
+    var art = artSet[state.sex] || artSet.male;
+    ctx.font = '14px "Courier New", monospace';
+    ctx.fillStyle = '#9898a8';
+    ctx.textAlign = 'left';
+    for (var ai = 0; ai < art.length; ai++) {
+      ctx.fillText(art[ai], pad + 24, curY + ai * 17);
+    }
+    curY += art.length * 17 + 28;
   }
-  curY += art.length * 17 + 28;
 
   // ═════════════════════════════════
   //  PLAYER NAME (large, prominent)

@@ -250,6 +250,49 @@
     100% { opacity: 1; transform: scale(1); }
   }
 
+  /* ── NPC Pixel Portraits (方案B: NPC像素圖 + 場景/怪物ASCII) ── */
+  .pixel-portrait-wrap {
+    text-align: center;
+    margin: 16px 0;
+    animation: portrait-appear .5s ease-out;
+  }
+  .pixel-portrait {
+    display: block;
+    margin: 0 auto;
+    width: 128px;
+    height: auto;
+    image-rendering: pixelated;
+    image-rendering: -moz-crisp-edges;
+    image-rendering: crisp-edges;
+    filter: drop-shadow(0 0 6px rgba(90, 106, 90, .4));
+  }
+  .pixel-portrait-label {
+    font-family: "Courier New", Courier, monospace;
+    font-size: 0.95rem;
+    color: #7a8a7a;
+    margin-top: 6px;
+    letter-spacing: 2px;
+    user-select: none;
+  }
+  /* Color variants matching ASCII art palette */
+  .pixel-portrait-cyan .pixel-portrait   { filter: drop-shadow(0 0 8px rgba(74, 138, 138, .5)); }
+  .pixel-portrait-cyan .pixel-portrait-label  { color: #4a8a8a; }
+  .pixel-portrait-gold .pixel-portrait   { filter: drop-shadow(0 0 8px rgba(154, 128, 64, .5)); }
+  .pixel-portrait-gold .pixel-portrait-label  { color: #9a8040; }
+  .pixel-portrait-purple .pixel-portrait { filter: drop-shadow(0 0 8px rgba(106, 90, 138, .5)); }
+  .pixel-portrait-purple .pixel-portrait-label { color: #6a5a8a; }
+  .pixel-portrait-red .pixel-portrait    { filter: drop-shadow(0 0 8px rgba(138, 74, 58, .5)); }
+  .pixel-portrait-red .pixel-portrait-label    { color: #8a4a3a; }
+  @keyframes portrait-appear {
+    0%   { opacity: 0; transform: translateY(8px); }
+    100% { opacity: 1; transform: translateY(0); }
+  }
+  /* Mobile: slightly smaller */
+  @media (max-width: 760px) {
+    .pixel-portrait { width: 96px; }
+    .pixel-portrait-label { font-size: 0.8rem; }
+  }
+
   /* ── Log feed lines ── */
   .log-line {
     padding: 3px 0;
