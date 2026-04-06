@@ -1078,7 +1078,7 @@ registerNode('r0_tunnel', () => {
           { tag: '石化', tagColor: 'tag-petri', text: '你的皮膚瞬間僵硬了幾秒——石蜥蜴擺出攻擊姿態。', textEn: 'Your skin goes rigid for seconds — the lizard assumes attack stance.', delay: 2000 },
         ], [{ text: '被迫戰鬥', textEn: 'Forced to fight', action: () => {
           startCombat(
-            { name: lizardName, hp: 30, atkMin: 8, atkMax: 18, petriDmg: 6, desc: lizardDescShort },
+            { name: lizardName, hp: 30, atkMin: 8, atkMax: 18, petriDmg: 6, xp: 15, desc: lizardDescShort },
             () => { changeStat('str', 1); notify(L('力量 +1', 'STR +1')); loadNode('r0_after_lizard'); },
             null
           );
@@ -1092,14 +1092,14 @@ registerNode('r0_tunnel', () => {
           { tag: '行動', tagColor: 'tag-combat', text: '你抽出碎石匕首，瞄準石蜥蜴的眼睛擲出！', textEn: 'You draw the Stone Dagger and hurl it at the lizard\'s eye!', delay: 1500 },
           { tag: '戰鬥', tagColor: 'tag-combat', text: '匕首準確擊中目標——石蜥蜴發出刺耳慘叫！', textEn: 'A perfect hit — the lizard lets out a piercing shriek!', delay: 2000 },
           { tag: '勝利', tagColor: 'tag-explore', text: '紫色的眼睛暗淡下來，它變回了一塊普通灰石。', textEn: 'The purple eyes dim, and it crumbles into ordinary grey stone.', delay: 2000 },
-        ], [{ text: '繼續前進', textEn: 'Continue forward', action: () => { changeStat('str', 1); loadNode('r0_after_lizard'); } }]);
+        ], [{ text: '繼續前進', textEn: 'Continue forward', action: () => { changeStat('str', 1); gainXp(15); notify(L('經驗 +15', 'XP +15')); loadNode('r0_after_lizard'); } }]);
       } else {
         autoExplore([
           { tag: '行動', tagColor: 'tag-move', text: '你大喊一聲，試圖嚇退石蜥蜴。', textEn: 'You shout, trying to scare the lizard off.', delay: 1500 },
           { tag: '失敗', tagColor: 'tag-warn', text: '石蜥蜴歪了歪頭……然後直接撲了過來！', textEn: 'The lizard tilts its head... then lunges at you!', delay: 1800 },
         ], [{ text: '戰鬥', textEn: 'Fight', action: () => {
           startCombat(
-            { name: lizardName, hp: 30, atkMin: 8, atkMax: 18, petriDmg: 6, desc: lizardDescShort },
+            { name: lizardName, hp: 30, atkMin: 8, atkMax: 18, petriDmg: 6, xp: 15, desc: lizardDescShort },
             () => { changeStat('str', 1); notify(L('力量 +1', 'STR +1')); loadNode('r0_after_lizard'); },
             () => { changePetri(5); loadNode('r0_climb_check'); }
           );

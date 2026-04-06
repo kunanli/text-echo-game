@@ -472,7 +472,7 @@ registerNode('r1_guard_fight', () => {
   var gName = L('石脈守衛', 'Vein Guardian');
   var gDesc = L('石脈守衛緩慢但攻擊力極強，每次重擊都帶有強烈的石化效果。', 'The Vein Guardian is slow but hits hard. Each blow carries intense petrification.');
   startCombat(
-    { name: gName, hp: 55, atkMin: 16, atkMax: 28, petriDmg: 8, desc: gDesc },
+    { name: gName, hp: 55, atkMin: 16, atkMax: 28, petriDmg: 8, xp: 30, desc: gDesc },
     () => {
       state.flags.r1GuardDefeated = true;
       changeStat('str', 2);
