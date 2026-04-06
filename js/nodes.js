@@ -219,6 +219,7 @@ function registerNode(id, fn, meta) {
 
 function loadNode(id) {
   state.node = id;
+  if (state.region > (state.maxRegion || 0)) state.maxRegion = state.region;
   if (typeof saveGame === 'function') saveGame();
   // Check achievements on node transitions
   if (typeof triggerAchievementCheck === 'function') triggerAchievementCheck();
@@ -254,7 +255,7 @@ registerNode('chapter_select', function() {
 
   for (var i = chData.length - 1; i >= 0; i--) {
     var ch = chData[i];
-    var unlocked = devUnlocked || state.region >= ch.id;
+    var unlocked = devUnlocked || (state.maxRegion || state.region) >= ch.id;
     var isCurrent = state.region === ch.id;
     var depth = en ? (' F' + (i + 1) + ' ') : (' ' + '一二三四'[i] + '層 ');
     var marker = isCurrent ? ' ◄◄' : '   ';

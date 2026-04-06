@@ -11,6 +11,7 @@ const state = {
   xp: 0, level: 1, xpToNext: 20,
   inventory: [],
   region: 0,         // 0=祭獻坑, 1=石脈迴廊, 2=大採石場, 3=河城渡口
+  maxRegion: 0,      // 到達過的最高區域（章節跳轉不會降低此值）
   node: 'start',
   flags: {},
   skills: [],            // unlocked combat skill IDs (NG+ only)

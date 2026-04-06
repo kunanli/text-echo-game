@@ -20,6 +20,7 @@ function saveGame() {
       xpToNext: state.xpToNext,
       inventory: state.inventory.slice(),
       region: state.region,
+      maxRegion: state.maxRegion || state.region,
       node: state.node,
       flags: JSON.parse(JSON.stringify(state.flags)),
       deathCount: state.deathCount,
@@ -54,6 +55,7 @@ function loadSave() {
     state.xpToNext = data.xpToNext || 20;
     state.inventory = data.inventory || [];
     state.region = data.region || 0;
+    state.maxRegion = data.maxRegion || data.region || 0;
     state.node = data.node || 'r0_start';
     state.flags = data.flags || {};
     state.deathCount = data.deathCount || 0;
@@ -448,6 +450,7 @@ function loadFromSlot(n) {
     state.xpToNext = data.xpToNext || 20;
     state.inventory = data.inventory || [];
     state.region = data.region || 0;
+    state.maxRegion = data.maxRegion || data.region || 0;
     state.node = data.node || 'r0_start';
     state.flags = data.flags || {};
     state.deathCount = data.deathCount || 0;

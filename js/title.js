@@ -304,7 +304,7 @@ function buildChapterMap(container, mapPre, onSelect) {
 
   for (var i = CHAPTERS.length - 1; i >= 0; i--) {
     var ch = CHAPTERS[i];
-    var unlocked = devUnlocked || state.region >= ch.id;
+    var unlocked = devUnlocked || (state.maxRegion || state.region) >= ch.id;
     var isCurrent = state.region === ch.id;
     var depth = en ? ('  F' + (i + 1) + ' ') : (' ' + '一二三四'[i] + '層 ');
     var marker = isCurrent ? ' ◄◄' : '   ';
@@ -371,7 +371,7 @@ function buildChapterMap(container, mapPre, onSelect) {
 
   for (var i = CHAPTERS.length - 1; i >= 0; i--) {
     var ch = CHAPTERS[i];
-    var unlocked = devUnlocked || state.region >= ch.id;
+    var unlocked = devUnlocked || (state.maxRegion || state.region) >= ch.id;
     var isCurrent = state.region === ch.id;
     var btn = document.createElement('button');
     btn.className = 'chapter-item' + (unlocked ? '' : ' locked') + (isCurrent ? ' current' : '');
