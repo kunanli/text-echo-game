@@ -25,6 +25,7 @@ function saveGame() {
       deathCount: state.deathCount,
       lang: state.lang,
       mood: state.mood,
+      skills: state.skills ? state.skills.slice() : [],
     };
     localStorage.setItem(SAVE_KEY, JSON.stringify(data));
   } catch (e) {
@@ -58,6 +59,7 @@ function loadSave() {
     state.deathCount = data.deathCount || 0;
     state.lang = data.lang || 'zh';
     state.mood = data.mood || 'normal';
+    state.skills = data.skills || [];
     return true;
   } catch (e) {
     return false;
@@ -414,6 +416,7 @@ function saveToSlot(n) {
       region: state.region, node: state.node,
       flags: JSON.parse(JSON.stringify(state.flags)),
       deathCount: state.deathCount, lang: state.lang, mood: state.mood,
+      skills: state.skills ? state.skills.slice() : [],
       savedAt: Date.now()
     };
     localStorage.setItem(slotKey(n), JSON.stringify(data));
@@ -450,6 +453,7 @@ function loadFromSlot(n) {
     state.deathCount = data.deathCount || 0;
     state.lang = data.lang || 'zh';
     state.mood = data.mood || 'normal';
+    state.skills = data.skills || [];
     saveGame();
     return true;
   } catch (e) { return false; }

@@ -177,6 +177,40 @@
   .cl-commune { color: #b09ae0; }
   .cl-observe { color: #60b8d0; font-size: .85rem; }
   .cl-empathy { color: #c0a0f0; font-size: .85rem; font-weight: bold; }
+  .cl-skill { color: #f0c060; font-size: .85rem; font-weight: bold; }
+  .combat-log-skill {
+    border-left: 3px solid #f0c060;
+    padding-left: 8px;
+    margin: 4px 0;
+  }
+  /* Skill unlock animation */
+  .skill-unlock-wrap {
+    text-align: center;
+    margin: 12px 0;
+    padding: 10px;
+    border: 1px solid #f0c060;
+    border-radius: 6px;
+    background: rgba(240, 192, 96, 0.08);
+    animation: skillFlash 1.5s ease-out;
+  }
+  .skill-unlock-banner {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #f0c060;
+    margin-bottom: 4px;
+  }
+  .skill-unlock-icon { font-size: 1.3rem; }
+  .skill-unlock-name { letter-spacing: 2px; }
+  .skill-unlock-desc {
+    font-size: 0.85rem;
+    color: #d0b870;
+    font-style: italic;
+  }
+  @keyframes skillFlash {
+    0% { border-color: #fff; background: rgba(255,255,255,0.15); }
+    30% { border-color: #f0c060; background: rgba(240,192,96,0.12); }
+    100% { border-color: #f0c060; background: rgba(240,192,96,0.08); }
+  }
   .combat-status {
     font-family: "Courier New", Courier, monospace;
     font-size: .78rem;
