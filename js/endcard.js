@@ -285,14 +285,15 @@ function generateEndCard() {
     ctx.imageSmoothingEnabled = false;
     ctx.drawImage(_pixelImg, drawX, drawY, drawW, drawH);
 
-    // Dark gradient overlay: transparent at top, dark at bottom (for text readability)
-    var overlay = ctx.createLinearGradient(0, 0, 0, ENDCARD_H);
-    overlay.addColorStop(0, 'rgba(13,13,21,0.15)');
-    overlay.addColorStop(0.35, 'rgba(13,13,21,0.4)');
-    overlay.addColorStop(0.55, 'rgba(13,13,21,0.75)');
+    // Dark gradient overlay: only bottom portion for text readability
+    // Keep upper 55% mostly transparent to show tarot art
+    var overlay = ctx.createLinearGradient(0, ENDCARD_H * 0.45, 0, ENDCARD_H);
+    overlay.addColorStop(0, 'rgba(13,13,21,0)');
+    overlay.addColorStop(0.2, 'rgba(13,13,21,0.6)');
+    overlay.addColorStop(0.5, 'rgba(13,13,21,0.85)');
     overlay.addColorStop(1, 'rgba(13,13,21,0.95)');
     ctx.fillStyle = overlay;
-    ctx.fillRect(0, 0, ENDCARD_W, ENDCARD_H);
+    ctx.fillRect(0, Math.floor(ENDCARD_H * 0.45), ENDCARD_W, ENDCARD_H);
   } else {
     // ASCII art fallback (no pixel image)
     var artSet = ENDCARD_ART[ending] || ENDCARD_ART.lockdown;
@@ -303,7 +304,6 @@ function generateEndCard() {
     for (var ai = 0; ai < art.length; ai++) {
       ctx.fillText(art[ai], pad + 40, 80 + ai * 17);
     }
-    // Dark overlay for bottom half
     var overlay2 = ctx.createLinearGradient(0, 250, 0, ENDCARD_H);
     overlay2.addColorStop(0, 'rgba(13,13,21,0)');
     overlay2.addColorStop(0.3, 'rgba(13,13,21,0.85)');
@@ -312,68 +312,59 @@ function generateEndCard() {
     ctx.fillRect(0, 250, ENDCARD_W, ENDCARD_H - 250);
   }
 
-  // ── Rounded border (rarity color) ──
-  _roundRect(ctx, 8, 8, ENDCARD_W - 16, ENDCARD_H - 16, 14);
-  ctx.strokeStyle = rarity.color;
-  ctx.globalAlpha = 0.5;
-  ctx.lineWidth = 2.5;
-  ctx.stroke();
-  ctx.globalAlpha = 1;
-
-  // ── Rarity glow at top ──
-  var glow = ctx.createLinearGradient(0, 0, 0, 80);
-  glow.addColorStop(0, rarity.color);
-  glow.addColorStop(1, 'rgba(0,0,0,0)');
-  ctx.globalAlpha = 0.06;
-  ctx.fillStyle = glow;
-  ctx.fillRect(8, 8, ENDCARD_W - 16, 80);
-  ctx.globalAlpha = 1;
+  // No extra border — tarot art already has ornate frame
 
   // ═════════════════════════════════
-  //  TOP BAR: stars + rarity / ending type
+  //  TOP BAR: stars + rarity / ending type (inside tarot border)
   // ═════════════════════════════════
-  var curY = 36;
+  var curY = 32;
 
   var stars = '';
   for (var i = 0; i < rarity.stars; i++) stars += '★';
-  ctx.font = 'bold 14px "Courier New", monospace';
+  ctx.font = 'bold 13px "Courier New", monospace';
   ctx.textAlign = 'left';
   ctx.fillStyle = rarity.color;
-  ctx.shadowColor = 'rgba(0,0,0,0.8)';
-  ctx.shadowBlur = 4;
-  ctx.fillText(stars + '  ' + (en ? rarity.en : rarity.zh), pad, curY);
+  ctx.shadowColor = 'rgba(0,0,0,0.9)';
+  ctx.shadowBlur = 5;
+  ctx.fillText(stars + '  ' + (en ? rarity.en : rarity.zh), pad + 8, curY);
 
   ctx.textAlign = 'right';
-  ctx.font = '13px "Courier New", monospace';
+  ctx.font = '12px "Courier New", monospace';
   ctx.fillStyle = rarity.color;
-  ctx.fillText(en ? meta.typeEn : meta.type, ENDCARD_W - pad, curY);
+  ctx.fillText(en ? meta.typeEn : meta.type, ENDCARD_W - pad - 8, curY);
   ctx.shadowBlur = 0;
 
   // ═════════════════════════════════
-  //  All text starts in the lower half (over dark overlay)
+  //  All text starts at 58% (below tarot art main visual)
   // ═════════════════════════════════
-  curY = ENDCARD_H * 0.48;
+  curY = Math.floor(ENDCARD_H * 0.58);
 
   // ═════════════════════════════════
   //  PLAYER NAME (large, prominent)
   // ═════════════════════════════════
-  ctx.shadowColor = 'rgba(0,0,0,0.8)';
+  ctx.shadowColor = 'rgba(0,0,0,0.9)';
   ctx.shadowBlur = 6;
-  ctx.font = 'bold 22px "Courier New", monospace';
+  ctx.font = 'bold 20px "Courier New", monospace';
   ctx.fillStyle = '#e8e8f0';
   ctx.textAlign = 'left';
   ctx.fillText(state.name, pad, curY);
 
   var nameW = ctx.measureText(state.name).width;
-  ctx.font = '14px sans-serif';
+  ctx.font = '13px sans-serif';
   ctx.fillStyle = '#8a8a9a';
   ctx.fillText(state.sex === 'female' ? '♀' : '♂', pad + nameW + 8, curY);
+
+  // Ending title on the right
+  ctx.textAlign = 'right';
+  ctx.font = 'bold 14px "Courier New", monospace';
+  ctx.fillStyle = meta.color;
+  ctx.fillText(en ? meta.typeEn : meta.type, ENDCARD_W - pad, curY);
   ctx.shadowBlur = 0;
 
   // ═════════════════════════════════
   //  FLAVOR TEXT
   // ═════════════════════════════════
-  curY += 22;
+  curY += 18;
   var flavor = ENDING_FLAVOR[ending] || ENDING_FLAVOR.lockdown;
   var flavorRaw = en ? flavor.en : flavor.zh;
   ctx.font = '11px "Courier New", monospace';
@@ -386,7 +377,7 @@ function generateEndCard() {
     ctx.fillText(flavorLines[fi], pad, curY + fi * 16);
   }
   ctx.shadowBlur = 0;
-  curY += flavorLines.length * 16 + 18;
+  curY += flavorLines.length * 16 + 12;
 
   // ═════════════════════════════════
   //  STATS — pixel blocks (1 block = 1 point)
@@ -428,7 +419,7 @@ function generateEndCard() {
     ctx.font = '11px "Courier New", monospace';
     ctx.fillText('' + sd.val, barX + barW + 10, sy + barH / 2 + 4);
   }
-  curY += statDefs.length * rowH + 12;
+  curY += statDefs.length * rowH + 8;
 
   // ═════════════════════════════════
   //  BOTTOM: highlights (left) + score (right)
@@ -481,7 +472,7 @@ function generateEndCard() {
   ctx.fillText('' + totalScore, ENDCARD_W - pad, scoreBlockY + 40);
   ctx.shadowBlur = 0;
 
-  curY += Math.max(hlItems.length * 18 + 24, 50) + 16;
+  curY += Math.max(hlItems.length * 18 + 20, 40) + 10;
 
   // ═════════════════════════════════
   //  NPC FAREWELL QUOTE
