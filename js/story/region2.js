@@ -1374,7 +1374,7 @@ registerNode('r2_ying_talk', () => {
     steps.push({ tag: '感知', tagColor: 'tag-sense', text: '螢忽然停下筆，看向你。「你又在用那種奇怪的眼神看我了。」', textEn: 'Ying suddenly stops writing and looks at you. "You\'re looking at me with that strange expression again."', delay: 2500 });
     steps.push({ tag: '感知', tagColor: 'tag-sense', text: '你移開視線。有些話還沒到能說出口的時候。', textEn: 'You look away. Some things aren\'t ready to be spoken yet.', delay: 2200 });
   }
-  steps.push({ art: `<pre class="ascii-art cyan">
+  steps.push({ art: npcPortrait.art('ying', { subtitle: '記錄員' }) || `<pre class="ascii-art cyan">
        ·✦· 螢 — 記錄員少女 ·✦·
                ╭───╮
               ╱ ˚ ˚ ╲───╮
@@ -1390,7 +1390,7 @@ registerNode('r2_ying_talk', () => {
              │ ◇手冊◇ │
              ╰────────╯
        ✦ 石化紋在手臂上微微發光 ✦
-</pre>`, artEn: `<pre class="ascii-art cyan">
+</pre>`, artEn: npcPortrait.art('ying', { subtitle: 'Chronicler' }) || `<pre class="ascii-art cyan">
       ·✦· Ying — Young Chronicler ·✦·
                ╭───╮
               ╱ ˚ ˚ ╲───╮
@@ -1482,7 +1482,7 @@ registerNode('r2_ying_seal', () => {
   var yPo = isMale ? 'her' : 'his';
   state.flags.r2YingLore3 = true;
   autoExplore([
-    { art: `<pre class="ascii-art cyan">
+    { art: npcPortrait.art('ying', { subtitle: '記錄員' }) || `<pre class="ascii-art cyan">
        ·✦· 螢 — 記錄員少女 ·✦·
                ╭───╮
               ╱ ˚ ˚ ╲───╮
@@ -1498,7 +1498,7 @@ registerNode('r2_ying_seal', () => {
              │ ◇手冊◇ │
              ╰────────╯
        ✦ 石化紋在手臂上微微發光 ✦
-</pre>`, artEn: `<pre class="ascii-art cyan">
+</pre>`, artEn: npcPortrait.art('ying', { subtitle: 'Chronicler' }) || `<pre class="ascii-art cyan">
       ·✦· Ying — Young Chronicler ·✦·
                ╭───╮
               ╱ ˚ ˚ ╲───╮
@@ -1557,7 +1557,7 @@ registerNode('r2_ying_night', () => {
   var yPo = isMale ? 'her' : 'his';
   state.flags.r2YingNight = true;
   autoExplore([
-    { art: `<pre class="ascii-art cyan">
+    { art: npcPortrait.art('ying', { subtitle: '記錄員' }) || `<pre class="ascii-art cyan">
        ·✦· 螢 — 記錄員少女 ·✦·
                ╭───╮
               ╱ ˚ ˚ ╲───╮
@@ -1573,7 +1573,7 @@ registerNode('r2_ying_night', () => {
              │ ◇手冊◇ │
              ╰────────╯
        ✦ 石化紋在手臂上微微發光 ✦
-</pre>`, artEn: `<pre class="ascii-art cyan">
+</pre>`, artEn: npcPortrait.art('ying', { subtitle: 'Chronicler' }) || `<pre class="ascii-art cyan">
       ·✦· Ying — Young Chronicler ·✦·
                ╭───╮
               ╱ ˚ ˚ ╲───╮
@@ -1652,7 +1652,7 @@ registerNode('r2_ying_promise', () => {
   var yPo = isMale ? 'her' : 'his';
   state.flags.r2YingPromise = true;
   autoExplore([
-    { art: `<pre class="ascii-art cyan">
+    { art: npcPortrait.art('ying', { subtitle: '記錄員' }) || `<pre class="ascii-art cyan">
        ·✦· 螢 — 記錄員少女 ·✦·
                ╭───╮
               ╱ ˚ ˚ ╲───╮
@@ -1668,7 +1668,7 @@ registerNode('r2_ying_promise', () => {
              │ ◇手冊◇ │
              ╰────────╯
        ✦ 石化紋在手臂上微微發光 ✦
-</pre>`, artEn: `<pre class="ascii-art cyan">
+</pre>`, artEn: npcPortrait.art('ying', { subtitle: 'Chronicler' }) || `<pre class="ascii-art cyan">
       ·✦· Ying — Young Chronicler ·✦·
                ╭───╮
               ╱ ˚ ˚ ╲───╮

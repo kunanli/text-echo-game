@@ -650,7 +650,7 @@ registerNode('r3_ying_talk', () => {
   var yPo = isMale ? 'her' : 'his';
 
   var steps = [];
-  steps.push({ art: `<pre class="ascii-art cyan">
+  steps.push({ art: npcPortrait.art('ying', { subtitle: '記錄員' }) || `<pre class="ascii-art cyan">
            ╲ · ˚
         ·   ╲╱~~╮
       ˚    ╭╯○ ○│  ·
@@ -663,7 +663,7 @@ registerNode('r3_ying_talk', () => {
         ╲  ˚·│╲  ╭──╮│
          ╲───│ ╲ │手冊│
              ╰──╰┴──╯
-</pre>`, artEn: `<pre class="ascii-art cyan">
+</pre>`, artEn: npcPortrait.art('ying', { subtitle: 'Chronicler' }) || `<pre class="ascii-art cyan">
            ╲ · ˚
         ·   ╲╱~~╮
       ˚    ╭╯○ ○│  ·
@@ -749,7 +749,7 @@ registerNode('r3_ying_inn', () => {
   var yPo = isMale ? 'her' : 'his';
   state.flags.r3YingInn = true;
   autoExplore([
-    { art: `<pre class="ascii-art cyan">
+    { art: npcPortrait.art('ying', { subtitle: '記錄員' }) || `<pre class="ascii-art cyan">
            ╲ · ˚
         ·   ╲╱~~╮
       ˚    ╭╯○ ○│  ·
@@ -762,7 +762,7 @@ registerNode('r3_ying_inn', () => {
         ╲  ˚·│╲  ╭──╮│
          ╲───│ ╲ │手冊│
              ╰──╰┴──╯
-</pre>`, artEn: `<pre class="ascii-art cyan">
+</pre>`, artEn: npcPortrait.art('ying', { subtitle: 'Chronicler' }) || `<pre class="ascii-art cyan">
            ╲ · ˚
         ·   ╲╱~~╮
       ˚    ╭╯○ ○│  ·

@@ -77,7 +77,9 @@ var npcPortrait = (function() {
     var colorClass = info.color ? (' pixel-portrait-' + info.color) : '';
 
     return '<div class="pixel-portrait-wrap' + colorClass + '">' +
-      '<img src="' + BASE_PATH + info.file + '" class="pixel-portrait" alt="' + label + '">' +
+      '<div class="pixel-portrait-frame">' +
+        '<img src="' + BASE_PATH + info.file + '" class="pixel-portrait" alt="' + label + '">' +
+      '</div>' +
       '<div class="pixel-portrait-label">' + label +
         (subtitle ? (' —— ' + subtitle) : '') +
       '</div>' +
