@@ -33,8 +33,10 @@ js/
   save.js           # 存讀檔 + 分享碼 + 3 個手動存檔槽
   stats.js          # 全域統計追蹤（跨遊玩累計數據）
   endcard.js        # 結局卡 canvas 生成（身分牌風格收藏卡，含評分/稀有度/NPC 語錄）
+  registry.js       # 集中式註冊系統（區域/節點/怪物/巡邏/事件/NPC 配置）
   nodes.js          # 節點系統 + 死亡/復活
-  patrol.js         # 隨機巡邏遭遇
+  patrol.js         # 隨機巡邏遭遇 + 敘事事件引擎
+  patrol-events.js  # 12 個巡邏隨機敘事事件（每區域 3 個）
   title.js          # 標題畫面 + 角色創建（最後載入，綁定事件）
   story/
     region0.js      # 祭獻坑（教學區）
@@ -81,6 +83,8 @@ assets/
 - 5 階石化懲罰系統（v1.5）：石化度 20/40/60/80% 閾值觸發屬性減值 + 最大 HP 壓縮
 - 多周目 New Game+ 系統（v1.6）：詳見下方「New Game+ 系統」
 - 戰鬥技能解鎖系統（v1.9）：NG+ 限定，10 個技能分 3 階，機率觸發 + 保底，詳見下方「戰鬥技能系統」
+- 集中式註冊系統（v1.9.1）：`registry.js` 提供區域/節點/怪物/巡邏/事件/NPC 的統一配置，R4+ 擴展零修改核心檔案
+- 隨機敘事事件（v1.9.2）：12 個巡邏隨機���件（每區域 3 個），25% 觸發率，含道德抉擇/屬性檢定/物品獎勵/劇情 flags
 
 ## ✅ 已完成：New Game+ 系統（v1.6）
 
@@ -759,9 +763,9 @@ if (hasSkill('undying') && !cooldowns.undying && state.hp + delta <= 0) {
 | R3 | 碼頭邊一個小孩在偷東西 | 道德 | 舉報 / 幫忙 / 無視，影響市場 NPC 態度 |
 | R3 | 收到一封匿名信 | 懸疑 | 引向隱藏的議會陰謀線索 |
 
-### 🔧 待實裝：隨機敘事事件系統（實裝規格）
+### ✅ 已完成：隨機敘事事件系統（v1.9.2，patrol-events.js）
 
-**狀態**：設計完成，待寫入 `patrol.js`
+**狀態**：已實裝，12 個事件全部完成
 
 #### 系統設計
 
@@ -856,16 +860,13 @@ function runPatrolCycle() {
 - 物件/場景類 → 40-60 字元寬，用 box-drawing + 符號
 - 與現有巡邏怪物 art 風格統一（暗黑奇幻地下城）
 
-#### 需修改的檔案
+#### 已修改的檔案
 
-1. **`js/patrol.js`**：
-   - 新增 `R0_EVENTS`, `R1_EVENTS`, `R2_EVENTS`, `R3_EVENTS` 事件池
-   - 新增 `getPatrolEvents()` 輔助函式
-   - 新增 `runNarrativeEvent(evt)` 函式（用巡邏的 queue 機制渲染事件 + 選項）
-   - 修改 `runPatrolCycle()`：開頭加 25% 事件觸發判定
-2. **`js/save.js`**：無需修改（事件 flags 已存在 `state.flags` 中，自動隨存檔保存）
-3. **`css/style.css`**：可能新增 `.tag-event` 標籤顏色（事件專用金色標籤）
-4. **`index.html`**：版本號更新
+1. **`js/registry.js`（新增）**：`registerPatrolEvents()` / `getAvailablePatrolEvents()` 註冊系統
+2. **`js/patrol.js`**：`runNarrativeEvent()` 敘事事件引擎 + `runPatrolCycle()` 25% 觸發判定 + 貓咪減傷
+3. **`js/patrol-events.js`（新增）**：12 個事件定義（`R0_EVENTS`、`R1_EVENTS`、`R2_EVENTS`、`R3_EVENTS`）
+4. **`css/style.css`**：`.tag-event` 金色標籤
+5. **`index.html`**：版本號 v1.9.2
 
 #### runNarrativeEvent() 實裝模板
 
@@ -956,9 +957,9 @@ function runNarrativeEvent(evt) {
 
 ### 實裝順序建議
 
-1. **NPC 支線** → 對現有內容影響最小，可逐步加入，立即增加深度
-2. **區域探索** → 與支線同步，豐富每個區域的可玩性
-3. **隨機事件** → 開發量小，快速增加重玩價值
+1. ~~**隨機事件** → 開發量小，快速增加重玩價值~~ ✅ 已完成（v1.9.2）
+2. **NPC 支線** → 對現有內容影響最小，可逐步加入，立即增加深度
+3. **區域探索** → 與支線同步，豐富每個區域的可玩性
 4. **NG+ 分歧** → 需要已有的 NG+ 框架，適合在其他內容穩定後加入
 5. **R4 冥河深淵** → 最大最完整的新內容，作為最終更新
 
@@ -969,7 +970,7 @@ function runNarrativeEvent(evt) {
 - NPC 支線需要新增對應的 flags（如 `r2YingSecret`, `r3BellNight` 等）
 - 新結局需要更新 `endcard.js` 的結局卡設計 + `stats.js` 的統計追蹤
 - R4 需要新增 `js/story/region4.js` + `patrol.js` 的 R4 怪物池 + `audio.js` 的 R4 音景
-- 隨機事件建議放在 `patrol.js` 中，與現有巡邏系統整合（非戰鬥事件也通過巡邏觸發）
+- 隨機敘事事件已放在 `patrol-events.js` 中，通過 `registerPatrolEvents()` 註冊，巡邏時 25% 觸發
 
 ## ✅ 已完成：ASCII 美術圖全覆蓋
 

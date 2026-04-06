@@ -302,6 +302,7 @@
   .log-tag.tag-system  { color: #6a6a8a; }
   .log-tag.tag-petri   { color: #7a7ac0; }
   .log-tag.tag-ally    { color: #e06080; }
+  .log-tag.tag-event   { color: #c8a840; }
 
   /* ── Explore status bar (ASCII style) ── */
   .explore-bar {

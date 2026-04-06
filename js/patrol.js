@@ -746,11 +746,13 @@ function runPatrolCycle() {
   var combatLog = [];
   var effStr = effectiveStat('str');
   var mercy = (typeof getMercyReduction === 'function') ? getMercyReduction() : 0;
+  var catBonus = state.flags.r1CatFed ? 0.1 : 0; // Cat distracts enemies: -10% damage
   while (mHp > 0 && rounds < 12) {
     rounds++;
     var pAtk = rng(Math.max(1, effStr), effStr + 4);
     var mAtk = rng(mAtkMin, mAtkMax);
     if (mercy > 0) mAtk = Math.max(1, Math.floor(mAtk * (1 - mercy)));
+    if (catBonus > 0) mAtk = Math.max(1, Math.floor(mAtk * (1 - catBonus)));
     mHp -= pAtk;
     totalDmg += mAtk;
     totalPetri += mPetriDmg;
