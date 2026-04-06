@@ -895,7 +895,7 @@ registerNode('r1_survivor_bread', () => {
   state.flags.r1SurvivorFed = true;
   removeItem(L('黑麵包', 'Black Bread'));
   autoExplore([
-    { art: `<pre class="ascii-art">
+    { art: npcPortrait.art('zhou', { subtitle: '倖存者' }) || `<pre class="ascii-art">
       ╭──╮ ╭━━━━━╮
       │⊙ │╱░░▔▔▔▔╲
       ╰┬─╱░│ ─  ● │
@@ -905,7 +905,7 @@ registerNode('r1_survivor_bread', () => {
   ⌐─╯  ░░░░│   │  ╲
        ░░═══════════
      老 周 · 倖 存 者
-</pre>`, artEn: `<pre class="ascii-art">
+</pre>`, artEn: npcPortrait.art('zhou', { subtitle: 'Survivor' }) || `<pre class="ascii-art">
       ╭──╮ ╭━━━━━╮
       │⊙ │╱░░▔▔▔▔╲
       ╰┬─╱░│ ─  ● │
@@ -930,7 +930,7 @@ registerNode('r1_survivor_bread', () => {
 
 registerNode('r1_survivor_reward', () => {
   autoExplore([
-    { art: `<pre class="ascii-art">
+    { art: npcPortrait.art('zhou', { subtitle: '倖存者' }) || `<pre class="ascii-art">
       ╭──╮ ╭━━━━━╮
       │⊙ │╱░░▔▔▔▔╲
       ╰┬─╱░│ ─  ● │
@@ -940,7 +940,7 @@ registerNode('r1_survivor_reward', () => {
   ⌐─╯  ░░░░│   │  ╲
        ░░═══════════
      老 周 · 倖 存 者
-</pre>`, artEn: `<pre class="ascii-art">
+</pre>`, artEn: npcPortrait.art('zhou', { subtitle: 'Survivor' }) || `<pre class="ascii-art">
       ╭──╮ ╭━━━━━╮
       │⊙ │╱░░▔▔▔▔╲
       ╰┬─╱░│ ─  ● │
@@ -972,7 +972,7 @@ registerNode('r1_survivor_reward', () => {
 
 registerNode('r1_survivor_info', () => {
   autoExplore([
-    { art: `<pre class="ascii-art">
+    { art: npcPortrait.art('zhou', { subtitle: '倖存者' }) || `<pre class="ascii-art">
       ╭──╮ ╭━━━━━╮
       │⊙ │╱░░▔▔▔▔╲
       ╰┬─╱░│ ─  ● │
@@ -982,7 +982,7 @@ registerNode('r1_survivor_info', () => {
   ⌐─╯  ░░░░│   │  ╲
        ░░═══════════
      老 周 · 倖 存 者
-</pre>`, artEn: `<pre class="ascii-art">
+</pre>`, artEn: npcPortrait.art('zhou', { subtitle: 'Survivor' }) || `<pre class="ascii-art">
       ╭──╮ ╭━━━━━╮
       │⊙ │╱░░▔▔▔▔╲
       ╰┬─╱░│ ─  ● │
@@ -1026,7 +1026,7 @@ registerNode('r1_survivor_talk', () => {
   var helped = state.flags.r1SurvivorHelped;
   var trust = fed || helped || state.flags.r1SurvivorFullTrust;
   var steps = [];
-  steps.push({ art: `<pre class="ascii-art">
+  steps.push({ art: npcPortrait.art('zhou', { subtitle: '倖存者' }) || `<pre class="ascii-art">
       ╭──╮ ╭━━━━━╮
       │⊙ │╱░░▔▔▔▔╲
       ╰┬─╱░│ ─  ● │
@@ -1036,7 +1036,7 @@ registerNode('r1_survivor_talk', () => {
   ⌐─╯  ░░░░│   │  ╲
        ░░═══════════
      老 周 · 倖 存 者
-</pre>`, artEn: `<pre class="ascii-art">
+</pre>`, artEn: npcPortrait.art('zhou', { subtitle: 'Survivor' }) || `<pre class="ascii-art">
       ╭──╮ ╭━━━━━╮
       │⊙ │╱░░▔▔▔▔╲
       ╰┬─╱░│ ─  ● │
