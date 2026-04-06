@@ -438,13 +438,17 @@ function generateEndCard() {
 
 // ── Show / Share / Download ──
 
+function _isMobile() {
+  return /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent) || ('ontouchstart' in window && window.innerWidth < 1024);
+}
+
 function showEndCard() {
   var canvas = generateEndCard();
   var $overlay = document.getElementById('endcard-overlay');
   var $container = document.getElementById('endcard-canvas-container');
-  var $dlBtn = document.getElementById('endcard-download-btn');
-  var $shareBtn = document.getElementById('endcard-share-btn');
+  var $saveBtn = document.getElementById('endcard-save-btn');
   var $closeBtn = document.getElementById('endcard-close-btn');
+  var en = state.lang === 'en';
 
   $container.innerHTML = '';
   canvas.style.maxWidth = '100%';
@@ -452,30 +456,31 @@ function showEndCard() {
   canvas.style.borderRadius = '6px';
   $container.appendChild(canvas);
 
-  $dlBtn.onclick = function() {
-    var link = document.createElement('a');
-    link.download = 'petriabyss-' + (state.flags.r3Ending || 'ending') + '.png';
-    link.href = canvas.toDataURL('image/png');
-    link.click();
-  };
+  var mobile = _isMobile();
 
-  if (navigator.share && navigator.canShare) {
-    $shareBtn.style.display = '';
-    $shareBtn.onclick = function() {
+  // Mobile: share (or copy to clipboard) / Desktop: download file
+  if (mobile) {
+    $saveBtn.textContent = en ? 'Share' : '分享圖片';
+    $saveBtn.onclick = function() {
       canvas.toBlob(function(blob) {
-        var file = new File([blob], 'petriabyss-ending.png', { type: 'image/png' });
-        var shareData = { files: [file] };
-        if (navigator.canShare(shareData)) {
-          navigator.share(shareData).catch(function() {});
-        } else {
-          fallbackCopyImage(canvas);
+        if (navigator.share && navigator.canShare) {
+          var file = new File([blob], 'petriabyss-ending.png', { type: 'image/png' });
+          var shareData = { files: [file] };
+          if (navigator.canShare(shareData)) {
+            navigator.share(shareData).catch(function() { fallbackCopyImage(canvas); });
+            return;
+          }
         }
+        fallbackCopyImage(canvas);
       });
     };
   } else {
-    $shareBtn.style.display = '';
-    $shareBtn.onclick = function() {
-      fallbackCopyImage(canvas);
+    $saveBtn.textContent = en ? 'Download' : '下載圖片';
+    $saveBtn.onclick = function() {
+      var link = document.createElement('a');
+      link.download = 'petriabyss-' + (state.flags.r3Ending || 'ending') + '.png';
+      link.href = canvas.toDataURL('image/png');
+      link.click();
     };
   }
 
