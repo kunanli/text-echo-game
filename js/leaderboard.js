@@ -138,7 +138,7 @@ function showLeaderboard() {
     };
 
     var html = '<table class="lb-table">';
-    html += '<tr class="lb-header"><th>#</th><th>' + L('玩家', 'Player') + '</th><th>' + L('卡片', 'Card') + '</th><th>' + L('周目', 'Cycle') + '</th><th>' + L('稀有度', 'Rarity') + '</th></tr>';
+    html += '<tr class="lb-header"><th>#</th><th>' + L('玩家', 'Player') + '</th><th>' + L('分數', 'Score') + '</th><th>' + L('卡片', 'Card') + '</th><th>' + L('稀有度', 'Rarity') + '</th></tr>';
 
     for (var i = 0; i < entries.length; i++) {
       var e = entries[i];
@@ -148,15 +148,14 @@ function showLeaderboard() {
       var rarityColor = rarity ? rarity.color : '#6a6a7a';
       var card = endingCards[e.ending];
       var cardName = card ? (en ? card.en : card.zh) : '--';
-      var cycleLabel = e.cycle > 1 ? (en ? 'C' + e.cycle : e.cycle + '周') : '-';
       var stars = '';
       for (var si = 0; si < (rarity ? rarity.stars : 0); si++) stars += '★';
 
       html += '<tr class="lb-row' + rankClass + '">';
       html += '<td class="lb-rank">' + (i + 1) + '</td>';
       html += '<td class="lb-name">' + e.name + '</td>';
+      html += '<td class="lb-score" style="color:' + rarityColor + '">' + e.score + '</td>';
       html += '<td class="lb-card">' + cardName + '</td>';
-      html += '<td class="lb-cycle" style="color:#e8d080">' + cycleLabel + '</td>';
       html += '<td class="lb-rarity" style="color:' + rarityColor + '"><span class="lb-stars">' + stars + '</span> ' + rarityName + '</td>';
       html += '</tr>';
     }

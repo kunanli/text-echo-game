@@ -68,7 +68,7 @@ assets/
 - **HTML 內容**：部分步驟用 `html`/`htmlEn` 取代 `text`/`textEn`，支援粗體等標記
 - **CSS 命名**：用 `.tag-xxx` 管理標籤顏色（tag-combat, tag-info, tag-sense, tag-system, tag-warn, tag-petri 等）
 - **雙語必備**：所有面向玩家的文字都必須同時提供 `zh` 和 `en` 版本
-- **版本號**：每次 push 前必須更新 `index.html` 中的版本號（`<div id="title-version">v1.x</div>`，約第 68 行）。版本遞增規則：新功能或劇情 → minor 版本 +0.1，bug fix / 文字修正 → patch 加後綴（如 v1.2.1）
+- **版本號**：每次 push 前必須更新 `index.html` 中的版本號（`<div id="title-version">v2.x</div>`，約第 68 行）。版本遞增規則：新功能或劇情 → minor 版本 +0.1，bug fix / 文字修正 → patch 加後綴（如 v2.0.1）
 
 ## 目前狀態
 
@@ -385,25 +385,20 @@ if (state.flags.r3PlagueProof)    score += 3;  // 瘟疫起源證據（關鍵）
 
 ## ✅ 已完成：玩家排行榜（leaderboard.js）
 
-使用 Dreamlo 免費排行榜服務（純 HTTP fetch，零 SDK）。
+使用 Firebase Realtime DB（純 REST fetch，零 SDK，HTTPS 原生支援）。
 
 **功能**：
-- 死亡（無復活石）或通關結局時，自動提交分數到 Dreamlo
-- 排行榜顯示：排名、玩家名稱、結局卡片稱號（曙光者/獻身者/斡旋者/守門者）、稀有度星級
+- 死亡（無復活石）或通關結局時，自動提交分數到 Firebase
+- 排行榜顯示：排名、玩家名稱、結局卡片稱號（曙光者/獻身者/斡旋者/守門者/殞命者）、稀有度星級
 - 首頁標題畫面有「高分榜」按鈕，可隨時查看
-- Game Over 流程：占卜師揭露 → 結局卡 → 自動開啟排行榜
+- Game Over 流程：占卜師像素肖像揭露 → 結局卡 → 排行榜
 
-**Dreamlo API**：
-- Private Key: `cewmb78CnUmsLIJuKmd6GQgL6TlyH9LkCyWxwfHbqkRQ`
-- Public Key: `69d1277e8f40bc2f60f2d6f8`
-- 提交：`GET /lb/{privateKey}/add/{name}/{score}/{seconds}/{ending}`
-- 讀取：`GET /lb/{publicKey}/json/{limit}`
-
-**已知問題**：
-- [ ] **Dreamlo API 在部分環境被封鎖** — 開發沙盒（sandbox proxy）會回傳 403 `host_not_allowed`，導致分數送不出去、排行榜顯示「暫無記錄」。這不是程式碼 bug，是網路環境限制。需在實際瀏覽器（手機/itch.io）測試驗證。
-- 已加入 `console.log` debug 記錄所有 API 請求 URL 和狀態碼
-- 提交失敗時會顯示 toast 提示「排行榜提交失敗，請檢查網路連線」
-- 若 itch.io 上仍無法使用，備選方案：改用 CORS proxy 或換 jsonbin.io / Firebase Realtime DB
+**Firebase Realtime DB**：
+- URL: `https://petriabyss-db-default-rtdb.asia-southeast1.firebasedatabase.app`
+- 提交：`POST /leaderboard.json` (JSON body: name, score, ending, cycle, seconds, timestamp)
+- 讀取：`GET /leaderboard.json?orderBy="score"&limitToLast=N`
+- Rules: `{ leaderboard: { .read: true, .write: true, .indexOn: ["score"] } }`
+- 支援 GitHub Pages (HTTPS) 和 itch.io
 
 ## 未來開發方向
 
