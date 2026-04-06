@@ -1098,7 +1098,7 @@ registerNode('r1_wanderer', () => {
   autoExplore([
     { tag: '感知', tagColor: 'tag-sense', text: '鐵軌旁傳來輕微的腳步聲——不是石化生物那種僵硬的步伐。', textEn: 'Light footsteps by the rails — not the rigid gait of a petrified creature.', delay: 2000 },
     { tag: '遭遇', tagColor: 'tag-combat', text: '你立刻壓低身體，握緊武器——', textEn: 'You crouch immediately, weapon ready —', delay: 1500 },
-    { art: `<pre class="ascii-art gold">
+    { art: npcPortrait.art('crane', { subtitle: '流浪者' }) || `<pre class="ascii-art gold">
       ·  .  ·  .  ·  .  ·  .  ·
           ╭━━━━━━━━━╮
          ╱           ╲
@@ -1114,7 +1114,7 @@ registerNode('r1_wanderer', () => {
     ╱╱        ╱ ╲        │╯
              ╱   ╲
       灰 鶴  ——  流 浪 者
-</pre>`, artEn: `<pre class="ascii-art gold">
+</pre>`, artEn: npcPortrait.art('crane', { subtitle: 'Wanderer' }) || `<pre class="ascii-art gold">
       ·  .  ·  .  ·  .  ·  .  ·
           ╭━━━━━━━━━╮
          ╱           ╲
@@ -1155,7 +1155,7 @@ registerNode('r1_wanderer', () => {
 
 registerNode('r1_wanderer_lore', () => {
   autoExplore([
-    { art: `<pre class="ascii-art gold">
+    { art: npcPortrait.art('crane', { subtitle: '流浪者' }) || `<pre class="ascii-art gold">
        ╭━━━━━━━╮
       ╱ ╭━━━━━╮ ╲
      │  │─  ─ │  │
@@ -1166,7 +1166,7 @@ registerNode('r1_wanderer_lore', () => {
      ╱╱   ╱╲  ╲╰┬──╯
           ╱  ╲  │╯
     灰 鶴 · 流 浪 者
-</pre>`, artEn: `<pre class="ascii-art gold">
+</pre>`, artEn: npcPortrait.art('crane', { subtitle: 'Wanderer' }) || `<pre class="ascii-art gold">
        ╭━━━━━━━╮
       ╱ ╭━━━━━╮ ╲
      │  │─  ─ │  │
@@ -1212,7 +1212,7 @@ registerNode('r1_wanderer_trade', () => {
   var hasScale = hasItem(L('蜥蜴鱗片', 'Lizard Scale'));
   var hasPureCrystal = hasItem(L('純淨石化結晶', 'Pure Petri Crystal'));
   autoExplore([
-    { art: `<pre class="ascii-art gold">
+    { art: npcPortrait.art('crane', { subtitle: '流浪者' }) || `<pre class="ascii-art gold">
        ╭━━━━━━━╮
       ╱ ╭━━━━━╮ ╲
      │  │─  ─ │  │
@@ -1223,7 +1223,7 @@ registerNode('r1_wanderer_trade', () => {
      ╱╱   ╱╲  ╲╰┬──╯
           ╱  ╲  │╯
     灰 鶴 · 流 浪 者
-</pre>`, artEn: `<pre class="ascii-art gold">
+</pre>`, artEn: npcPortrait.art('crane', { subtitle: 'Wanderer' }) || `<pre class="ascii-art gold">
        ╭━━━━━━━╮
       ╱ ╭━━━━━╮ ╲
      │  │─  ─ │  │
