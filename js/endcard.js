@@ -264,7 +264,10 @@ function generateEndCard() {
   // Try ending-specific art first, then player portrait fallback
   var _pixelImg = null;
   if (typeof npcPortrait !== 'undefined') {
-    _pixelImg = npcPortrait.getImage('endcard_' + ending) || npcPortrait.getImage(npcPortrait.playerId());
+    // Priority: ending-specific art → death art (for game over) → player portrait
+    _pixelImg = npcPortrait.getImage('endcard_' + ending)
+             || (state.flags.r3Ending ? null : npcPortrait.getImage('endcard_death'))
+             || npcPortrait.getImage(npcPortrait.playerId());
   }
   if (_pixelImg) {
     // Draw pixel portrait as full background (cover mode)

@@ -28,6 +28,9 @@ var npcPortrait = (function() {
     endcard_sacrifice:  { file: 'endcard_sacrifice.png',  zh: '犧牲', en: 'Sacrifice',  color: '' },
     endcard_compromise: { file: 'endcard_compromise.png', zh: '妥協', en: 'Compromise', color: '' },
     endcard_lockdown:   { file: 'endcard_lockdown.png',   zh: '封鎖', en: 'Lockdown',   color: '' },
+    endcard_death:      { file: 'endcard_death.png',     zh: '死亡', en: 'Death',      color: '' },
+    // Game Over NPC
+    diviner:  { file: 'diviner.png',  zh: '占卜師',    en: 'Diviner',     color: 'purple' },
     // 次要 NPC（待生成圖片）
     captain:  { file: 'captain.png',  zh: '老船長',    en: 'Captain',     color: ''       },
     vendor:   { file: 'vendor.png',   zh: '老婦人',    en: 'Vendor',      color: ''       },

@@ -128,9 +128,14 @@ function startGameOverSequence() {
     { zh: '「這就是刻在你石碑上的名字。」', en: '"This is the name carved upon your stone."' },
   ];
 
+  var divinerArtHtml = (typeof npcPortrait !== 'undefined') ? npcPortrait.art('diviner', { subtitle: '占卜師' }) : null;
+  var divinerArtEnHtml = (typeof npcPortrait !== 'undefined') ? npcPortrait.art('diviner', { subtitle: 'Diviner' }) : null;
+  var fallbackArt = '<pre class="ascii-art" style="color:#9a8ac8; font-size:.7rem;">' + fortuneArt.join('\n') + '</pre>';
+
   var steps = [
     { tag: '???', tagColor: 'tag-petri',
-      art: '<pre class="ascii-art" style="color:#9a8ac8; font-size:.7rem;">' + fortuneArt.join('\n') + '</pre>',
+      art: divinerArtHtml || fallbackArt,
+      artEn: divinerArtEnHtml || fallbackArt,
       delay: 2500 },
     { tag: '占卜師', tagColor: 'tag-petri',
       text: lines[0].zh, textEn: lines[0].en, delay: 2500 },
