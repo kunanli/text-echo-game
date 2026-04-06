@@ -422,10 +422,22 @@ if (state.flags.r3PlagueProof)    score += 3;  // 瘟疫起源證據（關鍵）
 類似劍星（Stellar Blade）的技能解鎖機制——在戰鬥中特定條件觸發時，有機率領悟新技巧。
 技能不是手動學習，而是在「對的時刻」自然觸發，給玩家驚喜感。
 
+### ⚠️ 前置條件：僅限二周目以上（NG+）
+
+技能系統是 NG+ 的核心獎勵之一，**一周目玩家不會觸發任何技能解鎖**。
+
+- 判定條件：`state.flags.ngPlus === true`（即 `globalStats.totalRuns >= 1`）
+- 一周目戰鬥中完全不執行 `checkSkillUnlock()`，不顯示技能按鈕
+- NG+ 開場提示：「你的身體記得上一世的戰鬥——石化的記憶開始甦醒。」
+- 劇情合理性：技能是「前世戰鬥記憶的殘留」，在石化能量的刺激下被喚醒
+- 這也給一周目玩家一個明確的二周目動機：「二周目會解鎖戰鬥技能」
+
 ### 設計核心
 
+- **NG+ 限定**：僅二周目以上觸發，一周目完全不啟用
 - **機率觸發**：每次滿足觸發條件時，有 X% 機率解鎖（非必定）
 - **一次解鎖永久可用**：解鎖後存入 `state.skills[]`，之後每場戰鬥都能使用
+- **跨周目保留**：已學技能存入 `globalStats.unlockedSkills`，下個周目開局即可使用
 - **漸進解鎖**：不同技能有不同的前置條件（戰鬥場次、等級、屬性值、已學技能數）
 - **戰鬥選項動態擴充**：解鎖後在戰鬥中出現新的行動按鈕（第 5、6… 個選項）
 
@@ -540,8 +552,9 @@ function buildCombatChoices() {
   return choices;
 }
 
-// 回合結束時判定技能解鎖
+// 回合結束時判定技能解鎖（僅 NG+）
 function checkSkillUnlock(triggerType) {
+  if (!state.flags.ngPlus) return; // 一周目不觸發
   var candidates = getUnlockCandidates(triggerType); // 過濾前置條件
   if (candidates.length === 0) return;
   var skill = candidates[0]; // 優先判定最接近保底的
@@ -581,7 +594,7 @@ if (hasSkill('undying') && !cooldowns.undying && state.hp + delta <= 0) {
 | 系統 | 整合方式 |
 |------|---------|
 | **石化懲罰** | 石化度高時，部分技能的觸發機率降低（stage 3+ 機率 ×0.7），但「深淵脈動」和「石化吸收」反而更容易觸發 |
-| **NG+** | 技能跨周目保留（存入 `globalStats.unlockedSkills`），NG+ 開局自帶上周目技能 |
+| **NG+** | **一周目完全不啟用**（`if (!state.flags.ngPlus) return;`）。技能跨周目保留（存入 `globalStats.unlockedSkills`），NG+ 開局自帶上周目技能 |
 | **裝備系統** | 部分飾品可增加技能觸發機率或降低冷卻 |
 | **成就系統** | 新增成就：「初次覺醒」（學會第一個技能）、「石之武者」（學會全部 10 個）、「一擊必殺」（深淵脈動秒殺 Boss） |
 | **結局卡** | 結局卡顯示已學技能數量 + 最稀有技能名稱 |
