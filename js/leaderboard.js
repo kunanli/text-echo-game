@@ -1,20 +1,13 @@
-// ══ Leaderboard System (Dreamlo) ══
-// Get your free keys at: https://dreamlo.com
-// Replace the keys below with your own.
+// ══ Leaderboard System (Firebase Realtime DB) ══
 
 var LEADERBOARD = {
-  // ── Dreamlo keys (REPLACE THESE) ──
-  privateKey: 'cewmb78CnUmsLIJuKmd6GQgL6TlyH9LkCyWxwfHbqkRQ',
-  publicKey:  '69d1277e8f40bc2f60f2d6f8',
-  baseUrl: 'https://dreamlo.com/lb',
+  dbUrl: 'https://petriabyss-db-default-rtdb.asia-southeast1.firebasedatabase.app',
 
-  // Is leaderboard configured?
   isEnabled: function() {
-    return this.privateKey !== 'YOUR_PRIVATE_KEY' && this.publicKey !== 'YOUR_PUBLIC_KEY';
+    return !!this.dbUrl;
   },
 
   // ── Submit score ──
-  // Format: name | score | seconds | ending
   submit: function(name, score, ending, callback) {
     if (!this.isEnabled()) {
       if (callback) callback(false);
@@ -24,14 +17,22 @@ var LEADERBOARD = {
     if (typeof globalStats !== 'undefined' && globalStats.currentRunStartMs > 0) {
       seconds = Math.floor((Date.now() - globalStats.currentRunStartMs) / 1000);
     }
-    // Dreamlo add: /lb/{privateKey}/add/{name}/{score}/{seconds}/{ending}
-    // Append cycle info to ending text for leaderboard display
     var cycle = state.flags.ngPlusRun || 0;
-    var endingText = ending + (cycle > 0 ? '|c' + (cycle + 1) : '');
-    var safeName = encodeURIComponent(name.replace(/[\/\\\?&]/g, '_'));
-    var url = this.baseUrl + '/' + this.privateKey + '/add/' + safeName + '/' + score + '/' + seconds + '/' + endingText;
+    var entry = {
+      name: name,
+      score: score,
+      ending: ending,
+      cycle: cycle + 1,
+      seconds: seconds,
+      timestamp: Date.now()
+    };
+    var url = this.dbUrl + '/leaderboard.json';
     console.log('[Leaderboard] submit →', url);
-    fetch(url).then(function(r) {
+    fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(entry)
+    }).then(function(r) {
       console.log('[Leaderboard] submit status:', r.status);
       if (callback) callback(r.ok);
     }).catch(function(err) {
@@ -47,26 +48,32 @@ var LEADERBOARD = {
       return;
     }
     var count = limit || 20;
-    var url = this.baseUrl + '/' + this.publicKey + '/json/' + count;
+    // orderBy score descending, limitToLast gets highest scores
+    var url = this.dbUrl + '/leaderboard.json?orderBy="score"&limitToLast=' + count;
     console.log('[Leaderboard] fetch →', url);
-    fetch(url).then(function(r) { console.log('[Leaderboard] fetch status:', r.status); return r.json(); }).then(function(data) {
+    fetch(url).then(function(r) {
+      console.log('[Leaderboard] fetch status:', r.status);
+      return r.json();
+    }).then(function(data) {
       console.log('[Leaderboard] data:', JSON.stringify(data));
       var entries = [];
-      if (data && data.dreamlo && data.dreamlo.leaderboard) {
-        var board = data.dreamlo.leaderboard.entry;
-        if (!board) { callback([]); return; }
-        // single entry comes as object, not array
-        if (!Array.isArray(board)) board = [board];
-        for (var i = 0; i < board.length; i++) {
-          entries.push({
-            name: board[i].name,
-            score: parseInt(board[i].score) || 0,
-            seconds: parseInt(board[i].seconds) || 0,
-            ending: board[i].text || '',
-          });
+      if (data && typeof data === 'object') {
+        for (var key in data) {
+          if (data.hasOwnProperty(key)) {
+            var d = data[key];
+            entries.push({
+              name: d.name || '???',
+              score: d.score || 0,
+              seconds: d.seconds || 0,
+              ending: d.ending || '',
+              cycle: d.cycle || 1
+            });
+          }
         }
       }
-      callback(entries);
+      // Sort by score descending
+      entries.sort(function(a, b) { return b.score - a.score; });
+      callback(entries.slice(0, count));
     }).catch(function(err) {
       console.error('[Leaderboard] fetch error:', err);
       callback([]);
@@ -78,7 +85,7 @@ var LEADERBOARD = {
 
 function submitToLeaderboard() {
   if (!LEADERBOARD.isEnabled()) return;
-  var ending = state.flags.r3Ending || 'lockdown';
+  var ending = state.flags.r3Ending || 'death';
   var score = (typeof calculateEndScore === 'function') ? calculateEndScore() : 0;
   LEADERBOARD.submit(state.name, score, ending, function(ok) {
     if (ok) {
@@ -122,12 +129,12 @@ function showLeaderboard() {
       return;
     }
 
-    var endingMeta = (typeof ENDING_META !== 'undefined') ? ENDING_META : {};
     var endingCards = {
       dawn:       { zh: '曙光者', en: 'DAWNBRINGER' },
       sacrifice:  { zh: '獻身者', en: 'MARTYR' },
       compromise: { zh: '斡旋者', en: 'MEDIATOR' },
       lockdown:   { zh: '守門者', en: 'WARDEN' },
+      death:      { zh: '殞命者', en: 'FALLEN' },
     };
 
     var html = '<table class="lb-table">';
@@ -139,17 +146,10 @@ function showLeaderboard() {
       var rarity = (typeof getRarity === 'function') ? getRarity(e.score) : null;
       var rarityName = rarity ? (en ? rarity.en : rarity.zh) : '--';
       var rarityColor = rarity ? rarity.color : '#6a6a7a';
-      // Parse ending|cycle format
-      var endingParts = (e.ending || '').split('|');
-      var endingKey = endingParts[0];
-      var cycleNum = 1;
-      if (endingParts[1] && endingParts[1].charAt(0) === 'c') {
-        cycleNum = parseInt(endingParts[1].substring(1)) || 1;
-      }
-      var card = endingCards[endingKey];
+      var card = endingCards[e.ending];
       var cardName = card ? (en ? card.en : card.zh) : '--';
-      var cycleLabel = cycleNum > 1 ? (en ? 'C' + cycleNum : cycleNum + '周') : '-';
-      var stars = rarity ? '' : '';
+      var cycleLabel = e.cycle > 1 ? (en ? 'C' + e.cycle : e.cycle + '周') : '-';
+      var stars = '';
       for (var si = 0; si < (rarity ? rarity.stars : 0); si++) stars += '★';
 
       html += '<tr class="lb-row' + rankClass + '">';
