@@ -753,10 +753,13 @@ registerNode('r3_ying_inn', () => {
     { tag: '感知', tagColor: 'tag-sense', text: '螢拿起湯碗，喝了一口。' + yP + '的眼睛瞬間睜大了。', textEn: 'Ying picks up the bowl, takes a sip. ' + yPC + ' eyes widen instantly.', delay: 2200 },
     { tag: '情報', tagColor: 'tag-info', text: '「好、好喝……！這是真正的食物！不是乾糧和蘑菇！」', textEn: '"Good — so good...! This is real food! Not rations and mushrooms!"', delay: 2500 },
     { tag: '感知', tagColor: 'tag-sense', text: '螢幾乎是狼吞虎嚥地喝完了湯。然後' + yP + '抬起頭，嘴角沾著湯汁，臉有些紅。', textEn: 'Ying practically gulps down the soup. Then ' + (isMale ? 'she' : 'he') + ' looks up, broth on ' + yPo + ' lips, face slightly flushed.', delay: 2800 },
-    { tag: '情報', tagColor: 'tag-info', text: '「……你沒在看吧。」', textEn: '"...You weren\'t watching, right?"', delay: 2000 },
+    { tag: '情報', tagColor: 'tag-info', text: '「……你沒在看吧。」螢用手背擦了擦嘴，卻只是把湯汁抹得更開了。', textEn: '"...You weren\'t watching, right?" Ying wipes ' + yPo + ' mouth with the back of ' + yPo + ' hand, only smearing the broth further.', delay: 2200 },
+    { tag: '行動', tagColor: 'tag-move', text: '你拿起桌上的布巾，不假思索地探過身去，幫' + yP + '擦了擦嘴角。', textEn: 'You pick up the napkin and lean across the table without thinking, wiping the corner of ' + yPo + ' mouth.', delay: 2500 },
+    { tag: '感知', tagColor: 'tag-sense', text: '螢愣住了。' + yP + '的呼吸停了半拍。你的指節隔著布巾碰到了' + yP + '的下唇——那裡比你想像的要柔軟。', textEn: 'Ying freezes. ' + yPC + ' breathing hitches. Your knuckle brushes ' + yPo + ' lower lip through the cloth — softer than you\'d imagined.', delay: 3000 },
+    { tag: '感知', tagColor: 'tag-sense', text: '你收回手的時候，你們都沒有說話。但你注意到——螢的耳尖紅得像是要滴血。' + yP + '把臉埋進手冊裡，假裝在翻頁。', textEn: 'When you pull back, neither of you speaks. But you notice — Ying\'s ear tips are crimson. ' + yPC + ' buries ' + yPo + ' face in the notebook, pretending to turn pages.', delay: 3200 },
     { tag: '感知', tagColor: 'tag-sense', text: '你笑了。在這個石化瘟疫籠罩的世界裡，這是你第一次覺得自己離正常的生活那麼近。', textEn: 'You smile. In this plague-shrouded world, it\'s the first time you feel this close to a normal life.', delay: 3000 },
-    { tag: '感知', tagColor: 'tag-sense', text: '河水在窗外流淌。燈光昏黃。螢在對面翻著手冊。一切都很安靜。', textEn: 'River water flows past the window. Dim lamplight. Ying flips through the notebook across from you. Everything is quiet.', delay: 2800 },
-    { tag: '感知', tagColor: 'tag-sense', text: '你忽然想——如果能一直這樣就好了。', textEn: 'You suddenly think — if only this could last forever.', delay: 2500 },
+    { tag: '感知', tagColor: 'tag-sense', text: '河水在窗外流淌。燈光昏黃。桌底下，螢的膝蓋不經意地碰到了你的——然後沒有移開。你也沒有。', textEn: 'River water flows past the window. Dim lamplight. Under the table, Ying\'s knee brushes yours — and doesn\'t move away. Neither do you.', delay: 3200 },
+    { tag: '感知', tagColor: 'tag-sense', text: '你忽然想——如果能一直這樣就好了。就這樣坐著，膝蓋碰著膝蓋，在昏黃的燈下，假裝外面的世界不存在。', textEn: 'You suddenly think — if only this could last forever. Just sitting here, knee touching knee, in the dim lamplight, pretending the outside world doesn\'t exist.', delay: 3200 },
   ], [
     { text: '這裡的魚湯不錯', textEn: 'The soup is good here', action: () => {
       changeHp(30);
