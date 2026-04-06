@@ -840,7 +840,7 @@ registerNode('r1_rest', () => {
 registerNode('r1_survivor', () => {
   state.flags.r1SurvivorMet = true;
   autoExplore([
-    { art: `<pre class="ascii-art">
+    { art: npcPortrait.art('zhou', { subtitle: '倖存者' }) || `<pre class="ascii-art">
        ╭──╮
        │⊙ │  ╭━━━━━━╮
        ╰┬─╯ ╱░░▔▔▔▔▔╲
@@ -855,7 +855,7 @@ registerNode('r1_survivor', () => {
          ░░░╱╱    ╲  ╲╲
          ░░═════════════
        老 周  ——  倖 存 者
-</pre>`, artEn: `<pre class="ascii-art">
+</pre>`, artEn: npcPortrait.art('zhou', { subtitle: 'Survivor' }) || `<pre class="ascii-art">
        ╭──╮
        │⊙ │  ╭━━━━━━╮
        ╰┬─╯ ╱░░▔▔▔▔▔╲

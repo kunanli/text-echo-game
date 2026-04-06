@@ -476,7 +476,7 @@ registerNode('r3_inn', () => {
 
 registerNode('r3_bell', () => {
   var steps = [];
-  steps.push({ art: `<pre class="ascii-art">
+  steps.push({ art: npcPortrait.art('bell', { subtitle: '議員' }) || `<pre class="ascii-art">
       ·  ˚  銅鐘 — 議員  ˚  ·
             ╱═══╲
            ╱ ◆◆◆ ╲
@@ -493,7 +493,7 @@ registerNode('r3_bell', () => {
       ╲  │文件簿│  │ ░▓█╱ ← 石化右手
        ╲ ╰─────╯  │ ░▓╱
         ·─·─·──────·─·
-</pre>`, artEn: `<pre class="ascii-art">
+</pre>`, artEn: npcPortrait.art('bell', { subtitle: 'Councilor' }) || `<pre class="ascii-art">
     ·  ˚  Bronze Bell — Councilor  ˚  ·
             ╱═══╲
            ╱ ◆◆◆ ╲
@@ -902,7 +902,7 @@ registerNode('r3_ying_river', () => {
 registerNode('r3_zhou', () => {
   state.flags.r3ZhouMet = true;
   autoExplore([
-    { art: `<pre class="ascii-art">
+    { art: npcPortrait.art('zhou', { subtitle: '倖存者' }) || `<pre class="ascii-art">
           ╭───────╮
          ╱ ─ ╌ ─  ╲
         │  ⌐=  =╕  │
@@ -916,7 +916,7 @@ registerNode('r3_zhou', () => {
      │░░░ │  │⚒ 🔧│ ╲│
       ░▓░ ╰──┴───┴──╯
        ░     工具台
-</pre>`, artEn: `<pre class="ascii-art">
+</pre>`, artEn: npcPortrait.art('zhou', { subtitle: 'Survivor' }) || `<pre class="ascii-art">
           ╭───────╮
          ╱ ─ ╌ ─  ╲
         │  ⌐=  =╕  │
@@ -988,7 +988,7 @@ registerNode('r3_zhou', () => {
 
 registerNode('r3_crane', () => {
   var steps = [];
-  steps.push({ art: `<pre class="ascii-art gold">
+  steps.push({ art: npcPortrait.art('crane', { subtitle: '行商人' }) || `<pre class="ascii-art gold">
        ·  ˚  灰鶴 — 市場  ˚  ·
               ╱═══╲
              ╱ ·˚· ╲
@@ -1003,7 +1003,7 @@ registerNode('r3_crane', () => {
          ╲╱ │ ╳╳╳╳╳╳ │ ╲╱
        ◆─┴──┤ ✦瓶✦刃✦ ├──┴─◆
              ╰═══════╯
-</pre>`, artEn: `<pre class="ascii-art gold">
+</pre>`, artEn: npcPortrait.art('crane', { subtitle: 'Merchant' }) || `<pre class="ascii-art gold">
     ·  ˚  Grey Crane — Market  ˚  ·
               ╱═══╲
              ╱ ·˚· ╲

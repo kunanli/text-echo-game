@@ -801,7 +801,7 @@ registerNode('r2_camp_chief', () => {
 
   if (!state.flags.r2ChiefTalked) {
     state.flags.r2ChiefTalked = true;
-    steps.push({ art: `<pre class="ascii-art">
+    steps.push({ art: npcPortrait.art('frost', { subtitle: '營地隊長' }) || `<pre class="ascii-art">
           ·  ˚  鐵霜 — 營地隊長  ˚  ·
             ╱─────────╲
            │  ◉     ◉  │
@@ -816,7 +816,7 @@ registerNode('r2_camp_chief', () => {
       ·█·█·█·│         │────╯ ╱──╯
       石化左臂│    ⚒    │   石錘
               ╰─────────╯
-</pre>`, artEn: `<pre class="ascii-art">
+</pre>`, artEn: npcPortrait.art('frost', { subtitle: 'Leader' }) || `<pre class="ascii-art">
         ·  ˚  Iron Frost — Leader  ˚  ·
             ╱─────────╲
            │  ◉     ◉  │
@@ -861,7 +861,7 @@ registerNode('r2_camp_chief', () => {
 
 registerNode('r2_camp_smith', () => {
   var steps = [
-    { art: `<pre class="ascii-art">
+    { art: npcPortrait.art('cast', { subtitle: '鍛匠' }) || `<pre class="ascii-art">
         ·  ˚  老鑄 — 鍛匠  ˚  ·
               ╱───────╲
              │ ─    ─  │
@@ -876,7 +876,7 @@ registerNode('r2_camp_smith', () => {
   ════╤═══════════╧═══════════╤════
   ░░░░│      ⚒  鐵砧  ⚒      │░░░░
   ════╧═══════════════════════╧════
-</pre>`, artEn: `<pre class="ascii-art">
+</pre>`, artEn: npcPortrait.art('cast', { subtitle: 'Blacksmith' }) || `<pre class="ascii-art">
       ·  ˚  Old Cast — Blacksmith  ˚  ·
               ╱───────╲
              │ ─    ─  │
@@ -934,7 +934,7 @@ registerNode('r2_camp_smith', () => {
 
 registerNode('r2_camp_medic', () => {
   autoExplore([
-    { art: `<pre class="ascii-art cyan">
+    { art: npcPortrait.art('dew', { subtitle: '醫師' }) || `<pre class="ascii-art cyan">
        ·  ˚  清露 — 醫師  ˚  ·
            ╭──·˚ ✚ ˚·──╮
           ╱   ˚·   ·˚   ╲
@@ -952,7 +952,7 @@ registerNode('r2_camp_medic', () => {
         ╲  ╭─┴────┬────┴─╮ ╱
          ·─│ ◇藥箱◇│˚手套˚│·
            ╰──────┴──────╯
-</pre>`, artEn: `<pre class="ascii-art cyan">
+</pre>`, artEn: npcPortrait.art('dew', { subtitle: 'Medic' }) || `<pre class="ascii-art cyan">
       ·  ˚  Dew — Medic  ˚  ·
            ╭──·˚ ✚ ˚·──╮
           ╱   ˚·   ·˚   ╲
@@ -1797,7 +1797,7 @@ registerNode('r2_crane', () => {
   var steps = [];
   if (!state.flags.r2CraneMet) {
     state.flags.r2CraneMet = true;
-    steps.push({ art: `<pre class="ascii-art gold">
+    steps.push({ art: npcPortrait.art('crane', { subtitle: '行商人' }) || `<pre class="ascii-art gold">
        ·  ˚  灰鶴 — 行商人  ˚  ·
               ╱═══╲
              ╱ ·˚· ╲
@@ -1813,7 +1813,7 @@ registerNode('r2_crane', () => {
           ╲ │ ◆ 貨物 ◆│ ╱
            ╲╰════════╯╱
             ·─·˚酒瓶˚·─·
-</pre>`, artEn: `<pre class="ascii-art gold">
+</pre>`, artEn: npcPortrait.art('crane', { subtitle: 'Merchant' }) || `<pre class="ascii-art gold">
     ·  ˚  Grey Crane — Merchant  ˚  ·
               ╱═══╲
              ╱ ·˚· ╲
