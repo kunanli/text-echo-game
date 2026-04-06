@@ -759,6 +759,190 @@ if (hasSkill('undying') && !cooldowns.undying && state.hp + delta <= 0) {
 | R3 | 碼頭邊一個小孩在偷東西 | 道德 | 舉報 / 幫忙 / 無視，影響市場 NPC 態度 |
 | R3 | 收到一封匿名信 | 懸疑 | 引向隱藏的議會陰謀線索 |
 
+### 🔧 待實裝：隨機敘事事件系統（實裝規格）
+
+**狀態**：設計完成，待寫入 `patrol.js`
+
+#### 系統設計
+
+- 整合進現有 `runPatrolCycle()`，每次巡邏循環有 **25% 機率**觸發敘事事件取代戰鬥
+- 每個事件有唯一 flag（如 `state.flags._evt_r0_statue`），**每周目只觸發一次**
+- 當該區域所有事件都已觸發時，回退為正常戰鬥
+- 事件使用巡邏系統的 `queue` + `processNext()` 機制渲染（與戰鬥同樣的打字機/pending 效果）
+- 事件結束後自動繼續下一輪巡邏循環
+
+#### 資料結構
+
+```javascript
+// 每個事件物件格式：
+{
+  id: 'r0_statue',           // 唯一 ID，用於 flag tracking
+  flag: '_evt_r0_statue',    // state.flags 中的 key
+  region: 0,                 // 所屬區域
+  // buildQueue(queue) — 將事件的敘事步驟推入 queue 陣列
+  // 使用與戰鬥相同的 { tag, color, text, html, art, delay, pending, sfx, effect } 格式
+  buildQueue: function(queue) { ... }
+}
+
+// 每區域事件池：
+var R0_EVENTS = [ ... ];  // 3 個事件
+var R1_EVENTS = [ ... ];  // 3 個事件
+var R2_EVENTS = [ ... ];  // 3 個事件
+var R3_EVENTS = [ ... ];  // 3 個事件
+
+function getPatrolEvents() {
+  return state.region >= 3 ? R3_EVENTS : state.region >= 2 ? R2_EVENTS
+       : state.region >= 1 ? R1_EVENTS : R0_EVENTS;
+}
+```
+
+#### runPatrolCycle() 修改
+
+```javascript
+function runPatrolCycle() {
+  if (!patrolActive) return;
+
+  // 25% 機率觸發敘事事件（取代戰鬥）
+  var events = getPatrolEvents();
+  var available = events.filter(function(e) { return !state.flags[e.flag]; });
+  if (available.length > 0 && Math.random() < 0.25) {
+    var evt = available[rng(0, available.length - 1)];
+    state.flags[evt.flag] = true;  // 標記已觸發
+    runNarrativeEvent(evt);
+    return;
+  }
+
+  // ... 原有戰鬥邏輯 ...
+}
+```
+
+#### 12 個事件詳細規格
+
+**R0 祭獻坑（3 個事件）：**
+
+| ID | 事件名 | 類型 | 互動 | 結果 |
+|----|--------|------|------|------|
+| `r0_statue` | 石化雕像求救 | 道德 | 2 選項：幫助(STR DC6) / 無視 | 幫助成功 → 獲得「石心碎片」+石化+3；幫助失敗 → 石化+5；無視 → 無事 |
+| `r0_crack_light` | 裂縫微光 | 探索 | AGI DC7 檢定鑽入 | 成功 → 獲得黑麵包+HP回復；失敗 → HP-5 卡住受傷 |
+| `r0_singer` | 遠方歌聲 | 氛圍 | 2 選項：跟隨 / 忽略 | 跟隨 → 發現石化歌者遺物（WIL+1）+ 石化+2；忽略 → 無事 |
+
+**R1 石脈迴廊（3 個事件）：**
+
+| ID | 事件名 | 類型 | 互動 | 結果 |
+|----|--------|------|------|------|
+| `r1_cat` | 未石化的貓 | 關係 | 2 選項：餵食(消耗黑麵包 or 免費) / 忽略 | 餵食 → flag `r1CatFed`，巡邏戰鬥傷害-10%（貓分散敵人）；忽略 → 無事 |
+| `r1_minecart` | 失控礦車 | 緊張 | 2 選項：AGI DC7 閃避 / STR DC7 攔停 | AGI 成功 → 無傷；AGI 失敗 → HP-8；STR 成功 → 獲得礦車中的物資（HP藥水）；STR 失敗 → HP-10 |
+| `r1_mirror` | 完整鏡子 | 敘事 | 1 選項：注視 / 離開 | 注視 → 看見石化更深的自己，WIL 檢定 DC6：成功 → WIL+1「你不會變成那樣」；失敗 → 石化+3「恐懼侵蝕了你」 |
+
+**R2 大採石場（3 個事件）：**
+
+| ID | 事件名 | 類型 | 互動 | 結果 |
+|----|--------|------|------|------|
+| `r2_vending` | 古代自動販賣機 | 幽默 | 投入金幣(需 ≥5 金幣) / 離開 | 50% 獲得隨機物品（抗石化藥水/黑麵包/微光石）；50% 被坑（機器吞錢 + 噴石化粉塵 石化+2） |
+| `r2_storyteller` | 營火說書人 | 情報 | 聽故事 / 離開 | 聽完 → 獲得世界觀線索（flag `r2LoreHeard`，議會投票 +1 隱藏加分），HP+5 |
+| `r2_quake` | 突發地震 | 危機 | 2 選項：跑(AGI DC7) / 躲(STR DC7) | AGI 成功 → 無傷 + 發現震出的寶物（金幣+3）；AGI 失敗 → HP-8；STR 成功 → 護住自己 + 發現地縫中的結晶（XP+10）；STR 失敗 → HP-12 + 石化+3 |
+
+**R3 河城渡口（3 個事件）：**
+
+| ID | 事件名 | 類型 | 互動 | 結果 |
+|----|--------|------|------|------|
+| `r3_gamble` | 碼頭賭局 | 金幣 | 參加(需 ≥3 金幣) / 離開 | 骰大小：玩家擲 d6，≥4 贏（金幣+5）；<4 輸（金幣-3）；暴擊6 贏雙倍（金幣+8） |
+| `r3_thief_kid` | 偷東西的小孩 | 道德 | 3 選項：舉報 / 幫忙掩護 / 無視 | 舉報 → 商人感謝（金幣+3）但小孩被打；幫忙 → 小孩感謝 flag `r3KidHelped`（後續議會場景可作為底層證人）；無視 → 無事 |
+| `r3_letter` | 匿名信 | 懸疑 | 打開 / 丟棄 | 打開 → 獲得議會陰謀線索 flag `r3AnonLetter`（銅鐘對話新選項），WIL+1；丟棄 → 無事 |
+
+#### 事件中的 ASCII Art 風格
+
+每個事件都需要配 ASCII art，風格參照：
+- 物件/場景類 → 40-60 字元寬，用 box-drawing + 符號
+- 與現有巡邏怪物 art 風格統一（暗黑奇幻地下城）
+
+#### 需修改的檔案
+
+1. **`js/patrol.js`**：
+   - 新增 `R0_EVENTS`, `R1_EVENTS`, `R2_EVENTS`, `R3_EVENTS` 事件池
+   - 新增 `getPatrolEvents()` 輔助函式
+   - 新增 `runNarrativeEvent(evt)` 函式（用巡邏的 queue 機制渲染事件 + 選項）
+   - 修改 `runPatrolCycle()`：開頭加 25% 事件觸發判定
+2. **`js/save.js`**：無需修改（事件 flags 已存在 `state.flags` 中，自動隨存檔保存）
+3. **`css/style.css`**：可能新增 `.tag-event` 標籤顏色（事件專用金色標籤）
+4. **`index.html`**：版本號更新
+
+#### runNarrativeEvent() 實裝模板
+
+```javascript
+function runNarrativeEvent(evt) {
+  // 建構敘事步驟 queue
+  var queue = [];
+
+  // 1-2 巡邏文字（與戰鬥相同）
+  var patrolPool = getPatrolTexts();
+  var p = patrolPool[rng(0, patrolPool.length - 1)];
+  queue.push({ tag: L('巡邏','Patrol'), color: 'tag-move',
+    text: L(p.text, p.textEn), delay: rng(1500, 2300) });
+
+  // 事件自己的步驟（由 buildQueue 填充）
+  evt.buildQueue(queue);
+
+  // 處理 queue（與戰鬥相同的 processNext 邏輯）
+  var qi = 0;
+  function processNext() {
+    if (!patrolActive) return;
+    if (qi >= queue.length) {
+      // 事件結束，繼續巡邏
+      patrolTimers.push(setTimeout(runPatrolCycle, 1500));
+      return;
+    }
+    var step = queue[qi++];
+    // ... 與現有 processNext 相同的 pending + render 邏輯 ...
+    // 如果 step.choices 存在，暫停巡邏顯示選項按鈕
+  }
+  processNext();
+}
+```
+
+#### 事件選項（中斷巡邏讓玩家選擇）
+
+部分事件需要玩家做選擇。實裝方式：
+- queue 步驟中加入 `choices: [{ text, textEn, action }]` 欄位
+- 當 processNext 遇到 choices 步驟時，暫停自動推進，顯示選項按鈕
+- 玩家選擇後，action 函式執行效果 + 推入後續步驟 + 恢復巡邏
+
+```javascript
+// choices 步驟格式
+{
+  tag: '抉擇', color: 'tag-info',
+  text: L('你要怎麼做？', 'What do you do?'),
+  choices: [
+    { text: '幫助它', textEn: 'Help it',
+      action: function() {
+        // 執行效果 + 推入後續敘事
+        var result = statCheck('str', 6);
+        if (result !== 'fail') {
+          addItem(L('石心碎片', 'Stone Heart Shard'));
+          changePetri(3);
+          patrolAppend(L('事件','Event'), 'tag-event',
+            L('你成功撬開了石化的外殼！', 'You pry open the petrified shell!'), false);
+        } else {
+          changePetri(5);
+          patrolAppend(L('事件','Event'), 'tag-event',
+            L('你沒能幫上忙，石化粉塵沾染了你。', 'You fail to help, petri-dust coats you.'), false);
+        }
+        renderStatus();
+        // 恢復巡邏
+        patrolTimers.push(setTimeout(runPatrolCycle, 2500));
+      }
+    },
+    { text: '走開', textEn: 'Walk away',
+      action: function() {
+        patrolAppend(L('巡邏','Patrol'), 'tag-move',
+          L('你決定不介入，繼續前進。', 'You decide not to intervene and move on.'), false);
+        patrolTimers.push(setTimeout(runPatrolCycle, 2000));
+      }
+    }
+  ]
+}
+```
+
 ### 擴展節點預估
 
 | 方向 | 新增節點 | 優先級 | 開發量 |
