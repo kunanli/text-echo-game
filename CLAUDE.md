@@ -395,6 +395,7 @@ if (state.flags.r3PlagueProof)    score += 3;  // 瘟疫起源證據（關鍵）
 
 ### 內容擴展（推薦下一步）
 
+- [ ] **戰鬥技能解鎖系統**（類似劍星） — 詳見下方「待實裝：戰鬥技能系統」
 - [ ] **冥河深淵（R4+ 新區域）** — 渡江人路線目前只有「敬請期待」，可開發全新區域：古代封印層、石化瘟疫真正起源、最終 Boss。NG+ 高周目玩家的終極挑戰
 - [ ] **NG+ 專屬劇情分歧** — 二周目以上解鎖全新對話選項和隱藏路線（例：直接揭露瘟疫真相給銅鐘、和 Boss 鏽刃談判時提及「上一世」的記憶）
 - [ ] **NPC 好感度系統強化** — 目前好感度只靠 flags 判斷，可改為數值型（0-100），影響 NPC 商店價格、戰鬥支援、專屬結局變體
@@ -415,6 +416,192 @@ if (state.flags.r3PlagueProof)    score += 3;  // 瘟疫起源證據（關鍵）
 - [x] **玩家排行榜** — `js/leaderboard.js`，Dreamlo API
 - [ ] **多語言擴展** — 架構已支援 i18n，可加日文或其他社群翻譯
 - [ ] **周目排行榜** — 排行榜加入「周目數」欄位，區分一周目和高周目玩家，展示最高通關周目
+
+## 待實裝：戰鬥技能系統（Combat Skills）
+
+類似劍星（Stellar Blade）的技能解鎖機制——在戰鬥中特定條件觸發時，有機率領悟新技巧。
+技能不是手動學習，而是在「對的時刻」自然觸發，給玩家驚喜感。
+
+### 設計核心
+
+- **機率觸發**：每次滿足觸發條件時，有 X% 機率解鎖（非必定）
+- **一次解鎖永久可用**：解鎖後存入 `state.skills[]`，之後每場戰鬥都能使用
+- **漸進解鎖**：不同技能有不同的前置條件（戰鬥場次、等級、屬性值、已學技能數）
+- **戰鬥選項動態擴充**：解鎖後在戰鬥中出現新的行動按鈕（第 5、6… 個選項）
+
+### 觸發時機 × 機率
+
+技能在**回合結束時**判定。每次觸發只判定一個技能（優先判定前置條件剛滿足的）。
+
+| 觸發條件 | 判定時機 | 基礎機率 | 機率修正 |
+|----------|---------|---------|---------|
+| 暴擊（觀察後攻擊） | 造成 2x 傷害後 | 15% | +2%/Lv |
+| 受傷（HP < 30%） | 被攻擊後 HP 低於閾值 | 12% | +3%/連續戰鬥場次 |
+| 感應成功 | 感應（Commune）判定成功後 | 10% | +2%/WIL |
+| 觀察成功 | 觀察（Observe）判定成功後 | 10% | +2%/AGI |
+| 擊殺 | 戰鬥勝利（非饒恕） | 8% | +5% if Boss |
+| 饒恕 | 和平解決戰鬥 | 8% | +5% if Boss |
+| 連續戰鬥 | 不休息連打 3 場以上 | 20% | 一次性觸發 |
+
+**保底機制**：每個技能有「未觸發計數器」，每次滿足條件但未觸發時 +1，累計 N 次後必定觸發（避免歐皇/非酋體驗差異過大）。
+
+### 技能列表（10 個技能，分 3 階）
+
+#### 第一階：基礎技（戰鬥 3 場後開始觸發）
+
+| 技能 | 中文 | 觸發條件 | 效果 | 冷卻 |
+|------|------|---------|------|------|
+| **反擊** | 石膚反擊 | 受傷時觸發 | 被攻擊後自動反擊，造成 STR×0.8 傷害 | 每場 1 次 |
+| **蓄力** | 石錘蓄力 | 暴擊時觸發 | 消耗本回合行動，下回合攻擊 3x（取代觀察的 2x） | 3 回合 |
+| **石盾** | 石化護壁 | 受傷(HP<30%)時觸發 | 下一次受到的傷害減半 | 每場 1 次 |
+
+#### 第二階：進階技（等級 ≥ 3 且已學 ≥ 2 個一階技）
+
+| 技能 | 中文 | 觸發條件 | 效果 | 冷卻 |
+|------|------|---------|------|------|
+| **連擊** | 裂石連擊 | 暴擊時觸發 | 一回合攻擊 2 次（第二次傷害 60%） | 3 回合 |
+| **石化共鳴** | 石脈共振 | 感應成功時觸發 | 利用石化能量攻擊，造成 WIL×1.5 傷害 + 敵人石化 | 2 回合 |
+| **看破** | 石眼看破 | 觀察成功時觸發 | 觀察後永久標記敵人弱點，本場戰鬥所有攻擊 +30% | 每場 1 次 |
+| **吸收** | 石化吸收 | 受傷時觸發 | 將受到的石化傷害轉為 HP 回復（petriDmg → HP） | 4 回合 |
+
+#### 第三階：覺醒技（等級 ≥ 5 且已學 ≥ 4 個技能）
+
+| 技能 | 中文 | 觸發條件 | 效果 | 冷卻 |
+|------|------|---------|------|------|
+| **石化爆發** | 深淵脈動 | 擊殺/饒恕時觸發 | 消耗 10% 石化度，對敵人造成 (petri×2) 固定傷害 | 每場 1 次 |
+| **不屈** | 石心不屈 | 受傷(HP<30%)時觸發 | HP 歸零時自動觸發，恢復 20% HP + 1 回合無敵（每場限 1 次） | 每場 1 次 |
+| **全觀** | 石眼全觀 | 觀察成功時觸發 | 本回合免費：觀察 + 攻擊同時進行（2x 傷害不消耗觀察 buff） | 5 回合 |
+
+### 解鎖演出
+
+技能觸發時中斷正常戰鬥流程，插入一段特殊演出：
+
+```javascript
+// 演出格式（插入 combat log）
+{
+  tag: '覺醒', tagColor: 'tag-petri',
+  html: '<div class="skill-unlock">⚡ 石膚反擊 ⚡</div>',
+  text: '你的身體記住了這種痛——石化的皮膚在被擊中的瞬間自動回彈！',
+  textEn: 'Your body remembers the pain — petrified skin rebounds the instant it\'s struck!',
+  delay: 3000,
+  effect: function() { sfx.levelUp(); notify(L('習得技能：石膚反擊！', 'Skill learned: Stone Counter!')); }
+}
+```
+
+- 螢幕閃爍 + 升級音效（`sfx.levelUp()`）
+- 技能名稱大字顯示（CSS 動畫）
+- 簡短的敘事描寫（配合當前石化/深淵主題）
+- **不中斷戰鬥**：演出後直接回到行動選擇，新技能立即可用
+
+### 技術實裝方案
+
+#### 資料結構
+
+```javascript
+// state.js 擴充
+state.skills = [];           // 已解鎖技能 ID 陣列，如 ['counter', 'charge', ...]
+state.flags._skillPity = {}; // 保底計數器，如 { counter: 3, charge: 1 }
+state.flags._combatCount = 0; // 累計戰鬥場次（跨存檔）
+
+// 技能定義（新檔案 js/skills.js）
+var SKILLS = {
+  counter:   { tier: 1, zh: '石膚反擊', en: 'Stone Counter',   trigger: 'hurt',    baseRate: 0.15, pity: 8,  reqCombats: 3, reqLevel: 1, reqSkills: 0 },
+  charge:    { tier: 1, zh: '石錘蓄力', en: 'Stone Charge',    trigger: 'crit',    baseRate: 0.15, pity: 8,  reqCombats: 3, reqLevel: 1, reqSkills: 0 },
+  shield:    { tier: 1, zh: '石化護壁', en: 'Stone Shield',    trigger: 'lowHp',   baseRate: 0.12, pity: 10, reqCombats: 3, reqLevel: 1, reqSkills: 0 },
+  combo:     { tier: 2, zh: '裂石連擊', en: 'Rift Combo',      trigger: 'crit',    baseRate: 0.15, pity: 10, reqCombats: 8, reqLevel: 3, reqSkills: 2 },
+  resonance: { tier: 2, zh: '石脈共振', en: 'Vein Resonance',  trigger: 'commune', baseRate: 0.10, pity: 12, reqCombats: 8, reqLevel: 3, reqSkills: 2 },
+  pierce:    { tier: 2, zh: '石眼看破', en: 'Stone Pierce',    trigger: 'observe', baseRate: 0.10, pity: 12, reqCombats: 8, reqLevel: 3, reqSkills: 2 },
+  absorb:    { tier: 2, zh: '石化吸收', en: 'Petri Absorb',    trigger: 'hurt',    baseRate: 0.12, pity: 12, reqCombats: 8, reqLevel: 3, reqSkills: 2 },
+  burst:     { tier: 3, zh: '深淵脈動', en: 'Abyss Pulse',     trigger: 'kill',    baseRate: 0.08, pity: 15, reqCombats: 15, reqLevel: 5, reqSkills: 4 },
+  undying:   { tier: 3, zh: '石心不屈', en: 'Stone Resolve',   trigger: 'lowHp',   baseRate: 0.12, pity: 12, reqCombats: 15, reqLevel: 5, reqSkills: 4 },
+  omnisight: { tier: 3, zh: '石眼全觀', en: 'Omnisight',       trigger: 'observe', baseRate: 0.10, pity: 15, reqCombats: 15, reqLevel: 5, reqSkills: 4 },
+};
+```
+
+#### combat.js 擴充
+
+```javascript
+// 戰鬥選項動態生成
+function buildCombatChoices() {
+  var choices = [
+    { text: atkLabel, action: doAttack },
+    { text: L('觀察 [敏捷]', 'Observe [AGI]'), action: doObserve },
+    { text: L('感應 [意志]', 'Commune [WIL]'), action: doCommune },
+  ];
+  // 動態插入已解鎖技能
+  if (hasSkill('charge') && !cooldowns.charge)
+    choices.splice(1, 0, { text: L('🔨 蓄力 (3x)', '🔨 Charge (3x)'), action: doCharge });
+  if (hasSkill('resonance') && !cooldowns.resonance)
+    choices.splice(-1, 0, { text: L('💎 石脈共振', '💎 Resonance'), action: doResonance });
+  if (hasSkill('burst') && !cooldowns.burst && state.petri >= 10)
+    choices.push({ text: L('🌋 深淵脈動 [-10%石化]', '🌋 Abyss Pulse [-10% petri]'), action: doBurst });
+  // ... 逃跑放最後
+  if (onFlee) choices.push({ text: L('逃跑', 'Flee'), action: doFlee });
+  return choices;
+}
+
+// 回合結束時判定技能解鎖
+function checkSkillUnlock(triggerType) {
+  var candidates = getUnlockCandidates(triggerType); // 過濾前置條件
+  if (candidates.length === 0) return;
+  var skill = candidates[0]; // 優先判定最接近保底的
+  var rate = skill.baseRate + levelBonus + pityBonus;
+  if (Math.random() < rate || state.flags._skillPity[skill.id] >= skill.pity) {
+    unlockSkill(skill.id); // 加入 state.skills，播放演出
+  } else {
+    state.flags._skillPity[skill.id] = (state.flags._skillPity[skill.id] || 0) + 1;
+  }
+}
+```
+
+#### 被動技能處理
+
+被動技能（反擊、石盾、吸收、不屈）不需要玩家選擇，在相應時機自動觸發：
+
+```javascript
+// doAttack() 內，敵人攻擊後：
+if (hasSkill('counter') && !cooldowns.counter) {
+  var counterDmg = Math.floor(effectiveStat('str') * 0.8);
+  enemyHp -= counterDmg;
+  cooldowns.counter = true;
+  log += '【石膚反擊】你的石化皮膚自動回彈！造成 ' + counterDmg + ' 反擊傷害。';
+}
+
+// changeHp() 攔截：
+if (hasSkill('undying') && !cooldowns.undying && state.hp + delta <= 0) {
+  state.hp = Math.floor(state.maxHp * 0.2);
+  cooldowns.undying = true;
+  // 插入演出：你拒絕倒下...
+  return false; // 沒有死亡
+}
+```
+
+### 與現有系統的整合
+
+| 系統 | 整合方式 |
+|------|---------|
+| **石化懲罰** | 石化度高時，部分技能的觸發機率降低（stage 3+ 機率 ×0.7），但「深淵脈動」和「石化吸收」反而更容易觸發 |
+| **NG+** | 技能跨周目保留（存入 `globalStats.unlockedSkills`），NG+ 開局自帶上周目技能 |
+| **裝備系統** | 部分飾品可增加技能觸發機率或降低冷卻 |
+| **成就系統** | 新增成就：「初次覺醒」（學會第一個技能）、「石之武者」（學會全部 10 個）、「一擊必殺」（深淵脈動秒殺 Boss） |
+| **結局卡** | 結局卡顯示已學技能數量 + 最稀有技能名稱 |
+| **存檔** | `state.skills` 和 `_skillPity` 自動隨 saveGame() 保存 |
+
+### 檔案規劃
+
+- `js/skills.js`（新檔案）：技能定義、觸發判定、解鎖演出、冷卻管理
+- `js/combat.js`：擴充行動選項 + 回合結束觸發 `checkSkillUnlock()`
+- `js/state.js`：`state.skills = []` 初始化
+- `js/save.js`：確保 skills 陣列正確序列化/反序列化
+- `index.html`：在 `combat.js` 之前載入 `skills.js`
+- `css/style.css`：`.skill-unlock` 動畫樣式
+
+### UI 顯示
+
+- 戰鬥介面：已解鎖的主動技能作為額外行動按鈕（帶冷卻計數）
+- 被動技能觸發時在 combat log 中顯示特殊顏色標籤 `[石膚反擊]`
+- 狀態列：小圖示顯示已學技能數 `⚔ 3/10`
+- 技能面板（新 UI）：查看已學/未學技能列表 + 觸發條件提示（模糊提示，不直接告訴機率）
 
 ## ✅ 已完成：ASCII 美術圖全覆蓋
 
