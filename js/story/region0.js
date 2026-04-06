@@ -1486,9 +1486,8 @@ registerNode('r0_ferryman_challenge', () => {
         loadNode('r0_ferryman_descent');
       } else {
         sfx.fail();
-        changePetri(8);
-        changeHp(-15);
-        notify(L('檢定失敗……石化度 +8%，HP -15', 'Check Failed... Petri +8%, HP -15'));
+        changePetri(100);
+        notify(L('檢定失敗……深淵吞噬了你。', 'Check Failed... The abyss consumed you.'));
         loadNode('r0_ferryman_fail');
       }
     }},
