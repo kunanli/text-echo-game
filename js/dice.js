@@ -172,7 +172,30 @@ var diceGame = (function() {
   //  Main game flow
   // ══════════════════════════════════════════
 
+  // Proximity transition lines when Crane moves to sit beside player (3rd game)
+  var CRANE_SIT_BESIDE = [
+    { zh: '第三把開始前，灰鶴忽然站起來，端著酒瓶繞過了桌子。', en: 'Before the third round, Grey Crane suddenly stands, carrying her bottle around the table.' },
+    { zh: '她在你旁邊坐了下來——不是對面，是緊挨著你。你的肩膀碰在一起。', en: 'She sits down beside you — not across, but right next to you. Your shoulders touch.' },
+    { zh: '「對面看不清你的骰子。」她隨口找了個理由，但她的大腿貼著你的大腿，完全沒有要挪開的意思。', en: '"Can\'t see your dice from over there." She tosses out an excuse, but her thigh presses against yours with no intention of moving.' },
+    { zh: '她的斗篷蹭著你的手臂，帶著酒和草藥的氣味。你能感覺到她的體溫——比你想像的暖。', en: 'Her cloak brushes your arm, carrying the scent of liquor and herbs. You can feel her body heat — warmer than expected.' },
+    { zh: '「怎麼了？」她側頭看你，臉只有幾寸遠，嘴角帶著似笑非笑的弧度：「怕了？」', en: '"What?" She turns her head — face just inches away, lips curved in a teasing half-smile: "Scared?"' },
+  ];
+
+  // Ambient proximity lines for games after Crane sits beside player
+  var CRANE_BESIDE_AMBIENT = [
+    { zh: '灰鶴搖骰子的時候，整個人隨著動作搖晃，肩膀一下一下地撞著你。', en: 'Grey Crane sways with each shake of the dice cup, her shoulder bumping yours rhythmically.' },
+    { zh: '她湊過來看你的骰子，下巴幾乎擱在你的肩膀上。她的頭髮掃過你的脖子。', en: 'She leans over to peek at your dice, chin nearly resting on your shoulder. Her hair brushes your neck.' },
+    { zh: '灰鶴喝了一口酒，順手把酒瓶遞到你嘴邊：「喝一口。」瓶口還帶著她的體溫。', en: 'Grey Crane takes a swig, then holds the bottle to your lips: "Have some." The rim is still warm from her mouth.' },
+    { zh: '她思考下一步的時候，手指無意識地在你的膝蓋上輕輕敲著節拍。', en: 'While pondering her next move, her fingers unconsciously tap a rhythm on your knee.' },
+    { zh: '灰鶴伸手去拿骰杯的時候，整個人壓在你的手臂上。她沒有道歉，也沒有退開。', en: 'Reaching for the dice cup, Grey Crane leans her weight against your arm. No apology. No pulling away.' },
+    { zh: '她輸了一把之後嘆了口氣，腦袋往你肩膀上一靠：「讓我緩緩。」過了幾秒才直起身子。', en: 'After losing a round, she sighs and drops her head onto your shoulder: "Let me regroup." A few seconds pass before she straightens.' },
+  ];
+
   function startGame(bet, onDone) {
+    // Track total games played for proximity escalation
+    state.flags.diceRounds = (state.flags.diceRounds || 0) + 1;
+    var roundNum = state.flags.diceRounds;
+
     var playerDice = rollDice(5);
     var craneDice = rollDice(5);
     var totalDice = 10;
@@ -180,6 +203,7 @@ var diceGame = (function() {
     var playerTurn = Math.random() < 0.5; // random who goes first
     var peeked = false; // has player peeked at crane's dice this round
     var en = state.lang === 'en';
+    var isBeside = roundNum >= 3; // Crane sits beside player from round 3 onward
 
     // Track crane's revealed dice for display
     var craneRevealed = false;
@@ -247,6 +271,12 @@ var diceGame = (function() {
     // ── Player's turn ──
     function playerRound() {
       var steps = [];
+      // Add ambient proximity flavor when sitting beside (random chance to avoid repetition)
+      if (isBeside && currentBid && Math.random() < 0.4) {
+        var amb = pickLine(CRANE_BESIDE_AMBIENT);
+        steps.push({ tag: en ? 'SENSE' : '感知', tagColor: 'tag-sense',
+          text: L(amb.zh, amb.en), delay: 2000 });
+      }
       if (!currentBid) {
         steps.push({ tag: en ? 'DICE' : '骰子', tagColor: 'tag-npc', html: statusText(), delay: 600 });
         steps.push({ tag: en ? 'DICE' : '骰子', tagColor: 'tag-info',
@@ -437,23 +467,46 @@ var diceGame = (function() {
 
     // Start
     state.flags._diceBluffedThisRound = false;
-    if (playerTurn) {
-      playerRound();
-    } else {
-      // Crane opens
-      var bid = craneBid(craneDice, null, totalDice);
-      currentBid = bid;
-      var line = pickLine(CRANE_BID_LINES);
-      var steps = [
-        { tag: en ? 'DICE' : '骰子', tagColor: 'tag-npc', html: statusText(), delay: 600 },
-        { tag: en ? 'DICE' : '骰子', tagColor: 'tag-npc',
+
+    function beginActualGame() {
+      if (playerTurn) {
+        playerRound();
+      } else {
+        // Crane opens
+        var bid = craneBid(craneDice, null, totalDice);
+        currentBid = bid;
+        var line = pickLine(CRANE_BID_LINES);
+        var steps = [];
+        // Add ambient proximity flavor from round 4+
+        if (isBeside && roundNum > 3) {
+          var amb = pickLine(CRANE_BESIDE_AMBIENT);
+          steps.push({ tag: en ? 'SENSE' : '感知', tagColor: 'tag-sense',
+            text: L(amb.zh, amb.en), delay: 2200 });
+        }
+        steps.push({ tag: en ? 'DICE' : '骰子', tagColor: 'tag-npc', html: statusText(), delay: 600 });
+        steps.push({ tag: en ? 'DICE' : '骰子', tagColor: 'tag-npc',
           text: L(line.zh + '「' + bid.count + ' 個 ' + DICE_ART[bid.face] + '。」——灰鶴先喊。',
                  line.en + ' "' + bid.count + ' × ' + DICE_ART[bid.face] + '." — Grey Crane opens.'),
-          delay: 2000 },
-      ];
-      autoExplore(steps, [
-        { text: L('繼續', 'Continue'), action: function() { playerRound(); } },
-      ], { label: L('灰鶴先喊', 'Crane opens') });
+          delay: 2000 });
+        autoExplore(steps, [
+          { text: L('繼續', 'Continue'), action: function() { playerRound(); } },
+        ], { label: L('灰鶴先喊', 'Crane opens') });
+      }
+    }
+
+    // Proximity transition: on the 3rd game, Crane moves to sit beside player
+    if (roundNum === 3) {
+      var sitSteps = [];
+      for (var i = 0; i < CRANE_SIT_BESIDE.length; i++) {
+        sitSteps.push({ tag: en ? 'SENSE' : '感知', tagColor: 'tag-sense',
+          text: L(CRANE_SIT_BESIDE[i].zh, CRANE_SIT_BESIDE[i].en),
+          delay: i < 2 ? 2500 : 2200 });
+      }
+      autoExplore(sitSteps, [
+        { text: L('開始第三局', 'Start round 3'), action: function() { beginActualGame(); } },
+      ], { label: L('灰鶴坐到你旁邊', 'Crane sits beside you') });
+    } else {
+      beginActualGame();
     }
   }
 
