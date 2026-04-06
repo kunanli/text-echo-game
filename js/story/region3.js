@@ -579,6 +579,7 @@ registerNode('r3_bell', () => {
           { tag: '感知', tagColor: 'tag-sense', text: '說到傷亡最慘重的部分時，她停下了筆。你看見她咬緊了下唇，胸口微微起伏——然後她深吸一口氣，重新拿起筆繼續記錄。', textEn: 'At the worst of the casualties, she stops writing. You see her bite her lower lip, chest rising slightly — then she draws a deep breath and picks up the pen again.', delay: 3200 },
           { tag: '情報', tagColor: 'tag-info', text: '「……我就知道。」她把筆放下，雙手撐在桌面上站起身來——她站起來的瞬間，你才真正感受到她的氣場。比坐著的時候壓迫感強了一倍。', textEn: '"...I knew it." She sets down the pen and stands, palms flat on the desk — the moment she rises, you truly feel her presence. Twice as commanding as when seated.', delay: 3500 },
           { tag: '情報', tagColor: 'tag-info', text: '「封鎖通道只會害死更多人。下面還有倖存者在苦撐。」她走到窗邊，背對著你。窗外微弱的光線勾勒出她挺拔的輪廓。', textEn: '"Sealing the passages will only kill more people. Survivors below are still holding on." She walks to the window, back to you. Faint light traces her upright silhouette.', delay: 3200 },
+          { art: npcPortrait.art('bell', { subtitle: '議員' }), artEn: npcPortrait.art('bell', { subtitle: 'Councilor' }), delay: 800 },
           { tag: '情報', tagColor: 'tag-info', html: '「你的證詞很重要。下一次議會投票時，我需要你<b>在議會上作證</b>——證明下面的人不是威脅，而是需要幫助的同胞。」', htmlEn: '"Your testimony matters. At the next Council vote, I need you to <b>testify before the Council</b> — prove the people below aren\'t a threat, but fellow humans who need help."', delay: 3500 },
           { tag: '情報', tagColor: 'tag-info', text: '「你願意嗎？」', textEn: '"Will you?"', delay: 1800 },
         ], [
