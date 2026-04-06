@@ -8,6 +8,7 @@ var ENDING_META = {
   sacrifice:  { zh: '犧牲', en: 'SACRIFICE',  type: '獻身者',  typeEn: 'MARTYR',      color: '#9a8ac8' },
   compromise: { zh: '妥協', en: 'COMPROMISE', type: '斡旋者',  typeEn: 'MEDIATOR',    color: '#d4a843' },
   lockdown:   { zh: '封鎖', en: 'LOCKDOWN',   type: '守門者',  typeEn: 'WARDEN',      color: '#c06060' },
+  death:      { zh: '隕落', en: 'FALLEN',     type: '殞命者',  typeEn: 'FALLEN',      color: '#6a6a7a' },
 };
 
 var ENDING_FLAVOR = {
@@ -26,6 +27,10 @@ var ENDING_FLAVOR = {
   lockdown: {
     zh: '"深淵的入口被永遠封閉。地底的一切——包括真相——都被埋葬在石壁之下。安全，但代價是永遠的沉默。也許有一天，會有人重新找到這扇被封印的門。"',
     en: '"The abyss was sealed forever. All beneath — truth included — buried under stone. Safe, yes. But at the cost of eternal silence. Perhaps someday, someone will find this sealed gate once more."',
+  },
+  death: {
+    zh: '"深淵吞噬了又一個靈魂。石化的身軀永遠留在了黑暗之中。"',
+    en: '"The abyss claimed another soul. A petrified body left in darkness, forever."',
   },
 };
 
@@ -62,7 +67,7 @@ function calculateEndScore() {
   if (state.deathCount === 0) s += 8;
   if (state.petri <= 10) s += 5;
   else if (state.petri <= 30) s += 3;
-  var ending = state.flags.r3Ending || 'lockdown';
+  var ending = state.flags.r3Ending || 'death';
   if (ending === 'dawn') s += 5;
   else if (ending === 'sacrifice') s += 4;
   else if (ending === 'compromise') s += 2;
@@ -251,7 +256,7 @@ function generateEndCard() {
   canvas.height = ENDCARD_H;
   var ctx = canvas.getContext('2d');
   var en = state.lang === 'en';
-  var ending = state.flags.r3Ending || 'lockdown';
+  var ending = state.flags.r3Ending || 'death';
   var meta = ENDING_META[ending] || ENDING_META.lockdown;
   var totalScore = calculateEndScore();
   var rarity = getRarity(totalScore);
@@ -320,29 +325,36 @@ function generateEndCard() {
   // ═════════════════════════════════
   var curY = Math.floor(ENDCARD_H * 0.68);
 
-  // ── Player name + ending type ──
+  var cx = ENDCARD_W / 2;
+
+  // ── Player name (centered) ──
   ctx.shadowColor = 'rgba(0,0,0,0.9)';
   ctx.shadowBlur = 8;
   ctx.font = 'bold 32px "Courier New", monospace';
   ctx.fillStyle = '#e8e8f0';
-  ctx.textAlign = 'left';
-  ctx.fillText(state.name, pad, curY);
-
-  ctx.textAlign = 'right';
-  ctx.font = 'bold 22px "Courier New", monospace';
-  ctx.fillStyle = meta.color;
-  ctx.fillText(en ? meta.typeEn : meta.type, ENDCARD_W - pad, curY);
+  ctx.textAlign = 'center';
+  ctx.fillText(state.name, cx, curY);
   ctx.shadowBlur = 0;
 
-  // ── Stats: compact single row ──
-  curY += 32;
+  // ── Ending type (centered, below name) ──
+  curY += 30;
+  ctx.shadowColor = 'rgba(0,0,0,0.9)';
+  ctx.shadowBlur = 6;
+  ctx.font = 'bold 22px "Courier New", monospace';
+  ctx.fillStyle = meta.color;
+  ctx.textAlign = 'center';
+  ctx.fillText(en ? meta.typeEn : meta.type, cx, curY);
+  ctx.shadowBlur = 0;
+
+  // ── Stats (centered) ──
+  curY += 30;
   var statDefs = [
     { label: 'STR', val: state.str },
     { label: 'AGI', val: state.agi },
     { label: 'WIL', val: state.wil },
   ];
   ctx.font = '18px "Courier New", monospace';
-  ctx.textAlign = 'left';
+  ctx.textAlign = 'center';
   ctx.shadowColor = 'rgba(0,0,0,0.7)';
   ctx.shadowBlur = 4;
   var statStr = '';
@@ -351,46 +363,46 @@ function generateEndCard() {
   }
   statStr += 'Lv.' + state.level + '  ' + (en ? 'PETRI ' : '石化 ') + state.petri + '%';
   ctx.fillStyle = '#9a9aaa';
-  ctx.fillText(statStr, pad, curY);
+  ctx.fillText(statStr, cx, curY);
   ctx.shadowBlur = 0;
 
-  // ── Score (large, right side) ──
-  curY += 42;
+  // ── Score + rarity (centered) ──
+  curY += 48;
   ctx.font = 'bold 52px "Courier New", monospace';
   ctx.fillStyle = rarity.color;
-  ctx.textAlign = 'right';
+  ctx.textAlign = 'center';
   if (rarity.stars >= 4) {
     ctx.shadowColor = rarity.color;
     ctx.shadowBlur = 16;
   }
-  ctx.fillText('' + totalScore, ENDCARD_W - pad, curY);
+  ctx.fillText('' + totalScore, cx, curY);
   ctx.shadowBlur = 0;
 
-  // Stars + rarity (left of score)
+  // Stars + rarity (centered, below score)
+  curY += 24;
   var stars = '';
   for (var i = 0; i < rarity.stars; i++) stars += '★';
-  ctx.font = '20px "Courier New", monospace';
-  ctx.textAlign = 'left';
+  ctx.font = '18px "Courier New", monospace';
+  ctx.textAlign = 'center';
   ctx.fillStyle = rarity.color;
   ctx.shadowColor = 'rgba(0,0,0,0.8)';
   ctx.shadowBlur = 4;
-  ctx.fillText(stars + ' ' + (en ? rarity.en : rarity.zh), pad, curY);
+  ctx.fillText(stars + ' ' + (en ? rarity.en : rarity.zh), cx, curY);
   ctx.shadowBlur = 0;
 
   // ═════════════════════════════════
-  //  FOOTER: time + url
+  //  FOOTER: time + url (centered)
   // ═════════════════════════════════
   var footerY = ENDCARD_H - 30;
-  ctx.textAlign = 'left';
-  ctx.font = '14px "Courier New", monospace';
+  ctx.textAlign = 'center';
+  ctx.font = '12px "Courier New", monospace';
   ctx.fillStyle = '#5a5a6a';
-  ctx.fillText('petriabyss.itch.io', pad, footerY);
-
-  ctx.textAlign = 'right';
+  var footerStr = 'petriabyss.itch.io';
   if (typeof globalStats !== 'undefined' && globalStats.currentRunStartMs > 0) {
     var runTime = Date.now() - globalStats.currentRunStartMs;
-    ctx.fillText((en ? 'time ' : '時間 ') + formatTime(runTime), ENDCARD_W - pad, footerY);
+    footerStr += '  ·  ' + (en ? 'time ' : '時間 ') + formatTime(runTime);
   }
+  ctx.fillText(footerStr, cx, footerY);
 
   return canvas;
 }
