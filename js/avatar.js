@@ -246,6 +246,8 @@ function _doHoodSway() {
 }
 
 var _avatarPixelOk = null; // null=untested, true=pixel, false=ascii
+var _avatarPixelSex = null; // track sex to reset on change
+var _avatarLastMood = null; // avoid redundant DOM updates
 
 function _renderAsciiAvatar(mood) {
   var art = AVATAR[state.sex] && AVATAR[state.sex][mood];
@@ -265,6 +267,13 @@ function _renderAsciiAvatar(mood) {
 function renderAvatar() {
   var mood = getAvatarMood();
 
+  // Reset if sex changed (new game)
+  if (_avatarPixelSex !== state.sex) {
+    _avatarPixelOk = null;
+    _avatarPixelSex = state.sex;
+    _avatarLastMood = null;
+  }
+
   // Already confirmed no pixel portrait
   if (_avatarPixelOk === false) { _renderAsciiAvatar(mood); return; }
 
@@ -274,16 +283,18 @@ function renderAvatar() {
     var info = npcPortrait.PORTRAITS[pid];
     if (info) {
       if (_avatarPixelOk === true) {
-        // Already confirmed working, just update mood
-        $avatarBox.innerHTML = '<img src="assets/npc/' + info.file + '" class="avatar-pixel" alt="avatar">';
-        $avatarBox.className = 'avatar-box avatar-box-pixel mood-' + mood;
-        stopIdleAnim();
+        // Only update if mood changed
+        if (_avatarLastMood !== mood) {
+          $avatarBox.className = 'avatar-box avatar-box-pixel mood-' + mood;
+          _avatarLastMood = mood;
+        }
         return;
       }
       // First attempt: test if image loads
       var img = new Image();
       img.onload = function() {
         _avatarPixelOk = true;
+        _avatarLastMood = mood;
         img.className = 'avatar-pixel';
         img.alt = 'avatar';
         $avatarBox.innerHTML = '';
