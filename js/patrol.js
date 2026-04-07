@@ -942,6 +942,245 @@ var R1_EVENTS = [
 
 registerPatrolEvents(1, R1_EVENTS);
 
+// ═══════════════════════════════════════════════════
+//  Narrative Patrol Events — R2 大採石場
+// ═══════════════════════════════════════════════════
+
+var R2_EVENTS = [
+  // ── Event 1: 古代自動販賣機 (幽默+金幣) ──
+  {
+    id: 'r2_vending', flag: '_evt_r2_vending', region: 2,
+    buildQueue: function(queue) {
+      queue.push({ art: '<pre class="ascii-art">\n' +
+        '     ╔══════════════╗\n' +
+        '     ║ ◈ 自動販賣 ◈ ║\n' +
+        '     ╠══════════════╣\n' +
+        '     ║  [?] [?] [?] ║\n' +
+        '     ║  [?] [?] [?] ║\n' +
+        '     ╠══════════════╣\n' +
+        '     ║  ○ 投幣口     ║\n' +
+        '     ║   ═══════    ║\n' +
+        '     ╚══════════════╝\n' +
+        '</pre>', delay: 800 });
+      queue.push({ tag: L('感知','Sense'), color: 'tag-sense',
+        text: L('採石場角落裡有一台機器——造型古舊、佈滿灰塵，但上面的水晶指示燈還在閃爍。它居然還在運作。', 'In the corner of the quarry stands a machine — ancient, dust-covered, but its crystal indicator lights still blink. It\'s still operational.'),
+        delay: 2800 });
+      queue.push({ tag: L('調查','Clue'), color: 'tag-info',
+        text: L('面板上的文字已經模糊，但你認出了幾個古代字符：「投入——獲得——祝你——」。後面的字被石化粉塵蓋住了。', 'The panel\'s text is blurred, but you make out ancient glyphs: "Insert — receive — may you —". The rest is buried under petri-dust.'),
+        delay: 2800 });
+      queue.push({ tag: L('抉擇','Choice'), color: 'tag-event',
+        text: L('投幣口的大小剛好適合你的金幣。', 'The coin slot is just the right size for your gold.'),
+        choices: [
+          { text: (state.flags._gold || 0) >= 5
+              ? L('投入 5 金幣', 'Insert 5 gold')
+              : L('金幣不夠（需要 5 枚）', 'Not enough gold (need 5)'),
+            textEn: (state.flags._gold || 0) >= 5
+              ? 'Insert 5 gold'
+              : 'Not enough gold (need 5)',
+            action: function() {
+              if ((state.flags._gold || 0) < 5) {
+                patrolAppend(L('系統','System'), 'tag-system',
+                  L('你翻遍了口袋，金幣不夠。', 'You search your pockets — not enough gold.'), false);
+                return;
+              }
+              state.flags._gold -= 5;
+              sfx.click();
+              // 50/50 reward or penalty
+              if (Math.random() < 0.5) {
+                var rewards = [
+                  { item: L('HP 藥水','HP Potion'), zh: '一瓶微微發光的藥水從出口滾了出來。', en: 'A faintly glowing potion rolls from the slot.' },
+                  { item: L('黑麵包','Black Bread'), zh: '一塊包裝完好的黑麵包——保存了幾百年居然還能吃？', en: 'A perfectly preserved Black Bread — edible after centuries?' },
+                  { item: L('微光石','Glimmer Stone'), zh: '一顆溫熱的微光石落入你手中。', en: 'A warm Glimmer Stone drops into your hands.' }
+                ];
+                var r = rewards[rng(0, rewards.length - 1)];
+                sfx.item();
+                addItem(r.item);
+                patrolAppend(L('事件','Event'), 'tag-item',
+                  L('機器嗡嗡作響，出口翻板彈開——' + r.zh, 'The machine hums, the delivery flap pops open — ' + r.en), false);
+              } else {
+                sfx.petri();
+                changePetri(2);
+                patrolAppend(L('事件','Event'), 'tag-warn',
+                  L('機器發出一陣刺耳的嘎嘎聲，然後從出口噴出了一團石化粉塵。你吃了金幣，卻只得到一臉灰。', 'The machine rattles harshly, then blasts petri-dust from the slot. It ate your gold and gave you a face full of dust.'), false);
+                patrolAppend(L('系統','System'), 'tag-system',
+                  L('金幣 -5。石化度 +2%。', 'Gold -5. Petrification +2%.'), false);
+              }
+              renderStatus();
+            }
+          },
+          { text: L('不碰它', 'Leave it alone'), textEn: 'Leave it alone',
+            action: function() {
+              patrolAppend(L('巡邏','Patrol'), 'tag-move',
+                L('你離開了販賣機。幾百年前的東西，誰知道裡面還裝著什麼。', 'You leave the machine. Who knows what\'s been sitting inside for centuries.'), false);
+            }
+          }
+        ]
+      });
+    }
+  },
+
+  // ── Event 2: 營火說書人 (調查+情報+羈絆) ──
+  {
+    id: 'r2_storyteller', flag: '_evt_r2_storyteller', region: 2,
+    buildQueue: function(queue) {
+      queue.push({ art: '<pre class="ascii-art">\n' +
+        '         ╱ ╲\n' +
+        '        ╱   ╲\n' +
+        '      ✦╱ ·˚· ╲✦\n' +
+        '    ──╱───────╲──\n' +
+        '      ·  ╱▲╲  ·\n' +
+        '     ·  ╱▲▲▲╲  ·\n' +
+        '    ·  ╱▲▲▲▲▲╲  ·\n' +
+        '       ═══════\n' +
+        '</pre>', delay: 800 });
+      queue.push({ tag: L('感知','Sense'), color: 'tag-sense',
+        text: L('前方有營火的光——不是倖存者營地的那個，而是更小的、更隱蔽的。一個佝僂的老人獨自坐在火旁。', 'Firelight ahead — not the survivor camp\'s, but smaller, more hidden. A hunched old figure sits alone by the flames.'),
+        delay: 2800 });
+      queue.push({ tag: L('感知','Sense'), color: 'tag-sense',
+        text: L('老人看到你也不驚慌，反而朝你招了招手。「來——坐。聽我說個故事。」他的聲音沙啞但平靜。', 'The old man doesn\'t startle at your approach. He waves you over. "Come — sit. Let me tell you a story." His voice is hoarse but calm.'),
+        delay: 3000 });
+      queue.push({ tag: L('抉擇','Choice'), color: 'tag-event',
+        text: L('你要聽嗎？', 'Listen?'),
+        choices: [
+          { text: L('坐下來聽', 'Sit and listen'), textEn: 'Sit and listen',
+            pauseQueue: true,
+            action: function() {
+              state.flags.r2LoreHeard = true;
+              changeHp(5);
+              patrolAppend(L('事件','Event'), 'tag-event',
+                L('你在營火旁坐下。火焰的溫度烤暖了你僵硬的關節。', 'You sit by the fire. Its warmth loosens your stiff joints.'), false);
+              patrolTimers.push(setTimeout(function() {
+                patrolAppend(L('情報','Intel'), 'tag-info',
+                  L('「很久以前，這裡不是洞穴。」老人盯著火焰。「這裡是一座城市。比河城大十倍。他們挖到了一種能量——石化能量。」', '"Long ago, this wasn\'t a cave." The old man stares into the flames. "It was a city. Ten times larger than River Port. They mined an energy — petrification energy."'), false);
+                patrolTimers.push(setTimeout(function() {
+                  patrolAppend(L('情報','Intel'), 'tag-info',
+                    L('「他們用它來造武器、造機器、甚至造長生不老的藥。但他們太貪了——封印破了。能量溢出來，一夜之間，整座城市變成了石頭。」', '"They used it for weapons, machines, even immortality elixirs. But they were too greedy — the seal broke. Energy flooded out, and overnight, the entire city turned to stone."'), false);
+                  patrolTimers.push(setTimeout(function() {
+                    patrolAppend(L('調查','Clue'), 'tag-info',
+                      L('「瘟疫不是天災。」老人看著你。「是人禍。而封印——」他指了指地下的方向。「就在更深的地方。」', '"The plague is no natural disaster." The old man looks at you. "It was man-made. And the seal —" He points downward. "— is deeper still."'), false);
+                    if (state.flags.r1YingCompanion) {
+                      patrolTimers.push(setTimeout(function() {
+                        patrolAppend(L('同伴','Ally'), 'tag-ally',
+                          L('螢在旁邊飛快地記錄著。她的筆尖劃過紙面的聲音在安靜的洞穴裡格外清晰。你看到她的手在微微發抖——不是因為冷。', 'Ying scribbles furiously beside you. The scratch of her pen on paper is crisp in the quiet cave. You see her hand trembling — not from cold.'), false);
+                        patrolTimers.push(setTimeout(function() {
+                          patrolAppend(L('同伴','Ally'), 'tag-ally',
+                            L('她抬頭看你，眼睛裡有你從未見過的表情——不是恐懼，是某種使命感。「這些……必須被記錄下來。」', 'She looks up, eyes holding an expression you\'ve never seen — not fear, but a sense of mission. "This... must be documented."'), false);
+                          endStoryteller();
+                        }, 3000));
+                      }, 2800));
+                    } else {
+                      endStoryteller();
+                    }
+                    function endStoryteller() {
+                      patrolTimers.push(setTimeout(function() {
+                        patrolAppend(L('事件','Event'), 'tag-event',
+                          L('老人笑了笑，站起身來。「好了——故事說完了。路還長，年輕人。」他走進黑暗中，消失得彷彿從未出現過。', 'The old man smiles and rises. "Well — the story\'s done. Long road ahead, young one." He walks into the dark, vanishing as if he\'d never been.'), false);
+                        patrolAppend(L('系統','System'), 'tag-system',
+                          L('HP +5。獲得古代瘟疫線索。', 'HP +5. Gained ancient plague clue.'), false);
+                        renderStatus();
+                        $choices.innerHTML = '';
+                        var sb = document.createElement('button');
+                        sb.className = 'choice-btn'; sb.textContent = L('停下腳步','Stop and rest');
+                        sb.addEventListener('click', stopPatrol); $choices.appendChild(sb);
+                        patrolTimers.push(setTimeout(runPatrolCycle, 2000));
+                      }, 2500));
+                    }
+                  }, 3500));
+                }, 3200));
+              }, 2500));
+            }
+          },
+          { text: L('不信任他，離開', 'Don\'t trust him — leave'), textEn: 'Don\'t trust him — leave',
+            action: function() {
+              patrolAppend(L('巡邏','Patrol'), 'tag-move',
+                L('你遠遠繞開了營火。在深淵裡，陌生人的善意可能是最危險的東西。', 'You give the fire a wide berth. In the abyss, a stranger\'s kindness may be the most dangerous thing of all.'), false);
+            }
+          }
+        ]
+      });
+    }
+  },
+
+  // ── Event 3: 突發地震 (戰鬥+危機) ──
+  {
+    id: 'r2_quake', flag: '_evt_r2_quake', region: 2,
+    buildQueue: function(queue) {
+      queue.push({ tag: L('警告','Alert'), color: 'tag-warn',
+        text: L('腳下的地面突然猛烈晃動。', 'The ground lurches violently beneath your feet.'), sfx: 'hurt',
+        delay: 1500 });
+      queue.push({ art: '<pre class="ascii-art">\n' +
+        '   ～～～～～～～～～～～～～～～\n' +
+        '   ≈≈  ╱╲ 落石 ╱╲  ≈≈\n' +
+        '   ～  ╱  ╲▼▼╱  ╲  ～\n' +
+        '   ≈ ╱    ╲╱    ╲ ≈\n' +
+        '   ═══════════════════\n' +
+        '     ◆你◆   !!!!!!\n' +
+        '</pre>', delay: 800 });
+      queue.push({ tag: L('警告','Alert'), color: 'tag-warn',
+        text: L('地震！巨大的石塊從採石場頂端崩落，粉塵瞬間遮蔽了視線。你的腳下裂開了一道縫——', 'Earthquake! Massive slabs crash from the quarry ceiling, dust blotting out your sight. The ground splits open beneath you —'),
+        delay: 2200 });
+      queue.push({ tag: L('抉擇','Choice'), color: 'tag-event',
+        text: L('你必須立刻反應——', 'React — now!'),
+        choices: [
+          { text: L('跑！ [敏捷]', 'Run! [AGI]'), textEn: 'Run! [AGI]',
+            action: function() {
+              var result = statCheck('agi', 7);
+              if (result !== 'fail') {
+                sfx.pass();
+                patrolAppend(L('事件','Event'), 'tag-event',
+                  L('你拔腿就跑。碎石在你身後轟然落下，氣浪推著你向前滾了兩圈——但你活下來了。', 'You sprint. Rubble crashes behind you, the blast wave rolling you forward — but you\'re alive.'), false);
+                if (result === 'crit') {
+                  state.flags._gold = (state.flags._gold || 0) + 3;
+                  patrolAppend(L('事件','Event'), 'tag-item',
+                    L('灰塵散去後，你發現腳邊有幾枚被震出來的金幣。', 'As the dust clears, you spot coins shaken loose near your feet.'), false);
+                  patrolAppend(L('系統','System'), 'tag-system',
+                    L('金幣 +3。', 'Gold +3.'), false);
+                }
+              } else {
+                sfx.fail();
+                changeHp(-8);
+                patrolAppend(L('事件','Event'), 'tag-warn',
+                  L('你跑得不夠快。一塊碎石砸中了你的背，把你壓倒在地。你掙扎了好一陣才爬出來。', 'Too slow. A slab catches your back, pinning you down. It takes a painful struggle to crawl free.'), false);
+                patrolAppend(L('系統','System'), 'tag-system',
+                  L('HP -8。', 'HP -8.'), false);
+                renderStatus();
+              }
+            }
+          },
+          { text: L('找掩護蹲下！ [力量]', 'Brace for cover! [STR]'), textEn: 'Brace for cover! [STR]',
+            action: function() {
+              var result = statCheck('str', 7);
+              if (result !== 'fail') {
+                sfx.pass();
+                patrolAppend(L('事件','Event'), 'tag-combat',
+                  L('你抱住頭縮到一塊巨石旁。落石砸在你的掩護上，震得你耳鳴——但巨石替你擋住了致命的一擊。', 'You curl up beside a boulder. Rubble hammers your shelter, ringing your ears — but the boulder takes the killing blow for you.'), false);
+                if (result === 'crit') {
+                  gainXp(10);
+                  patrolAppend(L('事件','Event'), 'tag-item',
+                    L('地震裂開的地縫裡露出了一團結晶——高品質的石化結晶，蘊含著能量。', 'The quake\'s fissure reveals a cluster of crystals — high-quality petri-crystals, brimming with energy.'), false);
+                  patrolAppend(L('系統','System'), 'tag-system',
+                    L('經驗 +10。', 'XP +10.'), false);
+                }
+              } else {
+                sfx.fail();
+                changeHp(-12);
+                changePetri(3);
+                patrolAppend(L('事件','Event'), 'tag-warn',
+                  L('你的掩護不夠好。碎石和石化粉塵同時砸向你——等到地震停止時，你渾身都是傷。', 'Your cover isn\'t enough. Rubble and petri-dust bury you — when the quake stops, you\'re bruised all over.'), false);
+                patrolAppend(L('系統','System'), 'tag-system',
+                  L('HP -12。石化度 +3%。', 'HP -12. Petrification +3%.'), false);
+                renderStatus();
+              }
+            }
+          }
+        ]
+      });
+    }
+  }
+];
+
+registerPatrolEvents(2, R2_EVENTS);
+
 // Region-aware helpers — now delegate to registry for R4+ extensibility
 var PATROL_TEXTS = R0_PATROL_TEXTS; // kept for backwards compat
 function getPatrolMonsters() { return getMonsterPool(); }
