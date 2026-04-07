@@ -131,7 +131,20 @@ registerNode('r2_look', () => {
     steps.push({ tag: '探索', tagColor: 'tag-explore', text: '你回到了採石場的瞭望台。暗金色的光芒依舊照亮著這片荒蕪的地下工場。', textEn: 'You return to the quarry overlook. Dark golden light still illuminates this desolate underground works.', delay: 2000 });
   }
 
+  // First-visit passive patrol: danger descriptions before mandatory patrol
+  if (!state.flags.r2PatrolCleared) {
+    steps.push({ tag: '警告', tagColor: 'tag-warn', text: '採石台之間的陰影中傳來低沉的咆哮聲——石化怪物在這片廢墟中築巢。', textEn: 'Low growls echo from shadows between quarry platforms — petrified monsters have nested in these ruins.', delay: 2500 });
+    steps.push({ tag: '感知', tagColor: 'tag-sense', text: '地面上散落著新鮮的爪痕和碎裂的石化結晶。它們很活躍——而且很近。', textEn: 'Fresh claw marks and shattered petri-crystals litter the ground. They\'re active — and close.', delay: 3000 });
+    steps.push({ tag: '判斷', tagColor: 'tag-move', text: '你必須先清除這片區域的威脅，才能安全地探索採石場。', textEn: 'You must clear the threats in this area before safely exploring the quarry.', delay: 2500 });
+  }
+
   autoExplore(steps, (function() {
+    // First visit: mandatory patrol (passive event)
+    if (!state.flags.r2PatrolCleared) {
+      return [{ text: L('穿越採石場的陰影……', 'Push through the quarry shadows...'), textEn: 'Push through the quarry shadows...', action: () => {
+        startPatrol({ firstVisit: true, onDiscovery: function() { stopPatrol(); }});
+      }}];
+    }
     var c = [];
     c.push({ text: '前往採石台', textEn: 'Go to the quarry platform', action: () => loadNode('r2_quarry_floor') });
     c.push({ text: '調查石化機械殘骸', textEn: 'Investigate the petrified machine', action: () => loadNode('r2_machine') });
@@ -3101,17 +3114,7 @@ registerNode('r2_patrol', () => {
     { tag: '判斷', tagColor: 'tag-move', text: '採石場的怪物比迴廊更加兇猛。但你需要更多的戰鬥經驗來面對前方的挑戰。', textEn: 'Quarry monsters are fiercer than those in the corridor. But you need combat experience for the challenges ahead.', delay: 2200 },
     { tag: '感知', tagColor: 'tag-sense', text: '你握緊武器，踏入了採石台之間的暗影。', textEn: 'You grip your weapon and step into the shadows between quarry platforms.', delay: 2000 },
   ], [
-    { text: state.flags.r2PatrolCleared ? L('開始巡邏', 'Begin patrol') : L('深入採石場探索', 'Explore deeper into the quarry'),
-      textEn: state.flags.r2PatrolCleared ? 'Begin patrol' : 'Explore deeper into the quarry',
-      action: () => {
-        if (state.flags.r2PatrolCleared) {
-          startPatrol();
-        } else {
-          startPatrol({ firstVisit: true, onDiscovery: function() {
-            stopPatrol();
-          }});
-        }
-      }},
+    { text: '開始巡邏', textEn: 'Begin patrol', action: () => startPatrol() },
     { text: '返回', textEn: 'Return', action: () => loadNode('r2_look') },
   ], { label: L('準備巡邏', 'Preparing patrol') });
 });

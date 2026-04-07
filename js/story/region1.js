@@ -126,7 +126,20 @@ registerNode('r1_look', () => {
     mapArt,
   ];
 
+  // First-visit passive patrol: danger descriptions before mandatory patrol
+  if (!state.flags.r1PatrolCleared) {
+    steps.push({ tag: '警告', tagColor: 'tag-warn', text: '迴廊深處傳來沉重的拖曳聲——石化生物的領地。', textEn: 'Deep in the corridor, heavy dragging sounds echo — petrified creature territory.', delay: 2500 });
+    steps.push({ tag: '感知', tagColor: 'tag-sense', text: '牆壁上的礦脈突然明暗閃爍，像是在警告什麼。空氣中的石化氣息比任何地方都濃。', textEn: 'Ore veins on the walls flicker light and dark, as if warning you. The petri-concentration here is the thickest yet.', delay: 3000 });
+    steps.push({ tag: '判斷', tagColor: 'tag-move', text: '前方一片未知——你必須先清除威脅，才能安全探索這片迴廊。', textEn: 'The unknown stretches ahead — you must clear threats before safely exploring this corridor.', delay: 2500 });
+  }
+
   autoExplore(steps, (function() {
+    // First visit: mandatory patrol (passive event)
+    if (!state.flags.r1PatrolCleared) {
+      return [{ text: L('深入這片未知的迴廊……', 'Venture into the unknown corridor...'), textEn: 'Venture into the unknown corridor...', action: () => {
+        startPatrol({ firstVisit: true, onDiscovery: function() { stopPatrol(); }});
+      }}];
+    }
     var c = [];
     c.push({ text: '探索北面鍛造間', textEn: 'Explore the forge room to the north', action: () => loadNode('r1_forge') });
     c.push({ text: '查看東面的守衛殘骸', textEn: 'Examine the guardian remains to the east', action: () => loadNode('r1_guard_check') });
@@ -2154,17 +2167,7 @@ registerNode('r1_patrol', () => {
     { tag: '判斷', tagColor: 'tag-move', text: '迴廊中的怪物比坑底更強，但也能提供更好的戰鬥經驗。', textEn: 'Corridor monsters are tougher, but offer better combat experience.', delay: 2000 },
     { tag: '感知', tagColor: 'tag-sense', text: '你握緊武器，沿著礦脈的冷光前進。', textEn: 'You grip your weapon and advance by the cold glow of ore veins.', delay: 2000 },
   ], [
-    { text: state.flags.r1PatrolCleared ? L('開始巡邏', 'Begin patrol') : L('深入迴廊探索', 'Explore deeper into the corridor'),
-      textEn: state.flags.r1PatrolCleared ? 'Begin patrol' : 'Explore deeper into the corridor',
-      action: () => {
-        if (state.flags.r1PatrolCleared) {
-          startPatrol();
-        } else {
-          startPatrol({ firstVisit: true, onDiscovery: function() {
-            stopPatrol();
-          }});
-        }
-      }},
+    { text: '開始巡邏', textEn: 'Begin patrol', action: () => startPatrol() },
     { text: '返回', textEn: 'Return', action: () => loadNode('r1_look') },
   ], { label: L('準備巡邏', 'Preparing patrol') });
 });

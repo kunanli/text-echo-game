@@ -126,7 +126,20 @@ registerNode('r3_look', () => {
     state.flags.r3CouncilUnlocked = true;
   }
 
+  // First-visit passive patrol: danger descriptions before mandatory patrol
+  if (!state.flags.r3PatrolCleared) {
+    steps.push({ tag: '警告', tagColor: 'tag-warn', text: '城市外圍的河岸隧道裡傳來令人不安的聲響——變異生物在那裡築巢。', textEn: 'Unsettling sounds drift from the river tunnels beyond the city\'s edge — mutants have nested there.', delay: 2500 });
+    steps.push({ tag: '感知', tagColor: 'tag-sense', text: '碼頭的守衛告訴你：「外圍隧道很危險，最好先清理一下再進城活動。」', textEn: 'A dock guard warns you: "The outer tunnels are dangerous. Best clear them out before moving around the city."', delay: 3000 });
+    steps.push({ tag: '判斷', tagColor: 'tag-move', text: '你決定先確保城市外圍的安全——這也是熟悉這片區域的好方法。', textEn: 'You decide to secure the city perimeter first — a good way to familiarize yourself with the area.', delay: 2500 });
+  }
+
   autoExplore(steps, (function() {
+    // First visit: mandatory patrol (passive event)
+    if (!state.flags.r3PatrolCleared) {
+      return [{ text: L('進入河岸隧道巡邏……', 'Enter the river tunnels on patrol...'), textEn: 'Enter the river tunnels on patrol...', action: () => {
+        startPatrol({ firstVisit: true, onDiscovery: function() { stopPatrol(); }});
+      }}];
+    }
     var c = [];
     c.push({ text: '碼頭', textEn: 'Dock', action: () => loadNode('r3_dock') });
     c.push({ text: '市場', textEn: 'Market', action: () => loadNode('r3_market') });
@@ -2557,17 +2570,7 @@ registerNode('r3_patrol', () => {
     { tag: '判斷', tagColor: 'tag-move', text: '渡口外圍的河岸隧道裡棲息著各種變異生物。城市的守衛不會巡邏到那裡。', textEn: 'Mutated creatures nest in the river tunnels beyond the docks. City guards don\'t patrol there.', delay: 2200 },
     { tag: '感知', tagColor: 'tag-sense', text: '你握緊武器，踏入了河岸隧道的陰暗深處。', textEn: 'You grip your weapon and step into the dark river tunnels.', delay: 2000 },
   ], [
-    { text: state.flags.r3PatrolCleared ? L('開始巡邏', 'Begin patrol') : L('深入河岸隧道探索', 'Explore deeper into the river tunnels'),
-      textEn: state.flags.r3PatrolCleared ? 'Begin patrol' : 'Explore deeper into the river tunnels',
-      action: () => {
-        if (state.flags.r3PatrolCleared) {
-          startPatrol();
-        } else {
-          startPatrol({ firstVisit: true, onDiscovery: function() {
-            stopPatrol();
-          }});
-        }
-      }},
+    { text: '開始巡邏', textEn: 'Begin patrol', action: () => startPatrol() },
     { text: '返回', textEn: 'Return', action: () => loadNode('r3_look') },
   ], { label: L('準備巡邏', 'Preparing patrol') });
 });

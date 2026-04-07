@@ -239,11 +239,22 @@ registerNode('r0_look', () => {
     mapArt,
   ];
 
+  // First-visit passive patrol: after getting weapon, add danger text before mandatory patrol
+  if (state.flags.corpseSearched && !state.flags.r0PatrolCleared) {
+    steps.push({ tag: '警告', tagColor: 'tag-warn', text: '黑暗中傳來細微的聲響——碎石被什麼東西踩碎的聲音。', textEn: 'Faint sounds in the darkness — something crushing gravel underfoot.', delay: 2500 });
+    steps.push({ tag: '感知', tagColor: 'tag-sense', text: '你的石化紋路隱隱作痛，空氣中的石化粒子突然變得濃厚。這裡……有石化生物在活動。', textEn: 'Your petrification marks throb. Airborne petri-particles suddenly thicken. Petrified creatures... are moving nearby.', delay: 3000 });
+    steps.push({ tag: '判斷', tagColor: 'tag-move', text: '你握緊武器——在探索更多區域之前，必須先確認這片區域的安全。', textEn: 'You grip your weapon — before exploring further, you must secure this area first.', delay: 2500 });
+  }
+
   autoExplore(steps, (function() {
+    // If weapon obtained but patrol not cleared → mandatory patrol (passive event)
+    if (state.flags.corpseSearched && !state.flags.r0PatrolCleared) {
+      return [{ text: L('在黑暗中小心前進……', 'Advance cautiously through the darkness...'), textEn: 'Advance cautiously through the darkness...', action: () => {
+        startPatrol({ firstVisit: true, onDiscovery: function() { stopPatrol(); }});
+      }}];
+    }
     var c = [];
-    if (state.flags.corpseSearched) {
-      c.push({ text: '在坑底四處警戒', textEn: 'Stay alert and patrol the pit', action: () => loadNode('r0_patrol') });
-    } else {
+    if (!state.flags.corpseSearched) {
       c.push({ text: '查看西側的屍體和石化人形', textEn: 'Examine the corpse and petrified figures', action: () => loadNode('r0_corpse') });
     }
     c.push({ text: '查看北面攀爬痕跡', textEn: 'Check the climbing marks to the north', action: () => loadNode('r0_climb_check') });
@@ -263,6 +274,10 @@ registerNode('r0_look', () => {
     }
     if (!state.flags.r0MuralSeen) {
       c.push({ text: '岩壁上似乎刻著什麼圖案', textEn: 'Patterns carved into the rock wall', action: () => loadNode('r0_mural') });
+    }
+    // Patrol option only available after first patrol cleared
+    if (state.flags.r0PatrolCleared) {
+      c.push({ text: '在坑底四處警戒', textEn: 'Stay alert and patrol the pit', action: () => loadNode('r0_patrol') });
     }
     // Ferryman route — always visible, but blocked if no ending achieved
     c.push({ text: '◇ 走向深處傳來的低語……', textEn: '◇ Follow the whispers from below...', action: () => loadNode('r0_ferryman_gate') });
@@ -302,17 +317,7 @@ registerNode('r0_patrol', () => {
 </pre>` },
     { tag: '感知', tagColor: 'tag-sense', text: '你握緊武器，壓低身體，沿著洞穴邊緣摸索前進。', textEn: 'You grip your weapon, crouch low, and creep along the cave walls.', delay: 2000 },
   ], [
-    { text: state.flags.r0PatrolCleared ? L('深入警戒搜索', 'Begin patrol sweep') : L('深入坑底探索', 'Explore deeper into the pit'),
-      textEn: state.flags.r0PatrolCleared ? 'Begin patrol sweep' : 'Explore deeper into the pit',
-      action: () => {
-        if (state.flags.r0PatrolCleared) {
-          startPatrol();
-        } else {
-          startPatrol({ firstVisit: true, onDiscovery: function() {
-            stopPatrol();
-          }});
-        }
-      }},
+    { text: '深入警戒搜索', textEn: 'Begin patrol sweep', action: () => startPatrol() },
     { text: '返回', textEn: 'Return', action: () => loadNode('r0_look') },
   ], { label: L('準備巡邏', 'Preparing patrol') });
 });
