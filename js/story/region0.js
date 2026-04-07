@@ -250,7 +250,23 @@ registerNode('r0_look', () => {
     // If weapon obtained but patrol not cleared → mandatory patrol (passive event)
     if (state.flags.corpseSearched && !state.flags.r0PatrolCleared) {
       return [{ text: L('在黑暗中小心前進……', 'Advance cautiously through the darkness...'), textEn: 'Advance cautiously through the darkness...', action: () => {
-        startPatrol({ firstVisit: true, onDiscovery: function() { stopPatrol(); }});
+        startPatrol({ firstVisit: true, onDiscovery: function() { stopPatrol(); },
+          firstVisitEvents: [
+            // Cycle 2: Find a hidden survivor's cache in the rubble
+            { cycle: 2, buildQueue: function(queue) {
+              queue.push({ tag: L('感知','Sense'), color: 'tag-sense',
+                text: L('你踢到了什麼硬物——碎石堆下藏著一個已經半碎的木箱。', 'You kick something hard — a half-broken crate hidden under rubble.'),
+                delay: 2500, pending: true });
+              queue.push({ tag: L('發現','Find'), color: 'tag-item',
+                text: L('箱子裡有一些前人留下的物資——看來之前有人在這裡試圖生存過。', 'Inside: supplies left by someone who tried to survive here.'),
+                delay: 2200 });
+              queue.push({ tag: L('物品','Item'), color: 'tag-item',
+                text: L('獲得黑麵包 × 1，HP +10', 'Obtained Black Bread × 1, HP +10'),
+                delay: 1500, sfx: 'item',
+                effect: function() { addItem(L('黑麵包', 'Black Bread')); changeHp(10); renderStatus(); } });
+            }}
+          ]
+        });
       }}];
     }
     var c = [];

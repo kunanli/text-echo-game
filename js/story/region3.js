@@ -137,7 +137,55 @@ registerNode('r3_look', () => {
     // First visit: mandatory patrol (passive event)
     if (!state.flags.r3PatrolCleared) {
       return [{ text: L('進入河岸隧道巡邏……', 'Enter the river tunnels on patrol...'), textEn: 'Enter the river tunnels on patrol...', action: () => {
-        startPatrol({ firstVisit: true, onDiscovery: function() { stopPatrol(); }});
+        startPatrol({ firstVisit: true, onDiscovery: function() { stopPatrol(); },
+          firstVisitEvents: [
+            // Cycle 2: A dock guard is overwhelmed by mutants
+            { cycle: 2, buildQueue: function(queue) {
+              queue.push({ tag: L('感知','Sense'), color: 'tag-sense',
+                text: L('隧道深處傳來金屬碰撞聲和喊叫聲——有人在戰鬥。', 'Clanging metal and shouts echo from deep in the tunnel — someone is fighting.'),
+                delay: 2500, pending: true });
+              queue.push({ tag: L('遭遇','Encounter'), color: 'tag-combat',
+                text: L('一個碼頭守衛被三隻變異水蛭包圍，長矛已經折斷了一半。', 'A dock guard is surrounded by three mutant leeches, his spear half-broken.'),
+                delay: 2800, pending: true });
+              queue.push({
+                text: L('你要怎麼做？', 'What do you do?'),
+                choices: [
+                  { text: L('加入戰鬥！', 'Join the fight!'), textEn: 'Join the fight!', action: function() {
+                    sfx.hit();
+                    patrolAppend(L('戰鬥','Battle'), 'tag-combat',
+                      L('你從側翼殺入——兩面夾擊之下，水蛭們四散逃竄！', 'You strike from the flank — caught in a pincer, the leeches scatter!'), false);
+                    changeHp(-4); renderStatus();
+                    setTimeout(function() {
+                      patrolAppend(L('對話','Dialogue'), 'tag-info',
+                        L('守衛喘著氣：「多謝……你是外面來的？議會的銅鐘大人應該會想見你。碼頭和市場先逛逛，打聽打聽情況。」',
+                          '"Thanks... You\'re from outside? Councilor Bronze Bell would want to meet you. Check out the dock and market first, get the lay of the land."'), false);
+                      state.flags.r3GuardSaved = true;
+                      gainXp(5);
+                      renderStatus();
+                      patrolTimers.push(setTimeout(runPatrolCycle, 3000));
+                    }, 2800);
+                  }},
+                  { text: L('繞路避開', 'Take a detour'), textEn: 'Take a detour', action: function() {
+                    patrolAppend(L('感知','Sense'), 'tag-sense',
+                      L('你悄悄繞開了戰場。身後傳來守衛的慘叫聲——但你不能冒險。',
+                        'You quietly skirt the battlefield. The guard\'s screams echo behind you — but you can\'t take the risk.'), false);
+                    patrolTimers.push(setTimeout(runPatrolCycle, 2000));
+                  }}
+                ]
+              });
+            }},
+            // Cycle 4: Find contraband near the tunnels
+            { cycle: 4, buildQueue: function(queue) {
+              queue.push({ tag: L('發現','Find'), color: 'tag-explore',
+                text: L('隧道壁的暗洞裡藏著一個油布包裹——裡面是走私物資。', 'A hidden alcove in the tunnel wall holds an oilcloth bundle — smuggled goods.'),
+                delay: 2800, pending: true });
+              queue.push({ tag: L('物品','Item'), color: 'tag-item',
+                text: L('你找到了一瓶淨化液。也許是灰鶴的存貨？', 'You find a purification vial. Grey Crane\'s stash, perhaps?'),
+                delay: 2000, sfx: 'item',
+                effect: function() { addItem(L('淨化液', 'Purification Vial')); renderStatus(); } });
+            }}
+          ]
+        });
       }}];
     }
     var c = [];

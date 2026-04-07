@@ -137,7 +137,93 @@ registerNode('r1_look', () => {
     // First visit: mandatory patrol (passive event)
     if (!state.flags.r1PatrolCleared) {
       return [{ text: L('深入這片未知的迴廊……', 'Venture into the unknown corridor...'), textEn: 'Venture into the unknown corridor...', action: () => {
-        startPatrol({ firstVisit: true, onDiscovery: function() { stopPatrol(); }});
+        startPatrol({ firstVisit: true, onDiscovery: function() { stopPatrol(); },
+          firstVisitEvents: [
+            // Cycle 2: Encounter Grey Crane being cornered by a stone creature
+            { cycle: 2, buildQueue: function(queue) {
+              queue.push({ tag: L('感知','Sense'), color: 'tag-sense',
+                text: L('前方傳來一聲尖叫——不是石化生物的吼聲，而是人類的呼喊。', 'A scream ahead — not a monster\'s roar, but a human cry.'),
+                delay: 2500, pending: true });
+              queue.push({ tag: L('遭遇','Encounter'), color: 'tag-combat',
+                text: L('你加快腳步——轉過拐角，一個穿著補丁斗篷的女人被兩隻石化蜥蜴逼到了死角！', 'You quicken your pace — rounding a corner, a woman in a patched cloak is cornered by two stone lizards!'),
+                delay: 3000, pending: true, sfx: 'click' });
+              queue.push({
+                text: L('你要怎麼做？', 'What do you do?'),
+                choices: [
+                  { text: L('衝上去幫忙！', 'Rush in to help!'), textEn: 'Rush in to help!', action: function() {
+                    var result = statCheck('str', 6);
+                    sfx.hit();
+                    if (result !== 'fail') {
+                      patrolAppend(L('戰鬥','Battle'), 'tag-combat',
+                        L('你從側面猛撲過去，一刀劈向最近的蜥蜴——它痛苦地嘶叫著向後退去！另一隻見狀也轉身逃竄。',
+                          'You lunge from the side, slashing the nearest lizard — it shrieks and retreats! The other flees at the sight.'), false);
+                    } else {
+                      patrolAppend(L('戰鬥','Battle'), 'tag-combat',
+                        L('你衝上去揮出一擊——沒打中！但你的出現嚇退了蜥蜴，它們嘶叫著退入黑暗。你被蜥蜴尾巴掃了一下。',
+                          'You charge and swing — miss! But your presence scares them off. A tail swipe catches you.'), false);
+                      changeHp(-5); renderStatus();
+                    }
+                    state.flags.r1WandererMet = true;
+                    state.flags.r1CranePatrolRescue = true;
+                    setTimeout(function() {
+                      patrolAppend(L('遭遇','Encounter'), 'tag-explore',
+                        L('女人直起身，拍了拍斗篷上的灰塵。她看起來出奇地冷靜。',
+                          'The woman straightens up and dusts off her cloak. She looks remarkably calm.'), false);
+                      setTimeout(function() {
+                        patrolAppend(L('對話','Dialogue'), 'tag-info',
+                          L('「……謝了。我叫灰鶴，在這些礦道裡討生活的。」她瞥了你一眼，「你不像是礦工。」',
+                            '"...Thanks. I\'m Grey Crane. I make my living in these mines." She eyes you. "You don\'t look like a miner."'), false);
+                        setTimeout(function() {
+                          patrolAppend(L('對話','Dialogue'), 'tag-info',
+                            L('「走吧，這裡不安全。如果你往深處走，鐵軌旁能找到我——我有東西可以跟你交易。」',
+                              '"Let\'s go, it\'s not safe here. If you head deeper, find me by the rails — I\'ve got things to trade."'), false);
+                          sfx.item();
+                          addItem(L('黑麵包', 'Black Bread'));
+                          notify(L('灰鶴給了你一塊黑麵包', 'Grey Crane gave you Black Bread'));
+                          renderStatus();
+                          patrolTimers.push(setTimeout(runPatrolCycle, 2500));
+                        }, 2500);
+                      }, 2800);
+                    }, 2000);
+                  }},
+                  { text: L('在暗處觀察', 'Watch from the shadows'), textEn: 'Watch from the shadows', action: function() {
+                    patrolAppend(L('感知','Sense'), 'tag-sense',
+                      L('你躲在柱子後面觀望——女人突然從斗篷下抽出一把短刀，精準地刺中蜥蜴的腹部。另一隻嘶叫著逃走了。',
+                        'You hide behind a pillar — the woman suddenly draws a short blade from her cloak, stabbing the lizard\'s belly with precision. The other flees shrieking.'), false);
+                    state.flags.r1WandererMet = true;
+                    setTimeout(function() {
+                      patrolAppend(L('感知','Sense'), 'tag-sense',
+                        L('她收刀入鞘，朝你藏身的方向看了一眼：「出來吧。我知道你在那裡。」',
+                          'She sheathes her blade and glances your way: "Come out. I know you\'re there."'), false);
+                      setTimeout(function() {
+                        patrolAppend(L('對話','Dialogue'), 'tag-info',
+                          L('「叫我灰鶴。」她沒有敵意，「你要是往深處走，鐵軌旁能找到我。」',
+                            '"Call me Grey Crane." No hostility. "Head deeper and find me by the rails."'), false);
+                        renderStatus();
+                        patrolTimers.push(setTimeout(runPatrolCycle, 2500));
+                      }, 2500);
+                    }, 2800);
+                  }}
+                ]
+              });
+            }},
+            // Cycle 4: Find traces of someone else (Ying foreshadowing)
+            { cycle: 4, buildQueue: function(queue) {
+              queue.push({ tag: L('感知','Sense'), color: 'tag-sense',
+                text: L('地上有一張被撕下的紙頁，邊緣沾著新鮮的墨漬。上面畫著精確的礦脈分佈圖。',
+                  'A torn page on the ground, edges stained with fresh ink. It bears a precise ore vein map.'),
+                delay: 2800, pending: true });
+              queue.push({ tag: L('感知','Sense'), color: 'tag-sense',
+                text: L('紙頁還是溫的——有人剛剛從這裡經過。一個纖細的身影？',
+                  'The page is still warm — someone passed through here moments ago. A slender figure?'),
+                delay: 2500 });
+              queue.push({ tag: L('情報','Intel'), color: 'tag-info',
+                text: L('你將紙頁折好收起。也許之後能找到這個人。',
+                  'You fold the page and pocket it. Perhaps you\'ll find this person later.'),
+                delay: 2000, effect: function() { state.flags.r1YingHintSeen = true; gainXp(3); } });
+            }}
+          ]
+        });
       }}];
     }
     var c = [];

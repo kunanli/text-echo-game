@@ -142,7 +142,57 @@ registerNode('r2_look', () => {
     // First visit: mandatory patrol (passive event)
     if (!state.flags.r2PatrolCleared) {
       return [{ text: L('穿越採石場的陰影……', 'Push through the quarry shadows...'), textEn: 'Push through the quarry shadows...', action: () => {
-        startPatrol({ firstVisit: true, onDiscovery: function() { stopPatrol(); }});
+        startPatrol({ firstVisit: true, onDiscovery: function() { stopPatrol(); },
+          firstVisitEvents: [
+            // Cycle 2: Encounter a wounded miner fleeing from monsters
+            { cycle: 2, buildQueue: function(queue) {
+              queue.push({ tag: L('感知','Sense'), color: 'tag-sense',
+                text: L('前方傳來急促的腳步聲——有人在逃跑。', 'Hurried footsteps ahead — someone is running.'),
+                delay: 2500, pending: true });
+              queue.push({ tag: L('遭遇','Encounter'), color: 'tag-explore',
+                text: L('一個滿身血汙的礦工跌跌撞撞地衝過來：「快跑——後面有東西追我！」',
+                  'A blood-covered miner stumbles toward you: "Run — something\'s chasing me!"'),
+                delay: 3000, pending: true });
+              queue.push({
+                text: L('你要怎麼做？', 'What do you do?'),
+                choices: [
+                  { text: L('護送他離開', 'Escort him to safety'), textEn: 'Escort him to safety', action: function() {
+                    sfx.hit();
+                    patrolAppend(L('戰鬥','Battle'), 'tag-combat',
+                      L('追兵是一隻石化蠍子——你擋在礦工前面，將它擊退！',
+                        'The pursuer: a petrified scorpion — you stand your ground and drive it back!'), false);
+                    changeHp(-3); renderStatus();
+                    setTimeout(function() {
+                      patrolAppend(L('對話','Dialogue'), 'tag-info',
+                        L('「謝、謝謝你……橋對面有營地，鐵霜大姐在那裡。你要是受傷了，可以去找清露醫師。」',
+                          '"Th-thank you... There\'s a camp across the bridge. Boss Iron Frost is there. If you\'re hurt, find Doctor Dew."'), false);
+                      state.flags.r2CampHinted = true;
+                      gainXp(5);
+                      renderStatus();
+                      patrolTimers.push(setTimeout(runPatrolCycle, 2500));
+                    }, 2800);
+                  }},
+                  { text: L('讓他自己跑', 'Let him run on his own'), textEn: 'Let him run on his own', action: function() {
+                    patrolAppend(L('感知','Sense'), 'tag-sense',
+                      L('礦工頭也不回地跑遠了。你獨自面對了追來的石化蠍子。', 'The miner flees without looking back. You face the pursuing scorpion alone.'), false);
+                    sfx.hit();
+                    changeHp(-5); renderStatus();
+                    patrolTimers.push(setTimeout(runPatrolCycle, 2000));
+                  }}
+                ]
+              });
+            }},
+            // Cycle 4: Spot campfire in the distance
+            { cycle: 4, buildQueue: function(queue) {
+              queue.push({ tag: L('發現','Discovery'), color: 'tag-explore',
+                text: L('你登上一塊巨石——遠處的黑暗中，有一團微弱的火光在搖曳。', 'You climb a boulder — far off in the darkness, a faint fire flickers.'),
+                delay: 2800, pending: true });
+              queue.push({ tag: L('情報','Intel'), color: 'tag-info',
+                text: L('那裡……有人的營地？在這個深度居然還有倖存者。', 'A camp... there? Survivors at this depth.'),
+                delay: 2200, effect: function() { state.flags.r2CampHinted = true; } });
+            }}
+          ]
+        });
       }}];
     }
     var c = [];

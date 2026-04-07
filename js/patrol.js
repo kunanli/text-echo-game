@@ -1426,6 +1426,8 @@ var _patrolCycles = 0;
 var _patrolFirstVisit = false;
 var _patrolDiscoveryShown = false;
 var _patrolOnDiscovery = null;  // callback when player chooses to leave on first visit
+var _firstPatrolEvents = [];    // special events during first-visit patrol
+var _firstPatrolDiscoveryCycle = 3; // cycle threshold for discovery prompt
 
 // Discovery texts per region (shown after N cycles on first visit)
 var DISCOVERY_TEXTS = {
@@ -1477,6 +1479,18 @@ function startPatrol(opts) {
   _patrolFirstVisit = !!opts.firstVisit;
   _patrolDiscoveryShown = false;
   _patrolOnDiscovery = opts.onDiscovery || null;
+  // First-visit special events
+  _firstPatrolEvents = (opts.firstVisitEvents || []).map(function(e) {
+    return { cycle: e.cycle, buildQueue: e.buildQueue, flag: e.flag || null, triggered: false };
+  });
+  // Discovery cycle: after last event + 2 combats, or default 3
+  if (_patrolFirstVisit && _firstPatrolEvents.length > 0) {
+    var maxCycle = 0;
+    _firstPatrolEvents.forEach(function(e) { if (e.cycle > maxCycle) maxCycle = e.cycle; });
+    _firstPatrolDiscoveryCycle = maxCycle + 2;
+  } else {
+    _firstPatrolDiscoveryCycle = 3;
+  }
   state.mood = 'combat';
   ambientAudio.setCombat(true);
   renderStatus();
@@ -1720,11 +1734,23 @@ function showPatrolDiscovery() {
 function runPatrolCycle() {
   if (!patrolActive) return;
 
-  // First-visit discovery prompt after 3 combat cycles
   _patrolCycles++;
-  if (_patrolFirstVisit && !_patrolDiscoveryShown && _patrolCycles > 3) {
-    showPatrolDiscovery();
-    return;
+
+  // First-visit special events at specific cycles
+  if (_patrolFirstVisit) {
+    for (var ei = 0; ei < _firstPatrolEvents.length; ei++) {
+      var fvEvt = _firstPatrolEvents[ei];
+      if (!fvEvt.triggered && _patrolCycles === fvEvt.cycle) {
+        fvEvt.triggered = true;
+        runNarrativeEvent(fvEvt);
+        return;
+      }
+    }
+    // Discovery prompt after all events + buffer cycles
+    if (!_patrolDiscoveryShown && _patrolCycles > _firstPatrolDiscoveryCycle) {
+      showPatrolDiscovery();
+      return;
+    }
   }
 
   // ── 25% chance to trigger a narrative event instead of combat ──
