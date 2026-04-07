@@ -1524,8 +1524,29 @@ registerNode('r2_boss', () => {
     { tag: '遭遇', tagColor: 'tag-combat', html: '一個巨大的身影從黑暗中走出——<b>石化巨像</b>。曾經的三號戰甲駕駛員，如今已與機甲融為一體。', htmlEn: 'A massive figure emerges from the darkness — the <b>Petrified Colossus</b>. Once the No.3 mech pilot, now fused with the machine.', delay: 2800 },
     { tag: '遭遇', tagColor: 'tag-combat', text: '它發出一聲低沉的咆哮——半是機械的轟鳴，半是人類的痛苦。', textEn: 'It lets out a deep roar — half mechanical grinding, half human agony.', delay: 2200 },
     { tag: '遭遇', tagColor: 'tag-combat', text: '鐵霜舉起石錘：「——來吧。」', textEn: 'Iron Frost raises her hammer: "— Come."', delay: 1800 },
-  ], [
-    { text: '戰鬥！', textEn: 'Fight!', action: () => {
+  ], (function() {
+    var c = [];
+    // NG+ exclusive: call out Cheng Gang by name to skip boss fight
+    if (state.flags.ngPlus) {
+      c.push({ text: '「承鋼——是你嗎？」', textEn: '"Cheng Gang — is that you?"', action: () => {
+        autoExplore([
+          { tag: '記憶', tagColor: 'tag-petri', text: '你叫出了那個名字。不是猜測——你記得。在另一段生命中，你曾從這具石化的軀殼裡救出他。', textEn: 'You call out the name. Not a guess — you remember. In another life, you pulled him from this petrified shell.', delay: 3200 },
+          { tag: '感知', tagColor: 'tag-sense', text: '巨像停住了。它巨大的身軀劇烈顫抖，機械的關節發出刺耳的尖叫。', textEn: 'The colossus freezes. Its massive frame shudders violently, joints screeching.', delay: 2800 },
+          { tag: '對話', tagColor: 'tag-npc', text: '「……你……怎麼……知道……」一個微弱但清晰的聲音從石化外殼深處傳來。不是咆哮——是人話。', textEn: '"...How...do you...know..." A faint but clear voice emerges from deep within the shell. Not a roar — human words.', delay: 3200 },
+          { tag: '感知', tagColor: 'tag-sense', text: '巨像緩緩跪了下來。石化的外殼開始崩裂，露出裡面蜷縮的人形。鐵霜扔下石錘衝了上去。', textEn: 'The colossus slowly kneels. Its shell cracks apart, revealing the curled figure within. Iron Frost drops her hammer and rushes forward.', delay: 3500 },
+          { tag: '情報', tagColor: 'tag-info', text: '「……你終於回來了。」鐵霜的聲音在發抖。她抱著那個瘦弱的男人，石化的手指小心翼翼地撫過他的臉。', textEn: '"...You\'re finally back." Iron Frost\'s voice trembles. She holds the frail man, petrified fingers carefully tracing his face.', delay: 3200 },
+          { tag: '效果', tagColor: 'tag-system', text: L('跳過 Boss 戰！經驗 +40 | 饒恕承鋼', 'Boss fight skipped! XP +40 | Spared Cheng Gang'), delay: 2000, effect: () => {
+            gainXp(40);
+            state.flags.r2BossDefeated = true;
+            state.flags.r2BossSpared = true;
+            state.flags.r2NgPlusBossSkip = true;
+          }},
+        ], [
+          { text: '繼續', textEn: 'Continue', action: () => loadNode('r2_gate') },
+        ], { label: L('前世的記憶', 'Memory of a past life') });
+      }});
+    }
+    c.push({ text: '戰鬥！', textEn: 'Fight!', action: () => {
       startCombat(BOSS, function() {
         // Victory
         state.flags.r2BossDefeated = true;
@@ -1537,8 +1558,9 @@ registerNode('r2_boss', () => {
         // Flee
         loadNode('r2_camp');
       });
-    }},
-  ], { label: L('石化巨像', 'Petrified Colossus') });
+    }});
+    return c;
+  })(), { label: L('石化巨像', 'Petrified Colossus') });
 });
 
 // ── Gate to Region 3 ──
@@ -3618,3 +3640,4 @@ registerNode('r2_cheng_cure', () => {
       }},
   ], { label: L('石化的治癒', 'Curing petrification') });
 });
+

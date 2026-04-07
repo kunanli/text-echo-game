@@ -584,6 +584,26 @@ registerNode('r3_bell', () => {
 
   autoExplore(steps, (function() {
     var c = [];
+    // NG+ exclusive: show past-life knowledge of Bell's quests
+    if (state.flags.ngPlus && !state.flags.r3BellReport) {
+      c.push({ text: '「清除隧道、灰鶴作證、瘟疫證據——對吧？」', textEn: '"Clear the tunnels, Crane\'s testimony, plague evidence — right?"', action: () => {
+        autoExplore([
+          { tag: '記憶', tagColor: 'tag-petri', text: '你不等她開口就說出了三個任務的內容。每一個字都精準得像是從她的嘴裡聽過一樣——因為你確實聽過。', textEn: 'You speak before she can. Every word precise, as if you\'d heard them from her lips — because you have.', delay: 3200 },
+          { tag: '感知', tagColor: 'tag-sense', text: '銅鐘的表情變了。第一次——你看到她露出了真正的驚訝。不是演的。', textEn: 'Bronze Bell\'s expression shifts. For the first time — genuine surprise. Not performed.', delay: 2800 },
+          { tag: '對話', tagColor: 'tag-npc', text: '「……你怎麼知道的？」她的聲音壓低了半度。琥珀色的眼睛死死盯著你，像是在分辨你是間諜還是別的什麼。', textEn: '"...How do you know that?" Her voice drops half a register. Amber eyes lock on you, trying to determine if you\'re a spy or something else.', delay: 3200 },
+          { tag: '對話', tagColor: 'tag-npc', text: '你沒有解釋。有些事情，解釋了反而更可疑。', textEn: 'You don\'t explain. Some things sound even more suspicious when explained.', delay: 2200 },
+          { tag: '感知', tagColor: 'tag-sense', text: '沉默了很久。然後銅鐘做了一件你意料之外的事——她笑了。很淡，但是真的。', textEn: 'A long silence. Then Bronze Bell does something unexpected — she smiles. Faint, but real.', delay: 2800 },
+          { tag: '對話', tagColor: 'tag-npc', text: '「有意思。你要麼是最精明的間諜——要麼是最奇怪的盟友。」她拿起筆。「好。既然你知道了——去做吧。用行動證明你不只是會說對的話。」', textEn: '"Interesting. You\'re either the shrewdest spy — or the strangest ally." She picks up her pen. "Fine. Since you know — go do it. Prove you\'re more than just someone who says the right words."', delay: 3500 },
+          { tag: '效果', tagColor: 'tag-system', text: L('銅鐘印象深刻 | 任務已接受', 'Bronze Bell is intrigued | Quests accepted'), delay: 1500, effect: () => {
+            state.flags.r3BellReport = true;
+            state.flags.r3BellQuest = true;
+            state.flags.r3NgPlusBellShock = true;
+          }},
+        ], [
+          { text: '（轉身離開。你知道該做什麼。）', textEn: '(Turn and leave. You know what to do.)', action: () => loadNode('r3_look') },
+        ], { label: L('前世的記憶', 'Memory of a past life') });
+      }});
+    }
     if (!state.flags.r3BellReport) {
       c.push({ text: '告訴她下面的情況', textEn: 'Report on conditions below', action: () => {
         state.flags.r3BellReport = true;
@@ -2366,6 +2386,27 @@ registerNode('r3_boss', () => {
 
   autoExplore(steps, (function() {
     var c = [];
+    // NG+ exclusive: use past-life knowledge + plague evidence to bypass boss
+    if (state.flags.ngPlus && state.flags.r3PlagueProof) {
+      c.push({ text: '「隊長，封鎖通道救不了任何人。我有證據。」', textEn: '"Captain, sealing the passages saves no one. I have proof."', action: () => {
+        autoExplore([
+          { tag: '記憶', tagColor: 'tag-petri', text: '你從懷中取出瘟疫起源的證據，遞到鏽刃面前。你的動作很平靜——因為你知道接下來會發生什麼。', textEn: 'You draw the plague origin evidence and hold it before Rust Blade. Your movements are calm — because you know what comes next.', delay: 3000 },
+          { tag: '對話', tagColor: 'tag-npc', text: '「瘟疫不是從下面來的。是你們的人——議會特派員孔德業炸開封印導致的。」', textEn: '"The plague didn\'t come from below. It was your people — Council envoy Kong Deye who blew the seal."', delay: 3200 },
+          { tag: '感知', tagColor: 'tag-sense', text: '鏽刃的手在發抖。不是因為憤怒——是因為他知道你說的是真的。', textEn: 'Rust Blade\'s hand shakes. Not from anger — because he knows you\'re telling the truth.', delay: 2800 },
+          { tag: '對話', tagColor: 'tag-npc', text: '「……你怎麼知道的？」他低聲問。劍尖已經落到了地面。', textEn: '"...How do you know all this?" he whispers. His sword tip has dropped to the floor.', delay: 2500 },
+          { tag: '對話', tagColor: 'tag-npc', text: '你沒有回答。有些答案太荒謬了——「我上輩子經歷過」不是一個能讓人信服的理由。', textEn: 'You don\'t answer. Some answers are too absurd — "I lived through this before" isn\'t convincing.', delay: 2800 },
+          { tag: '感知', tagColor: 'tag-sense', text: '鏽刃看著證據，沉默了很久。然後他收起劍，讓開了路。', textEn: 'Rust Blade studies the evidence, silent for a long time. Then he sheathes his sword and steps aside.', delay: 2800 },
+          { tag: '對話', tagColor: 'tag-npc', text: '「進去吧。」他的聲音很疲憊。「告訴他們……告訴他們我也知道了。」', textEn: '"Go." His voice is weary. "Tell them... tell them I know now too."', delay: 2800 },
+          { tag: '效果', tagColor: 'tag-system', text: L('跳過 Boss 戰！經驗 +25 | 鏽刃讓路', 'Boss fight skipped! XP +25 | Rust Blade steps aside'), delay: 2000, effect: () => {
+            gainXp(25);
+            state.flags.r3BossDefeated = true;
+            state.flags.r3BossMethod = 'ngplus_evidence';
+          }},
+        ], [
+          { text: '踏入議會大廳', textEn: 'Enter the Council chamber', action: () => loadNode('r3_vote') },
+        ], { label: L('前世的記憶', 'Memory of a past life') });
+      }});
+    }
     c.push({ text: '戰鬥！', textEn: 'Fight!', action: () => {
       startCombat(BOSS, function() {
         state.flags.r3BossDefeated = true;

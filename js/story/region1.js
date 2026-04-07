@@ -1510,11 +1510,28 @@ registerNode('r1_ying_encounter', () => {
   ].concat(state.flags.ngPlus ? [
     { tag: '記憶', tagColor: 'tag-petri', text: '一股強烈的既視感湧上心頭——你見過' + yingPronoun + '。在某個不屬於這裡的記憶中。', textEn: 'A powerful sense of déjà vu hits — you\'ve seen ' + (isMale ? 'her' : 'him') + ' before. In a memory that doesn\'t belong here.', delay: 2800 },
     { tag: '感知', tagColor: 'tag-sense', text: yingPronoun + '似乎也察覺到了什麼，微微皺眉：「……你的眼神很奇怪。好像……認識我？」', textEn: (isMale ? 'She' : 'He') + ' seems to notice something too, frowning slightly: "...Your eyes are strange. As if... you know me?"', delay: 3000 },
-  ] : []), [
-    { text: '我叫' + state.name + '，我也在找瘟疫的真相', textEn: 'I\'m ' + state.name + '. I\'m searching for the truth too', action: () => loadNode('r1_ying_truth') },
-    { text: '這裡很危險，你怎麼一個人？', textEn: 'It\'s dangerous here. Why are you alone?', action: () => loadNode('r1_ying_alone') },
-    { text: '保持沉默，點了點頭', textEn: 'Stay silent and nod', action: () => loadNode('r1_ying_silent') },
-  ], { label: L('遭遇記錄員', 'Meeting the chronicler') });
+  ] : []), (function() {
+    var c = [];
+    if (state.flags.ngPlus) {
+      c.push({ text: '「我認識你。」', textEn: '"I know you."', action: () => {
+        var yP = (state.sex === 'male') ? L('她', 'she') : L('他', 'he');
+        var yPC = (state.sex === 'male') ? 'She' : 'He';
+        autoExplore([
+          { tag: '記憶', tagColor: 'tag-petri', text: '你脫口而出。不是猜測——是確信。你知道' + yP + '的名字，知道' + yP + '手冊裡寫的東西，知道' + yP + '在月光下的樣子。', textEn: 'The words slip out. Not a guess — certainty. You know ' + yP + '\'s name, what\'s in ' + yP + '\'s notebook, what ' + yP + ' looks like under moonlight.', delay: 3200 },
+          { tag: '感知', tagColor: 'tag-sense', text: '螢僵住了。' + yP + '的手指收緊了手冊，關節泛白。', textEn: 'Ying freezes. ' + yPC + '\'s fingers tighten on the notebook, knuckles whitening.', delay: 2500 },
+          { tag: '對話', tagColor: 'tag-npc', text: '「……什麼意思？」' + yP + '後退了一步，但眼神不再是恐懼——而是困惑。「我從來沒見過你。但你的眼神——」', textEn: '"...What do you mean?" ' + yPC + ' steps back, but ' + yP + '\'s eyes hold confusion, not fear. "I\'ve never met you. But your eyes —"', delay: 3000 },
+          { tag: '對話', tagColor: 'tag-npc', text: '「——好像在看一個很久很久以前就認識的人。」', textEn: '"— look like they\'re seeing someone from a very long time ago."', delay: 2500 },
+          { tag: '效果', tagColor: 'tag-system', text: L('螢好感度 ↑↑ | 意志 +1', 'Ying bond ↑↑ | WIL +1'), delay: 1500, effect: () => { changeStat('wil', 1); state.flags.r1YingNgRecognize = true; } },
+        ], [
+          { text: '（你決定不再多說。有些記憶，還不是解釋的時候。）', textEn: '(You decide to say no more. Some memories aren\'t ready to be explained.)', action: () => loadNode('r1_ying_truth') },
+        ], { label: L('前世的記憶', 'Memories of a past life') });
+      }});
+    }
+    c.push({ text: '我叫' + state.name + '，我也在找瘟疫的真相', textEn: 'I\'m ' + state.name + '. I\'m searching for the truth too', action: () => loadNode('r1_ying_truth') });
+    c.push({ text: '這裡很危險，你怎麼一個人？', textEn: 'It\'s dangerous here. Why are you alone?', action: () => loadNode('r1_ying_alone') });
+    c.push({ text: '保持沉默，點了點頭', textEn: 'Stay silent and nod', action: () => loadNode('r1_ying_silent') });
+    return c;
+  })(), { label: L('遭遇記錄員', 'Meeting the chronicler') });
 });
 
 // ── Ying: player shares purpose ──
