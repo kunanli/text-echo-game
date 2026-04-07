@@ -1422,6 +1422,18 @@ function getPatrolReturnNode() { return getHubNode(); }
 
 var patrolActive = false;
 var patrolTimers = [];
+var _patrolCycles = 0;
+var _patrolFirstVisit = false;
+var _patrolDiscoveryShown = false;
+var _patrolOnDiscovery = null;  // callback when player chooses to leave on first visit
+
+// Discovery texts per region (shown after N cycles on first visit)
+var DISCOVERY_TEXTS = {
+  0: { zh: '你注意到坑壁上方有一條向上延伸的裂縫——也許能通往更深的地方。', en: 'You notice a crack extending upward along the pit wall — perhaps it leads somewhere deeper.' },
+  1: { zh: '巡邏途中，你發現前方的隧道分出了幾條岔路——迴廊的全貌逐漸在你眼前展開。', en: 'While patrolling, you spot tunnels branching ahead — the full layout of the corridor unfolds before you.' },
+  2: { zh: '你登上一處高台，俯瞰整個採石場——遠處似乎有營火的光芒。', en: 'You climb a vantage point overlooking the quarry — in the distance, you spot the glow of campfires.' },
+  3: { zh: '巡邏中你發現了幾條尚未探索的巷道——河城比你想像的要大得多。', en: 'While patrolling, you discover unexplored alleyways — the river city is far larger than you imagined.' }
+};
 
 function clearPatrolTimers() {
   patrolTimers.forEach(clearTimeout);
@@ -1456,10 +1468,15 @@ function patrolAppendArt(artLines, className) {
   $story.scrollTop = $story.scrollHeight;
 }
 
-function startPatrol() {
+function startPatrol(opts) {
+  opts = opts || {};
   stopAuto();
   clearPatrolTimers();
   patrolActive = true;
+  _patrolCycles = 0;
+  _patrolFirstVisit = !!opts.firstVisit;
+  _patrolDiscoveryShown = false;
+  _patrolOnDiscovery = opts.onDiscovery || null;
   state.mood = 'combat';
   ambientAudio.setCombat(true);
   renderStatus();
@@ -1469,14 +1486,16 @@ function startPatrol() {
     autoElapsed += 200;
     updateExploreTimer();
   }, 200);
-  // Persistent stop button
+  // Persistent stop button (hidden on first visit until discovery prompt)
   $choices.innerHTML = '';
   currentChoices = [];
-  var btn = document.createElement('button');
-  btn.className = 'choice-btn';
-  btn.textContent = L('停下腳步', 'Stop and rest');
-  btn.addEventListener('click', stopPatrol);
-  $choices.appendChild(btn);
+  if (!_patrolFirstVisit) {
+    var btn = document.createElement('button');
+    btn.className = 'choice-btn';
+    btn.textContent = L('停下腳步', 'Stop and rest');
+    btn.addEventListener('click', stopPatrol);
+    $choices.appendChild(btn);
+  }
   setTimeout(function() {
     $choices.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }, 200);
@@ -1576,14 +1595,16 @@ function runNarrativeEvent(evt) {
           btn.textContent = en ? choice.textEn : choice.text;
           btn.addEventListener('click', function() {
             sfx.click();
-            // Restore stop-patrol button
+            // Restore stop-patrol button (unless first-visit mode)
             $choices.innerHTML = '';
             currentChoices = [];
-            var stopBtn = document.createElement('button');
-            stopBtn.className = 'choice-btn';
-            stopBtn.textContent = L('停下腳步', 'Stop and rest');
-            stopBtn.addEventListener('click', stopPatrol);
-            $choices.appendChild(stopBtn);
+            if (!_patrolFirstVisit) {
+              var stopBtn = document.createElement('button');
+              stopBtn.className = 'choice-btn';
+              stopBtn.textContent = L('停下腳步', 'Stop and rest');
+              stopBtn.addEventListener('click', stopPatrol);
+              $choices.appendChild(stopBtn);
+            }
             // Execute choice action
             if (choice.action) choice.action();
             // If choice doesn't handle continuation itself, resume queue
@@ -1594,12 +1615,14 @@ function runNarrativeEvent(evt) {
           $choices.appendChild(btn);
         })(step.choices[c]);
       }
-      // Add stop-patrol option alongside choices
-      var stopBtn2 = document.createElement('button');
-      stopBtn2.className = 'choice-btn';
-      stopBtn2.textContent = L('停下腳步', 'Stop and rest');
-      stopBtn2.addEventListener('click', stopPatrol);
-      $choices.appendChild(stopBtn2);
+      // Add stop-patrol option alongside choices (unless first-visit mode)
+      if (!_patrolFirstVisit) {
+        var stopBtn2 = document.createElement('button');
+        stopBtn2.className = 'choice-btn';
+        stopBtn2.textContent = L('停下腳步', 'Stop and rest');
+        stopBtn2.addEventListener('click', stopPatrol);
+        $choices.appendChild(stopBtn2);
+      }
       return; // Wait for player choice
     }
 
@@ -1639,8 +1662,70 @@ function runNarrativeEvent(evt) {
   processNext();
 }
 
+function showPatrolDiscovery() {
+  if (!patrolActive) return;
+  _patrolDiscoveryShown = true;
+  clearPatrolTimers();
+
+  var reg = state.region;
+  var disc = DISCOVERY_TEXTS[reg] || DISCOVERY_TEXTS[0];
+
+  // Show discovery text
+  patrolAppend(L('發現','Discovery'), 'tag-explore',
+    L(disc.zh, disc.en), false);
+
+  // Show choices: leave or continue
+  $choices.innerHTML = '';
+  currentChoices = [];
+
+  var btnLeave = document.createElement('button');
+  btnLeave.className = 'choice-btn';
+  btnLeave.textContent = L('前往新區域', 'Head to the new area');
+  btnLeave.addEventListener('click', function() {
+    sfx.click();
+    // Mark patrol as cleared for this region
+    state.flags['r' + reg + 'PatrolCleared'] = true;
+    if (_patrolOnDiscovery) {
+      _patrolOnDiscovery();
+    } else {
+      stopPatrol();
+    }
+  });
+  $choices.appendChild(btnLeave);
+
+  var btnContinue = document.createElement('button');
+  btnContinue.className = 'choice-btn';
+  btnContinue.textContent = L('繼續巡邏', 'Continue patrolling');
+  btnContinue.addEventListener('click', function() {
+    sfx.click();
+    // Mark cleared but continue patrolling — now show stop button
+    state.flags['r' + reg + 'PatrolCleared'] = true;
+    _patrolFirstVisit = false;
+    $choices.innerHTML = '';
+    currentChoices = [];
+    var btn = document.createElement('button');
+    btn.className = 'choice-btn';
+    btn.textContent = L('停下腳步', 'Stop and rest');
+    btn.addEventListener('click', stopPatrol);
+    $choices.appendChild(btn);
+    runPatrolCycle();
+  });
+  $choices.appendChild(btnContinue);
+
+  setTimeout(function() {
+    $choices.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }, 200);
+}
+
 function runPatrolCycle() {
   if (!patrolActive) return;
+
+  // First-visit discovery prompt after 3 combat cycles
+  _patrolCycles++;
+  if (_patrolFirstVisit && !_patrolDiscoveryShown && _patrolCycles > 3) {
+    showPatrolDiscovery();
+    return;
+  }
 
   // ── 25% chance to trigger a narrative event instead of combat ──
   var available = getAvailablePatrolEvents();

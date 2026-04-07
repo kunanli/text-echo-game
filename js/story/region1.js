@@ -2154,7 +2154,17 @@ registerNode('r1_patrol', () => {
     { tag: '判斷', tagColor: 'tag-move', text: '迴廊中的怪物比坑底更強，但也能提供更好的戰鬥經驗。', textEn: 'Corridor monsters are tougher, but offer better combat experience.', delay: 2000 },
     { tag: '感知', tagColor: 'tag-sense', text: '你握緊武器，沿著礦脈的冷光前進。', textEn: 'You grip your weapon and advance by the cold glow of ore veins.', delay: 2000 },
   ], [
-    { text: '開始巡邏', textEn: 'Begin patrol', action: () => startPatrol() },
+    { text: state.flags.r1PatrolCleared ? L('開始巡邏', 'Begin patrol') : L('深入迴廊探索', 'Explore deeper into the corridor'),
+      textEn: state.flags.r1PatrolCleared ? 'Begin patrol' : 'Explore deeper into the corridor',
+      action: () => {
+        if (state.flags.r1PatrolCleared) {
+          startPatrol();
+        } else {
+          startPatrol({ firstVisit: true, onDiscovery: function() {
+            stopPatrol();
+          }});
+        }
+      }},
     { text: '返回', textEn: 'Return', action: () => loadNode('r1_look') },
   ], { label: L('準備巡邏', 'Preparing patrol') });
 });

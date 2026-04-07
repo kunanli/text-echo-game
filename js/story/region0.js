@@ -302,7 +302,17 @@ registerNode('r0_patrol', () => {
 </pre>` },
     { tag: '感知', tagColor: 'tag-sense', text: '你握緊武器，壓低身體，沿著洞穴邊緣摸索前進。', textEn: 'You grip your weapon, crouch low, and creep along the cave walls.', delay: 2000 },
   ], [
-    { text: '深入警戒搜索', textEn: 'Begin patrol sweep', action: () => startPatrol() },
+    { text: state.flags.r0PatrolCleared ? L('深入警戒搜索', 'Begin patrol sweep') : L('深入坑底探索', 'Explore deeper into the pit'),
+      textEn: state.flags.r0PatrolCleared ? 'Begin patrol sweep' : 'Explore deeper into the pit',
+      action: () => {
+        if (state.flags.r0PatrolCleared) {
+          startPatrol();
+        } else {
+          startPatrol({ firstVisit: true, onDiscovery: function() {
+            stopPatrol();
+          }});
+        }
+      }},
     { text: '返回', textEn: 'Return', action: () => loadNode('r0_look') },
   ], { label: L('準備巡邏', 'Preparing patrol') });
 });
