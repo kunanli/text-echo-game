@@ -524,12 +524,17 @@ registerNode('r3_bell', () => {
     }
     steps.push({ tag: '移動', tagColor: 'tag-move', text: '你走進議會廳右側走廊盡頭的房間。門半開著。', textEn: 'You enter the room at the end of the right corridor. The door is ajar.', delay: 2000 });
     steps.push({ tag: '感知', tagColor: 'tag-sense', html: '靠窗的桌旁坐著一個高挑豐腴的女人。淡金色的髮髻，輪廓銳利，官服被撐得很滿——氣場強得像一堵牆。她的右手已經完全石化，卻依然穩穩地握著筆在寫字。', htmlEn: 'A tall, full-figured woman sits by the window. Pale gold hair in a sharp bun, sculpted features, official robes stretched taut — her presence hits like a wall. Her right hand is fully petrified, yet still grips the pen steadily, writing without pause.', delay: 3000 });
-    steps.push({ tag: '情報', tagColor: 'tag-info', html: '「進來吧。」她沒有抬頭，聲音低沉而具有穿透力。「我是<b>銅鐘</b>。聽說有人從下面爬上來了——想必就是你。」', htmlEn: '"Come in." She doesn\'t look up, her voice low and penetrating. "I\'m <b>Bronze Bell</b>. I heard someone climbed up from below — that must be you."', delay: 3000 });
-    steps.push({ tag: '感知', tagColor: 'tag-sense', text: '她放下筆轉過身看你。琥珀色的眼睛帶著審視的壓迫感，目光在你身上停留的時間比正常打量長了一點——長到你注意到了，卻短到你無法確定那代表什麼。', textEn: 'She puts down the pen and turns. Amber eyes carry an appraising weight, lingering on you a beat too long — enough to notice, yet too brief to be sure what it means.', delay: 3000 });
-    steps.push({ tag: '感知', tagColor: 'tag-sense', text: '她的目光掃過你身上的石化痕跡，然後不自覺地按了按自己石化的右手腕。沒有嫌惡，沒有憐憫——只有感同身受的理解。', textEn: 'Her gaze sweeps your petri-marks, then she unconsciously presses her own petrified right wrist. No disgust, no pity — just empathetic understanding.', delay: 2800 });
-    steps.push({ tag: '情報', tagColor: 'tag-info', text: '「嗯——有意思。」她發出一個低沉的鼻音。「下面的情況怎麼樣？還有多少人活著？」', textEn: '"Hmm — interesting." A low hum. "How are things below? How many are still alive?"', delay: 2500 });
+    steps.push({ tag: '情報', tagColor: 'tag-info', html: '「門是關著的。」她沒有抬頭，聲音低沉而具有穿透力。語氣不是問句——是陳述。意思很清楚：<b>你沒有被邀請</b>。', htmlEn: '"The door was closed." She doesn\'t look up, her voice low and penetrating. It\'s not a question — it\'s a statement. The meaning is clear: <b>you were not invited</b>.', delay: 3000 });
+    steps.push({ tag: '感知', tagColor: 'tag-sense', text: '她終於放下筆，轉過身來。琥珀色的眼睛帶著冷銳的審視，像在估量一件可疑的貨物。', textEn: 'She finally sets down her pen and turns. Amber eyes carry a cold, cutting appraisal — like sizing up suspect merchandise.', delay: 2800 });
+    steps.push({ tag: '情報', tagColor: 'tag-info', html: '「我是<b>銅鐘</b>。聽說有人從下面爬上來了——」她的目光掃過你身上的石化痕跡，眉頭微微一皺。「看這石化程度，你確實是從深處來的。問題是——你來這裡做什麼？」', htmlEn: '"I\'m <b>Bronze Bell</b>. I heard someone crawled up from below —" Her gaze sweeps your petri-marks, brow furrowing slightly. "Given that level of petrification, you did come from deep down. The question is — what do you want here?"', delay: 3500 });
+    steps.push({ tag: '感知', tagColor: 'tag-sense', text: '她不自覺地用左手按了按石化的右手腕——但那個動作很快就被掩飾了。她的態度很明確：在你證明自己之前，你只是又一個帶著石化病從下面爬上來的麻煩。', textEn: 'She unconsciously presses her petrified right wrist with her left hand — but the gesture is quickly masked. Her stance is clear: until you prove yourself, you\'re just another petrified nuisance who crawled up from below.', delay: 3200 });
+    steps.push({ tag: '情報', tagColor: 'tag-info', text: '「議會裡有人主張封鎖下層通道。我需要的是事實，不是難民的哭訴。」她重新拿起筆，彷彿隨時準備結束這場對話。「如果你有什麼值得聽的——說吧。簡短一點。」', textEn: '"Some on the Council want to seal the lower passages. What I need are facts, not a refugee\'s sob story." She picks up her pen again, as if ready to end this conversation at any moment. "If you have something worth hearing — speak. Keep it brief."', delay: 3500 });
+  } else if (!state.flags.r3BellAlliance) {
+    // Before alliance: cold, professional — she hasn't accepted you yet
+    steps.push({ tag: '移動', tagColor: 'tag-move', text: '銅鐘還是坐在那張堆滿文件的桌子旁。看到你進來，她只是瞥了一眼。', textEn: 'Bronze Bell sits at her document-laden desk. She only glances at you when you enter.', delay: 2200 });
+    steps.push({ tag: '情報', tagColor: 'tag-info', text: '「任務完成了嗎？」她的語氣平淡，像在問一個下屬的進度報告。', textEn: '"Are the tasks done?" Her tone is flat, like asking a subordinate for a progress report.', delay: 2500 });
   } else {
-    // Track return visits for escalating intimacy
+    // Track return visits for escalating intimacy (only after alliance)
     state.flags._bellVisits = (state.flags._bellVisits || 1) + 1;
     var bv = state.flags._bellVisits;
 
@@ -567,68 +572,27 @@ registerNode('r3_bell', () => {
         autoExplore([
           { tag: '行動', tagColor: 'tag-move', text: '你把在祭獻坑、石脈迴廊和大採石場的經歷告訴了銅鐘。', textEn: 'You recount your experiences in the Sacrificial Pit, Vein Corridor, and Great Quarry.', delay: 2500 },
           { tag: '情報', tagColor: 'tag-info', text: '鐵霜帶領的營地、迴廊裡的倖存者、老周、守衛——', textEn: 'Iron Frost\'s camp, corridor survivors, Old Zhou, the guards —', delay: 2200 },
-          { tag: '感知', tagColor: 'tag-sense', text: '銅鐘一邊聽一邊用石化的右手在紙上做記錄。那隻手雖然已經變成石頭，卻仍能寫字——像某種不屈的意志。', textEn: 'Bronze Bell takes notes with her petrified right hand as she listens. Though turned to stone, it still writes — like some indomitable will.', delay: 3000 },
-          { tag: '感知', tagColor: 'tag-sense', text: '說到傷亡最慘重的部分時，她停下了筆。你看見她咬緊了下唇，胸口微微起伏——然後她深吸一口氣，重新拿起筆繼續記錄。', textEn: 'At the worst of the casualties, she stops writing. You see her bite her lower lip, chest rising slightly — then she draws a deep breath and picks up the pen again.', delay: 3200 },
-          { tag: '情報', tagColor: 'tag-info', text: '「……我就知道。」她把筆放下，雙手撐在桌面上站起身來——她站起來的瞬間，你才真正感受到她的氣場。比坐著的時候壓迫感強了一倍。', textEn: '"...I knew it." She sets down the pen and stands, palms flat on the desk — the moment she rises, you truly feel her presence. Twice as commanding as when seated.', delay: 3500 },
-          { tag: '情報', tagColor: 'tag-info', text: '「封鎖通道只會害死更多人。下面還有倖存者在苦撐。」她走到窗邊，背對著你。窗外微弱的光線勾勒出她挺拔的輪廓。', textEn: '"Sealing the passages will only kill more people. Survivors below are still holding on." She walks to the window, back to you. Faint light traces her upright silhouette.', delay: 3200 },
+          { tag: '感知', tagColor: 'tag-sense', text: '銅鐘一邊聽一邊用石化的右手在紙上做記錄。你說話的時候她一直沒抬頭——你無法判斷她信了多少。', textEn: 'Bronze Bell takes notes with her petrified right hand. She never looks up while you speak — you can\'t tell how much she believes.', delay: 3000 },
+          { tag: '感知', tagColor: 'tag-sense', text: '說到傷亡最慘重的部分時，她的筆尖頓了一下——只有一下。然後她繼續寫字，像什麼都沒發生。', textEn: 'At the worst of the casualties, her pen tip pauses — just for a beat. Then she resumes writing, as if nothing happened.', delay: 2800 },
+          { tag: '情報', tagColor: 'tag-info', text: '你說完了。沉默。銅鐘放下筆，雙手交叉撐在桌面上，終於抬眼看你。', textEn: 'You finish. Silence. Bronze Bell sets down her pen, arms crossed on the desk, and finally looks up.', delay: 2800 },
+          { tag: '情報', tagColor: 'tag-info', text: '「有意思。」她的語氣不冷不熱。「但議會每個月都能聽到這種故事。從下面爬上來的人，每個都說自己是無辜的難民。」', textEn: '"Interesting." Her tone is neither warm nor cold. "But the Council hears stories like this every month. Everyone who crawls up from below claims to be an innocent refugee."', delay: 3500 },
+          { tag: '感知', tagColor: 'tag-sense', text: '她站起身——站起來的瞬間，你才真正感受到她的氣場。比坐著的時候壓迫感強了一倍。', textEn: 'She stands — the moment she rises, you truly feel her presence. Twice as commanding as when seated.', delay: 2800 },
           { art: npcPortrait.art('bell', { subtitle: '議員' }), artEn: npcPortrait.art('bell', { subtitle: 'Councilor' }), delay: 800 },
-          { tag: '情報', tagColor: 'tag-info', html: '「你的證詞很重要。下一次議會投票時，我需要你<b>在議會上作證</b>——證明下面的人不是威脅，而是需要幫助的同胞。」', htmlEn: '"Your testimony matters. At the next Council vote, I need you to <b>testify before the Council</b> — prove the people below aren\'t a threat, but fellow humans who need help."', delay: 3500 },
-          { tag: '情報', tagColor: 'tag-info', text: '「你願意嗎？」', textEn: '"Will you?"', delay: 1800 },
+          { tag: '情報', tagColor: 'tag-info', html: '「我不會因為你的一面之詞就相信你。」她走到牆邊，伸手從高處取下一張捲起的地圖。「但我也不會因為別人的偏見就把你趕走。」', htmlEn: '"I won\'t believe you based on your word alone." She strides to the wall, reaching up for a rolled map. "But I won\'t chase you off based on others\' prejudice either."', delay: 3500 },
+          { tag: '情報', tagColor: 'tag-info', html: '她把地圖攤在桌面上，石化的右手釘住一角。抬眼看你的時候，琥珀色的瞳孔裡不是信任——是<b>考驗</b>。', htmlEn: 'She spreads the map across the desk, petrified right hand pinning one corner. When she looks up, what\'s in those amber eyes isn\'t trust — it\'s a <b>test</b>.', delay: 3000 },
+          { tag: '情報', tagColor: 'tag-info', html: '「議會投票還有幾天。如果你說的是真的——<b>用行動證明</b>。」', htmlEn: '"The Council vote is in a few days. If what you say is true — <b>prove it with actions</b>."', delay: 2800 },
+          { tag: '情報', tagColor: 'tag-info', html: '「第一：去<b>河岸隧道</b>清除那裡的變異生物。鏽刃說怪物從下面上來——如果你能證明那不是事實，他的藉口就不成立了。」', htmlEn: '"First: clear the <b>river tunnels</b> of mutants. Rust Blade claims monsters come from below — if you prove otherwise, his excuse collapses."', delay: 3500 },
+          { tag: '情報', tagColor: 'tag-info', html: '「第二：在市場找到<b>灰鶴</b>。她在上下層之間跑商路，她的證詞我信得過——不像你的。」', htmlEn: '"Second: find <b>Grey Crane</b> in the market. She runs trade routes between levels — her testimony I trust. Unlike yours."', delay: 3200 },
+          { tag: '情報', tagColor: 'tag-info', html: '「第三：找到<b>石化瘟疫起源</b>的證據。如果瘟疫不是因為下層通道——那封鎖就毫無意義。」', htmlEn: '"Third: find evidence of the <b>plague\'s true origin</b>. If the plague didn\'t come from the lower passages — sealing them is pointless."', delay: 3200 },
+          { tag: '感知', tagColor: 'tag-sense', text: '銅鐘直起身子，居高臨下地看著你。那個姿態不是盟友——是上位者在審視一個還沒通過考驗的人。', textEn: 'Bronze Bell straightens, looking down at you. That posture isn\'t an ally\'s — it\'s a superior assessing someone who hasn\'t yet passed muster.', delay: 3000 },
+          { tag: '情報', tagColor: 'tag-info', text: '「做到了，再來找我。做不到——」她重新坐下，拿起筆。「那你的故事就只是故事。」', textEn: '"Accomplish this, then come find me. If you can\'t —" She sits back down, picking up her pen. "Then your story is just a story."', delay: 3000 },
         ], [
-          { text: '我願意', textEn: 'I will', action: () => {
-            state.flags.r3BellAlliance = true;
-            gainXp(15);
-            notify(L('經驗 +15（與銅鐘建立同盟）', 'XP +15 (Allied with Bronze Bell)'));
-            autoExplore([
-              { tag: '感知', tagColor: 'tag-sense', text: '銅鐘轉過身來看著你。燈光映在她的琥珀色眼眸裡，你看到了某種久違的光芒——不是感激，而是找到同路人的釋然。', textEn: 'Bronze Bell turns to face you. Lamplight reflects in her amber eyes, and you see a long-absent gleam — not gratitude, but the relief of finding a kindred soul.', delay: 3200 },
-              { tag: '感知', tagColor: 'tag-sense', text: '她走上前一步——比你想像的近。你能聞到她身上淡淡的墨水和茶葉的氣味。', textEn: 'She steps forward — closer than expected. You catch the faint scent of ink and tea on her.', delay: 2800 },
-              { tag: '情報', tagColor: 'tag-info', text: '「……謝謝你。」她的聲音突然輕了下來。這個在議會上叱咤風雲的女人，此刻的語氣柔軟得讓你有些不適應。', textEn: '"...Thank you." Her voice suddenly softens. This woman who commands the council — her tone now tender enough to catch you off guard.', delay: 3000 },
-            ], [
-              { text: '下一步怎麼做？', textEn: 'What\'s next?', action: () => {
-                state.flags.r3BellQuest = true;
-                autoExplore([
-                  { tag: '行動', tagColor: 'tag-move', text: '銅鐘站起身來——她站起來的動作從容有力，像一堵牆緩緩升起。', textEn: 'Bronze Bell rises — the movement is slow, powerful, like a wall coming up.', delay: 2500 },
-                  { tag: '情報', tagColor: 'tag-info', text: '她走到牆邊，伸手從高處取下一張捲起的地圖。你注意到她即使用石化的右手也能輕鬆固定地圖的一角——力道驚人。', textEn: 'She strides to the wall, reaching up for a rolled map. You notice her petrified right hand pins the map\'s corner effortlessly — formidable strength.', delay: 3000 },
-                  { tag: '情報', tagColor: 'tag-info', text: '銅鐘把地圖攤在桌面上，俯身用左手指著幾個位置。她俯身時，花白的碎髮從耳後滑落，你能清楚看見她堅毅的側臉輪廓。', textEn: 'She spreads the map across the desk, leaning over to point out locations. As she bends, grey-streaked strands slip from behind her ear — you get a clear view of her resolute profile.', delay: 3200 },
-                  { tag: '情報', tagColor: 'tag-info', html: '「議會投票還有三天。在那之前，你需要做三件事——」她抬眼看你，琥珀色的瞳孔裡帶著不容置疑的堅定。', htmlEn: '"The Council vote is in three days. Before then, you need three things —" She looks up, amber eyes carrying an unquestionable resolve.', delay: 2800 },
-                  { tag: '情報', tagColor: 'tag-info', html: '「第一：去<b>河岸隧道</b>清除那裡的變異生物。鏽刃說封鎖通道是因為怪物從下面上來——如果你能證明怪物不是來自下層，他就沒藉口了。」', htmlEn: '"First: clear the <b>river tunnels</b> of mutants. Rust Blade claims sealing is needed because monsters come from below — if you prove the creatures aren\'t from the lower levels, his excuse crumbles."', delay: 3800 },
-                  { tag: '情報', tagColor: 'tag-info', html: '「第二：在市場找到<b>灰鶴</b>。她是唯一在上下層之間跑商路的人，她的證詞能動搖商會的玉秤。」', htmlEn: '"Second: find <b>Grey Crane</b> in the market. She\'s the only trader running routes between levels — her testimony can sway Jade Scale of the Merchants."', delay: 3200 },
-                  { tag: '情報', tagColor: 'tag-info', html: '「第三：找到能證明<b>石化瘟疫起源</b>的證據。如果能證明瘟疫不是因為下層通道——而是因為古代封印——那封鎖通道就毫無意義。」', htmlEn: '"Third: find evidence of the <b>plague\'s true origin</b>. If you can prove it came from the ancient seal, not the lower passages — sealing is pointless."', delay: 3800 },
-                  { tag: '感知', tagColor: 'tag-sense', text: '銅鐘直起身子，站在窗邊回頭看你。逆光勾勒出她寬闊的肩膀和挺拔的腰線——像一尊還未完全石化的雕像，威嚴而不可動搖。', textEn: 'Bronze Bell straightens and turns from the window. Backlit, her broad shoulders and upright waist are silhouetted — like a statue not yet fully petrified, majestic and immovable.', delay: 3000 },
-                  { tag: '情報', tagColor: 'tag-info', text: '「……拜託你了。」她的石化右手不自覺地握成了拳。你聽見石指關節碾磨的細微聲響。「這不只是我一個人的戰鬥。」', textEn: '"...I\'m counting on you." Her petrified right hand clenches into a fist. You hear the faint grinding of stone knuckles. "This isn\'t just my fight."', delay: 3000 },
-                ], [
-                  { text: '我會完成的', textEn: 'I\'ll get it done', action: () => {
-                    changeStat('wil', 1);
-                    notify(L('意志 +1（肩負重任）', 'WIL +1 (Shouldering responsibility)'));
-                    loadNode('r3_look');
-                  }},
-                ], { label: L('銅鐘的任務', 'Bronze Bell\'s mission') });
-              }},
-              { text: '先離開', textEn: 'Leave for now', action: () => loadNode('r3_council') },
-            ], { label: L('銅鐘的信任', 'Bronze Bell\'s trust') });
-          }},
-          { text: '讓我想想', textEn: 'Let me think', action: () => loadNode('r3_council') },
-        ], { label: L('銅鐘的請求', 'Bronze Bell\'s request') });
-      }});
-    }
-    if (state.flags.r3BellAlliance && !state.flags.r3BellQuest) {
-      c.push({ text: '下一步怎麼做？', textEn: 'What\'s next?', action: () => {
-        state.flags.r3BellQuest = true;
-        autoExplore([
-          { tag: '行動', tagColor: 'tag-move', text: '銅鐘站起身，從牆上取下地圖攤在桌面上。', textEn: 'Bronze Bell stands, taking a map from the wall and spreading it across the desk.', delay: 2200 },
-          { tag: '情報', tagColor: 'tag-info', html: '「議會投票還有三天。在那之前，你需要做三件事——」她抬起琥珀色的眼睛看著你。', htmlEn: '"The Council vote is in three days. Before then, you need three things —" She raises her amber eyes to you.', delay: 2800 },
-          { tag: '情報', tagColor: 'tag-info', html: '「第一：去<b>河岸隧道</b>清除那裡的變異生物。鏽刃說封鎖通道是因為怪物從下面上來——如果你能證明怪物不是來自下層，他就沒藉口了。」', htmlEn: '"First: clear the <b>river tunnels</b> of mutants. Rust Blade claims sealing is needed because monsters come from below — if you prove the creatures aren\'t from the lower levels, his excuse crumbles."', delay: 3800 },
-          { tag: '情報', tagColor: 'tag-info', html: '「第二：在市場找到<b>灰鶴</b>。她是唯一在上下層之間跑商路的人，她的證詞能動搖商會的玉秤。」', htmlEn: '"Second: find <b>Grey Crane</b> in the market. She\'s the only trader running routes between levels — her testimony can sway Jade Scale of the Merchants."', delay: 3200 },
-          { tag: '情報', tagColor: 'tag-info', html: '「第三：找到能證明<b>石化瘟疫起源</b>的證據。如果能證明瘟疫不是因為下層通道——而是因為古代封印——那封鎖通道就毫無意義。」', htmlEn: '"Third: find evidence of the <b>plague\'s true origin</b>. If you can prove it came from the ancient seal, not the lower passages — sealing is pointless."', delay: 3800 },
-          { tag: '感知', tagColor: 'tag-sense', text: '銅鐘直起腰，石化的右手握成拳按在桌面上，指節發出石碴碾磨的聲響。', textEn: 'Bronze Bell straightens, her petrified right fist pressed against the desk, stone knuckles grinding faintly.', delay: 2800 },
-          { tag: '情報', tagColor: 'tag-info', text: '「……拜託你了。這不只是我一個人的戰鬥。」', textEn: '"...I\'m counting on you. This isn\'t just my fight."', delay: 2500 },
-        ], [
-          { text: '我會完成的', textEn: 'I\'ll get it done', action: () => {
-            changeStat('wil', 1);
-            notify(L('意志 +1（肩負重任）', 'WIL +1 (Shouldering responsibility)'));
+          { text: '我會證明給你看', textEn: 'I\'ll prove it to you', action: () => {
+            state.flags.r3BellQuest = true;
             loadNode('r3_look');
           }},
-        ], { label: L('銅鐘的任務', 'Bronze Bell\'s mission') });
+          { text: '離開', textEn: 'Leave', action: () => loadNode('r3_council') },
+        ], { label: L('銅鐘的考驗', 'Bronze Bell\'s test') });
       }});
     }
     if (state.flags.r3BellQuest) {
@@ -1199,14 +1163,34 @@ registerNode('r3_quest_check', () => {
     steps.push({ tag: '警告', tagColor: 'tag-warn', html: '✗ 「瘟疫起源的證據——需要螢的幫助。去找她談談銅鐘的任務。」', htmlEn: '✗ "Plague origin evidence — you need Ying\'s help. Talk to her about Bell\'s mission."', delay: 2800 });
   }
 
-  // Summary
-  steps.push({ tag: '情報', tagColor: 'tag-info', html: L(
-    '銅鐘看著你：「完成了 <b>' + questsDone + '/3</b> 個任務。',
-    'Bronze Bell looks at you: "Completed <b>' + questsDone + '/3</b> tasks.'
-  ) + (questsDone >= 2
-    ? L('——勉強夠了。我們可以行動了。」', ' — That\'s enough. We can proceed."')
-    : L('——還不夠。再努力一下。」', ' — Not enough. Keep at it."')
-  ), delay: 2500 });
+  // Summary & alliance formation
+  if (questsDone >= 2 && !state.flags.r3BellAlliance) {
+    // Alliance earned — emotional payoff after proving yourself
+    state.flags.r3BellAlliance = true;
+    gainXp(15);
+    notify(L('經驗 +15（贏得銅鐘的信任）', 'XP +15 (Earned Bronze Bell\'s trust)'));
+    steps.push({ tag: '感知', tagColor: 'tag-sense', html: L(
+      '銅鐘看著你：「完成了 <b>' + questsDone + '/3</b> 個任務。」',
+      'Bronze Bell looks at you: "Completed <b>' + questsDone + '/3</b> tasks."'
+    ), delay: 2500 });
+    steps.push({ tag: '感知', tagColor: 'tag-sense', text: '她放下筆。這一次，沉默的質地不一樣了。', textEn: 'She sets down the pen. This time, the quality of the silence is different.', delay: 2500 });
+    steps.push({ tag: '感知', tagColor: 'tag-sense', text: '銅鐘站起身來，走到你面前。你第一次注意到她的琥珀色眼睛裡——冷銳消退了，取而代之的是某種你之前沒見過的光芒。', textEn: 'Bronze Bell rises and walks to you. For the first time, you notice the cold edge in her amber eyes has receded — replaced by a gleam you haven\'t seen before.', delay: 3200 });
+    steps.push({ tag: '感知', tagColor: 'tag-sense', text: '「……我錯了。」她的聲音低了下來。從這個驕傲的女人嘴裡說出這三個字，比任何讚美都重。', textEn: '"...I was wrong." Her voice drops. Coming from this proud woman, those three words carry more weight than any praise.', delay: 3200 });
+    steps.push({ tag: '感知', tagColor: 'tag-sense', text: '她不自覺地按了按石化的右手腕——這次，她沒有掩飾。「你不只是又一個從下面爬上來的難民。你是——」', textEn: 'She unconsciously presses her petrified right wrist — this time, she doesn\'t mask it. "You\'re not just another refugee from below. You\'re —"', delay: 3000 });
+    steps.push({ tag: '情報', tagColor: 'tag-info', text: '「——你是我的盟友。」她伸出左手。不是握手的姿態——是抓住你的手腕，用力。像立誓。', textEn: '"— you\'re my ally." She extends her left hand. Not a handshake — she grips your wrist, hard. Like an oath.', delay: 3000 });
+    steps.push({ tag: '感知', tagColor: 'tag-sense', text: '你能聞到她身上淡淡的墨水和茶葉的氣味。近距離下，她的琥珀色虹膜裡有細小的金色碎片。', textEn: 'You catch the faint scent of ink and tea on her. Up close, you notice tiny golden flecks within her amber irises.', delay: 2800 });
+    steps.push({ tag: '情報', tagColor: 'tag-info', text: '「下一次議會投票——我需要你在議會上作證。你的行動已經證明了一切。」', textEn: '"At the next Council vote — I need you to testify. Your actions have already proven everything."', delay: 3000 });
+    changeStat('wil', 1);
+    notify(L('意志 +1（贏得信任）', 'WIL +1 (Trust earned)'));
+  } else {
+    steps.push({ tag: '情報', tagColor: 'tag-info', html: L(
+      '銅鐘看著你：「完成了 <b>' + questsDone + '/3</b> 個任務。',
+      'Bronze Bell looks at you: "Completed <b>' + questsDone + '/3</b> tasks.'
+    ) + (questsDone >= 2
+      ? L('——夠了。我們可以行動了。」', ' — Enough. We can proceed."')
+      : L('——還不夠。再努力一下。」', ' — Not enough. Keep at it."')
+    ), delay: 2500 });
+  }
 
   autoExplore(steps, (function() {
     var c = [];

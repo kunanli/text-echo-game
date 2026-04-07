@@ -491,6 +491,929 @@ registerPatrolTexts(1, R1_PATROL_TEXTS);
 registerPatrolTexts(2, R2_PATROL_TEXTS);
 registerPatrolTexts(3, R3_PATROL_TEXTS);
 
+// ═══════════════════════════════════════════════════
+//  Narrative Patrol Events — R0 祭獻坑
+// ═══════════════════════════════════════════════════
+
+var R0_EVENTS = [
+  // ── Event 1: 石化雕像求救 (戰鬥+道德) ──
+  {
+    id: 'r0_statue', flag: '_evt_r0_statue', region: 0,
+    buildQueue: function(queue) {
+      queue.push({ art: '<pre class="ascii-art">\n' +
+        '        ╭─────╮\n' +
+        '        │ ◉  ◉│  ← 眼睛在動\n' +
+        '        │  ▽  │\n' +
+        '        ╰──┬──╯\n' +
+        '      ░▓███│███▓░\n' +
+        '      ▓████│████▓\n' +
+        '      ░▓██─┴─██▓░\n' +
+        '       ░▓█████▓░\n' +
+        '        ░░▓▓▓░░\n' +
+        '</pre>', delay: 800 });
+      queue.push({ tag: L('事件','Event'), color: 'tag-event',
+        text: L('你經過一尊石化雕像時，它的嘴唇動了。', 'As you pass a petrified statue, its lips move.'),
+        delay: 2200 });
+      queue.push({ tag: L('感知','Sense'), color: 'tag-sense',
+        text: L('「……幫……我……」聲音像從石頭縫裡擠出來的，乾澀、痛苦、微弱得幾乎不存在。', '"...help...me..." The voice squeezes from between cracks in stone — dry, agonized, barely there.'),
+        delay: 3000 });
+      queue.push({ tag: L('感知','Sense'), color: 'tag-sense',
+        text: L('你看見它的眼珠在石化的眼眶裡緩慢轉動。這個人還活著——被困在自己的身體裡。', 'You see its eyeballs rolling slowly within petrified sockets. This person is still alive — trapped inside their own body.'),
+        delay: 3000 });
+      queue.push({ tag: L('抉擇','Choice'), color: 'tag-event',
+        text: L('你要怎麼做？', 'What do you do?'),
+        choices: [
+          { text: L('嘗試撬開石殼 [力量]', 'Try to pry open the shell [STR]'), textEn: 'Try to pry open the shell [STR]',
+            action: function() {
+              var result = statCheck('str', 6);
+              if (result !== 'fail') {
+                sfx.pass();
+                addItem(L('石心碎片', 'Stone Heart Shard'));
+                changePetri(3);
+                patrolAppend(L('事件','Event'), 'tag-event',
+                  L('你用盡全力，掰開了胸口處的石殼。一塊溫熱的碎片落入你手中——它還帶著那個人最後的體溫。', 'You pry open the chest plate with all your strength. A warm shard falls into your palm — still carrying that person\'s last body heat.'), false);
+                patrolAppend(L('系統','System'), 'tag-system',
+                  L('石化度 +3%。獲得「石心碎片」。', 'Petrification +3%. Obtained "Stone Heart Shard".'), false);
+                patrolAppend(L('感知','Sense'), 'tag-sense',
+                  L('石像的嘴角似乎微微上揚了。然後，所有的動靜都停了。', 'The statue\'s lips seem to curve upward, just slightly. Then all movement ceases.'), false);
+                renderStatus();
+              } else {
+                sfx.fail();
+                changePetri(5);
+                patrolAppend(L('事件','Event'), 'tag-warn',
+                  L('你的手觸碰石殼的瞬間，石化粉塵從裂縫中噴出，沾滿了你的手臂。你什麼都沒能救出來。', 'The instant you touch the shell, petri-dust erupts from the cracks, coating your arms. You couldn\'t save anything.'), false);
+                patrolAppend(L('系統','System'), 'tag-system',
+                  L('石化度 +5%。', 'Petrification +5%.'), false);
+                renderStatus();
+              }
+            }
+          },
+          { text: L('走開', 'Walk away'), textEn: 'Walk away',
+            action: function() {
+              patrolAppend(L('巡邏','Patrol'), 'tag-move',
+                L('你移開目光，繼續前進。身後傳來一聲極輕的嘆息——或者只是風聲。', 'You look away and move on. A faint sigh drifts from behind — or perhaps it\'s just the wind.'), false);
+            }
+          }
+        ]
+      });
+    }
+  },
+
+  // ── Event 2: 裂縫微光 (探索+調查) ──
+  {
+    id: 'r0_crack_light', flag: '_evt_r0_crack_light', region: 0,
+    buildQueue: function(queue) {
+      queue.push({ art: '<pre class="ascii-art">\n' +
+        '    ██████████████████████\n' +
+        '    ████████╲    ╱████████\n' +
+        '    █████████╲✦╱█████████\n' +
+        '    ██████████╳██████████\n' +
+        '    █████████╱ ╲█████████\n' +
+        '    ████████╱✦✦ ╲████████\n' +
+        '    ███████╱ ·˚· ╲███████\n' +
+        '    ██████╱  ✦✦✦  ╲██████\n' +
+        '</pre>', delay: 800 });
+      queue.push({ tag: L('感知','Sense'), color: 'tag-sense',
+        text: L('牆壁上有一道狹窄的裂縫。從裂縫深處，溢出淡淡的金色微光——像是某種結晶在發光。', 'A narrow crack runs through the wall. Deep within, a faint golden glow seeps out — some crystal pulsing with light.'),
+        delay: 2800 });
+      queue.push({ tag: L('感知','Sense'), color: 'tag-sense',
+        text: L('裂縫很窄，勉強能擠進去一個人。空氣中有一股溫暖的礦物味——和一絲甜味。', 'The crack is barely wide enough for one person. The air carries a warm mineral scent — and a hint of sweetness.'),
+        delay: 2500 });
+      queue.push({ tag: L('抉擇','Choice'), color: 'tag-event',
+        text: L('你要鑽進去嗎？', 'Squeeze in?'),
+        choices: [
+          { text: L('鑽進裂縫 [敏捷]', 'Squeeze through [AGI]'), textEn: 'Squeeze through [AGI]',
+            action: function() {
+              var result = statCheck('agi', 7);
+              if (result !== 'fail') {
+                sfx.pass();
+                patrolAppend(L('事件','Event'), 'tag-event',
+                  L('你側身擠過裂縫，手肘擦破了皮，但成功到達另一側——一個拳頭大的空洞裡，藏著前人留下的補給。', 'You squeeze through sideways, scraping your elbows, but reach the other side — a fist-sized cavity with someone\'s hidden supplies.'), false);
+                addItem(L('黑麵包', 'Black Bread'));
+                changeHp(8);
+                patrolAppend(L('系統','System'), 'tag-system',
+                  L('HP +8。獲得「黑麵包」。', 'HP +8. Obtained "Black Bread".'), false);
+                renderStatus();
+              } else {
+                sfx.fail();
+                changeHp(-5);
+                patrolAppend(L('事件','Event'), 'tag-warn',
+                  L('你卡在了半路。尖銳的石壁割破了你的腰側，你費了好大力氣才退出來。', 'You get stuck halfway. The jagged rock slices your side, and it takes real effort to back out.'), false);
+                patrolAppend(L('系統','System'), 'tag-system',
+                  L('HP -5。', 'HP -5.'), false);
+                renderStatus();
+              }
+            }
+          },
+          { text: L('不值得冒險', 'Not worth the risk'), textEn: 'Not worth the risk',
+            action: function() {
+              patrolAppend(L('巡邏','Patrol'), 'tag-move',
+                L('你記下了裂縫的位置，繼續前進。也許以後會回來。', 'You note the crack\'s location and move on. Perhaps you\'ll return.'), false);
+            }
+          }
+        ]
+      });
+    }
+  },
+
+  // ── Event 3: 遠方歌聲 (羈絆+氛圍) ──
+  {
+    id: 'r0_singer', flag: '_evt_r0_singer', region: 0,
+    buildQueue: function(queue) {
+      queue.push({ tag: L('感知','Sense'), color: 'tag-sense',
+        text: L('你停下腳步。空氣中飄來一段旋律——微弱、破碎、卻清晰得不像回音。有人在唱歌。', 'You stop. A melody drifts through the air — faint, broken, yet too clear to be an echo. Someone is singing.'),
+        delay: 2800 });
+      queue.push({ tag: L('感知','Sense'), color: 'tag-sense',
+        text: L('歌聲來自南面的一條死路。語言聽不懂，但旋律裡有一種令人心碎的溫柔——像是在唱搖籃曲。', 'The song comes from a dead-end to the south. The language is unknown, but the melody holds a heartbreaking tenderness — like a lullaby.'),
+        delay: 3000 });
+      queue.push({ tag: L('抉擇','Choice'), color: 'tag-event',
+        text: L('你要跟隨歌聲嗎？', 'Follow the singing?'),
+        choices: [
+          { text: L('循著歌聲走去', 'Follow the voice'), textEn: 'Follow the voice',
+            pauseQueue: true,
+            action: function() {
+              patrolAppend(L('移動','Move'), 'tag-move',
+                L('你沿著聲音走了大約五十步。歌聲越來越近——然後，突然停了。', 'You follow the sound for fifty paces. The song grows closer — then, abruptly, stops.'), false);
+              // Show the petrified singer after a delay
+              patrolTimers.push(setTimeout(function() {
+                var singerArt = document.createElement('div');
+                singerArt.innerHTML = '<pre class="ascii-art">\n' +
+                  '          ╭──╮\n' +
+                  '          │♪ │  ·˚\n' +
+                  '       ╭──┤  ├──╮\n' +
+                  '       │░░│  │░░│\n' +
+                  '       │▓▓│  │▓▓│\n' +
+                  '       │██│  │██│\n' +
+                  '    ···╰──┴──┴──╯···\n' +
+                  '</pre>';
+                $story.appendChild(singerArt);
+                $story.scrollTop = $story.scrollHeight;
+                patrolTimers.push(setTimeout(function() {
+                  patrolAppend(L('感知','Sense'), 'tag-sense',
+                    L('死路的盡頭，坐著一個完全石化的女人。她的姿勢像是在抱著什麼——但懷裡是空的。', 'At the dead end sits a fully petrified woman. She seems to be holding something — but her arms are empty.'), false);
+                  patrolTimers.push(setTimeout(function() {
+                    patrolAppend(L('感知','Sense'), 'tag-sense',
+                      L('她的嘴微微張開，嘴唇凝固在一個音節上。完全石化的人，怎麼還能唱歌？', 'Her lips are parted, frozen mid-syllable. How could someone fully petrified still sing?'), false);
+                    patrolTimers.push(setTimeout(function() {
+                      patrolAppend(L('調查','Clue'), 'tag-info',
+                        L('你在她腳邊發現一枚石化吊墜。打開來，裡面有一縷沒有石化的頭髮——嬰兒的頭髮。她在唱搖籃曲。', 'At her feet lies a petrified locket. Inside — a lock of unpetrified hair. An infant\'s. She was singing a lullaby.'), false);
+                      // Show second choice
+                      $choices.innerHTML = '';
+                      var en = state.lang === 'en';
+                      var c1 = document.createElement('button');
+                      c1.className = 'choice-btn';
+                      c1.textContent = en ? 'Take it \u2014 remember her' : '\u5E36\u8D70\u5B83\uFF0C\u8A18\u4F4F\u5979';
+                      c1.addEventListener('click', function() {
+                        sfx.click(); sfx.item();
+                        changeStat('wil', 1); changePetri(2);
+                        $choices.innerHTML = '';
+                        var sb = document.createElement('button');
+                        sb.className = 'choice-btn'; sb.textContent = L('停下腳步','Stop and rest');
+                        sb.addEventListener('click', stopPatrol); $choices.appendChild(sb);
+                        patrolAppend(L('事件','Event'), 'tag-event',
+                          L('你收起吊墜。指尖觸碰石化表面的瞬間，暖意從手心蔓延——像是被感謝了。', 'You pocket the locket. Warmth spreads from your palm at the touch — as if being thanked.'), false);
+                        patrolAppend(L('系統','System'), 'tag-system',
+                          L('意志 +1。石化度 +2%。', 'WIL +1. Petrification +2%.'), false);
+                        notify(L('意志 +1（銘記亡者）', 'WIL +1 (Remembering the lost)'));
+                        renderStatus();
+                        patrolTimers.push(setTimeout(runPatrolCycle, 2000));
+                      });
+                      var c2 = document.createElement('button');
+                      c2.className = 'choice-btn';
+                      c2.textContent = en ? 'Leave it' : '\u653E\u56DE\u53BB';
+                      c2.addEventListener('click', function() {
+                        sfx.click();
+                        $choices.innerHTML = '';
+                        var sb = document.createElement('button');
+                        sb.className = 'choice-btn'; sb.textContent = L('停下腳步','Stop and rest');
+                        sb.addEventListener('click', stopPatrol); $choices.appendChild(sb);
+                        patrolAppend(L('巡邏','Patrol'), 'tag-move',
+                          L('你把吊墜放回她腳邊。轉身時，彷彿又聽見了極輕的哼唱。', 'You place the locket back. As you turn, you think you hear a faint hum once more.'), false);
+                        patrolTimers.push(setTimeout(runPatrolCycle, 2000));
+                      });
+                      var sb2 = document.createElement('button');
+                      sb2.className = 'choice-btn'; sb2.textContent = L('停下腳步','Stop and rest');
+                      sb2.addEventListener('click', stopPatrol);
+                      $choices.appendChild(c1); $choices.appendChild(c2); $choices.appendChild(sb2);
+                    }, 3500));
+                  }, 3000));
+                }, 2500));
+              }, 2000));
+            }
+          },
+          { text: L('忽略它', 'Ignore it'), textEn: 'Ignore it',
+            pauseQueue: true,
+            action: function() {
+              patrolAppend(L('巡邏','Patrol'), 'tag-move',
+                L('你捂住耳朵，加快腳步離開。有些聲音不該去追。', 'You cover your ears and quicken your pace. Some sounds are best left unfollowed.'), false);
+              patrolTimers.push(setTimeout(runPatrolCycle, 2000));
+            }
+          }
+        ]
+      });
+    }
+  }
+];
+
+registerPatrolEvents(0, R0_EVENTS);
+
+// ═══════════════════════════════════════════════════
+//  Narrative Patrol Events — R1 石脈迴廊
+// ═══════════════════════════════════════════════════
+
+var R1_EVENTS = [
+  // ── Event 1: 未石化的貓 (羈絆) ──
+  {
+    id: 'r1_cat', flag: '_evt_r1_cat', region: 1,
+    buildQueue: function(queue) {
+      queue.push({ art: '<pre class="ascii-art">\n' +
+        '         ╱╲___╱╲\n' +
+        '        (  ·  ·  )\n' +
+        '         ╲  ▽  ╱\n' +
+        '          ╱    ╲\n' +
+        '         │ ╭──╮ │\n' +
+        '         │ │  │ │\n' +
+        '         ╰─╯  ╰─╯\n' +
+        '</pre>', delay: 800 });
+      queue.push({ tag: L('感知','Sense'), color: 'tag-sense',
+        text: L('一雙發亮的眼睛從鐵軌旁的陰影裡盯著你。', 'A pair of glowing eyes watches you from the shadows beside the rail tracks.'),
+        delay: 2200 });
+      queue.push({ tag: L('感知','Sense'), color: 'tag-sense',
+        text: L('你屏住呼吸——是一隻貓。在這個一切都在石化的地方，一隻完全沒有石化跡象的、活生生的灰色小貓。', 'You hold your breath — it\'s a cat. In this place where everything turns to stone, a small grey cat with no trace of petrification. Alive.'),
+        delay: 3200 });
+      queue.push({ tag: L('感知','Sense'), color: 'tag-sense',
+        text: L('它歪著頭看你，發出一聲短促的「咪」。聲音在空曠的迴廊裡迴盪，竟然有一種荒誕的溫柔。', 'It tilts its head at you and lets out a short "mew." The sound echoes through the empty corridor — absurdly tender.'),
+        delay: 2800 });
+      // Ying companion variant
+      if (state.flags.r1YingCompanion) {
+        queue.push({ tag: L('同伴','Ally'), color: 'tag-ally',
+          text: L('螢蹲了下來，伸出手。小貓猶豫了一下，然後湊過來蹭了蹭她的指尖。螢笑了——你很少見到她笑得這麼沒有防備。', 'Ying crouches down, hand outstretched. The cat hesitates, then nuzzles her fingertips. Ying smiles — you\'ve rarely seen her smile so unguarded.'),
+          delay: 3200 });
+        queue.push({ tag: L('同伴','Ally'), color: 'tag-ally',
+          text: L('「牠怎麼沒有石化？」她抬頭看你，眼睛裡閃著好奇的光。「也許……牠知道什麼我們不知道的事。」', '"How is it not petrified?" She looks up at you, eyes bright with curiosity. "Maybe... it knows something we don\'t."'),
+          delay: 3000 });
+      }
+      queue.push({ tag: L('抉擇','Choice'), color: 'tag-event',
+        text: L('你要餵牠嗎？', 'Feed it?'),
+        choices: [
+          { text: hasItem(L('黑麵包','Black Bread'))
+              ? L('餵牠黑麵包', 'Feed it Black Bread')
+              : L('分一點口糧給牠', 'Share some rations'),
+            textEn: hasItem(L('黑麵包','Black Bread'))
+              ? 'Feed it Black Bread'
+              : 'Share some rations',
+            action: function() {
+              if (hasItem(L('黑麵包','Black Bread'))) removeItem(L('黑麵包','Black Bread'));
+              state.flags.r1CatFed = true;
+              sfx.item();
+              patrolAppend(L('事件','Event'), 'tag-event',
+                L('小貓小心翼翼地從你手裡叼走食物，吃完後用頭蹭了蹭你的腳踝。然後它跳上鐵軌，朝迴廊深處跑去——走了幾步又回頭看你一眼。', 'The cat delicately takes the food from your hand. After eating, it bumps its head against your ankle. Then it hops onto the rail and trots deeper into the corridor — pausing once to look back at you.'), false);
+              patrolAppend(L('系統','System'), 'tag-system',
+                L('巡邏戰鬥中受到的傷害 -10%（貓會分散敵人注意力）。', 'Patrol combat damage taken -10% (cat distracts enemies).'), false);
+              if (state.flags.r1YingCompanion) {
+                patrolAppend(L('同伴','Ally'), 'tag-ally',
+                  L('螢看著跑遠的小貓，又看看你：「……你比看起來心軟。」她的語氣裡有一絲你說不清的東西。', 'Ying watches the cat go, then looks at you: "...You\'re softer than you look." There\'s something in her tone you can\'t quite place.'), false);
+              }
+              renderStatus();
+            }
+          },
+          { text: L('不理牠', 'Ignore it'), textEn: 'Ignore it',
+            action: function() {
+              patrolAppend(L('巡邏','Patrol'), 'tag-move',
+                L('你沒有停下腳步。小貓在你身後叫了兩聲，然後消失在陰影裡。', 'You don\'t stop. The cat calls twice behind you, then vanishes into shadow.'), false);
+            }
+          }
+        ]
+      });
+    }
+  },
+
+  // ── Event 2: 失控礦車 (戰鬥+動作) ──
+  {
+    id: 'r1_minecart', flag: '_evt_r1_minecart', region: 1,
+    buildQueue: function(queue) {
+      queue.push({ tag: L('警告','Alert'), color: 'tag-warn',
+        text: L('腳下的鐵軌開始震動。', 'The rail tracks beneath your feet begin to vibrate.'),
+        delay: 1800 });
+      queue.push({ art: '<pre class="ascii-art">\n' +
+        '                    ╔═══╗\n' +
+        '     ──────────────→║礦車║→→→\n' +
+        '     ════════════════╚═╤═╝════\n' +
+        '     ──────────────────┴──────\n' +
+        '           !!  ◆你◆  !!\n' +
+        '</pre>', delay: 800 });
+      queue.push({ tag: L('警告','Alert'), color: 'tag-warn',
+        text: L('轟隆隆的聲音從黑暗中傳來——一輛裝滿碎石的礦車沿著軌道直衝而來！生鏽的車輪擦出火花，速度越來越快。', 'A thunderous rumble rolls from the darkness — a minecart loaded with rubble hurtles along the tracks! Rusted wheels throw sparks, accelerating.'),
+        delay: 2500, sfx: 'hurt' });
+      queue.push({ tag: L('抉擇','Choice'), color: 'tag-event',
+        text: L('沒時間想了——', 'No time to think —'),
+        choices: [
+          { text: L('閃到一邊 [敏捷]', 'Dodge aside [AGI]'), textEn: 'Dodge aside [AGI]',
+            action: function() {
+              var result = statCheck('agi', 7);
+              if (result !== 'fail') {
+                sfx.pass();
+                patrolAppend(L('事件','Event'), 'tag-event',
+                  L('你在最後一刻翻滾到鐵軌外側。礦車呼嘯而過，帶起的氣流吹得你頭髮飛揚。', 'You roll clear at the last second. The cart screams past, its slipstream whipping your hair.'), false);
+                if (result === 'crit') {
+                  patrolAppend(L('事件','Event'), 'tag-item',
+                    L('礦車翻覆後，你在散落的碎石中發現了一瓶完好的藥水。', 'After the cart overturns, you spot an intact potion among the scattered rubble.'), false);
+                  addItem(L('HP 藥水', 'HP Potion'));
+                }
+              } else {
+                sfx.fail();
+                changeHp(-8);
+                patrolAppend(L('事件','Event'), 'tag-warn',
+                  L('你閃避得太慢，礦車的邊緣擦過你的肩膀。劇痛讓你眼前一黑。', 'Too slow — the cart\'s edge clips your shoulder. Pain whites out your vision.'), false);
+                patrolAppend(L('系統','System'), 'tag-system',
+                  L('HP -8。', 'HP -8.'), false);
+                renderStatus();
+              }
+            }
+          },
+          { text: L('正面攔住它 [力量]', 'Brace and stop it [STR]'), textEn: 'Brace and stop it [STR]',
+            action: function() {
+              var result = statCheck('str', 7);
+              if (result !== 'fail') {
+                sfx.pass();
+                patrolAppend(L('事件','Event'), 'tag-combat',
+                  L('你紮穩腳步，雙手死死抵住礦車前沿。鐵鏽割破了你的掌心，但車速在減慢——最終，停了下來。', 'You brace yourself, palms jammed against the cart\'s front edge. Rust cuts your palms, but the cart slows — and stops.'), false);
+                changeHp(-3);
+                addItem(L('HP 藥水', 'HP Potion'));
+                patrolAppend(L('系統','System'), 'tag-system',
+                  L('HP -3。在車廂裡發現「HP 藥水」。', 'HP -3. Found "HP Potion" inside the cart.'), false);
+                renderStatus();
+              } else {
+                sfx.fail();
+                changeHp(-10);
+                patrolAppend(L('事件','Event'), 'tag-warn',
+                  L('礦車的重量遠超你的預期。它把你撞飛了出去，你重重地摔在鐵軌旁的碎石上。', 'The cart is far heavier than expected. It sends you flying, and you crash onto the gravel beside the tracks.'), false);
+                patrolAppend(L('系統','System'), 'tag-system',
+                  L('HP -10。', 'HP -10.'), false);
+                renderStatus();
+              }
+            }
+          }
+        ]
+      });
+    }
+  },
+
+  // ── Event 3: 完整的鏡子 (調查+內心) ──
+  {
+    id: 'r1_mirror', flag: '_evt_r1_mirror', region: 1,
+    buildQueue: function(queue) {
+      queue.push({ art: '<pre class="ascii-art">\n' +
+        '     ╔═══════════╗\n' +
+        '     ║  ╭─────╮  ║\n' +
+        '     ║  │ ?   ?│  ║\n' +
+        '     ║  │  ▽   │  ║\n' +
+        '     ║  │ ███  │  ║\n' +
+        '     ║  │ ▓▓▓  │  ║\n' +
+        '     ║  │ ░░░  │  ║\n' +
+        '     ║  ╰─────╯  ║\n' +
+        '     ╚═══════════╝\n' +
+        '</pre>', delay: 800 });
+      queue.push({ tag: L('感知','Sense'), color: 'tag-sense',
+        text: L('礦工宿舍的牆上掛著一面鏡子——完整的、沒有裂痕的。在這個到處都是廢墟的地方，這本身就很不正常。', 'A mirror hangs on the bunkhouse wall — intact, not a single crack. In this ruin, that alone is abnormal.'),
+        delay: 2800 });
+      queue.push({ tag: L('感知','Sense'), color: 'tag-sense',
+        text: L('鏡面上有一層淡淡的灰，但擦掉之後，倒影清晰得令人不安。', 'A thin layer of dust covers the surface, but once wiped, the reflection is unnervingly clear.'),
+        delay: 2500 });
+      queue.push({ tag: L('抉擇','Choice'), color: 'tag-event',
+        text: L('你要仔細看嗎？', 'Look closely?'),
+        choices: [
+          { text: L('凝視鏡中的自己', 'Gaze into the mirror'), textEn: 'Gaze into the mirror',
+            pauseQueue: true,
+            action: function() {
+              patrolAppend(L('感知','Sense'), 'tag-sense',
+                L('你靠近鏡子。起初，倒影是正常的——然後你注意到了。', 'You lean closer. At first, the reflection looks normal — then you notice.'), false);
+              patrolTimers.push(setTimeout(function() {
+                patrolAppend(L('感知','Sense'), 'tag-petri',
+                  L('鏡中的你，石化程度比現實更深。右臂已經完全變成了石頭，左腿的石化紋路一直蔓延到胸口。那是你的未來嗎？', 'The you in the mirror is more petrified than you are now. Right arm fully stone, left leg\'s patterns climbing to the chest. Is that your future?'), false);
+                patrolTimers.push(setTimeout(function() {
+                  if (state.flags.r1YingCompanion) {
+                    patrolAppend(L('同伴','Ally'), 'tag-ally',
+                      L('你還注意到——鏡中的你身邊，沒有螢。只有你一個人。', 'You also notice — in the mirror, Ying isn\'t beside you. You\'re alone.'), false);
+                  }
+                  patrolTimers.push(setTimeout(function() {
+                    patrolAppend(L('調查','Clue'), 'tag-info',
+                      L('鏡框的背面刻著一行小字：「此鏡照映石化之終。願觀者及時回頭。」——古代封印研究者的留言？', 'On the back of the frame, tiny words: "This mirror reflects petrification\'s end. May the viewer turn back in time." — A note from ancient seal researchers?'), false);
+                    // WIL check to resist despair
+                    var result = statCheck('wil', 6);
+                    if (result !== 'fail') {
+                      sfx.pass();
+                      changeStat('wil', 1);
+                      patrolAppend(L('事件','Event'), 'tag-event',
+                        L('你把鏡子翻過去扣在牆上。「我不會變成那樣。」你聽見自己的聲音比預期的更堅定。', 'You flip the mirror face-down against the wall. "I won\'t become that." Your voice sounds firmer than expected.'), false);
+                      patrolAppend(L('系統','System'), 'tag-system',
+                        L('意志 +1（抗拒命運）。', 'WIL +1 (Defying fate).'), false);
+                      notify(L('意志 +1（抗拒命運）', 'WIL +1 (Defying fate)'));
+                    } else {
+                      sfx.fail();
+                      changePetri(3);
+                      patrolAppend(L('事件','Event'), 'tag-petri',
+                        L('恐懼像冰水一樣灌進你的胸口。你退後一步，呼吸急促。手臂上的石化紋路彷彿比剛才……更深了一點。', 'Fear floods your chest like ice water. You step back, breathing hard. The petrification patterns on your arms seem... slightly deeper than before.'), false);
+                      patrolAppend(L('系統','System'), 'tag-system',
+                        L('石化度 +3%（恐懼侵蝕）。', 'Petrification +3% (eroded by fear).'), false);
+                    }
+                    renderStatus();
+                    $choices.innerHTML = '';
+                    var sb = document.createElement('button');
+                    sb.className = 'choice-btn'; sb.textContent = L('停下腳步','Stop and rest');
+                    sb.addEventListener('click', stopPatrol); $choices.appendChild(sb);
+                    patrolTimers.push(setTimeout(runPatrolCycle, 2000));
+                  }, 3000));
+                }, 2800));
+              }, 2500));
+            }
+          },
+          { text: L('離開，不看', 'Walk away — don\'t look'), textEn: 'Walk away — don\'t look',
+            action: function() {
+              patrolAppend(L('巡邏','Patrol'), 'tag-move',
+                L('你沒有看鏡子。有些真相，知道得太早並不是好事。', 'You leave the mirror alone. Some truths are best left unknown.'), false);
+            }
+          }
+        ]
+      });
+    }
+  }
+];
+
+registerPatrolEvents(1, R1_EVENTS);
+
+// ═══════════════════════════════════════════════════
+//  Narrative Patrol Events — R2 大採石場
+// ═══════════════════════════════════════════════════
+
+var R2_EVENTS = [
+  // ── Event 1: 古代自動販賣機 (幽默+金幣) ──
+  {
+    id: 'r2_vending', flag: '_evt_r2_vending', region: 2,
+    buildQueue: function(queue) {
+      queue.push({ art: '<pre class="ascii-art">\n' +
+        '     ╔══════════════╗\n' +
+        '     ║ ◈ 自動販賣 ◈ ║\n' +
+        '     ╠══════════════╣\n' +
+        '     ║  [?] [?] [?] ║\n' +
+        '     ║  [?] [?] [?] ║\n' +
+        '     ╠══════════════╣\n' +
+        '     ║  ○ 投幣口     ║\n' +
+        '     ║   ═══════    ║\n' +
+        '     ╚══════════════╝\n' +
+        '</pre>', delay: 800 });
+      queue.push({ tag: L('感知','Sense'), color: 'tag-sense',
+        text: L('採石場角落裡有一台機器——造型古舊、佈滿灰塵，但上面的水晶指示燈還在閃爍。它居然還在運作。', 'In the corner of the quarry stands a machine — ancient, dust-covered, but its crystal indicator lights still blink. It\'s still operational.'),
+        delay: 2800 });
+      queue.push({ tag: L('調查','Clue'), color: 'tag-info',
+        text: L('面板上的文字已經模糊，但你認出了幾個古代字符：「投入——獲得——祝你——」。後面的字被石化粉塵蓋住了。', 'The panel\'s text is blurred, but you make out ancient glyphs: "Insert — receive — may you —". The rest is buried under petri-dust.'),
+        delay: 2800 });
+      queue.push({ tag: L('抉擇','Choice'), color: 'tag-event',
+        text: L('投幣口的大小剛好適合你的金幣。', 'The coin slot is just the right size for your gold.'),
+        choices: [
+          { text: (state.flags._gold || 0) >= 5
+              ? L('投入 5 金幣', 'Insert 5 gold')
+              : L('金幣不夠（需要 5 枚）', 'Not enough gold (need 5)'),
+            textEn: (state.flags._gold || 0) >= 5
+              ? 'Insert 5 gold'
+              : 'Not enough gold (need 5)',
+            action: function() {
+              if ((state.flags._gold || 0) < 5) {
+                patrolAppend(L('系統','System'), 'tag-system',
+                  L('你翻遍了口袋，金幣不夠。', 'You search your pockets — not enough gold.'), false);
+                return;
+              }
+              state.flags._gold -= 5;
+              sfx.click();
+              // 50/50 reward or penalty
+              if (Math.random() < 0.5) {
+                var rewards = [
+                  { item: L('HP 藥水','HP Potion'), zh: '一瓶微微發光的藥水從出口滾了出來。', en: 'A faintly glowing potion rolls from the slot.' },
+                  { item: L('黑麵包','Black Bread'), zh: '一塊包裝完好的黑麵包——保存了幾百年居然還能吃？', en: 'A perfectly preserved Black Bread — edible after centuries?' },
+                  { item: L('微光石','Glimmer Stone'), zh: '一顆溫熱的微光石落入你手中。', en: 'A warm Glimmer Stone drops into your hands.' }
+                ];
+                var r = rewards[rng(0, rewards.length - 1)];
+                sfx.item();
+                addItem(r.item);
+                patrolAppend(L('事件','Event'), 'tag-item',
+                  L('機器嗡嗡作響，出口翻板彈開——' + r.zh, 'The machine hums, the delivery flap pops open — ' + r.en), false);
+              } else {
+                sfx.petri();
+                changePetri(2);
+                patrolAppend(L('事件','Event'), 'tag-warn',
+                  L('機器發出一陣刺耳的嘎嘎聲，然後從出口噴出了一團石化粉塵。你吃了金幣，卻只得到一臉灰。', 'The machine rattles harshly, then blasts petri-dust from the slot. It ate your gold and gave you a face full of dust.'), false);
+                patrolAppend(L('系統','System'), 'tag-system',
+                  L('金幣 -5。石化度 +2%。', 'Gold -5. Petrification +2%.'), false);
+              }
+              renderStatus();
+            }
+          },
+          { text: L('不碰它', 'Leave it alone'), textEn: 'Leave it alone',
+            action: function() {
+              patrolAppend(L('巡邏','Patrol'), 'tag-move',
+                L('你離開了販賣機。幾百年前的東西，誰知道裡面還裝著什麼。', 'You leave the machine. Who knows what\'s been sitting inside for centuries.'), false);
+            }
+          }
+        ]
+      });
+    }
+  },
+
+  // ── Event 2: 營火說書人 (調查+情報+羈絆) ──
+  {
+    id: 'r2_storyteller', flag: '_evt_r2_storyteller', region: 2,
+    buildQueue: function(queue) {
+      queue.push({ art: '<pre class="ascii-art">\n' +
+        '         ╱ ╲\n' +
+        '        ╱   ╲\n' +
+        '      ✦╱ ·˚· ╲✦\n' +
+        '    ──╱───────╲──\n' +
+        '      ·  ╱▲╲  ·\n' +
+        '     ·  ╱▲▲▲╲  ·\n' +
+        '    ·  ╱▲▲▲▲▲╲  ·\n' +
+        '       ═══════\n' +
+        '</pre>', delay: 800 });
+      queue.push({ tag: L('感知','Sense'), color: 'tag-sense',
+        text: L('前方有營火的光——不是倖存者營地的那個，而是更小的、更隱蔽的。一個佝僂的老人獨自坐在火旁。', 'Firelight ahead — not the survivor camp\'s, but smaller, more hidden. A hunched old figure sits alone by the flames.'),
+        delay: 2800 });
+      queue.push({ tag: L('感知','Sense'), color: 'tag-sense',
+        text: L('老人看到你也不驚慌，反而朝你招了招手。「來——坐。聽我說個故事。」他的聲音沙啞但平靜。', 'The old man doesn\'t startle at your approach. He waves you over. "Come — sit. Let me tell you a story." His voice is hoarse but calm.'),
+        delay: 3000 });
+      queue.push({ tag: L('抉擇','Choice'), color: 'tag-event',
+        text: L('你要聽嗎？', 'Listen?'),
+        choices: [
+          { text: L('坐下來聽', 'Sit and listen'), textEn: 'Sit and listen',
+            pauseQueue: true,
+            action: function() {
+              state.flags.r2LoreHeard = true;
+              changeHp(5);
+              patrolAppend(L('事件','Event'), 'tag-event',
+                L('你在營火旁坐下。火焰的溫度烤暖了你僵硬的關節。', 'You sit by the fire. Its warmth loosens your stiff joints.'), false);
+              patrolTimers.push(setTimeout(function() {
+                patrolAppend(L('情報','Intel'), 'tag-info',
+                  L('「很久以前，這裡不是洞穴。」老人盯著火焰。「這裡是一座城市。比河城大十倍。他們挖到了一種能量——石化能量。」', '"Long ago, this wasn\'t a cave." The old man stares into the flames. "It was a city. Ten times larger than River Port. They mined an energy — petrification energy."'), false);
+                patrolTimers.push(setTimeout(function() {
+                  patrolAppend(L('情報','Intel'), 'tag-info',
+                    L('「他們用它來造武器、造機器、甚至造長生不老的藥。但他們太貪了——封印破了。能量溢出來，一夜之間，整座城市變成了石頭。」', '"They used it for weapons, machines, even immortality elixirs. But they were too greedy — the seal broke. Energy flooded out, and overnight, the entire city turned to stone."'), false);
+                  patrolTimers.push(setTimeout(function() {
+                    patrolAppend(L('調查','Clue'), 'tag-info',
+                      L('「瘟疫不是天災。」老人看著你。「是人禍。而封印——」他指了指地下的方向。「就在更深的地方。」', '"The plague is no natural disaster." The old man looks at you. "It was man-made. And the seal —" He points downward. "— is deeper still."'), false);
+                    if (state.flags.r1YingCompanion) {
+                      patrolTimers.push(setTimeout(function() {
+                        patrolAppend(L('同伴','Ally'), 'tag-ally',
+                          L('螢在旁邊飛快地記錄著。她的筆尖劃過紙面的聲音在安靜的洞穴裡格外清晰。你看到她的手在微微發抖——不是因為冷。', 'Ying scribbles furiously beside you. The scratch of her pen on paper is crisp in the quiet cave. You see her hand trembling — not from cold.'), false);
+                        patrolTimers.push(setTimeout(function() {
+                          patrolAppend(L('同伴','Ally'), 'tag-ally',
+                            L('她抬頭看你，眼睛裡有你從未見過的表情——不是恐懼，是某種使命感。「這些……必須被記錄下來。」', 'She looks up, eyes holding an expression you\'ve never seen — not fear, but a sense of mission. "This... must be documented."'), false);
+                          endStoryteller();
+                        }, 3000));
+                      }, 2800));
+                    } else {
+                      endStoryteller();
+                    }
+                    function endStoryteller() {
+                      patrolTimers.push(setTimeout(function() {
+                        patrolAppend(L('事件','Event'), 'tag-event',
+                          L('老人笑了笑，站起身來。「好了——故事說完了。路還長，年輕人。」他走進黑暗中，消失得彷彿從未出現過。', 'The old man smiles and rises. "Well — the story\'s done. Long road ahead, young one." He walks into the dark, vanishing as if he\'d never been.'), false);
+                        patrolAppend(L('系統','System'), 'tag-system',
+                          L('HP +5。獲得古代瘟疫線索。', 'HP +5. Gained ancient plague clue.'), false);
+                        renderStatus();
+                        $choices.innerHTML = '';
+                        var sb = document.createElement('button');
+                        sb.className = 'choice-btn'; sb.textContent = L('停下腳步','Stop and rest');
+                        sb.addEventListener('click', stopPatrol); $choices.appendChild(sb);
+                        patrolTimers.push(setTimeout(runPatrolCycle, 2000));
+                      }, 2500));
+                    }
+                  }, 3500));
+                }, 3200));
+              }, 2500));
+            }
+          },
+          { text: L('不信任他，離開', 'Don\'t trust him — leave'), textEn: 'Don\'t trust him — leave',
+            action: function() {
+              patrolAppend(L('巡邏','Patrol'), 'tag-move',
+                L('你遠遠繞開了營火。在深淵裡，陌生人的善意可能是最危險的東西。', 'You give the fire a wide berth. In the abyss, a stranger\'s kindness may be the most dangerous thing of all.'), false);
+            }
+          }
+        ]
+      });
+    }
+  },
+
+  // ── Event 3: 突發地震 (戰鬥+危機) ──
+  {
+    id: 'r2_quake', flag: '_evt_r2_quake', region: 2,
+    buildQueue: function(queue) {
+      queue.push({ tag: L('警告','Alert'), color: 'tag-warn',
+        text: L('腳下的地面突然猛烈晃動。', 'The ground lurches violently beneath your feet.'), sfx: 'hurt',
+        delay: 1500 });
+      queue.push({ art: '<pre class="ascii-art">\n' +
+        '   ～～～～～～～～～～～～～～～\n' +
+        '   ≈≈  ╱╲ 落石 ╱╲  ≈≈\n' +
+        '   ～  ╱  ╲▼▼╱  ╲  ～\n' +
+        '   ≈ ╱    ╲╱    ╲ ≈\n' +
+        '   ═══════════════════\n' +
+        '     ◆你◆   !!!!!!\n' +
+        '</pre>', delay: 800 });
+      queue.push({ tag: L('警告','Alert'), color: 'tag-warn',
+        text: L('地震！巨大的石塊從採石場頂端崩落，粉塵瞬間遮蔽了視線。你的腳下裂開了一道縫——', 'Earthquake! Massive slabs crash from the quarry ceiling, dust blotting out your sight. The ground splits open beneath you —'),
+        delay: 2200 });
+      queue.push({ tag: L('抉擇','Choice'), color: 'tag-event',
+        text: L('你必須立刻反應——', 'React — now!'),
+        choices: [
+          { text: L('跑！ [敏捷]', 'Run! [AGI]'), textEn: 'Run! [AGI]',
+            action: function() {
+              var result = statCheck('agi', 7);
+              if (result !== 'fail') {
+                sfx.pass();
+                patrolAppend(L('事件','Event'), 'tag-event',
+                  L('你拔腿就跑。碎石在你身後轟然落下，氣浪推著你向前滾了兩圈——但你活下來了。', 'You sprint. Rubble crashes behind you, the blast wave rolling you forward — but you\'re alive.'), false);
+                if (result === 'crit') {
+                  state.flags._gold = (state.flags._gold || 0) + 3;
+                  patrolAppend(L('事件','Event'), 'tag-item',
+                    L('灰塵散去後，你發現腳邊有幾枚被震出來的金幣。', 'As the dust clears, you spot coins shaken loose near your feet.'), false);
+                  patrolAppend(L('系統','System'), 'tag-system',
+                    L('金幣 +3。', 'Gold +3.'), false);
+                }
+              } else {
+                sfx.fail();
+                changeHp(-8);
+                patrolAppend(L('事件','Event'), 'tag-warn',
+                  L('你跑得不夠快。一塊碎石砸中了你的背，把你壓倒在地。你掙扎了好一陣才爬出來。', 'Too slow. A slab catches your back, pinning you down. It takes a painful struggle to crawl free.'), false);
+                patrolAppend(L('系統','System'), 'tag-system',
+                  L('HP -8。', 'HP -8.'), false);
+                renderStatus();
+              }
+            }
+          },
+          { text: L('找掩護蹲下！ [力量]', 'Brace for cover! [STR]'), textEn: 'Brace for cover! [STR]',
+            action: function() {
+              var result = statCheck('str', 7);
+              if (result !== 'fail') {
+                sfx.pass();
+                patrolAppend(L('事件','Event'), 'tag-combat',
+                  L('你抱住頭縮到一塊巨石旁。落石砸在你的掩護上，震得你耳鳴——但巨石替你擋住了致命的一擊。', 'You curl up beside a boulder. Rubble hammers your shelter, ringing your ears — but the boulder takes the killing blow for you.'), false);
+                if (result === 'crit') {
+                  gainXp(10);
+                  patrolAppend(L('事件','Event'), 'tag-item',
+                    L('地震裂開的地縫裡露出了一團結晶——高品質的石化結晶，蘊含著能量。', 'The quake\'s fissure reveals a cluster of crystals — high-quality petri-crystals, brimming with energy.'), false);
+                  patrolAppend(L('系統','System'), 'tag-system',
+                    L('經驗 +10。', 'XP +10.'), false);
+                }
+              } else {
+                sfx.fail();
+                changeHp(-12);
+                changePetri(3);
+                patrolAppend(L('事件','Event'), 'tag-warn',
+                  L('你的掩護不夠好。碎石和石化粉塵同時砸向你——等到地震停止時，你渾身都是傷。', 'Your cover isn\'t enough. Rubble and petri-dust bury you — when the quake stops, you\'re bruised all over.'), false);
+                patrolAppend(L('系統','System'), 'tag-system',
+                  L('HP -12。石化度 +3%。', 'HP -12. Petrification +3%.'), false);
+                renderStatus();
+              }
+            }
+          }
+        ]
+      });
+    }
+  }
+];
+
+registerPatrolEvents(2, R2_EVENTS);
+
+// ═══════════════════════════════════════════════════
+//  Narrative Patrol Events — R3 河城渡口
+// ═══════════════════════════════════════════════════
+
+var R3_EVENTS = [
+  // ── Event 1: 碼頭賭局 (金幣+冒險) ──
+  {
+    id: 'r3_gamble', flag: '_evt_r3_gamble', region: 3,
+    buildQueue: function(queue) {
+      queue.push({ art: '<pre class="ascii-art">\n' +
+        '     ╔═══════════════╗\n' +
+        '     ║  ⚄ 碼頭賭局 ⚃ ║\n' +
+        '     ╠═══════════════╣\n' +
+        '     ║  「來一把？」   ║\n' +
+        '     ║   ⚀⚁⚂⚃⚄⚅   ║\n' +
+        '     ╚═══════════════╝\n' +
+        '</pre>', delay: 800 });
+      queue.push({ tag: L('感知','Sense'), color: 'tag-sense',
+        text: L('碼頭角落有幾個碼頭工人圍成一圈，蹲在地上擲骰子。看到你走過來，一個光頭大漢抬起頭：「有種來一把？」', 'Dock workers huddle in a circle, throwing dice on the ground. A bald bruiser looks up as you approach: "Got the nerve for a round?"'),
+        delay: 2800 });
+      queue.push({ tag: L('感知','Sense'), color: 'tag-sense',
+        text: L('賭注不大——三枚金幣入場。但碼頭上的賭局從來不只是賭錢。這是融入河城最快的方式。', 'The stakes are modest — three gold to enter. But dock games are never just about money. It\'s the fastest way to fit in at River Port.'),
+        delay: 2500 });
+      queue.push({ tag: L('抉擇','Choice'), color: 'tag-event',
+        text: L('你要參加嗎？', 'Join?'),
+        choices: [
+          { text: (state.flags._gold || 0) >= 3
+              ? L('加入（3 金幣）', 'Join (3 gold)')
+              : L('金幣不夠（需要 3 枚）', 'Not enough gold (need 3)'),
+            textEn: (state.flags._gold || 0) >= 3
+              ? 'Join (3 gold)'
+              : 'Not enough gold (need 3)',
+            action: function() {
+              if ((state.flags._gold || 0) < 3) {
+                patrolAppend(L('系統','System'), 'tag-system',
+                  L('你攤了攤手。光頭大漢嗤笑了一聲：「沒錢就別來湊熱鬧。」', 'You show empty palms. The bruiser snorts: "No coin, no game."'), false);
+                return;
+              }
+              state.flags._gold -= 3;
+              var roll = rng(1, 6);
+              sfx.click();
+              patrolAppend(L('事件','Event'), 'tag-event',
+                L('你投入三枚金幣，抓起骰子——擲出了 ' + roll + ' 點。', 'You toss in three gold, grab the dice — and roll a ' + roll + '.'), false);
+              if (roll >= 5) {
+                sfx.pass();
+                var win = roll === 6 ? 8 : 5;
+                state.flags._gold = (state.flags._gold || 0) + win;
+                patrolAppend(L('事件','Event'), 'tag-item',
+                  L(roll === 6
+                    ? '六點！滿堂彩！碼頭工人們鼓掌叫好。光頭大漢把一大把金幣推到你面前：「手氣不錯嘛。」'
+                    : '贏了。光頭大漢咂了咂嘴，把金幣推過來：「運氣不錯。」',
+                    roll === 6
+                    ? 'Six! Full marks! The dock workers cheer. The bruiser shoves a pile of coins your way: "Lucky hand."'
+                    : 'You win. The bruiser clicks his tongue and pushes coins over: "Not bad."'), false);
+                patrolAppend(L('系統','System'), 'tag-system',
+                  L('金幣 +' + win + '。', 'Gold +' + win + '.'), false);
+              } else {
+                sfx.fail();
+                patrolAppend(L('事件','Event'), 'tag-warn',
+                  L('輸了。光頭大漢把你的金幣掃走，朝你咧嘴笑：「下次再來。」周圍的人哄笑一片。', 'You lose. The bruiser sweeps your coins away, grinning: "Come again." Laughter all around.'), false);
+                patrolAppend(L('系統','System'), 'tag-system',
+                  L('金幣 -3。', 'Gold -3.'), false);
+              }
+              renderStatus();
+            }
+          },
+          { text: L('搖頭離開', 'Shake your head and leave'), textEn: 'Shake your head and leave',
+            action: function() {
+              patrolAppend(L('巡邏','Patrol'), 'tag-move',
+                L('你擺了擺手，繼續巡邏。身後傳來嘲弄的口哨聲。', 'You wave them off and move on. A mocking whistle trails behind you.'), false);
+            }
+          }
+        ]
+      });
+    }
+  },
+
+  // ── Event 2: 偷東西的小孩 (道德+調查+羈絆) ──
+  {
+    id: 'r3_thief_kid', flag: '_evt_r3_thief_kid', region: 3,
+    buildQueue: function(queue) {
+      queue.push({ art: '<pre class="ascii-art">\n' +
+        '      ╭──╮\n' +
+        '      │··│    ╔═══╗\n' +
+        '      │▿ │ ←──║蘋果║\n' +
+        '    ╭─┤  ├─╮  ╚═══╝\n' +
+        '    │ ╰──╯ │  攤位\n' +
+        '    │      │  ═══════\n' +
+        '    ╰─┬──┬─╯\n' +
+        '      │  │\n' +
+        '</pre>', delay: 800 });
+      queue.push({ tag: L('感知','Sense'), color: 'tag-sense',
+        text: L('市場的水果攤旁，一個瘦得皮包骨的小孩正把一顆蘋果塞進破爛的衣服裡。動作很快——但不夠快。', 'By the market fruit stall, a skeletal child is stuffing an apple into their ragged clothes. Quick — but not quick enough.'),
+        delay: 2800 });
+      queue.push({ tag: L('感知','Sense'), color: 'tag-sense',
+        text: L('攤主還沒發現。但按照河城的規矩，偷竊者會被砍掉一隻手——即使是小孩。', 'The vendor hasn\'t noticed yet. But by River Port law, thieves lose a hand — even children.'),
+        delay: 2800 });
+      queue.push({ tag: L('感知','Sense'), color: 'tag-sense',
+        text: L('小孩的眼睛和你對上了。那雙眼裡沒有恐懼——只有一種超越年齡的冷靜：「你要怎麼辦？」', 'The child\'s eyes meet yours. No fear in them — only a calm beyond their years: "So what are you going to do?"'),
+        delay: 3000 });
+      queue.push({ tag: L('抉擇','Choice'), color: 'tag-event',
+        text: L('你的選擇——', 'Your choice —'),
+        choices: [
+          { text: L('幫忙掩護', 'Cover for the kid'), textEn: 'Cover for the kid',
+            action: function() {
+              state.flags.r3KidHelped = true;
+              sfx.pass();
+              patrolAppend(L('事件','Event'), 'tag-event',
+                L('你不動聲色地擋住攤主的視線，假裝在挑選水果。小孩趁機溜進了人群。', 'You casually block the vendor\'s line of sight, pretending to browse. The child slips into the crowd.'), false);
+              patrolAppend(L('感知','Sense'), 'tag-sense',
+                L('幾秒後，一隻小手從你的袖口裡塞了一張紙條進去。你低頭看——上面寫著一個地址，還有一行字：「晚上來，有你想知道的事。」', 'Seconds later, a small hand slips a note into your sleeve. You read: an address, and one line: "Come at night. I have what you want to know."'), false);
+              patrolAppend(L('調查','Clue'), 'tag-info',
+                L('這個地址……在河城的下城區。那裡住的都是石化度最高的人——被遺棄的人。', 'This address... is in the lower quarter. That\'s where the most petrified live — the abandoned ones.'), false);
+              patrolAppend(L('系統','System'), 'tag-system',
+                L('小孩可能是底層的重要證人。', 'The child may be an important witness from below.'), false);
+              renderStatus();
+            }
+          },
+          { text: L('向攤主舉報', 'Report to the vendor'), textEn: 'Report to the vendor',
+            action: function() {
+              state.flags._gold = (state.flags._gold || 0) + 3;
+              sfx.click();
+              patrolAppend(L('事件','Event'), 'tag-event',
+                L('你指了指小孩。攤主一把抓住了那條瘦弱的手臂。「小兔崽子——！」', 'You point at the child. The vendor grabs that skinny arm. "You little rat — !"'), false);
+              patrolAppend(L('感知','Sense'), 'tag-sense',
+                L('小孩被拖走的時候回頭看了你一眼。那雙眼睛裡終於有了情緒——不是恨，是失望。', 'As the child is dragged away, they look back at you. Finally, emotion in those eyes — not hatred. Disappointment.'), false);
+              patrolAppend(L('系統','System'), 'tag-system',
+                L('攤主感謝你，給了你 3 金幣。', 'The vendor thanks you with 3 gold.'), false);
+              renderStatus();
+            }
+          },
+          { text: L('假裝沒看到', 'Pretend you didn\'t see'), textEn: 'Pretend you didn\'t see',
+            action: function() {
+              patrolAppend(L('巡邏','Patrol'), 'tag-move',
+                L('你移開視線，繼續走你的路。河城的規矩不關你的事。', 'You look away and continue on your path. River Port\'s rules aren\'t your concern.'), false);
+            }
+          }
+        ]
+      });
+    }
+  },
+
+  // ── Event 3: 匿名信 (調查+懸疑+愛情) ──
+  {
+    id: 'r3_letter', flag: '_evt_r3_letter', region: 3,
+    buildQueue: function(queue) {
+      queue.push({ art: '<pre class="ascii-art">\n' +
+        '     ╔═══════════════╗\n' +
+        '     ║  ╭──────────╮ ║\n' +
+        '     ║  │ 致：外來者│ ║\n' +
+        '     ║  │          │ ║\n' +
+        '     ║  │ ？？？？ │ ║\n' +
+        '     ║  │          │ ║\n' +
+        '     ║  ╰──────────╯ ║\n' +
+        '     ║    ＊密封＊    ║\n' +
+        '     ╚═══════════════╝\n' +
+        '</pre>', delay: 800 });
+      queue.push({ tag: L('感知','Sense'), color: 'tag-sense',
+        text: L('你在客棧門口發現一封信。沒有署名，只寫著「致：外來者」——顯然是給你的。信封用蠟封了口。', 'At the inn\'s doorstep, you find a letter. No signature — just "To: The Outsider." Obviously for you. Wax-sealed.'),
+        delay: 2800 });
+      queue.push({ tag: L('感知','Sense'), color: 'tag-sense',
+        text: L('蠟封的圖案是一隻閉上眼睛的貓頭鷹——你在議會廳的牆壁上見過同樣的標誌。', 'The seal bears a closed-eyed owl — the same emblem you\'ve seen on the Council Hall walls.'),
+        delay: 2500 });
+      queue.push({ tag: L('抉擇','Choice'), color: 'tag-event',
+        text: L('你要打開它嗎？', 'Open it?'),
+        choices: [
+          { text: L('拆開信封', 'Break the seal'), textEn: 'Break the seal',
+            pauseQueue: true,
+            action: function() {
+              state.flags.r3AnonLetter = true;
+              sfx.item();
+              patrolAppend(L('調查','Clue'), 'tag-info',
+                L('信紙上的字跡工整而急促，像是在很短的時間裡寫完的——', 'The handwriting is neat but hurried, as if dashed off in stolen minutes —'), false);
+              patrolTimers.push(setTimeout(function() {
+                patrolAppend(L('情報','Intel'), 'tag-info',
+                  L('「封鎖通道的提案不是鏽刃一個人的主意。議會裡有人在暗中推動——他們需要封鎖通道來壟斷石化結晶的開採權。下層死多少人不重要。重要的是利潤。」', '"The sealing proposal isn\'t Rust Blade\'s idea alone. Someone on the Council is pushing it from the shadows — they need the passages sealed to monopolize petri-crystal mining rights. How many die below doesn\'t matter. Only profit does."'), false);
+                patrolTimers.push(setTimeout(function() {
+                  patrolAppend(L('情報','Intel'), 'tag-info',
+                    L('「你找到的那個人——銅鐘——是唯一一個反對的。但她不知道真正的敵人是誰。告訴她，查查玉秤的帳本。」', '"The one you found — Bronze Bell — is the only one opposed. But she doesn\'t know who the real enemy is. Tell her to check Jade Scale\'s ledger."'), false);
+                  patrolTimers.push(setTimeout(function() {
+                    patrolAppend(L('調查','Clue'), 'tag-info',
+                      L('信的末尾只有一行小字：「毀掉這封信。看完就忘。——一個還有良心的人。」', 'At the bottom, one small line: "Burn this letter. Forget you read it. — Someone with a conscience still."'), false);
+                    changeStat('wil', 1);
+                    patrolAppend(L('系統','System'), 'tag-system',
+                      L('意志 +1。獲得議會陰謀線索。（銅鐘對話時可使用）', 'WIL +1. Gained Council conspiracy clue. (Use in Bronze Bell dialogue)'), false);
+                    notify(L('意志 +1（真相的重量）', 'WIL +1 (The weight of truth)'));
+                    // Ying romance moment
+                    if (state.flags.r1YingCompanion) {
+                      patrolTimers.push(setTimeout(function() {
+                        patrolAppend(L('同伴','Ally'), 'tag-ally',
+                          L('螢從你身後湊過來看信。她的肩膀碰到了你的手臂——她沒有避開。', 'Ying leans over your shoulder to read. Her shoulder touches your arm — she doesn\'t pull away.'), false);
+                        patrolTimers.push(setTimeout(function() {
+                          patrolAppend(L('同伴','Ally'), 'tag-ally',
+                            L('「……有人在幫我們。」她的聲音很輕，呼吸拂在你的耳邊。你突然意識到她靠得有多近。', '"...Someone\'s helping us." Her voice is quiet, breath brushing your ear. You suddenly realize how close she is.'), false);
+                          patrolTimers.push(setTimeout(function() {
+                            patrolAppend(L('同伴','Ally'), 'tag-ally',
+                              L('她注意到你的視線，耳尖微微泛紅，但沒有退開。「看什麼……專心看信。」', 'She notices your gaze, ear tips flushing, but doesn\'t retreat. "What are you looking at... focus on the letter."'), false);
+                            renderStatus();
+                            $choices.innerHTML = '';
+                            var sb = document.createElement('button');
+                            sb.className = 'choice-btn'; sb.textContent = L('停下腳步','Stop and rest');
+                            sb.addEventListener('click', stopPatrol); $choices.appendChild(sb);
+                            patrolTimers.push(setTimeout(runPatrolCycle, 2500));
+                          }, 2800));
+                        }, 3000));
+                      }, 2500));
+                    } else {
+                      renderStatus();
+                      $choices.innerHTML = '';
+                      var sb = document.createElement('button');
+                      sb.className = 'choice-btn'; sb.textContent = L('停下腳步','Stop and rest');
+                      sb.addEventListener('click', stopPatrol); $choices.appendChild(sb);
+                      patrolTimers.push(setTimeout(runPatrolCycle, 2000));
+                    }
+                  }, 3200));
+                }, 3500));
+              }, 2800));
+            }
+          },
+          { text: L('丟掉它', 'Discard it'), textEn: 'Discard it',
+            action: function() {
+              patrolAppend(L('巡邏','Patrol'), 'tag-move',
+                L('你把信扔進了路邊的火盆。匿名信從來不是好東西。', 'You toss the letter into a roadside brazier. Anonymous letters are never good news.'), false);
+            }
+          }
+        ]
+      });
+    }
+  }
+];
+
+registerPatrolEvents(3, R3_EVENTS);
+
 // Region-aware helpers — now delegate to registry for R4+ extensibility
 var PATROL_TEXTS = R0_PATROL_TEXTS; // kept for backwards compat
 function getPatrolMonsters() { return getMonsterPool(); }
