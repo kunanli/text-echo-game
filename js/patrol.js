@@ -491,6 +491,232 @@ registerPatrolTexts(1, R1_PATROL_TEXTS);
 registerPatrolTexts(2, R2_PATROL_TEXTS);
 registerPatrolTexts(3, R3_PATROL_TEXTS);
 
+// ═══════════════════════════════════════════════════
+//  Narrative Patrol Events — R0 祭獻坑
+// ═══════════════════════════════════════════════════
+
+var R0_EVENTS = [
+  // ── Event 1: 石化雕像求救 (戰鬥+道德) ──
+  {
+    id: 'r0_statue', flag: '_evt_r0_statue', region: 0,
+    buildQueue: function(queue) {
+      queue.push({ art: '<pre class="ascii-art">\n' +
+        '        ╭─────╮\n' +
+        '        │ ◉  ◉│  ← 眼睛在動\n' +
+        '        │  ▽  │\n' +
+        '        ╰──┬──╯\n' +
+        '      ░▓███│███▓░\n' +
+        '      ▓████│████▓\n' +
+        '      ░▓██─┴─██▓░\n' +
+        '       ░▓█████▓░\n' +
+        '        ░░▓▓▓░░\n' +
+        '</pre>', delay: 800 });
+      queue.push({ tag: L('事件','Event'), color: 'tag-event',
+        text: L('你經過一尊石化雕像時，它的嘴唇動了。', 'As you pass a petrified statue, its lips move.'),
+        delay: 2200 });
+      queue.push({ tag: L('感知','Sense'), color: 'tag-sense',
+        text: L('「……幫……我……」聲音像從石頭縫裡擠出來的，乾澀、痛苦、微弱得幾乎不存在。', '"...help...me..." The voice squeezes from between cracks in stone — dry, agonized, barely there.'),
+        delay: 3000 });
+      queue.push({ tag: L('感知','Sense'), color: 'tag-sense',
+        text: L('你看見它的眼珠在石化的眼眶裡緩慢轉動。這個人還活著——被困在自己的身體裡。', 'You see its eyeballs rolling slowly within petrified sockets. This person is still alive — trapped inside their own body.'),
+        delay: 3000 });
+      queue.push({ tag: L('抉擇','Choice'), color: 'tag-event',
+        text: L('你要怎麼做？', 'What do you do?'),
+        choices: [
+          { text: L('嘗試撬開石殼 [力量]', 'Try to pry open the shell [STR]'), textEn: 'Try to pry open the shell [STR]',
+            action: function() {
+              var result = statCheck('str', 6);
+              if (result !== 'fail') {
+                sfx.pass();
+                addItem(L('石心碎片', 'Stone Heart Shard'));
+                changePetri(3);
+                patrolAppend(L('事件','Event'), 'tag-event',
+                  L('你用盡全力，掰開了胸口處的石殼。一塊溫熱的碎片落入你手中——它還帶著那個人最後的體溫。', 'You pry open the chest plate with all your strength. A warm shard falls into your palm — still carrying that person\'s last body heat.'), false);
+                patrolAppend(L('系統','System'), 'tag-system',
+                  L('石化度 +3%。獲得「石心碎片」。', 'Petrification +3%. Obtained "Stone Heart Shard".'), false);
+                patrolAppend(L('感知','Sense'), 'tag-sense',
+                  L('石像的嘴角似乎微微上揚了。然後，所有的動靜都停了。', 'The statue\'s lips seem to curve upward, just slightly. Then all movement ceases.'), false);
+                renderStatus();
+              } else {
+                sfx.fail();
+                changePetri(5);
+                patrolAppend(L('事件','Event'), 'tag-warn',
+                  L('你的手觸碰石殼的瞬間，石化粉塵從裂縫中噴出，沾滿了你的手臂。你什麼都沒能救出來。', 'The instant you touch the shell, petri-dust erupts from the cracks, coating your arms. You couldn\'t save anything.'), false);
+                patrolAppend(L('系統','System'), 'tag-system',
+                  L('石化度 +5%。', 'Petrification +5%.'), false);
+                renderStatus();
+              }
+            }
+          },
+          { text: L('走開', 'Walk away'), textEn: 'Walk away',
+            action: function() {
+              patrolAppend(L('巡邏','Patrol'), 'tag-move',
+                L('你移開目光，繼續前進。身後傳來一聲極輕的嘆息——或者只是風聲。', 'You look away and move on. A faint sigh drifts from behind — or perhaps it\'s just the wind.'), false);
+            }
+          }
+        ]
+      });
+    }
+  },
+
+  // ── Event 2: 裂縫微光 (探索+調查) ──
+  {
+    id: 'r0_crack_light', flag: '_evt_r0_crack_light', region: 0,
+    buildQueue: function(queue) {
+      queue.push({ art: '<pre class="ascii-art">\n' +
+        '    ██████████████████████\n' +
+        '    ████████╲    ╱████████\n' +
+        '    █████████╲✦╱█████████\n' +
+        '    ██████████╳██████████\n' +
+        '    █████████╱ ╲█████████\n' +
+        '    ████████╱✦✦ ╲████████\n' +
+        '    ███████╱ ·˚· ╲███████\n' +
+        '    ██████╱  ✦✦✦  ╲██████\n' +
+        '</pre>', delay: 800 });
+      queue.push({ tag: L('感知','Sense'), color: 'tag-sense',
+        text: L('牆壁上有一道狹窄的裂縫。從裂縫深處，溢出淡淡的金色微光——像是某種結晶在發光。', 'A narrow crack runs through the wall. Deep within, a faint golden glow seeps out — some crystal pulsing with light.'),
+        delay: 2800 });
+      queue.push({ tag: L('感知','Sense'), color: 'tag-sense',
+        text: L('裂縫很窄，勉強能擠進去一個人。空氣中有一股溫暖的礦物味——和一絲甜味。', 'The crack is barely wide enough for one person. The air carries a warm mineral scent — and a hint of sweetness.'),
+        delay: 2500 });
+      queue.push({ tag: L('抉擇','Choice'), color: 'tag-event',
+        text: L('你要鑽進去嗎？', 'Squeeze in?'),
+        choices: [
+          { text: L('鑽進裂縫 [敏捷]', 'Squeeze through [AGI]'), textEn: 'Squeeze through [AGI]',
+            action: function() {
+              var result = statCheck('agi', 7);
+              if (result !== 'fail') {
+                sfx.pass();
+                patrolAppend(L('事件','Event'), 'tag-event',
+                  L('你側身擠過裂縫，手肘擦破了皮，但成功到達另一側——一個拳頭大的空洞裡，藏著前人留下的補給。', 'You squeeze through sideways, scraping your elbows, but reach the other side — a fist-sized cavity with someone\'s hidden supplies.'), false);
+                addItem(L('黑麵包', 'Black Bread'));
+                changeHp(8);
+                patrolAppend(L('系統','System'), 'tag-system',
+                  L('HP +8。獲得「黑麵包」。', 'HP +8. Obtained "Black Bread".'), false);
+                renderStatus();
+              } else {
+                sfx.fail();
+                changeHp(-5);
+                patrolAppend(L('事件','Event'), 'tag-warn',
+                  L('你卡在了半路。尖銳的石壁割破了你的腰側，你費了好大力氣才退出來。', 'You get stuck halfway. The jagged rock slices your side, and it takes real effort to back out.'), false);
+                patrolAppend(L('系統','System'), 'tag-system',
+                  L('HP -5。', 'HP -5.'), false);
+                renderStatus();
+              }
+            }
+          },
+          { text: L('不值得冒險', 'Not worth the risk'), textEn: 'Not worth the risk',
+            action: function() {
+              patrolAppend(L('巡邏','Patrol'), 'tag-move',
+                L('你記下了裂縫的位置，繼續前進。也許以後會回來。', 'You note the crack\'s location and move on. Perhaps you\'ll return.'), false);
+            }
+          }
+        ]
+      });
+    }
+  },
+
+  // ── Event 3: 遠方歌聲 (羈絆+氛圍) ──
+  {
+    id: 'r0_singer', flag: '_evt_r0_singer', region: 0,
+    buildQueue: function(queue) {
+      queue.push({ tag: L('感知','Sense'), color: 'tag-sense',
+        text: L('你停下腳步。空氣中飄來一段旋律——微弱、破碎、卻清晰得不像回音。有人在唱歌。', 'You stop. A melody drifts through the air — faint, broken, yet too clear to be an echo. Someone is singing.'),
+        delay: 2800 });
+      queue.push({ tag: L('感知','Sense'), color: 'tag-sense',
+        text: L('歌聲來自南面的一條死路。語言聽不懂，但旋律裡有一種令人心碎的溫柔——像是在唱搖籃曲。', 'The song comes from a dead-end to the south. The language is unknown, but the melody holds a heartbreaking tenderness — like a lullaby.'),
+        delay: 3000 });
+      queue.push({ tag: L('抉擇','Choice'), color: 'tag-event',
+        text: L('你要跟隨歌聲嗎？', 'Follow the singing?'),
+        choices: [
+          { text: L('循著歌聲走去', 'Follow the voice'), textEn: 'Follow the voice',
+            pauseQueue: true,
+            action: function() {
+              patrolAppend(L('移動','Move'), 'tag-move',
+                L('你沿著聲音走了大約五十步。歌聲越來越近——然後，突然停了。', 'You follow the sound for fifty paces. The song grows closer — then, abruptly, stops.'), false);
+              // Show the petrified singer after a delay
+              patrolTimers.push(setTimeout(function() {
+                var singerArt = document.createElement('div');
+                singerArt.innerHTML = '<pre class="ascii-art">\n' +
+                  '          ╭──╮\n' +
+                  '          │♪ │  ·˚\n' +
+                  '       ╭──┤  ├──╮\n' +
+                  '       │░░│  │░░│\n' +
+                  '       │▓▓│  │▓▓│\n' +
+                  '       │██│  │██│\n' +
+                  '    ···╰──┴──┴──╯···\n' +
+                  '</pre>';
+                $story.appendChild(singerArt);
+                $story.scrollTop = $story.scrollHeight;
+                patrolTimers.push(setTimeout(function() {
+                  patrolAppend(L('感知','Sense'), 'tag-sense',
+                    L('死路的盡頭，坐著一個完全石化的女人。她的姿勢像是在抱著什麼——但懷裡是空的。', 'At the dead end sits a fully petrified woman. She seems to be holding something — but her arms are empty.'), false);
+                  patrolTimers.push(setTimeout(function() {
+                    patrolAppend(L('感知','Sense'), 'tag-sense',
+                      L('她的嘴微微張開，嘴唇凝固在一個音節上。完全石化的人，怎麼還能唱歌？', 'Her lips are parted, frozen mid-syllable. How could someone fully petrified still sing?'), false);
+                    patrolTimers.push(setTimeout(function() {
+                      patrolAppend(L('調查','Clue'), 'tag-info',
+                        L('你在她腳邊發現一枚石化吊墜。打開來，裡面有一縷沒有石化的頭髮——嬰兒的頭髮。她在唱搖籃曲。', 'At her feet lies a petrified locket. Inside — a lock of unpetrified hair. An infant\'s. She was singing a lullaby.'), false);
+                      // Show second choice
+                      $choices.innerHTML = '';
+                      var en = state.lang === 'en';
+                      var c1 = document.createElement('button');
+                      c1.className = 'choice-btn';
+                      c1.textContent = en ? 'Take it \u2014 remember her' : '\u5E36\u8D70\u5B83\uFF0C\u8A18\u4F4F\u5979';
+                      c1.addEventListener('click', function() {
+                        sfx.click(); sfx.item();
+                        changeStat('wil', 1); changePetri(2);
+                        $choices.innerHTML = '';
+                        var sb = document.createElement('button');
+                        sb.className = 'choice-btn'; sb.textContent = L('停下腳步','Stop and rest');
+                        sb.addEventListener('click', stopPatrol); $choices.appendChild(sb);
+                        patrolAppend(L('事件','Event'), 'tag-event',
+                          L('你收起吊墜。指尖觸碰石化表面的瞬間，暖意從手心蔓延——像是被感謝了。', 'You pocket the locket. Warmth spreads from your palm at the touch — as if being thanked.'), false);
+                        patrolAppend(L('系統','System'), 'tag-system',
+                          L('意志 +1。石化度 +2%。', 'WIL +1. Petrification +2%.'), false);
+                        notify(L('意志 +1（銘記亡者）', 'WIL +1 (Remembering the lost)'));
+                        renderStatus();
+                        patrolTimers.push(setTimeout(runPatrolCycle, 2000));
+                      });
+                      var c2 = document.createElement('button');
+                      c2.className = 'choice-btn';
+                      c2.textContent = en ? 'Leave it' : '\u653E\u56DE\u53BB';
+                      c2.addEventListener('click', function() {
+                        sfx.click();
+                        $choices.innerHTML = '';
+                        var sb = document.createElement('button');
+                        sb.className = 'choice-btn'; sb.textContent = L('停下腳步','Stop and rest');
+                        sb.addEventListener('click', stopPatrol); $choices.appendChild(sb);
+                        patrolAppend(L('巡邏','Patrol'), 'tag-move',
+                          L('你把吊墜放回她腳邊。轉身時，彷彿又聽見了極輕的哼唱。', 'You place the locket back. As you turn, you think you hear a faint hum once more.'), false);
+                        patrolTimers.push(setTimeout(runPatrolCycle, 2000));
+                      });
+                      var sb2 = document.createElement('button');
+                      sb2.className = 'choice-btn'; sb2.textContent = L('停下腳步','Stop and rest');
+                      sb2.addEventListener('click', stopPatrol);
+                      $choices.appendChild(c1); $choices.appendChild(c2); $choices.appendChild(sb2);
+                    }, 3500));
+                  }, 3000));
+                }, 2500));
+              }, 2000));
+            }
+          },
+          { text: L('忽略它', 'Ignore it'), textEn: 'Ignore it',
+            pauseQueue: true,
+            action: function() {
+              patrolAppend(L('巡邏','Patrol'), 'tag-move',
+                L('你捂住耳朵，加快腳步離開。有些聲音不該去追。', 'You cover your ears and quicken your pace. Some sounds are best left unfollowed.'), false);
+              patrolTimers.push(setTimeout(runPatrolCycle, 2000));
+            }
+          }
+        ]
+      });
+    }
+  }
+];
+
+registerPatrolEvents(0, R0_EVENTS);
+
 // Region-aware helpers — now delegate to registry for R4+ extensibility
 var PATROL_TEXTS = R0_PATROL_TEXTS; // kept for backwards compat
 function getPatrolMonsters() { return getMonsterPool(); }
