@@ -1447,6 +1447,9 @@ registerNode('r2_ying_talk', () => {
         ], { label: L('螢的素描', 'Ying\'s sketch') });
       }});
     }
+    if (state.flags.r2YingLore3 && state.flags.r2YingSketch && !state.flags.r2YingSecret) {
+      c.push({ text: '螢……你的手冊裡還藏了什麼？', textEn: 'Ying... what else are you hiding in that notebook?', action: () => loadNode('r2_ying_secret') });
+    }
     if (state.flags.r2CampVisited && !state.flags.r2YingNight) {
       c.push({ text: '要不要一起去營地休息？', textEn: 'Want to rest at the camp together?', action: () => loadNode('r2_ying_night') });
     }
@@ -1795,7 +1798,113 @@ registerNode('r2_ying_nightmare', () => {
   ], { label: L('深夜的噩夢', 'Nightmare in the Dark') });
 });
 
-// ═════════════════════════════════════════���═════════
+// ── Ying: Secret notebook pages ──
+registerNode('r2_ying_secret', () => {
+  var isMale = state.sex === 'male';
+  var yP = isMale ? L('她', 'she') : L('他', 'he');
+  var yPC = isMale ? 'She' : 'He';
+  var yPo = isMale ? 'her' : 'his';
+
+  state.flags.r2YingSecret = true;
+  autoExplore([
+    { art: npcPortrait.art('ying', { subtitle: '記錄員' }), artEn: npcPortrait.art('ying', { subtitle: 'Chronicler' }), delay: 800 },
+    { tag: '感知', tagColor: 'tag-sense', text: '螢的表情僵了一下。' + yP + '的手無意識地壓在手冊上，指尖微微泛白。', textEn: 'Ying\'s expression freezes. ' + yPC + '\'s hand presses down on the notebook, fingertips whitening.', delay: 2800 },
+    { tag: '情報', tagColor: 'tag-info', text: '「……什麼意思？」' + yP + '的聲音很輕，但你聽出了防備。這不是那個會對你臉紅的螢——這是另一面。', textEn: '"...What do you mean?" ' + yPC + '\'s voice is soft, but you catch the guardedness. This isn\'t the Ying who blushes around you — this is another side.', delay: 3200 },
+    { tag: '感知', tagColor: 'tag-sense', text: '你之前注意到了——' + yP + '每次寫完筆記，都會把手冊翻到某幾頁用力夾緊。那些頁面的邊角比其他頁磨損得更厲害，像是經常被單獨翻開。', textEn: 'You\'ve noticed — every time ' + yP + ' finishes writing, ' + yP + ' presses certain pages firmly shut. Those pages are more worn than the rest, as if opened separately, often.', delay: 3500 },
+    { tag: '感知', tagColor: 'tag-sense', text: '而且——那些頁面上的字跡和其他頁不一樣。不是給你看的記錄。是寫給別人的。', textEn: 'And the handwriting on those pages differs from the rest. Not records for you to see. Written for someone else.', delay: 3000 },
+  ], [
+    { text: '我看到了不一樣的字跡。你在寫報告——寫給誰？', textEn: 'I saw different handwriting. You\'re writing reports — to whom?', action: () => loadNode('r2_ying_past') },
+    { text: '算了，你不想說就算了', textEn: 'Never mind, you don\'t have to tell me', action: () => {
+      autoExplore([
+        { tag: '感知', tagColor: 'tag-sense', text: '螢看著你的眼睛，沉默了很久。' + yP + '的表情在掙扎——像是很想說什麼，但最終只是低下了頭。', textEn: 'Ying holds your gaze for a long silence. ' + yPC + '\'s expression wrestles with itself — as if wanting to speak, but ultimately just lowers ' + yPo + ' head.', delay: 3200 },
+        { tag: '情報', tagColor: 'tag-info', text: '「……謝謝你不追問。」' + yP + '的聲音很小。「等到了河城……我會告訴你的。我保證。」', textEn: '"...Thank you for not pushing." ' + yPC + '\'s voice is tiny. "When we reach River Port... I\'ll tell you. I promise."', delay: 3000 },
+        { tag: '感知', tagColor: 'tag-sense', text: yP + '的手慢慢鬆開了壓住手冊的力道，但你注意到' + yP + '的另一隻手悄悄握了一下拳——像是在鼓勵自己。', textEn: yPC + '\'s grip on the notebook slowly relaxes, but you notice ' + yPo + ' other hand quietly clenching — as if steeling ' + yPo + 'self.', delay: 3000 },
+      ], [
+        { text: '繼續', textEn: 'Continue', action: () => {
+          changeHp(5);
+          changePetri(-3);
+          notify(L('HP +5，石化度 -3%（信任的重量）', 'HP +5, Petri -3% (Weight of trust)'));
+          loadNode('r2_look');
+        }},
+      ], { label: L('未說出口的話', 'Unspoken words') });
+    }},
+  ], { label: L('螢的秘密', 'Ying\'s secret') });
+});
+
+// ── Ying: True identity reveal ──
+registerNode('r2_ying_past', () => {
+  var isMale = state.sex === 'male';
+  var yP = isMale ? L('她', 'she') : L('他', 'he');
+  var yPC = isMale ? 'She' : 'He';
+  var yPo = isMale ? 'her' : 'his';
+
+  state.flags.r2YingPast = true;
+  autoExplore([
+    { tag: '感知', tagColor: 'tag-sense', text: '螢整個人繃緊了。' + yP + '慢慢地把手冊放在膝蓋上，然後深深吸了一口氣。', textEn: 'Ying goes rigid. ' + yPC + ' slowly places the notebook on ' + yPo + ' knee, then draws a long, deep breath.', delay: 2800 },
+    { tag: '情報', tagColor: 'tag-info', text: '「……你說得對。」' + yP + '的聲音突然變了——不再是那個會臉紅的少女的語氣，而是某種更冷靜、更專業的腔調。', textEn: '"...You\'re right." ' + yPC + '\'s voice shifts — no longer the girl who blushes, but something colder, more professional.', delay: 3200 },
+    { art: npcPortrait.art('ying', { subtitle: '議會調查員' }) || npcPortrait.art('ying', { subtitle: '記錄員' }), artEn: npcPortrait.art('ying', { subtitle: 'Council Investigator' }) || npcPortrait.art('ying', { subtitle: 'Chronicler' }), delay: 800 },
+    { tag: '情報', tagColor: 'tag-info', html: L('「我不是普通的記錄員。我是河城議會派下來的<b>調查員</b>。」', '"I\'m not an ordinary chronicler. I\'m an <b>investigator</b> sent by the River Port Council."'), delay: 3500 },
+    { tag: '感知', tagColor: 'tag-sense', text: '這句話像一桶冰水。你看著' + yP + '——' + yP + '沒有躲開你的目光，但琥珀色的眼睛裡閃過了什麼。是愧疚。', textEn: 'The words hit like ice water. You stare at ' + yP + ' — ' + yP + ' doesn\'t dodge your gaze, but something flickers in those amber eyes. Guilt.', delay: 3200 },
+    { tag: '情報', tagColor: 'tag-info', text: '「我的任務是……評估下層的狀況。然後寫一份報告，交給議會。」' + yP + '停了一下。「報告的結論，會決定議會是否封鎖通道。」', textEn: '"My mission is... to assess conditions in the lower levels. Then write a report for the Council." ' + yPC + ' pauses. "The report\'s conclusion will determine whether the Council seals the passages."', delay: 3800 },
+    { tag: '感知', tagColor: 'tag-sense', text: '你的腦海裡快速閃過一切——' + yP + '為什麼會出現在石脈迴廊、為什麼一直在記錄、為什麼' + yP + '的筆記本有不同的字跡——全部說通了。', textEn: 'Your mind races through everything — why ' + yP + ' appeared in the Vein Corridor, why ' + yP + ' was always recording, why the notebook has different handwriting — it all makes sense now.', delay: 3500 },
+    { tag: '情報', tagColor: 'tag-info', text: '「我原本……」' + yP + '的聲音裂了一下。「我原本被交代寫的是：下層已經不適合人類生存，建議封鎖。上面已經決定好答案了——我只是來蓋章的。」', textEn: '"I was originally..." ' + yPC + '\'s voice cracks. "I was told to write: the lower levels are unsuitable for human survival, recommend sealing. The decision was already made up top — I was just here to rubber-stamp it."', delay: 4000 },
+    { tag: '感知', tagColor: 'tag-sense', text: yP + '低下頭。你看見' + yP + '的肩膀在微微發抖。', textEn: yPC + ' bows ' + yPo + ' head. You see ' + yPo + ' shoulders trembling.', delay: 2500 },
+    { tag: '情報', tagColor: 'tag-info', text: '「但是我遇見了你。遇見了老周、鐵霜、清露——遇見了這些在地底拼命活著的人。」' + yP + '抬起頭，眼眶泛紅。「我寫不出那份報告。我寫不出來。」', textEn: '"But then I met you. Met Old Zhou, Iron Frost, Dew — met all these people fighting to stay alive underground." ' + yPC + ' looks up, eyes reddening. "I can\'t write that report. I just can\'t."', delay: 4000 },
+  ], [
+    { text: '你為什麼現在才說？', textEn: 'Why tell me now?', action: () => {
+      autoExplore([
+        { tag: '情報', tagColor: 'tag-info', text: '「因為……」' + yP + '吞了一下口水。「因為你遲早會發現的。我寧可你從我嘴裡聽到——而不是在河城，從別人嘴裡。」', textEn: '"Because..." ' + yPC + ' swallows. "Because you\'d find out sooner or later. I\'d rather you hear it from me — than from someone else in River Port."', delay: 3500 },
+        { tag: '感知', tagColor: 'tag-sense', text: yP + '看著你的眼睛。你從沒見過' + yP + '這麼認真。也從沒見過' + yP + '這麼害怕。', textEn: yPC + ' looks into your eyes. You\'ve never seen ' + yP + ' this serious. Or this scared.', delay: 2800 },
+        { tag: '情報', tagColor: 'tag-info', text: '「而且——」' + yP + '的聲音輕得幾乎聽不到。「你是唯一一個……讓我覺得說出真話不會被討厭的人。」', textEn: '"And —" ' + yPC + '\'s voice drops to almost nothing. "You\'re the only person... who makes me feel like telling the truth won\'t make me hated."', delay: 3500 },
+      ], [
+        { text: '我不會討厭你。但你必須做出選擇', textEn: 'I don\'t hate you. But you need to choose', action: () => loadNode('r2_ying_choice') },
+        { text: '你已經做出選擇了，不是嗎？', textEn: 'You\'ve already made your choice, haven\'t you?', action: () => loadNode('r2_ying_choice') },
+      ], { label: L('為什麼', 'Why') });
+    }},
+    { text: '……我需要時間消化', textEn: '...I need time to process this', action: () => {
+      autoExplore([
+        { tag: '感知', tagColor: 'tag-sense', text: '你站起來，沒有看' + yP + '。', textEn: 'You stand, without looking at ' + yP + '.', delay: 2000 },
+        { tag: '感知', tagColor: 'tag-sense', text: '身後傳來一聲極輕的抽泣。然後是手冊合上的聲音。', textEn: 'Behind you, the softest sob. Then the sound of a notebook closing.', delay: 2800 },
+      ], [
+        { text: '繼續', textEn: 'Continue', action: () => loadNode('r2_look') },
+      ], { label: L('沉默的離開', 'Silent departure') });
+    }},
+  ], { label: L('螢的真實身分', 'Ying\'s true identity') });
+});
+
+// ── Ying: The choice — her mission vs her conscience ──
+registerNode('r2_ying_choice', () => {
+  var isMale = state.sex === 'male';
+  var yP = isMale ? L('她', 'she') : L('他', 'he');
+  var yPC = isMale ? 'She' : 'He';
+  var yPo = isMale ? 'her' : 'his';
+
+  state.flags.r2YingChoice = true;
+  autoExplore([
+    { tag: '感知', tagColor: 'tag-sense', text: '螢擦了擦眼角，深吸一口氣。' + yP + '翻開手冊，找到那些被壓緊的頁面——然後一頁一頁地撕下來。', textEn: 'Ying wipes ' + yPo + ' eyes and draws a deep breath. ' + yPC + ' opens the notebook, finds those tightly pressed pages — and tears them out, one by one.', delay: 3200 },
+    { tag: '感知', tagColor: 'tag-sense', text: '碎紙片在風中飄散。那些是' + yP + '寫好的偽報告——「下層不適合人類生存」。', textEn: 'Torn paper scatters in the draft. Those are the fake reports ' + yP + ' had prepared — "lower levels unsuitable for human survival."', delay: 3000 },
+    { tag: '情報', tagColor: 'tag-info', text: '「到了河城之後——」' + yP + '的聲音沙啞但堅定。「我會重新寫。寫真實的報告。寫你們怎麼在下面活過來的。」', textEn: '"When we reach River Port —" ' + yPC + '\'s voice is hoarse but firm. "I\'ll rewrite it. A true report. How you survived down here."', delay: 3500 },
+    { tag: '感知', tagColor: 'tag-sense', text: yP + '看著你，眼眶還是紅的，但眼神已經不一樣了——那種恐懼不見了，取而代之的是你在' + yP + '身上見過的最堅定的表情。', textEn: yPC + ' looks at you, eyes still red, but the look in them has changed — the fear is gone, replaced by the most resolute expression you\'ve ever seen on ' + yP + '.', delay: 3200 },
+    { tag: '情報', tagColor: 'tag-info', text: '「這可能會讓我被除名。甚至被關起來。但——」' + yP + '的嘴角微微上翹。「至少我能在你面前抬起頭。」', textEn: '"This might get me expelled. Even imprisoned. But —" The corner of ' + yPo + ' mouth curls up. "At least I can hold my head up in front of you."', delay: 3500 },
+  ], [
+    { text: '你不會一個人面對的', textEn: 'You won\'t face this alone', action: () => {
+      changeStat('wil', 1);
+      changeHp(10);
+      changePetri(-5);
+      sfx.levelUp();
+      notify(L('意志 +1，HP +10，石化度 -5%（共同的決心）', 'WIL +1, HP +10, Petri -5% (Shared resolve)'));
+      autoExplore([
+        { tag: '感知', tagColor: 'tag-sense', text: yP + '愣了一下——然後笑了。這次的笑和以前不一樣。不是害羞的、躲閃的那種。是真正的、如釋重負的笑。', textEn: yPC + ' blinks — then smiles. This smile is different from before. Not shy or evasive. A genuine, relieved smile.', delay: 3000 },
+        { tag: '感知', tagColor: 'tag-sense', text: '「……你這個人真的很奇怪。」' + yP + '輕聲說。「被騙了還能說出這種話。」', textEn: '"...You really are strange." ' + yPC + ' murmurs. "Being lied to and still saying something like that."', delay: 3000 },
+        { tag: '感知', tagColor: 'tag-sense', text: yP + '低頭在手冊上寫了什麼。你瞄了一眼——只看到了兩個字：「吾友。」', textEn: yPC + ' bends over the notebook and writes something. You catch a glimpse — just two words: "My ally."', delay: 3000 },
+      ], [
+        { text: '繼續', textEn: 'Continue', action: () => loadNode('r2_look') },
+      ], { label: L('共同的決心', 'Shared resolve') });
+    }},
+  ], { label: L('螢的抉擇', 'Ying\'s choice') });
+});
+
+// ═══════════════════════════════════════════════════
 //  NPC Continuation — 灰鶴 (Grey Crane) in Region 2
 // ═══════════════════════════════════════════════════
 
