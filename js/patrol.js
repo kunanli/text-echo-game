@@ -717,6 +717,231 @@ var R0_EVENTS = [
 
 registerPatrolEvents(0, R0_EVENTS);
 
+// ═══════════════════════════════════════════════════
+//  Narrative Patrol Events — R1 石脈迴廊
+// ═══════════════════════════════════════════════════
+
+var R1_EVENTS = [
+  // ── Event 1: 未石化的貓 (羈絆) ──
+  {
+    id: 'r1_cat', flag: '_evt_r1_cat', region: 1,
+    buildQueue: function(queue) {
+      queue.push({ art: '<pre class="ascii-art">\n' +
+        '         ╱╲___╱╲\n' +
+        '        (  ·  ·  )\n' +
+        '         ╲  ▽  ╱\n' +
+        '          ╱    ╲\n' +
+        '         │ ╭──╮ │\n' +
+        '         │ │  │ │\n' +
+        '         ╰─╯  ╰─╯\n' +
+        '</pre>', delay: 800 });
+      queue.push({ tag: L('感知','Sense'), color: 'tag-sense',
+        text: L('一雙發亮的眼睛從鐵軌旁的陰影裡盯著你。', 'A pair of glowing eyes watches you from the shadows beside the rail tracks.'),
+        delay: 2200 });
+      queue.push({ tag: L('感知','Sense'), color: 'tag-sense',
+        text: L('你屏住呼吸——是一隻貓。在這個一切都在石化的地方，一隻完全沒有石化跡象的、活生生的灰色小貓。', 'You hold your breath — it\'s a cat. In this place where everything turns to stone, a small grey cat with no trace of petrification. Alive.'),
+        delay: 3200 });
+      queue.push({ tag: L('感知','Sense'), color: 'tag-sense',
+        text: L('它歪著頭看你，發出一聲短促的「咪」。聲音在空曠的迴廊裡迴盪，竟然有一種荒誕的溫柔。', 'It tilts its head at you and lets out a short "mew." The sound echoes through the empty corridor — absurdly tender.'),
+        delay: 2800 });
+      // Ying companion variant
+      if (state.flags.r1YingCompanion) {
+        queue.push({ tag: L('同伴','Ally'), color: 'tag-ally',
+          text: L('螢蹲了下來，伸出手。小貓猶豫了一下，然後湊過來蹭了蹭她的指尖。螢笑了——你很少見到她笑得這麼沒有防備。', 'Ying crouches down, hand outstretched. The cat hesitates, then nuzzles her fingertips. Ying smiles — you\'ve rarely seen her smile so unguarded.'),
+          delay: 3200 });
+        queue.push({ tag: L('同伴','Ally'), color: 'tag-ally',
+          text: L('「牠怎麼沒有石化？」她抬頭看你，眼睛裡閃著好奇的光。「也許……牠知道什麼我們不知道的事。」', '"How is it not petrified?" She looks up at you, eyes bright with curiosity. "Maybe... it knows something we don\'t."'),
+          delay: 3000 });
+      }
+      queue.push({ tag: L('抉擇','Choice'), color: 'tag-event',
+        text: L('你要餵牠嗎？', 'Feed it?'),
+        choices: [
+          { text: hasItem(L('黑麵包','Black Bread'))
+              ? L('餵牠黑麵包', 'Feed it Black Bread')
+              : L('分一點口糧給牠', 'Share some rations'),
+            textEn: hasItem(L('黑麵包','Black Bread'))
+              ? 'Feed it Black Bread'
+              : 'Share some rations',
+            action: function() {
+              if (hasItem(L('黑麵包','Black Bread'))) removeItem(L('黑麵包','Black Bread'));
+              state.flags.r1CatFed = true;
+              sfx.item();
+              patrolAppend(L('事件','Event'), 'tag-event',
+                L('小貓小心翼翼地從你手裡叼走食物，吃完後用頭蹭了蹭你的腳踝。然後它跳上鐵軌，朝迴廊深處跑去——走了幾步又回頭看你一眼。', 'The cat delicately takes the food from your hand. After eating, it bumps its head against your ankle. Then it hops onto the rail and trots deeper into the corridor — pausing once to look back at you.'), false);
+              patrolAppend(L('系統','System'), 'tag-system',
+                L('巡邏戰鬥中受到的傷害 -10%（貓會分散敵人注意力）。', 'Patrol combat damage taken -10% (cat distracts enemies).'), false);
+              if (state.flags.r1YingCompanion) {
+                patrolAppend(L('同伴','Ally'), 'tag-ally',
+                  L('螢看著跑遠的小貓，又看看你：「……你比看起來心軟。」她的語氣裡有一絲你說不清的東西。', 'Ying watches the cat go, then looks at you: "...You\'re softer than you look." There\'s something in her tone you can\'t quite place.'), false);
+              }
+              renderStatus();
+            }
+          },
+          { text: L('不理牠', 'Ignore it'), textEn: 'Ignore it',
+            action: function() {
+              patrolAppend(L('巡邏','Patrol'), 'tag-move',
+                L('你沒有停下腳步。小貓在你身後叫了兩聲，然後消失在陰影裡。', 'You don\'t stop. The cat calls twice behind you, then vanishes into shadow.'), false);
+            }
+          }
+        ]
+      });
+    }
+  },
+
+  // ── Event 2: 失控礦車 (戰鬥+動作) ──
+  {
+    id: 'r1_minecart', flag: '_evt_r1_minecart', region: 1,
+    buildQueue: function(queue) {
+      queue.push({ tag: L('警告','Alert'), color: 'tag-warn',
+        text: L('腳下的鐵軌開始震動。', 'The rail tracks beneath your feet begin to vibrate.'),
+        delay: 1800 });
+      queue.push({ art: '<pre class="ascii-art">\n' +
+        '                    ╔═══╗\n' +
+        '     ──────────────→║礦車║→→→\n' +
+        '     ════════════════╚═╤═╝════\n' +
+        '     ──────────────────┴──────\n' +
+        '           !!  ◆你◆  !!\n' +
+        '</pre>', delay: 800 });
+      queue.push({ tag: L('警告','Alert'), color: 'tag-warn',
+        text: L('轟隆隆的聲音從黑暗中傳來——一輛裝滿碎石的礦車沿著軌道直衝而來！生鏽的車輪擦出火花，速度越來越快。', 'A thunderous rumble rolls from the darkness — a minecart loaded with rubble hurtles along the tracks! Rusted wheels throw sparks, accelerating.'),
+        delay: 2500, sfx: 'hurt' });
+      queue.push({ tag: L('抉擇','Choice'), color: 'tag-event',
+        text: L('沒時間想了——', 'No time to think —'),
+        choices: [
+          { text: L('閃到一邊 [敏捷]', 'Dodge aside [AGI]'), textEn: 'Dodge aside [AGI]',
+            action: function() {
+              var result = statCheck('agi', 7);
+              if (result !== 'fail') {
+                sfx.pass();
+                patrolAppend(L('事件','Event'), 'tag-event',
+                  L('你在最後一刻翻滾到鐵軌外側。礦車呼嘯而過，帶起的氣流吹得你頭髮飛揚。', 'You roll clear at the last second. The cart screams past, its slipstream whipping your hair.'), false);
+                if (result === 'crit') {
+                  patrolAppend(L('事件','Event'), 'tag-item',
+                    L('礦車翻覆後，你在散落的碎石中發現了一瓶完好的藥水。', 'After the cart overturns, you spot an intact potion among the scattered rubble.'), false);
+                  addItem(L('HP 藥水', 'HP Potion'));
+                }
+              } else {
+                sfx.fail();
+                changeHp(-8);
+                patrolAppend(L('事件','Event'), 'tag-warn',
+                  L('你閃避得太慢，礦車的邊緣擦過你的肩膀。劇痛讓你眼前一黑。', 'Too slow — the cart\'s edge clips your shoulder. Pain whites out your vision.'), false);
+                patrolAppend(L('系統','System'), 'tag-system',
+                  L('HP -8。', 'HP -8.'), false);
+                renderStatus();
+              }
+            }
+          },
+          { text: L('正面攔住它 [力量]', 'Brace and stop it [STR]'), textEn: 'Brace and stop it [STR]',
+            action: function() {
+              var result = statCheck('str', 7);
+              if (result !== 'fail') {
+                sfx.pass();
+                patrolAppend(L('事件','Event'), 'tag-combat',
+                  L('你紮穩腳步，雙手死死抵住礦車前沿。鐵鏽割破了你的掌心，但車速在減慢——最終，停了下來。', 'You brace yourself, palms jammed against the cart\'s front edge. Rust cuts your palms, but the cart slows — and stops.'), false);
+                changeHp(-3);
+                addItem(L('HP 藥水', 'HP Potion'));
+                patrolAppend(L('系統','System'), 'tag-system',
+                  L('HP -3。在車廂裡發現「HP 藥水」。', 'HP -3. Found "HP Potion" inside the cart.'), false);
+                renderStatus();
+              } else {
+                sfx.fail();
+                changeHp(-10);
+                patrolAppend(L('事件','Event'), 'tag-warn',
+                  L('礦車的重量遠超你的預期。它把你撞飛了出去，你重重地摔在鐵軌旁的碎石上。', 'The cart is far heavier than expected. It sends you flying, and you crash onto the gravel beside the tracks.'), false);
+                patrolAppend(L('系統','System'), 'tag-system',
+                  L('HP -10。', 'HP -10.'), false);
+                renderStatus();
+              }
+            }
+          }
+        ]
+      });
+    }
+  },
+
+  // ── Event 3: 完整的鏡子 (調查+內心) ──
+  {
+    id: 'r1_mirror', flag: '_evt_r1_mirror', region: 1,
+    buildQueue: function(queue) {
+      queue.push({ art: '<pre class="ascii-art">\n' +
+        '     ╔═══════════╗\n' +
+        '     ║  ╭─────╮  ║\n' +
+        '     ║  │ ?   ?│  ║\n' +
+        '     ║  │  ▽   │  ║\n' +
+        '     ║  │ ███  │  ║\n' +
+        '     ║  │ ▓▓▓  │  ║\n' +
+        '     ║  │ ░░░  │  ║\n' +
+        '     ║  ╰─────╯  ║\n' +
+        '     ╚═══════════╝\n' +
+        '</pre>', delay: 800 });
+      queue.push({ tag: L('感知','Sense'), color: 'tag-sense',
+        text: L('礦工宿舍的牆上掛著一面鏡子——完整的、沒有裂痕的。在這個到處都是廢墟的地方，這本身就很不正常。', 'A mirror hangs on the bunkhouse wall — intact, not a single crack. In this ruin, that alone is abnormal.'),
+        delay: 2800 });
+      queue.push({ tag: L('感知','Sense'), color: 'tag-sense',
+        text: L('鏡面上有一層淡淡的灰，但擦掉之後，倒影清晰得令人不安。', 'A thin layer of dust covers the surface, but once wiped, the reflection is unnervingly clear.'),
+        delay: 2500 });
+      queue.push({ tag: L('抉擇','Choice'), color: 'tag-event',
+        text: L('你要仔細看嗎？', 'Look closely?'),
+        choices: [
+          { text: L('凝視鏡中的自己', 'Gaze into the mirror'), textEn: 'Gaze into the mirror',
+            pauseQueue: true,
+            action: function() {
+              patrolAppend(L('感知','Sense'), 'tag-sense',
+                L('你靠近鏡子。起初，倒影是正常的——然後你注意到了。', 'You lean closer. At first, the reflection looks normal — then you notice.'), false);
+              patrolTimers.push(setTimeout(function() {
+                patrolAppend(L('感知','Sense'), 'tag-petri',
+                  L('鏡中的你，石化程度比現實更深。右臂已經完全變成了石頭，左腿的石化紋路一直蔓延到胸口。那是你的未來嗎？', 'The you in the mirror is more petrified than you are now. Right arm fully stone, left leg\'s patterns climbing to the chest. Is that your future?'), false);
+                patrolTimers.push(setTimeout(function() {
+                  if (state.flags.r1YingCompanion) {
+                    patrolAppend(L('同伴','Ally'), 'tag-ally',
+                      L('你還注意到——鏡中的你身邊，沒有螢。只有你一個人。', 'You also notice — in the mirror, Ying isn\'t beside you. You\'re alone.'), false);
+                  }
+                  patrolTimers.push(setTimeout(function() {
+                    patrolAppend(L('調查','Clue'), 'tag-info',
+                      L('鏡框的背面刻著一行小字：「此鏡照映石化之終。願觀者及時回頭。」——古代封印研究者的留言？', 'On the back of the frame, tiny words: "This mirror reflects petrification\'s end. May the viewer turn back in time." — A note from ancient seal researchers?'), false);
+                    // WIL check to resist despair
+                    var result = statCheck('wil', 6);
+                    if (result !== 'fail') {
+                      sfx.pass();
+                      changeStat('wil', 1);
+                      patrolAppend(L('事件','Event'), 'tag-event',
+                        L('你把鏡子翻過去扣在牆上。「我不會變成那樣。」你聽見自己的聲音比預期的更堅定。', 'You flip the mirror face-down against the wall. "I won\'t become that." Your voice sounds firmer than expected.'), false);
+                      patrolAppend(L('系統','System'), 'tag-system',
+                        L('意志 +1（抗拒命運）。', 'WIL +1 (Defying fate).'), false);
+                      notify(L('意志 +1（抗拒命運）', 'WIL +1 (Defying fate)'));
+                    } else {
+                      sfx.fail();
+                      changePetri(3);
+                      patrolAppend(L('事件','Event'), 'tag-petri',
+                        L('恐懼像冰水一樣灌進你的胸口。你退後一步，呼吸急促。手臂上的石化紋路彷彿比剛才……更深了一點。', 'Fear floods your chest like ice water. You step back, breathing hard. The petrification patterns on your arms seem... slightly deeper than before.'), false);
+                      patrolAppend(L('系統','System'), 'tag-system',
+                        L('石化度 +3%（恐懼侵蝕）。', 'Petrification +3% (eroded by fear).'), false);
+                    }
+                    renderStatus();
+                    $choices.innerHTML = '';
+                    var sb = document.createElement('button');
+                    sb.className = 'choice-btn'; sb.textContent = L('停下腳步','Stop and rest');
+                    sb.addEventListener('click', stopPatrol); $choices.appendChild(sb);
+                    patrolTimers.push(setTimeout(runPatrolCycle, 2000));
+                  }, 3000));
+                }, 2800));
+              }, 2500));
+            }
+          },
+          { text: L('離開，不看', 'Walk away — don\'t look'), textEn: 'Walk away — don\'t look',
+            action: function() {
+              patrolAppend(L('巡邏','Patrol'), 'tag-move',
+                L('你沒有看鏡子。有些真相，知道得太早並不是好事。', 'You leave the mirror alone. Some truths are best left unknown.'), false);
+            }
+          }
+        ]
+      });
+    }
+  }
+];
+
+registerPatrolEvents(1, R1_EVENTS);
+
 // Region-aware helpers — now delegate to registry for R4+ extensibility
 var PATROL_TEXTS = R0_PATROL_TEXTS; // kept for backwards compat
 function getPatrolMonsters() { return getMonsterPool(); }
