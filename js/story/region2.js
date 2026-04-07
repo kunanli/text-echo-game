@@ -2071,6 +2071,202 @@ registerNode('r2_ying_nightmare', () => {
   ], { label: L('深夜的噩夢', 'Nightmare in the Dark') });
 });
 
+// ═══════════════════════════════════════════════════
+//  NPC Sidequest — 灰鶴 (Grey Crane) Scar + Debt
+// ═══════════════════════════════════════════════════
+
+registerNode('r2_crane_scar', () => {
+  state.flags.r2CraneScar = true;
+  autoExplore([
+    { art: npcPortrait.art('crane', { subtitle: '行商人' }) || `<pre class="ascii-art gold">
+       ·  ˚  灰鶴  ˚  ·
+              ╱═══╲
+             ╱ ·˚· ╲
+            │ ─  ─  │
+            │  ╲─╱  │
+             ╲──┬──╱
+         ╱░░░╲ │ ╱░░░╲
+        │░░ ╱──┤├──╲ ░░│
+        │░╱ ╳╳││╳╳ ╲░│  ← 放血刀疤
+        │╱──═╧╧═──╲│
+</pre>`, artEn: npcPortrait.art('crane', { subtitle: 'Merchant' }) || `<pre class="ascii-art gold">
+    ·  ˚  Grey Crane  ˚  ·
+              ╱═══╲
+             ╱ ·˚· ╲
+            │ ─  ─  │
+            │  ╲─╱  │
+             ╲──┬──╱
+         ╱░░░╲ │ ╱░░░╲
+        │░░ ╱──┤├──╲ ░░│
+        │░╱ ╳╳││╳╳ ╲░│  ← bloodletting scars
+        │╱──═╧╧═──╲│
+</pre>`, delay: 800 },
+    { tag: '觀察', tagColor: 'tag-sense', text: '灰鶴喝酒的時候，袖口滑落。你看見了——她前臂內側有一排整齊的刀疤，不是戰鬥留下的。', textEn: 'When Grey Crane drinks, her sleeve slips. You see it — a row of neat scars on her inner forearm. Not from combat.', delay: 3000 },
+    { tag: '對話', tagColor: 'tag-info', text: '你的目光停留了一秒太久。灰鶴注意到了，笑容消失了。', textEn: 'Your gaze lingers one second too long. Grey Crane notices. The smile vanishes.', delay: 2500 },
+    { tag: '灰鶴', tagColor: 'tag-npc', text: '「……看夠了？」她把袖子拉回去，聲音冷了下來。', textEn: '"...Seen enough?" She pulls her sleeve back. Her voice turns cold.', delay: 2500 },
+    { tag: '灰鶴', tagColor: 'tag-npc', text: '「那是地表留下的。」她又灌了一口酒。「欠了不該欠的人的錢。他們收債的方式……很有創意。」', textEn: '"Surface scars." She takes another swig. "Owed money to the wrong people. Their collection methods were... creative."', delay: 3500 },
+    { tag: '灰鶴', tagColor: 'tag-npc', text: '「每逾期一天，放一次血。說是讓你記住欠的滋味。」灰鶴的手指無意識地摩挲著前臂。', textEn: '"One bloodletting for every overdue day. Said it helps you remember the taste of debt." Her fingers absently trace her forearm.', delay: 3200 },
+    { tag: '灰鶴', tagColor: 'tag-npc', text: '「所以我跑了。跑到連陽光都照不到的地方。」她苦笑一聲。「沒想到地底反而自由。」', textEn: '"So I ran. Ran to where even sunlight can\'t reach." A bitter laugh. "Didn\'t expect the underground to feel freer."', delay: 3200 },
+    { tag: '情報', tagColor: 'tag-info', text: '她搖了搖酒瓶，裡面已經空了。「別跟其他人說。做生意最忌的是讓人覺得你弱。」', textEn: 'She shakes the bottle — empty. "Don\'t tell anyone. Worst thing in trade is looking weak."', delay: 3000 },
+  ], [
+    { text: '你的秘密我會保守', textEn: 'Your secret\'s safe with me', action: () => {
+      gainXp(5);
+      notify(L('經驗 +5（灰鶴的信任）', 'XP +5 (Grey Crane\'s trust)'));
+      loadNode('r2_crane');
+    }},
+  ], { label: L('放血刀疤', 'Bloodletting Scars') });
+});
+
+registerNode('r2_crane_debt', () => {
+  state.flags.r2CraneDebt = true;
+  autoExplore([
+    { art: `<pre class="ascii-art">
+  ╔═══════════════════════════════╗
+  ║  營 地 外 圍                  ║
+  ╠═══════════════════════════════╣
+  ║                               ║
+  ║    ╱╲  ╱╲  ╱╲                ║
+  ║   ╱  ╲╱  ╲╱  ╲   ← 帳篷    ║
+  ║  ╱────────────╲              ║
+  ║                  👤 👤 👤    ║
+  ║             ← 三個陌生人      ║
+  ║                               ║
+  ╚═══════════════════════════════╝
+</pre>`, artEn: `<pre class="ascii-art">
+  ╔═══════════════════════════════╗
+  ║  CAMP PERIMETER               ║
+  ╠═══════════════════════════════╣
+  ║                               ║
+  ║    ╱╲  ╱╲  ╱╲                ║
+  ║   ╱  ╲╱  ╲╱  ╲   ← tents   ║
+  ║  ╱────────────╲              ║
+  ║                  👤 👤 👤    ║
+  ║             ← three strangers ║
+  ║                               ║
+  ╚═══════════════════════════════╝
+</pre>`, delay: 800 },
+    { tag: '警告', tagColor: 'tag-warn', text: '營地邊緣傳來騷動。三個穿著地表風格皮甲的陌生人正在和灰鶴對峙。', textEn: 'Commotion at the camp edge. Three strangers in surface-style leather armour face off against Grey Crane.', delay: 2800 },
+    { tag: '對話', tagColor: 'tag-npc', html: '領頭的是個禿頭大漢，臉上橫肉糾結：「<b>秋蘅</b>。老規矩——要錢，還是要命。」', htmlEn: 'The leader is a bald, scarred brute: "<b>Qiu Heng</b>. The usual — money, or your life."', delay: 3000 },
+    { tag: '灰鶴', tagColor: 'tag-npc', text: '灰鶴退了一步，手按在腰間的短刀上。你從沒見她這麼緊張過。', textEn: 'Grey Crane steps back, hand on her waist knife. You\'ve never seen her this tense.', delay: 2500 },
+    { tag: '灰鶴', tagColor: 'tag-npc', text: '「我已經還了三倍了。」她的聲音在發抖。「利滾利到什麼時候是個頭？」', textEn: '"I\'ve repaid triple already." Her voice shakes. "When does the interest end?"', delay: 3000 },
+    { tag: '情報', tagColor: 'tag-info', text: '禿頭男冷笑：「地表有你家人。你要是不想讓你妹妹替你還……就乖乖跟我們走。」', textEn: 'The bald man sneers: "Your family is on the surface. If you don\'t want your sister paying your debts... come quietly."', delay: 3200 },
+  ], [
+    { text: L('用意志說服他們離開 [WIL DC8]（成功率' + checkRate('wil', 8) + '）', 'Talk them down [WIL DC8] (rate ' + checkRate('wil', 8) + ')'), textEn: 'Talk them down [WIL DC8] (rate ' + checkRate('wil', 8) + ')', action: () => {
+      var result = statCheck('wil', 8);
+      if (result !== 'fail') {
+        sfx.pass();
+        state.flags.r2CraneDebtSaved = true;
+        autoExplore([
+          { tag: '檢定', tagColor: 'tag-system', text: result === 'crit' ? L('大成功！', 'Critical success!') : L('成功！', 'Success!'), delay: 1200 },
+          { tag: '說服', tagColor: 'tag-info', text: '你站到灰鶴身前，直視禿頭男的眼睛。你的聲音很平靜，但每個字都像石頭一樣沉。', textEn: 'You step in front of Grey Crane, meeting the bald man\'s eyes. Your voice is calm, but every word lands like stone.', delay: 3000 },
+          { tag: '說服', tagColor: 'tag-info', text: '「她是這個營地的人。你們的地表規矩在這裡不管用。鐵霜的人很快就會來。」', textEn: '"She\'s one of this camp. Your surface rules don\'t apply here. Iron Frost\'s people will be here soon."', delay: 3000 },
+          { tag: '結果', tagColor: 'tag-info', text: '三個人互相看了一眼。禿頭男啐了一口：「算了。這破地方不值得待。」他們轉身消失在黑暗中。', textEn: 'The three exchange glances. The bald man spits: "Forget it. This hellhole isn\'t worth the trouble." They vanish into the dark.', delay: 3200 },
+          { tag: '灰鶴', tagColor: 'tag-npc', text: '灰鶴愣了好一會兒。然後她做了一件你從沒見過的事——她的眼眶紅了。', textEn: 'Grey Crane freezes for a long moment. Then she does something you\'ve never seen — her eyes redden.', delay: 2800 },
+          { tag: '灰鶴', tagColor: 'tag-npc', text: '「……謝了。」只有兩個字。但她的手在抖。', textEn: '"...Thanks." Just one word. But her hands are shaking.', delay: 2500 },
+        ], [
+          { text: '拍拍她肩膀', textEn: 'Pat her shoulder', action: () => {
+            gainXp(10);
+            changeStat('wil', 1);
+            notify(L('經驗 +10，意志 +1（為灰鶴挺身而出）', 'XP +10, WIL +1 (Stood up for Grey Crane)'));
+            loadNode('r2_crane');
+          }},
+        ], { label: L('追債人', 'Debt Collectors') });
+      } else {
+        sfx.fail();
+        autoExplore([
+          { tag: '檢定', tagColor: 'tag-system', text: L('失敗……', 'Failed...'), delay: 1200 },
+          { tag: '結果', tagColor: 'tag-warn', text: '禿頭男冷笑：「小鬼少管閒事。」他一把推開你，你踉蹌退了幾步。', textEn: 'The bald man sneers: "Mind your own business, kid." He shoves you back.', delay: 2500 },
+          { tag: '戰鬥', tagColor: 'tag-combat', text: '看來只能用拳頭說話了——', textEn: 'Seems words won\'t work — time to fight —', delay: 1500 },
+        ], [
+          { text: '戰鬥！', textEn: 'Fight!', action: () => {
+            var enemy = {
+              name: '追債人頭目', nameEn: 'Debt Collector Boss',
+              hp: 22, atkMin: 4, atkMax: 8, petriDmg: 0, xp: 12,
+              empathyGoal: 4,
+              art: [
+                '      ╱══╲',
+                '     │ ⊘⊘ │',
+                '     │ ═══ │',
+                '      ╲──╱',
+                '    ╱██████╲',
+                '   │ ╱    ╲ │',
+                '   │╱  拳  ╲│',
+                '    ╲══════╱',
+              ],
+              commune: [
+                { zh: '禿頭男的拳頭停頓了一下——他想起了什麼。', en: 'The bald man\'s fist hesitates — he remembers something.' },
+                { zh: '「……算了。我也是替人辦事。」他的語氣軟了。', en: '"...Forget it. I\'m just doing a job." His tone softens.' },
+              ],
+              spareText: { zh: '追債人搖搖頭，帶著手下離開了。「下次沒這麼好說話。」', en: 'The collector shakes his head and leaves with his men. "Next time won\'t be so easy."' }
+            };
+            enemy = scaleEnemyNgPlus(enemy);
+            startCombat(enemy, function() {
+              state.flags.r2CraneDebtSaved = true;
+              autoExplore([
+                { tag: '結果', tagColor: 'tag-info', text: '追債人倒在地上，他的手下慌忙把他拖走了。', textEn: 'The collector falls. His men hastily drag him away.', delay: 2200 },
+                { tag: '灰鶴', tagColor: 'tag-npc', text: '灰鶴走過來，沉默了很久。然後她輕聲說：「……你這個白癡。」', textEn: 'Grey Crane approaches, silent for a long time. Then softly: "...You idiot."', delay: 2800 },
+                { tag: '灰鶴', tagColor: 'tag-npc', text: '但她眼眶是紅的。「……謝了。真的。」', textEn: 'But her eyes are red. "...Thanks. Really."', delay: 2500 },
+              ], [
+                { text: '別客氣', textEn: 'Don\'t mention it', action: () => {
+                  changeStat('str', 1);
+                  notify(L('力量 +1（為灰鶴而戰）', 'STR +1 (Fought for Grey Crane)'));
+                  loadNode('r2_crane');
+                }},
+              ], { label: L('追債人', 'Debt Collectors') });
+            }, null);
+          }},
+        ], { label: L('追債人', 'Debt Collectors') });
+      }
+    }},
+    { text: '直接動手保護她 [戰鬥]', textEn: 'Fight to protect her [Combat]', action: () => {
+      var enemy = {
+        name: '追債人頭目', nameEn: 'Debt Collector Boss',
+        hp: 22, atkMin: 4, atkMax: 8, petriDmg: 0, xp: 12,
+        empathyGoal: 4,
+        art: [
+          '      ╱══╲',
+          '     │ ⊘⊘ │',
+          '     │ ═══ │',
+          '      ╲──╱',
+          '    ╱██████╲',
+          '   │ ╱    ╲ │',
+          '   │╱  拳  ╲│',
+          '    ╲══════╱',
+        ],
+        commune: [
+          { zh: '禿頭男的拳頭停頓了一下——他想起了什麼。', en: 'The bald man\'s fist hesitates — he remembers something.' },
+          { zh: '「……算了。我也是替人辦事。」他的語氣軟了。', en: '"...Forget it. I\'m just doing a job." His tone softens.' },
+        ],
+        spareText: { zh: '追債人搖搖頭，帶著手下離開了。「下次沒這麼好說話。」', en: 'The collector shakes his head and leaves with his men. "Next time won\'t be so easy."' }
+      };
+      enemy = scaleEnemyNgPlus(enemy);
+      startCombat(enemy, function() {
+        state.flags.r2CraneDebtSaved = true;
+        autoExplore([
+          { tag: '結果', tagColor: 'tag-info', text: '追債人倒在地上，他的手下慌忙把他拖走了。', textEn: 'The collector falls. His men hastily drag him away.', delay: 2200 },
+          { tag: '灰鶴', tagColor: 'tag-npc', text: '灰鶴走過來，沉默了很久。然後她輕聲說：「……你這個白癡。為了我去打架。」', textEn: 'Grey Crane approaches, silent for a long time. Then softly: "...You idiot. Fighting for me."', delay: 2800 },
+          { tag: '灰鶴', tagColor: 'tag-npc', text: '但她眼眶是紅的。「……謝了。真的。」', textEn: 'But her eyes are red. "...Thanks. Really."', delay: 2500 },
+        ], [
+          { text: '別客氣', textEn: 'Don\'t mention it', action: () => {
+            changeStat('str', 1);
+            notify(L('力量 +1（為灰鶴而戰）', 'STR +1 (Fought for Grey Crane)'));
+            loadNode('r2_crane');
+          }},
+        ], { label: L('追債人', 'Debt Collectors') });
+      }, null);
+    }},
+    { text: '不介入', textEn: 'Don\'t intervene', action: () => {
+      autoExplore([
+        { tag: '結果', tagColor: 'tag-info', text: '你退後一步。這是她的事——你不該插手。', textEn: 'You step back. This is her business — you shouldn\'t interfere.', delay: 2200 },
+        { tag: '灰鶴', tagColor: 'tag-npc', text: '灰鶴看了你一眼。那個眼神你會記很久——不是怨恨，而是失望。', textEn: 'Grey Crane glances at you. You\'ll remember that look — not resentment, but disappointment.', delay: 3000 },
+        { tag: '結果', tagColor: 'tag-warn', text: '她被追債人帶走了。幾個小時後她回來了，嘴角有血，但什麼都沒說。', textEn: 'They take her away. She returns hours later, blood at the corner of her mouth, but says nothing.', delay: 3000 },
+      ], [
+        { text: '……', textEn: '...', action: () => loadNode('r2_camp') },
+      ], { label: L('追債人', 'Debt Collectors') });
+    }},
+  ], { label: L('追債人來襲', 'Debt Collectors Arrive') });
+});
+
 // ── Ying: Secret notebook pages ──
 registerNode('r2_ying_secret', () => {
   var isMale = state.sex === 'male';
