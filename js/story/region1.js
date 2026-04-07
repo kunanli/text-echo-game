@@ -2158,3 +2158,356 @@ registerNode('r1_patrol', () => {
     { text: '返回', textEn: 'Return', action: () => loadNode('r1_look') },
   ], { label: L('準備巡邏', 'Preparing patrol') });
 });
+
+// ── Minecart Track ──
+registerNode('r1_minecart', function() {
+  if (state.flags.r1MinecartDone) {
+    renderScene(L('礦車軌道上已經沒有新的發現了。', 'Nothing new along the minecart tracks.'),
+      [{ text: '返回', textEn: 'Return', action: function() { loadNode('r1_look'); }}]);
+    return;
+  }
+  state.flags.r1MinecartDone = true;
+  autoExplore([
+    { art: '<pre class="ascii-art red">\n' +
+'    ╔═══╗     ╔═══╗\n' +
+'    ║ ▓ ║═════║ ▓ ║\n' +
+'    ╚═╤═╝     ╚═╤═╝\n' +
+'  ────┴─────────┴────────\n' +
+'  ═══ o─[▓▓▓▓]─o ═══════\n' +
+'  ────────────────────────\n' +
+'      廢 棄 礦 車 軌 道\n' +
+'</pre>', artEn: '<pre class="ascii-art red">\n' +
+'    ╔═══╗     ╔═══╗\n' +
+'    ║ ▓ ║═════║ ▓ ║\n' +
+'    ╚═╤═╝     ╚═╤═╝\n' +
+'  ────┴─────────┴────────\n' +
+'  ═══ o─[▓▓▓▓]─o ═══════\n' +
+'  ────────────────────────\n' +
+'     Abandoned  Minecart\n' +
+'</pre>', delay: 800 },
+    { tag: '環境', tagColor: 'tag-sense',
+      text: '一段生鏽的鐵軌延伸進黑暗中，一輛翻倒的礦車斜靠在岩壁上。',
+      textEn: 'Rusted rails stretch into darkness. An overturned minecart leans against the rock wall.',
+      delay: 2200 },
+    { tag: '探索', tagColor: 'tag-explore',
+      text: '礦車底下似乎藏著什麼東西，但要夠靈活才能鑽進那個狹窄的縫隙。',
+      textEn: 'Something is hidden beneath the cart, but you need to be nimble to squeeze through the narrow gap.',
+      delay: 2200 },
+    { tag: '檢定', tagColor: 'tag-info',
+      text: L('你側身鑽入礦車底部。（AGI 檢定 DC7，成功率 ' + checkRate('agi', 7) + '%）',
+             'You squeeze under the minecart. (AGI check DC7, ' + checkRate('agi', 7) + '% chance)'),
+      delay: 1800,
+      effect: function() {
+        var r = statCheck('agi', 7);
+        if (r !== 'fail') {
+          sfx.pass();
+          addItem(L('濃縮藥水', 'Concentrated Potion'));
+          changeHp(5);
+          notify(L('找到濃縮藥水！HP+5', 'Found Concentrated Potion! HP+5'));
+        } else {
+          sfx.fail();
+          changeHp(-8);
+          notify(L('礦車滑動壓傷了你！HP-8', 'The cart shifts and crushes you! HP-8'));
+        }
+      }},
+    { tag: '系統', tagColor: 'tag-system',
+      text: L('你從礦車底下爬了出來。', 'You crawl out from beneath the minecart.'),
+      delay: 1500 },
+  ], [
+    { text: '返回迴廊', textEn: 'Return to corridor', action: function() { loadNode('r1_look'); }},
+  ], { label: L('廢棄礦車', 'Abandoned Minecart') });
+});
+
+// ── Underground River ──
+registerNode('r1_underground_river', function() {
+  if (state.flags.r1RiverDone) {
+    renderScene(L('地下河畔的隱藏洞穴已經被你搜刮乾淨了。', 'The hidden cave by the underground river has been picked clean.'),
+      [{ text: '返回', textEn: 'Return', action: function() { loadNode('r1_look'); }}]);
+    return;
+  }
+  state.flags.r1RiverDone = true;
+  autoExplore([
+    { art: '<pre class="ascii-art cyan">\n' +
+'  ┌─────────────────────────────┐\n' +
+'  │  ·  ·  ≈≈≈≈≈≈≈≈≈≈≈≈  ·  · │\n' +
+'  │ ·  ≈≈≈≈≈  ╔═══╗  ≈≈≈≈≈  · │\n' +
+'  │   ≈≈≈≈  ╔═╝洞穴╚═╗  ≈≈≈≈  │\n' +
+'  │  ≈≈≈≈≈  ║  ◊  ◊  ║  ≈≈≈≈  │\n' +
+'  │  ≈≈≈≈≈  ╚═══════╝  ≈≈≈≈  │\n' +
+'  │  · ≈≈ 地 下 河 ≈≈≈≈≈ ·  │\n' +
+'  └─────────────────────────────┘\n' +
+'</pre>', artEn: '<pre class="ascii-art cyan">\n' +
+'  ┌─────────────────────────────┐\n' +
+'  │  ·  ·  ≈≈≈≈≈≈≈≈≈≈≈≈  ·  · │\n' +
+'  │ ·  ≈≈≈≈≈  ╔═══╗  ≈≈≈≈≈  · │\n' +
+'  │   ≈≈≈≈  ╔═╝Cave ╚═╗  ≈≈≈  │\n' +
+'  │  ≈≈≈≈≈  ║  ◊  ◊  ║  ≈≈≈≈  │\n' +
+'  │  ≈≈≈≈≈  ╚═══════╝  ≈≈≈≈  │\n' +
+'  │  · ≈≈  Underground  ≈≈ ·  │\n' +
+'  └─────────────────────────────┘\n' +
+'</pre>', delay: 800 },
+    { tag: '環境', tagColor: 'tag-sense',
+      text: '一條暗河在石壁間蜿蜒流淌，冰涼的水霧沾濕了你的臉。',
+      textEn: 'A dark river winds between stone walls. Cold mist dampens your face.',
+      delay: 2200 },
+    { tag: '探索', tagColor: 'tag-explore',
+      text: '你沿著河岸行走，發現一處被矮石堆遮擋的隱蔽洞穴。',
+      textEn: 'Following the riverbank, you discover a hidden cave concealed behind a low stone pile.',
+      delay: 2500 },
+    { tag: '發現', tagColor: 'tag-item',
+      html: L('洞穴裡藏著倖存者的物資：一份<b>黑麵包</b>和一瓶<b>淨化液</b>。',
+             'Inside the cave: a survivor\'s cache — <b>Black Bread</b> and a <b>Purifier</b>.'),
+      delay: 2200,
+      effect: function() {
+        sfx.item();
+        addItem(L('黑麵包', 'Black Bread'));
+        addItem(L('淨化液', 'Purifier'));
+      }},
+    { tag: '效果', tagColor: 'tag-info',
+      text: L('河水帶走了你身上的一些石化粉塵。石化度 -5。',
+             'The river water washes away some petrification dust. Petri -5.'),
+      delay: 2000,
+      effect: function() { changePetri(-5); }},
+  ], [
+    { text: '返回迴廊', textEn: 'Return to corridor', action: function() { loadNode('r1_look'); }},
+  ], { label: L('地下河', 'Underground River') });
+});
+
+// ── Collapse Zone ──
+registerNode('r1_collapse', function() {
+  if (state.flags.r1CollapseDone) {
+    renderScene(L('坍塌區域仍然危險，但已經沒有值得冒險的東西了。', 'The collapsed area is still dangerous, and nothing remains worth the risk.'),
+      [{ text: '返回', textEn: 'Return', action: function() { loadNode('r1_look'); }}]);
+    return;
+  }
+  state.flags.r1CollapseDone = true;
+  autoExplore([
+    { art: '<pre class="ascii-art red">\n' +
+'     ╱╲  ╱╲ ░░ ╱╲╱╲\n' +
+'    ╱▓▓╲╱▓▓╲░░╱▓▓▓▓╲\n' +
+'   ╱▓▓▓▓▓▓▓▓░░▓▓▓▓▓▓╲\n' +
+'  ═══════╳═══════╳═══════\n' +
+'    ░░░ ╱ ╲ ░░░ ╱ ╲ ░░░\n' +
+'   ░░░ ╱ ◊ ╲░░░╱   ╲░░░\n' +
+'      坍 塌 區 域\n' +
+'</pre>', artEn: '<pre class="ascii-art red">\n' +
+'     ╱╲  ╱╲ ░░ ╱╲╱╲\n' +
+'    ╱▓▓╲╱▓▓╲░░╱▓▓▓▓╲\n' +
+'   ╱▓▓▓▓▓▓▓▓░░▓▓▓▓▓▓╲\n' +
+'  ═══════╳═══════╳═══════\n' +
+'    ░░░ ╱ ╲ ░░░ ╱ ╲ ░░░\n' +
+'   ░░░ ╱ ◊ ╲░░░╱   ╲░░░\n' +
+'      Collapse Zone\n' +
+'</pre>', delay: 800 },
+    { tag: '警告', tagColor: 'tag-warn',
+      text: '前方的隧道已經大面積坍塌。巨石和碎礦堆成了一面不穩定的牆。',
+      textEn: 'The tunnel ahead has collapsed. Boulders and debris form an unstable wall.',
+      delay: 2200 },
+    { tag: '探索', tagColor: 'tag-explore',
+      text: '坍塌的另一側似乎有微光閃爍——可能藏著珍貴的裝備。但要推開這些巨石需要相當的力量。',
+      textEn: 'A faint glimmer shines beyond the rubble — perhaps valuable gear. But shifting these boulders requires serious strength.',
+      delay: 2500 },
+    { tag: '檢定', tagColor: 'tag-info',
+      text: L('你用肩膀頂住巨石，全力推開。（STR 檢定 DC7，成功率 ' + checkRate('str', 7) + '%）',
+             'You brace against the boulder and push with all your might. (STR check DC7, ' + checkRate('str', 7) + '% chance)'),
+      delay: 1800,
+      effect: function() {
+        var r = statCheck('str', 7);
+        if (r !== 'fail') {
+          sfx.pass();
+          addItem(L('鐵石護腕', 'Ironstone Bracer'));
+          changeStat('str', 1);
+          notify(L('找到鐵石護腕！STR+1', 'Found Ironstone Bracer! STR+1'));
+        } else {
+          sfx.fail();
+          changeHp(-10);
+          changePetri(2);
+          notify(L('巨石崩落砸中了你！HP-10，石化+2', 'Boulders crash down on you! HP-10, Petri+2'));
+        }
+      }},
+    { tag: '系統', tagColor: 'tag-system',
+      text: L('塵埃漸漸落定。', 'The dust slowly settles.'),
+      delay: 1500 },
+  ], [
+    { text: '返回迴廊', textEn: 'Return to corridor', action: function() { loadNode('r1_look'); }},
+  ], { label: L('坍塌區域', 'Collapse Zone') });
+});
+
+// ── Miner's Shrine ──
+registerNode('r1_shrine', function() {
+  if (state.flags.r1ShrineDone) {
+    renderScene(L('礦工祠堂安靜如昔，但神龕上的蠟燭已經燃盡。', 'The miner\'s shrine stands quiet as before, but the candles on the altar have burned out.'),
+      [{ text: '返回', textEn: 'Return', action: function() { loadNode('r1_look'); }}]);
+    return;
+  }
+  state.flags.r1ShrineDone = true;
+  autoExplore([
+    { art: '<pre class="ascii-art gold">\n' +
+'       ╔═══════════╗\n' +
+'       ║  ·  ☆  ·  ║\n' +
+'       ║ ┌───────┐ ║\n' +
+'       ║ │ 礦 工 │ ║\n' +
+'       ║ │ 之 靈 │ ║\n' +
+'       ║ └───────┘ ║\n' +
+'       ║ ¤  ¤  ¤  ¤║\n' +
+'       ╚═══════════╝\n' +
+'</pre>', artEn: '<pre class="ascii-art gold">\n' +
+'       ╔═══════════╗\n' +
+'       ║  ·  ☆  ·  ║\n' +
+'       ║ ┌───────┐ ║\n' +
+'       ║ │Miners\'│ ║\n' +
+'       ║ │Spirit │ ║\n' +
+'       ║ └───────┘ ║\n' +
+'       ║ ¤  ¤  ¤  ¤║\n' +
+'       ╚═══════════╝\n' +
+'</pre>', delay: 800 },
+    { tag: '環境', tagColor: 'tag-sense',
+      text: '一座簡陋的祠堂嵌在石壁凹處。礦工們用碎石砌成了一個神龕，上面擺著幾截快要燃盡的蠟燭。',
+      textEn: 'A crude shrine is set into a wall alcove. Miners built a small altar from rubble, with guttering candle stubs on top.',
+      delay: 2500 },
+    { tag: '感知', tagColor: 'tag-sense',
+      text: '空氣中有一股奇異的溫暖感——在這冰冷的迴廊裡，這裡是唯一讓你感到安心的地方。',
+      textEn: 'A strange warmth fills the air — in this freezing corridor, this is the only place that brings comfort.',
+      delay: 2200 },
+    { tag: '祈禱', tagColor: 'tag-info',
+      text: L('你在神龕前低頭默禱。傷口的疼痛減緩了，石化的僵硬也鬆動了些。',
+             'You bow your head in prayer before the altar. The pain fades, and the petrification loosens slightly.'),
+      delay: 2500,
+      effect: function() {
+        changeHp(15);
+        changePetri(-5);
+        sfx.pass();
+        notify(L('HP+15，石化度-5', 'HP+15, Petri-5'));
+      }},
+    { tag: '發現', tagColor: 'tag-info',
+      html: L('神龕後面塞著一張摺疊的紙條，字跡潦草：<b>「監工K下令封閉第三通風井——他不想讓任何人活著上去。」</b>',
+             'Behind the altar, a folded note in scrawled handwriting: <b>"Foreman K ordered the third ventilation shaft sealed — he wanted no one to make it out alive."</b>'),
+      delay: 3000,
+      effect: function() {
+        gainXp(5);
+        state.flags.r1ShrineNote = true;
+      }},
+  ], [
+    { text: '返回迴廊', textEn: 'Return to corridor', action: function() { loadNode('r1_look'); }},
+  ], { label: L('礦工祠堂', 'Miner\'s Shrine') });
+});
+
+// ── Deep Vein ──
+registerNode('r1_vein_deep', function() {
+  if (state.flags.r1VeinDeepDone) {
+    renderScene(L('深層結晶區的輻射讓你不敢久留。', 'The radiation from the deep crystal zone keeps you from lingering.'),
+      [{ text: '返回', textEn: 'Return', action: function() { loadNode('r1_look'); }}]);
+    return;
+  }
+  state.flags.r1VeinDeepDone = true;
+  autoExplore([
+    { art: '<pre class="ascii-art purple">\n' +
+'    ░ ·✦·  ·✦·  ·✦· ░\n' +
+'   ░ ◆╱╲◆╱╲◆╱╲◆╱╲◆ ░\n' +
+'  ░  ╱✦╲╱✦╲╱✦╲╱✦╲  ░\n' +
+'  ░ ╱▓▓▓▓▓▓▓▓▓▓▓▓▓╲ ░\n' +
+'  ░ ▓▓ 深 層 結 晶 ▓▓ ░\n' +
+'  ░░░░░░░░░░░░░░░░░░░░\n' +
+'</pre>', artEn: '<pre class="ascii-art purple">\n' +
+'    ░ ·✦·  ·✦·  ·✦· ░\n' +
+'   ░ ◆╱╲◆╱╲◆╱╲◆╱╲◆ ░\n' +
+'  ░  ╱✦╲╱✦╲╱✦╲╱✦╲  ░\n' +
+'  ░ ╱▓▓▓▓▓▓▓▓▓▓▓▓▓╲ ░\n' +
+'  ░ ▓▓ Deep Crystal ▓▓ ░\n' +
+'  ░░░░░░░░░░░░░░░░░░░░\n' +
+'</pre>', delay: 800 },
+    { tag: '警告', tagColor: 'tag-warn',
+      text: '石脈在這裡變得極為密集。結晶從地面、牆壁、甚至天花板上生長出來，散發紫色微光。',
+      textEn: 'The veins grow incredibly dense here. Crystals sprout from floor, walls, and ceiling, emitting a violet glow.',
+      delay: 2500 },
+    { tag: '感知', tagColor: 'tag-sense',
+      text: '你感覺皮膚上的石化紋路在隱隱跳動。這裡的結晶濃度極高——採集能獲得珍稀材料，但也極為危險。',
+      textEn: 'Your petrification marks throb faintly. Crystal density is extreme — harvesting could yield rare materials, but it\'s perilous.',
+      delay: 2500 },
+  ], [
+    { text: L('冒險採集（AGI DC8，' + checkRate('agi', 8) + '%）', 'Risk harvesting (AGI DC8, ' + checkRate('agi', 8) + '%)'), textEn: 'Risk harvesting (AGI DC8, ' + checkRate('agi', 8) + '%)', action: function() {
+      var r = statCheck('agi', 8);
+      if (r !== 'fail') {
+        sfx.pass();
+        addItem(L('精煉結晶', 'Refined Crystal'));
+        gainXp(10);
+        notify(L('採集成功！獲得精煉結晶，XP+10', 'Harvest success! Got Refined Crystal, XP+10'));
+      } else {
+        sfx.fail();
+        changePetri(5);
+        notify(L('結晶粉塵灌入肺部！石化度+5', 'Crystal dust floods your lungs! Petri+5'));
+      }
+      loadNode('r1_look');
+    }},
+    { text: '安全觀察後離開', textEn: 'Observe safely and leave', action: function() {
+      gainXp(5);
+      notify(L('你記下了結晶分佈規律。XP+5', 'You note the crystal distribution patterns. XP+5'));
+      loadNode('r1_look');
+    }},
+  ], { label: L('深層結晶區', 'Deep Crystal Vein') });
+});
+
+// ── Miner's Ghost ──
+registerNode('r1_ghost', function() {
+  if (state.flags.r1GhostDone) {
+    renderScene(L('那道蒼白的身影已經消失了。', 'The pale figure has vanished.'),
+      [{ text: '返回', textEn: 'Return', action: function() { loadNode('r1_look'); }}]);
+    return;
+  }
+  state.flags.r1GhostDone = true;
+  autoExplore([
+    { art: '<pre class="ascii-art purple">\n' +
+'        ·  ˚  ·\n' +
+'       ╱ ˚˚˚ ╲\n' +
+'      ╱ · ○ · ╲\n' +
+'     │  ╱───╲  │\n' +
+'     │ ╱ ░░░ ╲ │\n' +
+'      ╲ ░░░░ ╱\n' +
+'       ╲░░░╱\n' +
+'    ···  ˚˚˚  ···\n' +
+'      石 化 幽 靈\n' +
+'</pre>', artEn: '<pre class="ascii-art purple">\n' +
+'        ·  ˚  ·\n' +
+'       ╱ ˚˚˚ ╲\n' +
+'      ╱ · ○ · ╲\n' +
+'     │  ╱───╲  │\n' +
+'     │ ╱ ░░░ ╲ │\n' +
+'      ╲ ░░░░ ╱\n' +
+'       ╲░░░╱\n' +
+'    ···  ˚˚˚  ···\n' +
+'     Petrified Ghost\n' +
+'</pre>', delay: 800 },
+    { tag: '異常', tagColor: 'tag-petri',
+      text: '迴廊深處，一個蒼白的人影站在那裡。它的皮膚已經完全石化，但它的嘴唇還在微微顫動——仿佛不知道自己已經死了。',
+      textEn: 'Deep in the corridor, a pale figure stands motionless. Its skin is fully petrified, yet its lips still tremble — as if unaware it has already died.',
+      delay: 3000 },
+    { tag: '對話', tagColor: 'tag-info',
+      text: '「你……也是來挖礦的嗎？監工K說……今天可以提早收工……」它的聲音像碎石摩擦。',
+      textEn: '"Are you... also here for the dig? Foreman K said... we can knock off early today..." Its voice sounds like grinding gravel.',
+      delay: 3000 },
+    { tag: '檢定', tagColor: 'tag-info',
+      text: L('你嘗試與它的殘存意識溝通。（WIL 檢定 DC6，成功率 ' + checkRate('wil', 6) + '%）',
+             'You try to communicate with its lingering consciousness. (WIL check DC6, ' + checkRate('wil', 6) + '% chance)'),
+      delay: 2000,
+      effect: function() {
+        var r = statCheck('wil', 6);
+        if (r !== 'fail') {
+          sfx.pass();
+          changeStat('wil', 1);
+          notify(L('你感受到了它的悲傷。WIL+1', 'You feel its sorrow. WIL+1'));
+        } else {
+          sfx.fail();
+          changePetri(3);
+          notify(L('石化的悲鳴侵蝕了你！石化度+3', 'Petrified grief corrodes you! Petri+3'));
+        }
+      }},
+    { tag: '結束', tagColor: 'tag-sense',
+      text: L('幽靈的輪廓漸漸模糊，化為飄散的石化粉塵。你記住了它——第117號礦工。',
+             'The ghost\'s outline blurs, dissolving into petrification dust. You remember it — Miner No. 117.'),
+      delay: 2500,
+      effect: function() { gainXp(8); }},
+  ], [
+    { text: '返回迴廊', textEn: 'Return to corridor', action: function() { loadNode('r1_look'); }},
+  ], { label: L('石化幽靈', 'Petrified Ghost') });
+});
+
