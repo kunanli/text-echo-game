@@ -878,6 +878,9 @@ registerNode('r1_quarters', () => {
     } else {
       c.push({ text: '找老周說話', textEn: 'Talk to Old Zhou', action: () => loadNode('r1_survivor_talk') });
     }
+    if (state.flags.r1SurvivorMet && !state.flags.r1ZhouFire) {
+      c.push({ text: '角落裡老周在生火……', textEn: 'Old Zhou is making a fire in the corner...', action: () => loadNode('r1_zhou_fire') });
+    }
     c.push({ text: '在床上休息', textEn: 'Rest on a bunk', action: () => loadNode('r1_rest') });
     c.push({ text: '返回', textEn: 'Return', action: () => loadNode('r1_deep') });
     return c;
@@ -2629,5 +2632,77 @@ registerNode('r1_ghost', function() {
   ], [
     { text: '返回迴廊', textEn: 'Return to corridor', action: function() { loadNode('r1_look'); }},
   ], { label: L('石化幽靈', 'Petrified Ghost') });
+});
+
+// ═══════════════════════════════════════
+//  Brotherhood: 老周生火 (Zhou's Campfire)
+// ═══════════════════════════════════════
+registerNode('r1_zhou_fire', () => {
+  state.flags.r1ZhouFire = true;
+  addNpcAffinity('zhou', 8);
+  autoExplore([
+    { tag: '場景', tagColor: 'tag-sense',
+      art: `<pre class="ascii-art gold">
+       ·  ˚  ✦  ˚  ·
+      ╱╲  火苗  ╱╲
+     ╱◇◇╲ ↑↑↑ ╱◇◇╲
+    ╱ ◇◇◇ ╲↑╱ ◇◇◇ ╲
+   ═══╧═══════╧══════
+    ░ 老周 ░░░░ 你 ░░
+   ══════════════════
+</pre>`, artEn: `<pre class="ascii-art gold">
+       ·  ˚  ✦  ˚  ·
+      ╱╲ Flames ╱╲
+     ╱◇◇╲ ↑↑↑ ╱◇◇╲
+    ╱ ◇◇◇ ╲↑╱ ◇◇◇ ╲
+   ═══╧═══════╧══════
+    ░ Zhou ░░░░ You ░░
+   ══════════════════
+</pre>`,
+      text: '老周蹲在宿舍角落，用兩塊石脈礦石互相敲擊。火星飛濺，照亮了他那張佈滿皺紋的臉。',
+      textEn: 'Old Zhou crouches in the corner, striking two vein-stones together. Sparks fly, lighting up his weathered face.',
+      delay: 2800 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: '「坐。」他頭也不抬。「這種石頭含硫量高，敲對地方就能生火。這是我在礦坑裡學的第一件事。」',
+      textEn: '"Sit." He doesn\'t look up. "These stones are high in sulfur. Hit the right spot, you get fire. First thing I learned in the mines."',
+      delay: 3200 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: '他把一塊遞給你。「來，你試試。往斜上方敲——對，就是那個角度。」',
+      textEn: 'He hands you a piece. "Here, try. Strike upward at an angle — right, just like that."',
+      delay: 2500 },
+    { tag: '行動', tagColor: 'tag-explore',
+      text: '你學著他的手勢敲了幾次。第三次，一簇小小的火苗跳了起來。老周點了點頭。',
+      textEn: 'You mimic his motion and strike a few times. On the third try, a small flame leaps up. Old Zhou nods.',
+      delay: 2500 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: '火堆慢慢旺了起來。老周從口袋裡掏出一個壓扁的鐵壺，往裡倒了點水，架在火上。',
+      textEn: 'The fire grows. Old Zhou pulls out a dented iron kettle, pours in some water, and sets it over the flames.',
+      delay: 2800 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: '「你知道在礦坑裡怎麼判斷水能不能喝嗎？」他問。你搖頭。',
+      textEn: '"Know how to tell if water\'s drinkable in the mines?" he asks. You shake your head.',
+      delay: 2500 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: '「先嚐一口。沒死的話，就能喝。」他一本正經地說。然後嘴角微微彎了一下。',
+      textEn: '"Take a sip. If you don\'t die, it\'s drinkable." He says it deadpan. Then the corner of his mouth twitches.',
+      delay: 3000 },
+    { tag: '感知', tagColor: 'tag-sense',
+      text: '你不由自主地笑了。這是你來到地底以後第一次笑。老周也笑了——一種很輕的、沙啞的笑聲，像是鏽蝕的齒輪重新轉動。',
+      textEn: 'You can\'t help but laugh. It\'s the first time you\'ve laughed since coming underground. Old Zhou laughs too — a faint, rusty sound, like corroded gears turning again.',
+      delay: 3500 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: '他遞給你一杯滾燙的水。「這個真的能喝。別擔心。」',
+      textEn: 'He passes you a cup of scalding water. "This one\'s actually safe. Don\'t worry."',
+      delay: 2200 },
+    { tag: '感知', tagColor: 'tag-sense',
+      text: '你們就這樣坐在火邊，喝著沒有味道的熱水，什麼也沒說。但這個地底洞穴忽然覺得沒那麼冷了。',
+      textEn: 'You sit by the fire together, drinking tasteless hot water in silence. But somehow the underground doesn\'t feel as cold anymore.',
+      delay: 3500, effect: function() { changeHp(8); changePetri(-2); } },
+    { tag: '效果', tagColor: 'tag-system',
+      text: L('HP+8，石化-2%。你學會了一種新的生火方法。', 'HP+8, Petri-2%. You learned a new way to make fire.'),
+      delay: 1500 },
+  ], [
+    { text: '返回', textEn: 'Return', action: () => loadNode('r1_quarters') },
+  ], { label: L('老周的火', 'Zhou\'s Fire') });
 });
 

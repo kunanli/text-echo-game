@@ -760,6 +760,15 @@ registerNode('r2_camp', () => {
     if (state.flags.r1WandererMet) {
       c.push({ text: state.flags.r2CraneMet ? '找灰鶴' : '角落裡有個熟悉的身影……', textEn: state.flags.r2CraneMet ? 'Find Grey Crane' : 'A familiar figure in the corner...', action: () => loadNode('r2_crane') });
     }
+    if (!state.flags.r2CampDinner) {
+      c.push({ text: '營火邊飄來飯菜香……', textEn: 'The smell of food drifts from the campfire...', action: () => loadNode('r2_camp_dinner') });
+    }
+    if (state.flags.r2CampVisited && !state.flags.r2FrostSpar) {
+      c.push({ text: '鐵霜在空地上練刀', textEn: 'Iron Frost is drilling in the clearing', action: () => loadNode('r2_frost_spar') });
+    }
+    if (state.flags.r2CampVisited && state.flags.r2FrostSpar && !state.flags.r2FrostVigil) {
+      c.push({ text: '夜深了，鐵霜還坐在營火邊', textEn: 'Late night — Iron Frost still sits by the fire', action: () => loadNode('r2_frost_vigil') });
+    }
     c.push({ text: '在營地休息', textEn: 'Rest at the camp', action: () => loadNode('r2_rest') });
     c.push({ text: '過橋返回', textEn: 'Cross back', action: () => loadNode('r2_look') });
     return c;
@@ -4077,5 +4086,175 @@ registerNode('r2_mural_war', function() {
   autoExplore(steps, [
     { text: '返回採石場', textEn: 'Return to the quarry', action: function() { loadNode('r2_look'); }},
   ], { label: L('戰爭壁畫', 'War Mural') });
+});
+
+// ═══════════════════════════════════════
+//  Brotherhood: 營火晚餐 (Camp Dinner)
+// ═══════════════════════════════════════
+registerNode('r2_camp_dinner', () => {
+  state.flags.r2CampDinner = true;
+  autoExplore([
+    { tag: '場景', tagColor: 'tag-sense',
+      art: `<pre class="ascii-art gold">
+    ·  ˚  ✦  ˚  ·  ˚  ✦
+   ╭──────────────────────╮
+   │  🍲  ↑↑ 營火 ↑↑  🍲  │
+   ├──────────────────────┤
+   │ 老鑄  清露  鐵霜  你 │
+   ╰──────────────────────╯
+</pre>`, artEn: `<pre class="ascii-art gold">
+    ·  ˚  ✦  ˚  ·  ˚  ✦
+   ╭──────────────────────╮
+   │  🍲  ↑↑ FIRE ↑↑  🍲  │
+   ├──────────────────────┤
+   │ Cast  Dew  Frost You │
+   ╰──────────────────────╯
+</pre>`,
+      text: '營火邊支著一口大鍋，老鑄正用一把生鏽的鐵勺攪動裡面灰綠色的東西。',
+      textEn: 'A large pot hangs over the campfire. Old Cast stirs something grey-green with a rusted iron ladle.',
+      delay: 2800 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: '「今天的菜是石脈蘑菇湯。」老鑄宣布。清露立刻皺起眉頭：「又是蘑菇？你就不能找點別的食材嗎？」',
+      textEn: '"Tonight\'s menu: vein-mushroom soup." Old Cast announces. Dew immediately frowns: "Mushrooms again? Can\'t you find anything else?"',
+      delay: 3200 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: '「你去採石場外面種稻米啊。」老鑄頭也不抬。清露被噎了一下，哼了一聲坐到旁邊。',
+      textEn: '"Then go plant rice outside the quarry." Old Cast doesn\'t look up. Dew sputters, huffs, and sits down.',
+      delay: 2800 },
+    { tag: '感知', tagColor: 'tag-sense',
+      text: '鐵霜坐在角落，一言不發地喝湯。你以為她不會參與這種閒聊——但你注意到她嘴角有一個極淡的弧度。',
+      textEn: 'Iron Frost sits in the corner, drinking soup in silence. You think she wouldn\'t join the banter — but you notice the faintest curve at the corner of her mouth.',
+      delay: 3000 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: '老鑄遞給你一碗。味道很淡，帶著一點泥土的氣息。但是是熱的。在地底，「熱的」就已經是奢侈了。',
+      textEn: 'Old Cast hands you a bowl. The flavor is faint, with an earthy undertone. But it\'s hot. Underground, "hot" is already a luxury.',
+      delay: 3000 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: '「那個新來的，」鐵霜突然開口，目光落在你身上。「吃完了去把鍋洗了。」',
+      textEn: '"You, the new one," Iron Frost speaks up, eyes on you. "When you\'re done, go wash the pot."',
+      delay: 2500 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: '清露笑了。「歡迎加入營地——第一課：鐵霜從不洗鍋。」',
+      textEn: 'Dew laughs. "Welcome to camp — lesson one: Iron Frost never washes the pot."',
+      delay: 2500 },
+    { tag: '感知', tagColor: 'tag-sense',
+      text: '鐵霜哼了一聲，但沒有反駁。老鑄把第二碗遞給清露，她接過去的時候小聲說了句「謝謝」。他裝作沒聽見。',
+      textEn: 'Iron Frost snorts but doesn\'t deny it. Old Cast passes a second bowl to Dew, who murmurs "thanks" as she takes it. He pretends not to hear.',
+      delay: 3200 },
+    { tag: '感知', tagColor: 'tag-sense',
+      text: '火光在每個人臉上跳動。你忽然意識到——這個被石化瘟疫籠罩的營地，此刻像是一個家。',
+      textEn: 'Firelight dances on every face. You realize — this camp, shrouded by petrification plague, feels like a home right now.',
+      delay: 3500, effect: function() { changeHp(10); changePetri(-3); addNpcAffinity('frost', 5); } },
+    { tag: '效果', tagColor: 'tag-system',
+      text: L('HP+10，石化-3%。營地的人把你當自己人了。', 'HP+10, Petri-3%. The camp has accepted you as one of their own.'),
+      delay: 1500 },
+  ], [
+    { text: '返回營地', textEn: 'Return to camp', action: () => loadNode('r2_camp') },
+  ], { label: L('營火晚餐', 'Camp Dinner') });
+});
+
+// ═══════════════════════════════════════
+//  Brotherhood: 鐵霜切磋 (Sparring with Frost)
+// ═══════════════════════════════════════
+registerNode('r2_frost_spar', () => {
+  state.flags.r2FrostSpar = true;
+  addNpcAffinity('frost', 10);
+  autoExplore([
+    { tag: '場景', tagColor: 'tag-combat',
+      art: npcPortrait.art('frost', { subtitle: '營地首領' }) || `<pre class="ascii-art">
+       ╱▔▔▔▔╲
+      │ ◆  ◆ │
+      │ ╰──╯ │
+    ──┤      ├──
+   ╱  │  ⚔  │  ╲
+      ╱╲  ╱╲
+     ╱╱ ╲╱ ╲╲
+   鐵霜 · 首領
+</pre>`, artEn: npcPortrait.art('frost', { subtitle: 'Camp Leader' }) || `<pre class="ascii-art">
+       ╱▔▔▔▔╲
+      │ ◆  ◆ │
+      │ ╰──╯ │
+    ──┤      ├──
+   ╱  │  ⚔  │  ╲
+      ╱╲  ╱╲
+     ╱╱ ╲╱ ╲╲
+  Frost · Leader
+</pre>`,
+      text: '鐵霜在空地上揮刀。每一刀都精準、乾脆——但你注意到她的右肩有些僵硬，那裡的石化紋路比別處更深。',
+      textEn: 'Iron Frost drills in the clearing. Each swing is precise and clean — but you notice her right shoulder is stiff, the petrification marks deeper there.',
+      delay: 3000 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: '她感覺到你在看，停下了。「想試試？」不是邀請——是命令。',
+      textEn: 'She senses you watching and stops. "Want to try?" Not an invitation — a command.',
+      delay: 2200 },
+    { tag: '行動', tagColor: 'tag-combat',
+      text: '你拿起一根木棍應戰。鐵霜沒有留手——第一擊就把你的木棍打飛了。',
+      textEn: 'You pick up a wooden stick. Iron Frost doesn\'t hold back — her first strike sends it flying.',
+      delay: 2500 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: '「再來。」她把木棍踢回你腳邊。你撿起來，這次抓得更緊。',
+      textEn: '"Again." She kicks the stick back. You pick it up and grip tighter this time.',
+      delay: 2200 },
+    { tag: '行動', tagColor: 'tag-combat',
+      text: '第二次、第三次、第四次——你每次都被打飛。但到了第五次，你擋住了她的一擊。',
+      textEn: 'Second, third, fourth — you\'re disarmed each time. But on the fifth, you block one of her strikes.',
+      delay: 2800, effect: function() { var r = statCheck('str', 7); if (r !== 'fail') { changeStat('str', 1); sfx.pass(); } } },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: '鐵霜收刀。她看著你的眼睛，很久沒有說話。然後她露出了一個笑容——不是禮貌的那種，是久違地遇到對手的那種。',
+      textEn: 'Iron Frost sheathes her blade. She looks into your eyes, silent for a long moment. Then she smiles — not a polite one, but the kind when you finally meet a worthy opponent.',
+      delay: 3500 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: '「不錯。」只有兩個字。但從鐵霜嘴裡說出來，比任何人的十句讚美都重。',
+      textEn: '"Not bad." Just two words. But coming from Iron Frost, they outweigh ten sentences of praise from anyone else.',
+      delay: 3000 },
+    { tag: '效果', tagColor: 'tag-system',
+      text: L('STR 檢定通過時 STR+1。鐵霜認可了你的實力。', 'STR+1 on check pass. Iron Frost acknowledges your strength.'),
+      delay: 1500 },
+  ], [
+    { text: '返回營地', textEn: 'Return to camp', action: () => loadNode('r2_camp') },
+  ], { label: L('鐵霜切磋', 'Sparring with Frost') });
+});
+
+// ═══════════════════════════════════════
+//  Brotherhood: 鐵霜守夜 (Frost's Vigil)
+// ═══════════════════════════════════════
+registerNode('r2_frost_vigil', () => {
+  state.flags.r2FrostVigil = true;
+  addNpcAffinity('frost', 8);
+  autoExplore([
+    { tag: '場景', tagColor: 'tag-sense',
+      text: '夜很深了。營地的人都睡了，只有鐵霜還坐在快要熄滅的營火邊。',
+      textEn: 'Deep night. The camp sleeps. Only Iron Frost remains by the dying fire.',
+      delay: 2500 },
+    { tag: '行動', tagColor: 'tag-move',
+      text: '你走過去，在她旁邊坐下。她瞥了你一眼，沒有說話，也沒有趕你走。',
+      textEn: 'You walk over and sit beside her. She glances at you, says nothing, doesn\'t send you away.',
+      delay: 2500 },
+    { tag: '感知', tagColor: 'tag-sense',
+      text: '火光很弱了。只剩下幾顆橙色的餘燼在灰燼裡明滅。遠處石壁上的結晶散發著幽藍的冷光。',
+      textEn: 'The fire is low. A few orange embers glow and fade in the ash. Distant crystals cast cold blue light on the stone walls.',
+      delay: 3000 },
+    { tag: '感知', tagColor: 'tag-sense',
+      text: '你們就這樣坐了很久。沒有人說話。只有火的細碎聲響，和遠處石脈收縮的低鳴。',
+      textEn: 'You sit together for a long time. No words. Only the crackle of embers and the distant groan of contracting rock.',
+      delay: 3500 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: '「明天之後，」鐵霜終於開口，聲音低得像是在自言自語，「不管結果如何——謝謝你沒把他當成怪物。」',
+      textEn: '"After tomorrow," Iron Frost finally speaks, voice so low it\'s almost to herself, "regardless of the outcome — thank you for not treating him like a monster."',
+      delay: 3500 },
+    { tag: '感知', tagColor: 'tag-sense',
+      text: '她說的是承鋼——那個被石化的巨像。你點了點頭。',
+      textEn: 'She means Cheng Gang — the petrified colossus. You nod.',
+      delay: 2200 },
+    { tag: '感知', tagColor: 'tag-sense',
+      text: '鐵霜沒有再說話。但在沉默中，她的手鬆開了一直攥著的刀柄。有時候，沉默比說話更有用。',
+      textEn: 'Iron Frost says no more. But in the silence, her hand finally releases the grip on her blade. Sometimes silence speaks louder than words.',
+      delay: 3500, effect: function() { changeHp(5); changePetri(-2); } },
+    { tag: '效果', tagColor: 'tag-system',
+      text: L('HP+5，石化-2%。無言的信任。', 'HP+5, Petri-2%. Unspoken trust.'),
+      delay: 1500 },
+  ], [
+    { text: '回去睡覺', textEn: 'Go back to sleep', action: () => loadNode('r2_camp') },
+  ], { label: L('鐵霜守夜', 'Frost\'s Vigil') });
 });
 

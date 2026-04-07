@@ -224,6 +224,12 @@ registerNode('r3_look', () => {
     if (!state.flags.r3PrisonDone) {
       c.push({ text: '河城監獄', textEn: 'City Prison', action: () => loadNode('r3_prison') });
     }
+    if (state.flags.r3ZhouMet && !state.flags.r3ZhouDrink) {
+      c.push({ text: '老周說今晚請你喝酒', textEn: 'Old Zhou invited you for a drink tonight', action: () => loadNode('r3_zhou_drink') });
+    }
+    if (state.flags.r1YingCompanion && state.flags.r3BellAlliance && !state.flags.r3NpcArgument) {
+      c.push({ text: '議會廳外傳來爭吵聲……', textEn: 'Arguing voices outside the council hall...', action: () => loadNode('r3_npc_argument') });
+    }
     c.push({ text: '巡邏（練級）', textEn: 'Patrol (grind)', action: () => loadNode('r3_patrol') });
     c.push({ text: '返回上升通道', textEn: 'Return to ascent shaft', action: () => loadNode('r2_gate') });
     return c;
@@ -311,6 +317,9 @@ registerNode('r3_dock', () => {
           { text: '繼續', textEn: 'Continue', action: () => loadNode('r3_dock') },
         ], { label: L('搜索碼頭', 'Searching dock') });
       }});
+    }
+    if (state.flags.r3ZhouMet && state.flags.r3CraneMet3 && !state.flags.r3CraneZhou) {
+      c.push({ text: '碼頭盡頭有兩個人在下棋', textEn: 'Two people are playing chess at the dock\'s end', action: () => loadNode('r3_crane_zhou') });
     }
     c.push({ text: '返回', textEn: 'Return', action: () => loadNode('r3_look') });
     return c;
@@ -3443,4 +3452,227 @@ registerNode('r3_epilogue', () => {
       location.reload();
     }},
   ], { label: L('尾聲', 'Epilogue') });
+});
+
+// ═══════════════════════════════════════
+//  Brotherhood: 老周請酒 (Zhou's Drink)
+// ═══════════════════════════════════════
+registerNode('r3_zhou_drink', () => {
+  state.flags.r3ZhouDrink = true;
+  addNpcAffinity('zhou', 12);
+  autoExplore([
+    { tag: '場景', tagColor: 'tag-sense',
+      art: npcPortrait.art('zhou', { subtitle: '倖存者' }) || `<pre class="ascii-art gold">
+      ╭─────╮
+     ╱ ▓  ─ ╲
+     │ ╰──╯ │
+     │ 🍶🍶 │
+     ╱╱    ╲╲
+   老周 · 倖存者
+</pre>`, artEn: npcPortrait.art('zhou', { subtitle: 'Survivor' }) || `<pre class="ascii-art gold">
+      ╭─────╮
+     ╱ ▓  ─ ╲
+     │ ╰──╯ │
+     │ 🍶🍶 │
+     ╱╱    ╲╲
+  Zhou · Survivor
+</pre>`,
+      text: '老周在碼頭邊的一張歪歪扭扭的木桌旁等你。桌上擺了兩個粗陶碗和一壺混濁的液體。',
+      textEn: 'Old Zhou waits at a crooked wooden table by the dock. Two crude clay bowls and a jug of murky liquid sit on top.',
+      delay: 2800 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: '「坐。」他倒了兩碗。「河城的酒很爛——但至少是酒。」',
+      textEn: '"Sit." He pours two bowls. "River City\'s booze is terrible — but at least it\'s booze."',
+      delay: 2500 },
+    { tag: '行動', tagColor: 'tag-explore',
+      text: '你喝了一口。像是液態的鐵鏽混合了某種說不上來的辛辣。你咳了幾聲。老周哈哈笑了。',
+      textEn: 'You take a sip. It tastes like liquid rust mixed with something indescribably spicy. You cough. Old Zhou laughs.',
+      delay: 2800 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: '「第一口都是這樣。第二口就好了。」他又倒了一碗。',
+      textEn: '"First sip\'s always like that. Second one\'s better." He refills your bowl.',
+      delay: 2200 },
+    { tag: '感知', tagColor: 'tag-sense',
+      text: '酒過三碗，老周的話開始多了。但不是快樂的那種多——是壓了太久終於找到出口的那種。',
+      textEn: 'Three bowls in, Old Zhou starts talking more. Not the happy kind — the kind that\'s been dammed too long and finally found a crack.',
+      delay: 3000 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: '「你想聽他們的名字嗎？」他忽然問。你知道他在說那十六個人。',
+      textEn: '"Want to hear their names?" he asks suddenly. You know he means the sixteen.',
+      delay: 2500 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: '老周開始數。一個一個，慢慢地，像是在點名。「趙大柱。馬二。孫老拐。黃毛。陳半斤……」',
+      textEn: 'Old Zhou begins counting. One by one, slowly, like calling roll. "Zhao Dazhu. Ma Er. Sun Laoguai. Huang Mao. Chen Banjin..."',
+      delay: 3500 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: '他數到第九個的時候停了。閉上眼睛想了一會。「……第十個叫什麼來著。」',
+      textEn: 'He pauses at the ninth. Closes his eyes and thinks. "...What was the tenth one\'s name?"',
+      delay: 3000 },
+    { tag: '感知', tagColor: 'tag-sense',
+      text: '老周的眼睛紅了。不是因為酒。',
+      textEn: 'Old Zhou\'s eyes redden. Not from the drink.',
+      delay: 2200 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: '「我開始忘了。」他低聲說。「十六個名字——以前背得滾瓜爛熟。現在……石化不只吃身體，也吃記憶。」',
+      textEn: '"I\'m starting to forget." His voice drops. "Sixteen names — I used to know them by heart. Now... the stone doesn\'t just eat your body. It eats your memory."',
+      delay: 3500 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: '他把碗舉起來。「替他們喝一碗。替那些被忘記的人。」',
+      textEn: 'He raises his bowl. "Drink one for them. For the ones who\'ll be forgotten."',
+      delay: 2800 },
+    { tag: '行動', tagColor: 'tag-explore',
+      text: '你舉碗碰了他的碗。在碼頭邊，在地底城市的微光中，你們一起為十六個名字沉默。',
+      textEn: 'You clink your bowl against his. On the dockside, in the underground city\'s dim glow, you share a silence for sixteen names.',
+      delay: 3500, effect: function() { changeStat('wil', 1); } },
+    { tag: '效果', tagColor: 'tag-system',
+      text: L('WIL+1。有些重量需要兩個人才能扛。', 'WIL+1. Some weights need two people to carry.'),
+      delay: 1500 },
+  ], [
+    { text: '返回', textEn: 'Return', action: () => loadNode('r3_look') },
+  ], { label: L('碼頭一杯酒', 'A Drink at the Dock') });
+});
+
+// ═══════════════════════════════════════
+//  Brotherhood: 螢 vs 銅鐘爭吵 (Ying vs Bell)
+// ═══════════════════════════════════════
+registerNode('r3_npc_argument', () => {
+  state.flags.r3NpcArgument = true;
+  autoExplore([
+    { tag: '場景', tagColor: 'tag-sense',
+      text: '議會廳外的走廊傳來激烈的爭吵聲。你靠近一看——是螢和銅鐘。',
+      textEn: 'Heated voices echo from the corridor outside the council hall. You approach — it\'s Ying and Bronze Bell.',
+      delay: 2500 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: '「你不能隱瞞這些！」螢的聲音在發抖，但很堅定。她手裡攥著筆記本。「下面的人有權知道真相。」',
+      textEn: '"You can\'t hide this!" Ying\'s voice trembles but holds firm. She grips her notebook. "The people below deserve the truth."',
+      delay: 3000 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: '「真相？」銅鐘冷冷地說。「你知道真相公開之後會怎樣嗎？恐慌。暴動。上面的人會直接封死所有通道。」',
+      textEn: '"Truth?" Bronze Bell says coldly. "Do you know what happens after the truth goes public? Panic. Riots. The people above will seal every passage."',
+      delay: 3500 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: '「那你的方法呢？」螢逼近一步。「繼續假裝一切都好？等石化吞噬所有人之後再寫一份漂亮的報告？」',
+      textEn: '"And your method?" Ying steps closer. "Keep pretending everything\'s fine? Write a nice report after the stone swallows everyone?"',
+      delay: 3200 },
+    { tag: '感知', tagColor: 'tag-sense',
+      text: '銅鐘的石化右手微微顫抖。她攥住了它，像是不想讓別人看到。',
+      textEn: 'Bronze Bell\'s petrified right hand trembles slightly. She grips it, as if not wanting anyone to see.',
+      delay: 2500 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: '「你以為我不想說嗎？」銅鐘的聲音忽然低了下去。「每天晚上我都在想——但這不是我一個人的秘密。牽涉到整個議會。」',
+      textEn: '"You think I don\'t want to speak?" Bell\'s voice drops suddenly. "Every night I think about it — but this isn\'t just my secret. The entire council is involved."',
+      delay: 3500 },
+    { tag: '感知', tagColor: 'tag-sense',
+      text: '兩個人都沉默了。走廊裡只剩下她們急促的呼吸聲。',
+      textEn: 'Both fall silent. Only their heavy breathing echoes in the corridor.',
+      delay: 2500 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: '螢最先開口。「……我們需要第三個人的意見。」她看向你。銅鐘也轉過頭來。',
+      textEn: 'Ying speaks first. "...We need a third opinion." She looks at you. Bronze Bell turns as well.',
+      delay: 2800 },
+  ], [
+    { text: '支持螢——公開真相', textEn: 'Side with Ying — reveal the truth',
+      action: () => {
+        addNpcAffinity('ying', 8);
+        addNpcAffinity('bell', -3);
+        autoExplore([
+          { tag: '對話', tagColor: 'tag-npc', text: '銅鐘閉上了眼睛。「……好吧。但要按我的方式公開——在議會框架內。不能引發恐慌。」', textEn: 'Bronze Bell closes her eyes. "...Fine. But we do it my way — within the council framework. No panic."', delay: 3000 },
+          { tag: '感知', tagColor: 'tag-sense', text: '螢點了點頭。這是她們第一次達成共識——雖然各自讓了一步。', textEn: 'Ying nods. It\'s their first consensus — though both gave ground.', delay: 2500, effect: function() { state.flags.r3ArgumentSidedYing = true; } },
+        ], [{ text: '繼續', textEn: 'Continue', action: () => loadNode('r3_look') }]);
+      }},
+    { text: '支持銅鐘——保守秘密', textEn: 'Side with Bell — keep it secret',
+      action: () => {
+        addNpcAffinity('bell', 8);
+        addNpcAffinity('ying', -3);
+        autoExplore([
+          { tag: '對話', tagColor: 'tag-npc', text: '螢咬住嘴唇。很久之後，她點了點頭。「……但不是永遠。等到時機成熟，我會把一切都寫出來。」', textEn: 'Ying bites her lip. After a long pause, she nods. "...But not forever. When the time comes, I\'ll write everything."', delay: 3000 },
+          { tag: '感知', tagColor: 'tag-sense', text: '銅鐘伸出完好的左手，搭在螢的肩上。「我答應你。」這是她第一次在別人面前展示信任。', textEn: 'Bronze Bell reaches out with her good left hand and places it on Ying\'s shoulder. "I promise." It\'s her first public display of trust.', delay: 3000, effect: function() { state.flags.r3ArgumentSidedBell = true; } },
+        ], [{ text: '繼續', textEn: 'Continue', action: () => loadNode('r3_look') }]);
+      }},
+    { text: '讓她們自己解決', textEn: 'Let them work it out',
+      action: () => {
+        autoExplore([
+          { tag: '感知', tagColor: 'tag-sense', text: '你退了一步。有些事需要她們自己面對。你聽到走廊裡的爭吵聲漸漸變小——不是因為有人贏了，是因為她們累了。', textEn: 'You step back. Some things they must face alone. The arguing fades — not because someone won, but because they\'re exhausted.', delay: 3000 },
+        ], [{ text: '離開', textEn: 'Leave', action: () => loadNode('r3_look') }]);
+      }},
+  ], { label: L('議會外的爭吵', 'Argument Outside the Council') });
+});
+
+// ═══════════════════════════════════════
+//  Brotherhood: 灰鶴 & 老周下棋 (Crane-Zhou Chess)
+// ═══════════════════════════════════════
+registerNode('r3_crane_zhou', () => {
+  state.flags.r3CraneZhou = true;
+  addNpcAffinity('crane', 5);
+  addNpcAffinity('zhou', 5);
+  autoExplore([
+    { tag: '場景', tagColor: 'tag-sense',
+      art: `<pre class="ascii-art gold">
+   ╭─────────────────────╮
+   │   ┌──┐    ┌──┐     │
+   │   │棋│    │棋│     │
+   │   └──┘    └──┘     │
+   │  灰鶴  ══  老周    │
+   │          🎲         │
+   ╰─────────────────────╯
+      碼頭 · 盡頭
+</pre>`, artEn: `<pre class="ascii-art gold">
+   ╭─────────────────────╮
+   │   ┌──┐    ┌──┐     │
+   │   │♟ │    │♟ │     │
+   │   └──┘    └──┘     │
+   │ Crane  ══  Zhou    │
+   │          🎲         │
+   ╰─────────────────────╯
+      Dock · Far End
+</pre>`,
+      text: '碼頭盡頭，灰鶴和老周面對面坐著，中間擺了一盤用石子充當棋子的棋局。',
+      textEn: 'At the far end of the dock, Grey Crane and Old Zhou sit facing each other over a board game made of pebbles.',
+      delay: 2800 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: '灰鶴落了一子。老周瞇著眼看了一會，然後默默把她的棋子拿掉了。「你偷偷多放了一顆。」',
+      textEn: 'Grey Crane places a stone. Old Zhou squints, then silently removes it. "You slipped in an extra piece."',
+      delay: 3000 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: '「證據呢？」灰鶴笑嘻嘻地反問。老周把那顆石子舉到她面前：「你的棋子是黑的。這顆是深灰色。我又不瞎。」',
+      textEn: '"Prove it." Crane grins. Old Zhou holds the stone up to her face: "Your pieces are black. This one\'s dark grey. I\'m not blind."',
+      delay: 3200 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: '灰鶴嘖了一聲，但眼睛在笑。「這招我在地表的時候就在用了，從來沒被抓到過。」',
+      textEn: 'Crane clicks her tongue, eyes laughing. "I\'ve been using that trick since my surface days. Never been caught before."',
+      delay: 2800 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: '「那是因為地表的人不夠老。」老周重新擺好棋盤。「活到我這歲數，什麼花招都見過了。」',
+      textEn: '"That\'s because surface folk aren\'t old enough." Old Zhou resets the board. "Live to my age, you\'ve seen every trick."',
+      delay: 3000 },
+    { tag: '感知', tagColor: 'tag-sense',
+      text: '你靠在碼頭的柱子上看他們下棋。灰鶴的嘴上不停——講地表的故事、碼頭的八卦、走私路線上的趣事。老周一句話也不說，只是偶爾點頭。',
+      textEn: 'You lean against a dock post and watch. Crane chatters nonstop — surface tales, dock gossip, smuggling route anecdotes. Old Zhou says nothing, just nods occasionally.',
+      delay: 3500 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: '灰鶴忽然停下來。「周叔——你為什麼從來不問我是怎麼到地底的？」',
+      textEn: 'Crane stops suddenly. "Old Zhou — how come you never ask how I ended up underground?"',
+      delay: 2800 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: '老周落了一子。「因為到了這裡的人，沒有一個是自願的。問那幹嘛。」',
+      textEn: 'Old Zhou places a piece. "Because nobody here came by choice. Why ask?"',
+      delay: 3000 },
+    { tag: '感知', tagColor: 'tag-sense',
+      text: '灰鶴愣了一下。然後她低下頭，用你從沒見過的認真語氣說：「……謝了，周叔。」',
+      textEn: 'Crane goes still. Then she lowers her head and says in a tone you\'ve never heard from her: "...Thanks, Old Zhou."',
+      delay: 3000 },
+    { tag: '感知', tagColor: 'tag-sense',
+      text: '老周又落了一子。「你輸了。」灰鶴低頭一看，果然。她趁聊天的時候忘了防守。',
+      textEn: 'Old Zhou places another piece. "You lose." Crane looks down — he\'s right. She forgot to defend while chatting.',
+      delay: 2800 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: '「再來一局！」灰鶴立刻重置棋盤。老周嘆了口氣：「跟年輕人下棋真累。」但他沒有起身離開。',
+      textEn: '"One more round!" Crane resets the board immediately. Old Zhou sighs: "Playing against young people is exhausting." But he doesn\'t get up to leave.',
+      delay: 3000, effect: function() { gainXp(5); } },
+    { tag: '效果', tagColor: 'tag-system',
+      text: L('XP+5。有些人在地底找到了不一樣的家人。', 'XP+5. Some people find a different kind of family underground.'),
+      delay: 1500 },
+  ], [
+    { text: '返回碼頭', textEn: 'Return to the dock', action: () => loadNode('r3_dock') },
+  ], { label: L('碼頭棋局', 'Dock Chess Game') });
 });
