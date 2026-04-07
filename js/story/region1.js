@@ -134,6 +134,24 @@ registerNode('r1_look', () => {
     if (state.flags.r1ForgeVisited && state.flags.r1GuardDefeated) {
       c.push({ text: '沿鐵軌深入迴廊', textEn: 'Follow the rails deeper', action: () => loadNode('r1_deep') });
     }
+    if (!state.flags.r1MinecartDone) {
+      c.push({ text: '查看廢棄礦車軌道', textEn: 'Check the abandoned mine cart track', action: () => loadNode('r1_minecart') });
+    }
+    if (!state.flags.r1RiverDone) {
+      c.push({ text: '循水聲探索地下河', textEn: 'Follow the sound of water to an underground river', action: () => loadNode('r1_underground_river') });
+    }
+    if (!state.flags.r1CollapseDone) {
+      c.push({ text: '冒險穿越坍塌區域', textEn: 'Risk passage through the collapsed area', action: () => loadNode('r1_collapse') });
+    }
+    if (!state.flags.r1ShrineDone) {
+      c.push({ text: '前往礦工祠堂', textEn: 'Visit the miner\'s shrine', action: () => loadNode('r1_shrine') });
+    }
+    if (!state.flags.r1VeinDeepDone) {
+      c.push({ text: '深入高密度結晶區', textEn: 'Venture into the dense crystal vein', action: () => loadNode('r1_vein_deep') });
+    }
+    if (!state.flags.r1GhostDone) {
+      c.push({ text: '靠近那個半透明的身影', textEn: 'Approach the translucent figure', action: () => loadNode('r1_ghost') });
+    }
     c.push({ text: '在迴廊中巡邏練級', textEn: 'Patrol the corridor for experience', action: () => loadNode('r1_patrol') });
     return c;
   })(), { label: L('觀察迴廊', 'Surveying corridor') });
@@ -1087,9 +1105,149 @@ registerNode('r1_survivor_talk', () => {
         ], [{ text: '繼續', textEn: 'Continue', action: () => loadNode('r1_quarters') }]);
       }});
     }
+    // Sidequest: Zhou's hidden memory (requires full trust)
+    if (trust && !state.flags.r1ZhouMemory) {
+      c.push({ text: '通風管裡刻的字……不只是求生記錄吧？', textEn: 'Those carvings in the vents... they\'re more than survival notes, right?', action: () => loadNode('r1_zhou_memory') });
+    }
     c.push({ text: '離開', textEn: 'Leave', action: () => loadNode('r1_quarters') });
     return c;
   })(), { label: L('與老周交談', 'Talking to Zhou') });
+});
+
+// ── NPC Sidequest: Old Zhou's Memory ──
+registerNode('r1_zhou_memory', () => {
+  state.flags.r1ZhouMemory = true;
+  autoExplore([
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('老周聽到你的問題，整個人僵住了。好一會兒，他才開口。',
+             'Old Zhou stiffens at your question. A long silence before he speaks.'),
+      delay: 2500 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「……你看到了。」他低下頭。「我以為那些字太小，沒人會注意。」',
+             '"...You saw them." He lowers his head. "I thought no one would notice — the letters were so small."'),
+      delay: 2800 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「通風管裡……我不只刻了求救的話。」老周的聲音沙啞了。「我把所有記得的都刻下來了。怕自己石化之前忘掉。」',
+             '"In the vents... I didn\'t just carve pleas for help." Old Zhou\'s voice goes rough. "I carved everything I could remember. Afraid I\'d forget before the stone took me."'),
+      delay: 3500 },
+    { art: `<pre class="ascii-art">
+  ╔═════════════════════════════════╗
+  ║  通風管壁 — 老周的記錄          ║
+  ╠═════════════════════════════════╣
+  ║                                 ║
+  ║  ╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱      ║
+  ║  ╱ 第三班 17人            ╱     ║
+  ║  ╱ 礦難前一天 監工K下令   ╱     ║
+  ║  ╱ 加班開採 東翼B-7區    ╱     ║
+  ║  ╱ 那裡不該碰的          ╱     ║
+  ║  ╱ 所有人都知道           ╱     ║
+  ║  ╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱      ║
+  ║  ╱ 第二天 爆炸           ╱     ║
+  ║  ╱ 不是瓦斯 不是塌方     ╱     ║
+  ║  ╱ 是封印碎了            ╱     ║
+  ║  ╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱      ║
+  ║                                 ║
+  ║     · ˚ · 密密麻麻的刻痕 · ˚ · ║
+  ╚═════════════════════════════════╝
+</pre>`, artEn: `<pre class="ascii-art">
+  ╔═════════════════════════════════╗
+  ║  Vent Wall — Zhou's Record     ║
+  ╠═════════════════════════════════╣
+  ║                                 ║
+  ║  ╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱      ║
+  ║  ╱ Crew 3, 17 men         ╱    ║
+  ║  ╱ Day before disaster:   ╱    ║
+  ║  ╱ Overseer K ordered     ╱    ║
+  ║  ╱ overtime in East Wing  ╱    ║
+  ║  ╱ Sector B-7             ╱    ║
+  ║  ╱ We all knew: forbidden ╱    ║
+  ║  ╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱      ║
+  ║  ╱ Next day: explosion    ╱    ║
+  ║  ╱ Not gas. Not collapse. ╱    ║
+  ║  ╱ The seal broke.        ╱    ║
+  ║  ╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱      ║
+  ║                                 ║
+  ║    · ˚ · Dense carvings · ˚ ·  ║
+  ╚═════════════════════════════════╝
+</pre>`, delay: 800 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「東翼 B-7 區——那裡有一層古老的封印。老礦工都知道，不能碰。但監工 K……他不在乎。」',
+             '"East Wing Sector B-7 — there was an ancient seal. All the old miners knew: don\'t touch it. But Overseer K... he didn\'t care."'),
+      delay: 3200 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「他說封印後面有大量石化結晶——純度最高的那種。值很多錢。」老周攥緊了拳頭。',
+             '"He said behind the seal lay massive petrification crystals — highest purity. Worth a fortune." Old Zhou clenches his fists.'),
+      delay: 3000 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「我們第三班被派去炸開封印。十七個人。」他的聲音開始發抖。',
+             '"Our Crew 3 was ordered to blast the seal open. Seventeen men." His voice starts shaking.'),
+      delay: 2800 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「爆炸的一瞬間——不是石頭碎裂的聲音。是一聲……尖嘯。像是什麼東西被放了出來。」',
+             '"The instant it blew — it wasn\'t the sound of rock shattering. It was a... shriek. Like something had been set free."'),
+      delay: 3200 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「然後石化瘟疫就來了。先是離封印最近的人——幾秒鐘內就完全石化。然後是第二排、第三排……」老周閉上了眼睛。',
+             '"Then the petrification plague came. First the men closest to the seal — fully petrified in seconds. Then the second row, the third..." Old Zhou closes his eyes.'),
+      delay: 3500 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「十七個人。活下來的只有我一個。因為我當時在最後面搬炸藥。」',
+             '"Seventeen men. I\'m the only survivor. Because I was at the back, carrying explosives."'),
+      delay: 3000 },
+    { tag: '感知', tagColor: 'tag-sense',
+      text: L('老周的完好的手在發抖。他那隻深棕色的眼睛濕潤了。',
+             'Old Zhou\'s good hand trembles. His deep brown eye glistens.'),
+      delay: 2500 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「我把這些都刻在通風管裡了。怕的是——如果我也石化了，就再也沒人記得真相。」',
+             '"I carved it all in the vents. I was afraid — if I turned to stone too, no one would remember the truth."'),
+      delay: 3000 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「礦難不是天災。是監工 K 為了石化結晶，故意炸開了封印。」',
+             '"The disaster wasn\'t natural. Overseer K blew the seal open on purpose — for the crystals."'),
+      delay: 3000 },
+  ], [
+    { text: '監工 K 現在在哪？', textEn: 'Where is Overseer K now?',
+      action: () => {
+        autoExplore([
+          { tag: '對話', tagColor: 'tag-npc',
+            text: L('老周搖了搖頭。「不知道。爆炸之後我就跑了，再也沒見過他。」',
+                   'Old Zhou shakes his head. "Don\'t know. I ran after the explosion. Never saw him again."'),
+            delay: 2800 },
+          { tag: '對話', tagColor: 'tag-npc',
+            text: L('「但如果他還活著——他一定往上跑了。那種人不會往下走。」',
+                   '"But if he\'s alive — he ran upward. That kind of man doesn\'t go deeper."'),
+            delay: 2800 },
+          { tag: '對話', tagColor: 'tag-npc',
+            text: L('「如果你到了上面……替那十六個人問問他——值不值得。」老周的語氣平靜得可怕。',
+                   '"If you make it up there... ask him for those sixteen men — was it worth it." Old Zhou\'s tone is terrifyingly calm.'),
+            delay: 3200 },
+          { tag: '效果', tagColor: 'tag-system',
+            text: L('獲得關鍵情報 | 經驗 +10', 'Key intel acquired | XP +10'),
+            delay: 1500, effect: () => { gainXp(10); state.flags.r1ZhouMineDisaster = true; } },
+        ], [
+          { text: '我會查清楚的', textEn: 'I\'ll find out', action: () => loadNode('r1_quarters') },
+        ], { label: L('老周的真相', 'Zhou\'s truth') });
+      }},
+    { text: '這些不會白白被埋沒的', textEn: 'This won\'t be buried',
+      action: () => {
+        autoExplore([
+          { tag: '對話', tagColor: 'tag-npc',
+            text: L('老周看了你很久。然後他點了點頭。',
+                   'Old Zhou looks at you for a long time. Then nods.'),
+            delay: 2500 },
+          { tag: '對話', tagColor: 'tag-npc',
+            text: L('「……謝了，小子。」他低聲說。「能有人知道就夠了。」',
+                   '"...Thanks, kid." He says quietly. "Just knowing someone knows is enough."'),
+            delay: 2800 },
+          { tag: '效果', tagColor: 'tag-system',
+            text: L('獲得關鍵情報 | 經驗 +10', 'Key intel acquired | XP +10'),
+            delay: 1500, effect: () => { gainXp(10); state.flags.r1ZhouMineDisaster = true; } },
+        ], [
+          { text: '返回', textEn: 'Back', action: () => loadNode('r1_quarters') },
+        ], { label: L('老周的真相', 'Zhou\'s truth') });
+      }},
+  ], { label: L('老周的記憶', 'Zhou\'s memory') });
 });
 
 // ── NPC: The Wanderer — 灰鶴 (Grey Crane) ──

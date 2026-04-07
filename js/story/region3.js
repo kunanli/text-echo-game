@@ -145,6 +145,24 @@ registerNode('r3_look', () => {
     if (state.flags.r3BellQuest && !state.flags.r3Ending) {
       c.push({ text: '回報銅鐘（任務進度）', textEn: 'Report to Bronze Bell (quest progress)', action: () => loadNode('r3_quest_check') });
     }
+    if (!state.flags.r3UndergroundDone) {
+      c.push({ text: '地下通道', textEn: 'Underground Tunnels', action: () => loadNode('r3_underground') });
+    }
+    if (!state.flags.r3TempleDone) {
+      c.push({ text: '石化神殿', textEn: 'Petrification Temple', action: () => loadNode('r3_temple') });
+    }
+    if (!state.flags.r3LibraryDone) {
+      c.push({ text: '圖書館', textEn: 'Library', action: () => loadNode('r3_library') });
+    }
+    if (!state.flags.r3SlumDone) {
+      c.push({ text: '下城區', textEn: 'Lower District', action: () => loadNode('r3_slum') });
+    }
+    if (!state.flags.r3GardenDone) {
+      c.push({ text: '議會花園', textEn: 'Council Garden', action: () => loadNode('r3_garden_r3') });
+    }
+    if (!state.flags.r3PrisonDone) {
+      c.push({ text: '河城監獄', textEn: 'City Prison', action: () => loadNode('r3_prison') });
+    }
     c.push({ text: '巡邏（練級）', textEn: 'Patrol (grind)', action: () => loadNode('r3_patrol') });
     c.push({ text: '返回上升通道', textEn: 'Return to ascent shaft', action: () => loadNode('r2_gate') });
     return c;
@@ -598,9 +616,280 @@ registerNode('r3_bell', () => {
     if (state.flags.r3BellQuest) {
       c.push({ text: '回報任務進度', textEn: 'Report quest progress', action: () => loadNode('r3_quest_check') });
     }
+    // Sidequest: Bell's night (requires alliance formed)
+    if (state.flags.r3BellAlliance && !state.flags.r3BellNight) {
+      c.push({ text: '深夜拜訪銅鐘', textEn: 'Visit Bell at night', action: () => loadNode('r3_bell_night') });
+    }
+    // Sidequest: Bell's secret (requires night visit + has letter or testimony)
+    if (state.flags.r3BellNight && !state.flags.r3BellSecret && (state.flags.r2FrostLetterCarried || state.flags.r3ZhouTestimony)) {
+      c.push({ text: '銅鐘，你知道封鎖的真正原因嗎？', textEn: 'Bell, do you know the real reason for the lockdown?', action: () => loadNode('r3_bell_secret') });
+    }
+    // Sidequest: Bell's deep alliance (requires secret revealed)
+    if (state.flags.r3BellSecret && !state.flags.r3BellAllianceDeep) {
+      c.push({ text: '銅鐘，我們需要一起面對這件事', textEn: 'Bell, we need to face this together', action: () => loadNode('r3_bell_alliance_deep') });
+    }
     c.push({ text: '離開', textEn: 'Leave', action: () => loadNode(state.flags.r3BellQuest ? 'r3_look' : 'r3_council') });
     return c;
   })(), { label: L('銅鐘', 'Bronze Bell') });
+});
+
+// ═══════════════════════════════════════════════════
+//  NPC Sidequest — 銅鐘 (Bronze Bell) Deep Arc
+// ═══════════════════════════════════════════════════
+
+// --- r3_bell_night: Late-night visit, discovering Bell's vulnerability ---
+registerNode('r3_bell_night', () => {
+  state.flags.r3BellNight = true;
+  autoExplore([
+    { tag: '移動', tagColor: 'tag-move',
+      text: L('深夜。議會廳的走廊空無一人。銅鐘辦公室的門縫裡還透著燭光。',
+             'Late at night. The Council hall corridors are empty. Candlelight seeps through the crack beneath Bronze Bell\'s office door.'),
+      delay: 2800 },
+    { tag: '感知', tagColor: 'tag-sense',
+      text: L('你推門的時候聽到了一聲壓抑的——是呻吟嗎？不是。是痛苦的低語。',
+             'As you push the door, you hear a stifled — a moan? No. A murmur of pain.'),
+      delay: 2500 },
+    { art: npcPortrait.art('bell', { subtitle: '……' }) || `<pre class="ascii-art">
+       ·  ˚  銅鐘 — 深夜辦公室  ˚  ·
+              ╱═══╲
+             │ ─  ─ │  ← 閉眼
+             │  ───  │
+              ╲═══╱
+        ╱───┤  ░▓█  ├───╲
+       ╱    │  ▓██  │    ╲
+      ╱  ╱──┤  ░▓█  ├──╲  ╲
+           石化右手
+           正在疼痛……
+</pre>`, artEn: npcPortrait.art('bell', { subtitle: '...' }) || `<pre class="ascii-art">
+    ·  ˚  Bronze Bell — Late night  ˚  ·
+              ╱═══╲
+             │ ─  ─ │  ← eyes shut
+             │  ───  │
+              ╲═══╱
+        ╱───┤  ░▓█  ├───╲
+       ╱    │  ▓██  │    ╲
+      ╱  ╱──┤  ░▓█  ├──╲  ╲
+        Petrified hand
+        in agony...
+</pre>`, delay: 800 },
+    { tag: '感知', tagColor: 'tag-sense',
+      text: L('銅鐘跪在桌旁，左手用力按住石化的右手腕。她的額頭上全是冷汗。石化的右手指節發出細微的碎裂聲——像是石頭在膨脹。',
+             'Bronze Bell kneels beside her desk, left hand pressing hard on her petrified right wrist. Cold sweat covers her forehead. Her stone fingers emit faint cracking sounds — as if the rock is expanding.'),
+      delay: 3500 },
+    { tag: '感知', tagColor: 'tag-sense',
+      text: L('她聽到你的腳步聲，猛地抬頭——琥珀色的眼睛裡沒有平時的從容。只有赤裸裸的痛苦。和一瞬間的……羞恥。',
+             'She hears your footsteps and snaps her head up — no composure in those amber eyes. Just raw pain. And a flash of... shame.'),
+      delay: 3000 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「出去。」她的聲音嘶啞。「我沒讓你進來。」',
+             '"Get out." Her voice is hoarse. "I didn\'t invite you in."'),
+      delay: 2500 },
+    { tag: '感知', tagColor: 'tag-sense',
+      text: L('但她的左手沒有鬆開石化的右手腕——你看到她的手在發抖。疼痛讓她無法維持那副鐵面孔。',
+             'But her left hand doesn\'t release her petrified wrist — you see her hand trembling. The pain strips away her iron mask.'),
+      delay: 3000 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「……每天晚上都會這樣。」沉默了很久，她才小聲開口。「石化在擴散的時候，就像——有人在用熱鐵從裡面燒你的骨頭。」',
+             '"...It happens every night." After a long silence, she whispers. "When the petrification spreads, it feels like — someone burning your bones from the inside with a hot iron."'),
+      delay: 3500 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「白天我撐得住。議會的人不能看到我疼。」她苦笑了一聲。「夜裡……就沒辦法了。」',
+             '"During the day I hold it together. The Council can\'t see me in pain." She laughs bitterly. "At night... I can\'t."'),
+      delay: 3200 },
+  ], [
+    { text: '幫她按住手腕', textEn: 'Help hold her wrist',
+      action: () => {
+        autoExplore([
+          { tag: '行動', tagColor: 'tag-move',
+            text: L('你蹲到她身邊，伸手覆上她的左手——幫她一起按住石化的手腕。你的體溫透過她的手指傳了過去。',
+                   'You kneel beside her, your hand covering hers — helping press down on the petrified wrist. Your warmth passes through her fingers.'),
+            delay: 3000 },
+          { tag: '感知', tagColor: 'tag-sense',
+            text: L('銅鐘的身體僵了一瞬。然後——你感覺她的手指慢慢放鬆了。不是不疼了，而是不再逞強了。',
+                   'Bronze Bell\'s body stiffens for a heartbeat. Then — you feel her fingers slowly relax. Not because the pain stopped, but because she stopped pretending.'),
+            delay: 3200 },
+          { tag: '對話', tagColor: 'tag-npc',
+            text: L('「……你手很暖。」她低聲說。語氣裡沒有了白天那個鐵面議員的影子。只是一個疼痛中的女人在感謝一雙溫暖的手。',
+                   '"...Your hand is warm." She whispers. The iron councilor from daylight is gone. Just a woman in pain, grateful for a warm hand.'),
+            delay: 3200 },
+          { tag: '感知', tagColor: 'tag-sense',
+            text: L('你們就這樣坐在黑暗的辦公室裡，很久。燭光在石化的手指上閃爍。',
+                   'The two of you sit like that in the dark office for a long time. Candlelight flickers on petrified fingers.'),
+            delay: 3000 },
+          { tag: '效果', tagColor: 'tag-system',
+            text: L('銅鐘好感 ↑↑↑ | 經驗 +10 | HP +15', 'Bronze Bell bond ↑↑↑ | XP +10 | HP +15'),
+            delay: 2000, effect: () => { gainXp(10); changeHp(15); } },
+        ], [
+          { text: '返回', textEn: 'Back', action: () => loadNode('r3_council') },
+        ], { label: L('銅鐘的夜晚', 'Bronze Bell\'s night') });
+      }},
+    { text: '默默陪著她', textEn: 'Stay silently beside her',
+      action: () => {
+        autoExplore([
+          { tag: '感知', tagColor: 'tag-sense',
+            text: L('你沒有說話。只是坐到她旁邊，靠著牆壁。痛苦的時候，有時候沉默比安慰更有用。',
+                   'You say nothing. Just sit beside her, leaning against the wall. In pain, sometimes silence is more useful than comfort.'),
+            delay: 3000 },
+          { tag: '對話', tagColor: 'tag-npc',
+            text: L('過了很久，銅鐘輕聲說了一句：「……謝謝你沒走。」',
+                   'After a long while, Bronze Bell murmurs: "...Thank you for not leaving."'),
+            delay: 2800 },
+          { tag: '效果', tagColor: 'tag-system',
+            text: L('銅鐘好感 ↑↑ | 經驗 +8', 'Bronze Bell bond ↑↑ | XP +8'),
+            delay: 1500, effect: () => gainXp(8) },
+        ], [
+          { text: '返回', textEn: 'Back', action: () => loadNode('r3_council') },
+        ], { label: L('銅鐘的夜晚', 'Bronze Bell\'s night') });
+      }},
+  ], { label: L('銅鐘的夜晚', 'Bronze Bell\'s night') });
+});
+
+// --- r3_bell_secret: Bell knows the real reason for lockdown ---
+registerNode('r3_bell_secret', () => {
+  state.flags.r3BellSecret = true;
+  autoExplore([
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('你提到了監工 K 的真名、議會的軍事命令、以及鐵霜的信。銅鐘聽著，表情一點點變了。',
+             'You mention Overseer K\'s real name, the Council\'s military orders, and Iron Frost\'s letter. Bronze Bell listens, her expression shifting slowly.'),
+      delay: 3000 },
+    { tag: '感知', tagColor: 'tag-sense',
+      text: L('她沒有震驚。她的表情是——確認。像是某個一直懷疑的事情，終於得到了證實。',
+             'She doesn\'t look shocked. Her expression is — confirmation. As if something long suspected has finally been verified.'),
+      delay: 2800 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「……我知道。」銅鐘閉上了眼睛。「不是全部，但我知道一些。」',
+             '"...I know." Bronze Bell closes her eyes. "Not everything, but some of it."'),
+      delay: 2800 },
+    { tag: '對話', tagColor: 'tag-npc',
+      html: L('「議會裡有一個派系——以<b>鏽刃</b>為首。他們一直在推動封鎖通道。我以為只是為了安全。」',
+             '"There\'s a faction in the Council — led by <b>Rust Blade</b>. They\'ve been pushing to seal the passages. I assumed it was for safety."'),
+      delay: 3200 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「但半年前我在鏽刃的私人文件裡看到了一份採購清單。」她的聲音壓得很低。',
+             '"But six months ago I saw a procurement list in Rust Blade\'s private files." Her voice drops low.'),
+      delay: 2800 },
+    { tag: '對話', tagColor: 'tag-npc',
+      html: L('「<b>石化結晶</b>——大量的、精煉過的石化結晶。不是用來研究治療的，是用來<b>製造武器</b>的。」',
+             '"<b>Petrification crystals</b> — refined, in massive quantities. Not for researching a cure. For <b>manufacturing weapons</b>."'),
+      delay: 3200 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「封鎖通道的真正目的不是防止瘟疫擴散——是壟斷下層的石化結晶資源。封了通道，就沒人能跟他們搶。」',
+             '"The real purpose of sealing the passages isn\'t to stop plague spread — it\'s to monopolize the lower levels\' petrification crystal resources. Seal the routes, and no one competes."'),
+      delay: 3500 },
+    { tag: '感知', tagColor: 'tag-sense',
+      text: L('銅鐘的眼睛睜開了。琥珀色的瞳孔裡燃燒著某種你從未見過的東西——不是恐懼，是憤怒。',
+             'Bronze Bell\'s eyes open. Something you\'ve never seen before burns in those amber irises — not fear, but fury.'),
+      delay: 2800 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「我一個人的話——查不動。鏽刃在議會裡的勢力太大了。」她看著你。「但現在……有你的證據，有老周的證詞，有鐵霜的信——也許夠了。」',
+             '"Alone — I can\'t investigate. Rust Blade\'s influence in the Council is too strong." She looks at you. "But now... with your evidence, Zhou\'s testimony, Frost\'s letter — maybe it\'s enough."'),
+      delay: 3500 },
+    { tag: '效果', tagColor: 'tag-system',
+      text: L('經驗 +12', 'XP +12'),
+      delay: 1500, effect: () => gainXp(12) },
+  ], [
+    { text: '我們一起揭露真相', textEn: 'Let\'s expose the truth together', action: () => loadNode('r3_bell') },
+    { text: '返回', textEn: 'Back', action: () => loadNode('r3_council') },
+  ], { label: L('銅鐘的秘密', 'Bronze Bell\'s secret') });
+});
+
+// --- r3_bell_alliance_deep: Bell shows all her cards ---
+registerNode('r3_bell_alliance_deep', () => {
+  state.flags.r3BellAllianceDeep = true;
+  autoExplore([
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('銅鐘把辦公室的門鎖上了。她走到桌旁，從一個暗格裡取出一疊文件。',
+             'Bronze Bell locks the office door. She walks to her desk and retrieves a stack of documents from a hidden compartment.'),
+      delay: 2800 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「這些是我這半年偷偷收集的。」她把文件攤在桌上。「鏽刃的私人信件、結晶交易記錄、議會內部的表決分析——」',
+             '"These are what I\'ve secretly gathered over six months." She spreads the files across the desk. "Rust Blade\'s private letters, crystal trade records, Council vote analyses —"'),
+      delay: 3500 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「全部。我的底牌。現在給你看。」銅鐘直視你的眼睛。她的目光裡沒有了考驗，沒有了保留。只有信任。',
+             '"Everything. My hand of cards. Showing it to you now." Bronze Bell meets your eyes directly. No more testing, no more holding back. Only trust.'),
+      delay: 3200 },
+    { art: `<pre class="ascii-art">
+  ╔═════════════════════════════════╗
+  ║   銅鐘的秘密檔案                ║
+  ╠═════════════════════════════════╣
+  ║                                 ║
+  ║  ┌───────┐ ┌───────┐           ║
+  ║  │鏽刃信件│ │結晶帳目│          ║
+  ║  └───┬───┘ └───┬───┘           ║
+  ║  ┌───┴───┐ ┌───┴───┐           ║
+  ║  │表決紀錄│ │軍事訂單│          ║
+  ║  └───┬───┘ └───┬───┘           ║
+  ║  ┌───┴─────────┴───┐           ║
+  ║  │ 議會腐敗的完整證據 │         ║
+  ║  └─────────────────┘           ║
+  ║                                 ║
+  ║    ·˚· 她的全部底牌 ·˚·        ║
+  ╚═════════════════════════════════╝
+</pre>`, artEn: `<pre class="ascii-art">
+  ╔═════════════════════════════════╗
+  ║   BELL'S SECRET DOSSIER        ║
+  ╠═════════════════════════════════╣
+  ║                                 ║
+  ║  ┌────────┐ ┌────────┐         ║
+  ║  │Rust Blade│ │Crystal  │       ║
+  ║  │ Letters  │ │Ledgers  │       ║
+  ║  └────┬───┘ └────┬───┘         ║
+  ║  ┌────┴───┐ ┌────┴───┐         ║
+  ║  │  Vote   │ │Military │        ║
+  ║  │Records  │ │ Orders  │        ║
+  ║  └────┬───┘ └────┬───┘         ║
+  ║  ┌────┴──────────┴────┐        ║
+  ║  │ Complete corruption │        ║
+  ║  │      evidence       │        ║
+  ║  └────────────────────┘        ║
+  ║                                 ║
+  ║    ·˚· All her cards ·˚·       ║
+  ╚═════════════════════════════════╝
+</pre>`, delay: 800 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「我一個人能做的到此為止了。」她的聲音很輕，但很穩。「鏽刃在議會有三票。我只有一票。加上你帶來的證據——也許能翻盤。」',
+             '"This is as far as I can go alone." Her voice is quiet but steady. "Rust Blade has three votes. I have one. With the evidence you\'ve brought — maybe we can turn it around."'),
+      delay: 3500 },
+    { tag: '對話', tagColor: 'tag-npc',
+      html: L('「但如果失敗了——」銅鐘頓了頓。「我會被議會開除，或者更糟。鏽刃不會放過知道真相的人。」',
+             '"But if we fail —" Bronze Bell pauses. "I\'ll be expelled from the Council, or worse. Rust Blade doesn\'t forgive those who know the truth."'),
+      delay: 3200 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('她伸出左手——完好的那隻，不是石化的那隻。掌心向上。',
+             'She extends her left hand — the unpetrified one. Palm up.'),
+      delay: 2500 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「一起？」她問。只有一個字。但你從她的眼睛裡看到了你見過的最真誠的表情。',
+             '"Together?" she asks. A single word. But in her eyes you see the most sincere expression you\'ve ever witnessed from her.'),
+      delay: 3000 },
+  ], [
+    { text: '握住她的手', textEn: 'Take her hand',
+      action: () => {
+        autoExplore([
+          { tag: '感知', tagColor: 'tag-sense',
+            text: L('你握住了銅鐘的手。她的手指收緊了——用力，但不疼。像是在握住一個承諾。',
+                   'You take Bronze Bell\'s hand. Her fingers tighten — firmly, but not painfully. As if holding onto a promise.'),
+            delay: 3000 },
+          { tag: '對話', tagColor: 'tag-npc',
+            text: L('「……好。」她的嘴角勾起了一個弧度——不是白天那種精心計算的微笑。是真的。「那就一起把這個爛攤子收拾乾淨。」',
+                   '"...Good." Her lips curve — not the calculated daytime smile. A real one. "Then let\'s clean up this mess together."'),
+            delay: 3200 },
+          { tag: '效果', tagColor: 'tag-system',
+            text: L('銅鐘好感 MAX | 獲得「銅鐘的秘密檔案」| 經驗 +15 | 意志 +2', 'Bronze Bell bond MAX | Acquired "Bell\'s Secret Dossier" | XP +15 | WIL +2'),
+            delay: 2000, effect: () => {
+              addItem(L('銅鐘的秘密檔案', 'Bell\'s Secret Dossier'));
+              gainXp(15);
+              changeStat('wil', 2);
+            }},
+          { tag: '系統', tagColor: 'tag-system',
+            text: L('（銅鐘的檔案將在議會投票中起決定性作用）', '(Bell\'s dossier will play a decisive role in the Council vote)'),
+            delay: 2000 },
+        ], [
+          { text: '返回', textEn: 'Back', action: () => loadNode('r3_council') },
+        ], { label: L('深度同盟', 'Deep alliance') });
+      }},
+  ], { label: L('銅鐘的底牌', 'Bronze Bell\'s cards') });
 });
 
 // ═══════════════════════════════════════════════════
@@ -1057,9 +1346,223 @@ registerNode('r3_zhou', () => {
         ], { label: L('老周的留言', 'Zhou\'s message') });
       }});
     }
+    // Sidequest: Zhou tells the full truth (requires R2 evidence)
+    if (state.flags.r2ZhouEvidence && !state.flags.r3ZhouTruth) {
+      c.push({ text: '老周，我找到了你刻的那些字……', textEn: 'Zhou, I found those carvings you made...', action: () => loadNode('r3_zhou_truth') });
+    }
+    // Sidequest: Zhou's justice (requires truth told)
+    if (state.flags.r3ZhouTruth && !state.flags.r3ZhouJustice) {
+      c.push({ text: '老周，你想好了嗎？', textEn: 'Zhou, have you decided?', action: () => loadNode('r3_zhou_justice') });
+    }
     c.push({ text: '離開', textEn: 'Leave', action: () => loadNode('r3_market') });
     return c;
   })(), { label: L('老周', 'Old Zhou') });
+});
+
+// ── NPC Sidequest: Old Zhou's Truth (R3) ──
+registerNode('r3_zhou_truth', () => {
+  state.flags.r3ZhouTruth = true;
+  autoExplore([
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('你把在採石場岩壁上發現的深層刻痕告訴老周——監工 K 的真名、議會的命令、軍事用途。',
+             'You tell Old Zhou about the deeper carvings you found on the quarry wall — Overseer K\'s real name, the Council\'s orders, the military purpose.'),
+      delay: 3000 },
+    { tag: '感知', tagColor: 'tag-sense',
+      text: L('老周聽完，整個人像被抽走了力氣。他慢慢靠回牆上，用石化的手捂住了臉。',
+             'Old Zhou listens, then seems to deflate. He slowly leans against the wall, covering his face with his petrified hand.'),
+      delay: 3000 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「……你都看到了。」他的聲音像是從石頭裡擠出來的。',
+             '"...You saw it all." His voice sounds like it\'s being squeezed from stone.'),
+      delay: 2500 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「我刻那些字的時候，以為自己快死了。想著就算死了，也不能讓真相爛在地底。」',
+             '"When I carved those words, I thought I was dying. Figured even if I died, the truth shouldn\'t rot underground."'),
+      delay: 3200 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「結果我沒死。我到了河城。然後我才發現——」他抬起頭，完好的左眼裡燃燒著某種東西。',
+             '"Turns out I didn\'t die. I made it to River City. And then I found out —" He looks up, something burning in his good eye.'),
+      delay: 3000 },
+    { tag: '對話', tagColor: 'tag-npc',
+      html: L('「監工 K——<b>孔德業</b>——現在是河城議會的顧問。坐在議會廳裡，穿著乾淨的衣服，說著漂亮的話。」',
+             '"Overseer K — <b>Kong De-ye</b> — is now an advisor on the River City Council. Sitting in the Council chamber, wearing clean clothes, speaking pretty words."'),
+      delay: 3500 },
+    { tag: '感知', tagColor: 'tag-sense',
+      text: L('老周的拳頭捏得咯咯作響。石化的右手上裂開了幾道細紋。',
+             'Old Zhou\'s fists creak. Hairline cracks spiderweb across his petrified right hand.'),
+      delay: 2500 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「十六條人命。我的腿。整個地底幾千人的石化。全是因為他。」',
+             '"Sixteen lives. My legs. Thousands petrified underground. All because of him."'),
+      delay: 3000 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「而他在上面活得好好的。」老周閉上眼，深深吸了一口氣。',
+             '"And he\'s doing just fine up here." Old Zhou closes his eyes, draws a deep breath.'),
+      delay: 2800 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「我想公開這件事。在議會上。讓所有人知道瘟疫的真相。」',
+             '"I want to go public. At the Council. Let everyone know the truth about the plague."'),
+      delay: 3000 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('他看著你，那隻深棕色的眼睛異常清醒。「但我需要你幫我。一個瘸腿老礦工的話，沒人會信。」',
+             'He looks at you, that deep brown eye unusually lucid. "But I need your help. No one will believe a crippled old miner alone."'),
+      delay: 3200 },
+  ], [
+    { text: '我幫你', textEn: 'I\'ll help you',
+      action: () => {
+        autoExplore([
+          { tag: '對話', tagColor: 'tag-npc',
+            text: L('老周看了你很久。然後他伸出那隻完好的手——不是握手，是用力攥住了你的前臂。',
+                   'Old Zhou stares at you a long while. Then he extends his good hand — not a handshake, but a firm grip on your forearm.'),
+            delay: 3000 },
+          { tag: '對話', tagColor: 'tag-npc',
+            text: L('「……我老周這輩子不欠人情。但這個情，我欠了。」',
+                   '"...Old Zhou doesn\'t owe favors in this life. But this one — I owe."'),
+            delay: 2800 },
+          { tag: '效果', tagColor: 'tag-system',
+            text: L('老周好感 ↑↑↑ | 經驗 +10', 'Old Zhou bond ↑↑↑ | XP +10'),
+            delay: 1500, effect: () => gainXp(10) },
+        ], [
+          { text: '返回', textEn: 'Back', action: () => loadNode('r3_zhou') },
+        ], { label: L('老周的請求', 'Zhou\'s request') });
+      }},
+    { text: '你確定嗎？議會的人可能不好惹', textEn: 'Are you sure? The Council won\'t take it well',
+      action: () => {
+        autoExplore([
+          { tag: '對話', tagColor: 'tag-npc',
+            text: L('「不好惹？」老周冷笑了一聲。「我半個身子都石化了，還有什麼好怕的？」',
+                   '"Won\'t take it well?" Old Zhou laughs coldly. "Half my body is stone. What\'s left to be afraid of?"'),
+            delay: 3000 },
+          { tag: '對話', tagColor: 'tag-npc',
+            text: L('「那十六個人沒有怕的機會。我至少還能站著說話。」',
+                   '"Those sixteen men didn\'t get a chance to be afraid. At least I can still stand and speak."'),
+            delay: 2800 },
+        ], [
+          { text: '好，我幫你', textEn: 'Alright, I\'ll help', action: () => {
+            gainXp(10);
+            loadNode('r3_zhou');
+          }},
+        ], { label: L('老周的決心', 'Zhou\'s resolve') });
+      }},
+  ], { label: L('老周的真相', 'Zhou\'s truth') });
+});
+
+// ── NPC Sidequest: Old Zhou's Justice (R3) ──
+registerNode('r3_zhou_justice', () => {
+  state.flags.r3ZhouJustice = true;
+  autoExplore([
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('老周坐在工具台旁，手裡攥著一張寫滿字的紙。看到你來，他站了起來——靠著拐杖，但脊背挺得很直。',
+             'Old Zhou sits by the workbench, clutching a paper covered in writing. When he sees you, he stands — leaning on his crutch, but spine ramrod straight.'),
+      delay: 3000 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「我寫好了。」他把紙遞給你。「第三班十六個人的名字。礦難的經過。監工 K 的真名和議會的命令。全部。」',
+             '"I\'ve written it all." He hands you the paper. "The names of all sixteen men from Crew 3. What happened. Overseer K\'s real name and the Council\'s orders. Everything."'),
+      delay: 3500 },
+    { art: `<pre class="ascii-art">
+  ╔═════════════════════════════════╗
+  ║     老周的證詞書                ║
+  ╠═════════════════════════════════╣
+  ║                                 ║
+  ║  第三班 十六人名單：            ║
+  ║  張大山、李鐵柱、王石根、      ║
+  ║  趙礦生、錢得福、孫大力、      ║
+  ║  劉黑臉、陳老實、楊二蛋、      ║
+  ║  馬驢子、朱小胖、黃石頭、      ║
+  ║  林木根、吳長命、鄭方圓、      ║
+  ║  何來福                         ║
+  ║                                 ║
+  ║  ——以上十六人死於東翼B-7       ║
+  ║  ——監工孔德業下令炸開封印     ║
+  ║  ——受河城議會軍事部門指派     ║
+  ║                                 ║
+  ║  證人：第三班·周  [手印]        ║
+  ╚═════════════════════════════════╝
+</pre>`, artEn: `<pre class="ascii-art">
+  ╔═════════════════════════════════╗
+  ║     ZHOU'S WRITTEN TESTIMONY   ║
+  ╠═════════════════════════════════╣
+  ║                                 ║
+  ║  Crew 3, 16 names:             ║
+  ║  Zhang Dashan, Li Tiezhu,      ║
+  ║  Wang Shigen, Zhao Kuangsheng, ║
+  ║  Qian Defu, Sun Dali,          ║
+  ║  Liu Heilian, Chen Laoshi,     ║
+  ║  Yang Erdan, Ma Lvzi,          ║
+  ║  Zhu Xiaopang, Huang Shitou,   ║
+  ║  Lin Mugen, Wu Changming,      ║
+  ║  Zheng Fangyuan, He Laifu      ║
+  ║                                 ║
+  ║  —Died at East Wing B-7        ║
+  ║  —Overseer Kong De-ye ordered  ║
+  ║   the seal destroyed           ║
+  ║  —Under River City Council     ║
+  ║   military division orders     ║
+  ║                                 ║
+  ║  Witness: Crew 3 · Zhou [mark] ║
+  ╚═════════════════════════════════╝
+</pre>`, delay: 800 },
+    { tag: '感知', tagColor: 'tag-sense',
+      text: L('你看到紙的最下方按了一個手印——半邊是墨跡，半邊是石化的灰色。老周用石化的手指蘸了墨水，留下了他的印記。',
+             'At the bottom of the page — a handprint, half ink, half grey stone. Old Zhou dipped his petrified fingers in ink to leave his mark.'),
+      delay: 3200 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「我不知道議會會不會聽。但至少——十六個名字不再是沒人知道的秘密。」',
+             '"I don\'t know if the Council will listen. But at least — sixteen names will no longer be a secret no one knows."'),
+      delay: 3000 },
+  ], [
+    { text: '我會帶到議會去', textEn: 'I\'ll bring this to the Council',
+      action: () => {
+        state.flags.r3ZhouTestimony = true;
+        autoExplore([
+          { tag: '對話', tagColor: 'tag-npc',
+            text: L('老周點了點頭。然後他做了一件讓你意外的事——他用力站了起來，甩開了拐杖。',
+                   'Old Zhou nods. Then he does something unexpected — he forces himself up, casting aside his crutch.'),
+            delay: 2800 },
+          { tag: '對話', tagColor: 'tag-npc',
+            text: L('「不。我自己去。」石化的雙腿在發抖，但他站住了。「十六個人的名字，不該由別人代念。」',
+                   '"No. I\'ll go myself." His petrified legs shake, but he stands. "Sixteen names shouldn\'t be read by a stranger."'),
+            delay: 3500 },
+          { tag: '感知', tagColor: 'tag-sense',
+            text: L('他朝你伸出完好的那隻手。掌心粗糙溫熱。「一起去。」',
+                   'He extends his good hand toward you. The palm is rough and warm. "Together."'),
+            delay: 2800 },
+          { tag: '效果', tagColor: 'tag-system',
+            text: L('老周好感 MAX | 經驗 +15 | 力量 +1', 'Old Zhou bond MAX | XP +15 | STR +1'),
+            delay: 2000, effect: () => {
+              gainXp(15);
+              changeStat('str', 1);
+            }},
+          { tag: '系統', tagColor: 'tag-system',
+            text: L('（老周的證詞將影響議會投票結果）', '(Zhou\'s testimony will affect the Council vote)'),
+            delay: 2000 },
+        ], [
+          { text: '一起去', textEn: 'Together', action: () => loadNode('r3_market') },
+        ], { label: L('老周的正義', 'Zhou\'s justice') });
+      }},
+    { text: '太危險了，讓我替你說', textEn: 'Too dangerous — let me speak for you',
+      action: () => {
+        state.flags.r3ZhouTestimony = true;
+        autoExplore([
+          { tag: '對話', tagColor: 'tag-npc',
+            text: L('老周沉默了。他低頭看了看自己石化的腿，然後苦笑了。',
+                   'Old Zhou goes silent. He looks down at his petrified legs, then laughs bitterly.'),
+            delay: 2800 },
+          { tag: '對話', tagColor: 'tag-npc',
+            text: L('「……也是。我連走到議會廳都勉強。」他把紙折好塞進你手裡。「替我念那十六個名字。每一個。」',
+                   '"...True. I can barely make it to the Council chamber." He folds the paper and presses it into your hand. "Read those sixteen names for me. Every one."'),
+            delay: 3500 },
+          { tag: '效果', tagColor: 'tag-system',
+            text: L('老周好感 ↑↑ | 經驗 +12', 'Old Zhou bond ↑↑ | XP +12'),
+            delay: 1500, effect: () => gainXp(12) },
+          { tag: '系統', tagColor: 'tag-system',
+            text: L('（老周的證詞將影響議會投票結果）', '(Zhou\'s testimony will affect the Council vote)'),
+            delay: 2000 },
+        ], [
+          { text: '返回', textEn: 'Back', action: () => loadNode('r3_market') },
+        ], { label: L('老周的正義', 'Zhou\'s justice') });
+      }},
+  ], { label: L('老周的正義', 'Zhou\'s justice') });
 });
 
 // ═══════════════════════════════════════════════════
@@ -1181,9 +1684,435 @@ registerNode('r3_crane', () => {
       ], { label: L('吹牛骰', 'Liar\'s Dice') });
     }});
 
+    // Sidequest: Crane's secret warehouse (requires debt saved in R2)
+    if (state.flags.r2CraneDebtSaved && !state.flags.r3CraneMerchant) {
+      c.push({ text: '灰鶴，你在河城有秘密倉庫？', textEn: 'Crane, do you have a stash in River City?', action: () => loadNode('r3_crane_merchant') });
+    }
+    // Sidequest: Crane's real name (requires warehouse visited)
+    if (state.flags.r3CraneMerchant && !state.flags.r3CranePast) {
+      c.push({ text: '那個等你回去的人……', textEn: 'The person waiting for you...', action: () => loadNode('r3_crane_past') });
+    }
+    // Sidequest: Crane's deal (requires past revealed + Bell alliance)
+    if (state.flags.r3CranePast && state.flags.r3BellAlliance && !state.flags.r3CraneDeal) {
+      c.push({ text: '灰鶴，你考慮好了嗎？', textEn: 'Crane, have you decided?', action: () => loadNode('r3_crane_deal') });
+    }
     c.push({ text: '離開', textEn: 'Leave', action: () => loadNode('r3_market') });
     return c;
   })(), { label: L('灰鶴', 'Grey Crane') });
+});
+
+// ═══════════════════════════════════════════════════
+//  NPC Sidequest — 灰鶴 (Grey Crane) R3 arc
+// ═══════════════════════════════════════════════════
+
+// --- r3_crane_merchant: Secret warehouse in River City ---
+registerNode('r3_crane_merchant', () => {
+  state.flags.r3CraneMerchant = true;
+  autoExplore([
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('灰鶴聽到你的問題，先是一愣，然後發出一聲低笑。',
+             'Grey Crane freezes at your question, then lets out a low laugh.'),
+      delay: 2500 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「你怎麼知道的？——算了，你都幫我趕走追債人了，告訴你也無所謂。」',
+             '"How did you know? — Never mind, you chased off the collectors for me. Might as well tell you."'),
+      delay: 3000 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('灰鶴帶你穿過市場後巷，在一堵牆上推開了一塊活動石板。',
+             'Grey Crane leads you through back alleys, pushing open a loose stone panel in a wall.'),
+      delay: 2500 },
+    { art: `<pre class="ascii-art gold">
+    ╔═══════════════════════════════╗
+    ║   灰鶴的秘密倉庫             ║
+    ╠═══════════════════════════════╣
+    ║                               ║
+    ║  ┌─────┐ ┌─────┐ ┌─────┐    ║
+    ║  │ 藥水 │ │ 糧食 │ │ 武器 │   ║
+    ║  └──┬──┘ └──┬──┘ └──┬──┘    ║
+    ║  ┌──┴──┐ ┌──┴──┐ ┌──┴──┐    ║
+    ║  │ 結晶 │ │ 工具 │ │ 布匹 │   ║
+    ║  └─────┘ └─────┘ └─────┘    ║
+    ║                               ║
+    ║   ·˚· 走私半年的全部家當 ·˚· ║
+    ╚═══════════════════════════════╝
+</pre>`, artEn: `<pre class="ascii-art gold">
+    ╔═══════════════════════════════╗
+    ║   GREY CRANE'S SECRET CACHE  ║
+    ╠═══════════════════════════════╣
+    ║                               ║
+    ║  ┌─────┐ ┌─────┐ ┌─────┐    ║
+    ║  │Potion│ │ Food │ │Weapon│   ║
+    ║  └──┬──┘ └──┬──┘ └──┬──┘    ║
+    ║  ┌──┴──┐ ┌──┴──┐ ┌──┴──┐    ║
+    ║  │Cryst.│ │Tools │ │Cloth │   ║
+    ║  └─────┘ └─────┘ └─────┘    ║
+    ║                               ║
+    ║  ·˚· Half a year's smuggling ║
+    ╚═══════════════════════════════╝
+</pre>`, delay: 800 },
+    { tag: '情報', tagColor: 'tag-info',
+      text: L('石板後面是一個不大的洞穴，裡面堆滿了木箱和布袋。這是灰鶴走私半年的全部家當。',
+             'Behind the panel lies a small cave packed with crates and sacks. Grey Crane\'s entire half-year smuggling haul.'),
+      delay: 3000 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「藥水、結晶、鍛造材料、甚至還有幾把像樣的武器。」灰鶴拍了拍箱子。「夠養活半個市場的人。」',
+             '"Potions, crystals, forging materials, even a few decent weapons." Grey Crane pats a crate. "Enough to sustain half the market."'),
+      delay: 3200 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「我一直在等價格漲到最高再出手。」她靠在箱子上，語氣突然變得安靜。',
+             '"I\'ve been waiting for prices to peak before selling." She leans against a crate, her voice suddenly quiet.'),
+      delay: 2800 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「但看到那兩個追債人之後，我在想……也許不應該再囤了。也許應該做點別的。」',
+             '"But after those collectors showed up, I\'m thinking... maybe I shouldn\'t keep hoarding. Maybe it\'s time for something else."'),
+      delay: 3200 },
+    { tag: '物品', tagColor: 'tag-item',
+      html: L('灰鶴遞給你一小瓶液體。「<b>高濃度淨化劑</b>——我最好的貨。算我謝你的。」',
+             'Grey Crane hands you a small vial. "<b>Concentrated Purifier</b> — my best stock. Consider it thanks."'),
+      delay: 2800, effect: () => {
+        addItem(L('高濃度淨化劑', 'Concentrated Purifier'));
+        changePetri(-8);
+      }},
+    { tag: '效果', tagColor: 'tag-system',
+      text: L('石化度 -8%', 'Petrification -8%'),
+      delay: 1000 },
+  ], [
+    { text: '這些東西能幫到很多人', textEn: 'These supplies could help a lot of people',
+      action: () => {
+        autoExplore([
+          { tag: '對話', tagColor: 'tag-npc',
+            text: L('灰鶴看著那些箱子，沉默了好一會兒。',
+                   'Grey Crane stares at the crates for a long time.'),
+            delay: 2500 },
+          { tag: '對話', tagColor: 'tag-npc',
+            text: L('「……我知道。」她輕聲說。「讓我再想想。」',
+                   '"...I know." She says softly. "Let me think about it."'),
+            delay: 2500 },
+        ], [
+          { text: '返回', textEn: 'Back', action: () => loadNode('r3_crane') },
+        ], { label: L('灰鶴的倉庫', 'Grey Crane\'s cache') });
+      }},
+    { text: '返回', textEn: 'Back', action: () => loadNode('r3_crane') },
+  ], { label: L('灰鶴的倉庫', 'Grey Crane\'s cache') });
+});
+
+// --- r3_crane_past: Crane's real identity + someone on the surface ---
+registerNode('r3_crane_past', () => {
+  state.flags.r3CranePast = true;
+  autoExplore([
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('你在灰鶴收攤之後找到她。傍晚的碼頭很安靜，河水拍打著石壁。',
+             'You find Grey Crane after she closes her stall. The evening dock is quiet, river lapping against stone.'),
+      delay: 2500 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「你之前說，你以前不叫灰鶴。」你直接切入正題。',
+             '"You said before — you used to have a different name." You get straight to the point.'),
+      delay: 2500 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('灰鶴的笑容僵住了一瞬。她轉過頭看著暗河。',
+             'Grey Crane\'s smile freezes for a beat. She turns to look at the dark river.'),
+      delay: 2500 },
+    { art: npcPortrait.art('crane', { subtitle: '……' }) || `<pre class="ascii-art gold">
+       ·  ˚  灰鶴 — 碼頭  ˚  ·
+              ╱═══╲
+             ╱ ·˚· ╲
+            │ ─  ─  │
+            │  ───  │  ← 沒有笑
+             ╲──┬──╱
+          ╱░░░╲ │ ╱░░░╲
+         ╱░░░░░╲│╱░░░░░╲
+        │░░░░░░░░░░░░░░░│
+        │░░░░░░░░░░░░░░░│
+</pre>`, artEn: npcPortrait.art('crane', { subtitle: '...' }) || `<pre class="ascii-art gold">
+    ·  ˚  Grey Crane — Dock  ˚  ·
+              ╱═══╲
+             ╱ ·˚· ╲
+            │ ─  ─  │
+            │  ───  │  ← no smile
+             ╲──┬──╱
+          ╱░░░╲ │ ╱░░░╲
+         ╱░░░░░╲│╱░░░░░╲
+        │░░░░░░░░░░░░░░░│
+        │░░░░░░░░░░░░░░░│
+</pre>`, delay: 800 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「……我叫秋蘅。」她的聲音很輕，像是在說一個不屬於自己的名字。「地表的名字。」',
+             '"...My name is Qiu Heng." Her voice is barely audible, as if speaking a name that belongs to someone else. "My surface name."'),
+      delay: 3500 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「我在地表有一個妹妹。秋蕓。借錢做生意，就是為了給她治病。」灰鶴——秋蘅——看著河面的漣漪。',
+             '"I have a younger sister on the surface. Qiu Yun. I borrowed to start that business — to pay for her treatment." Grey Crane — Qiu Heng — watches the river ripples.'),
+      delay: 3500 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「結果生意賠了，追債人來了，我跑了。」她咬了咬嘴唇。「丟下她一個人。」',
+             '"Business failed, collectors came, I ran." She bites her lip. "Left her all alone."'),
+      delay: 3000 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「我在地底做商人賺的錢，大部分都託人帶上去給她了。但我不敢回去——回去就會被抓。」',
+             '"Most of what I earn trading underground, I send up to her through middlemen. But I can\'t go back — they\'d catch me."'),
+      delay: 3200 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('灰鶴沉默了。河風吹過她的斗篷，在暮光裡看起來比平時小了一圈。',
+             'Grey Crane goes silent. River wind catches her cloak; in the fading light she looks smaller than usual.'),
+      delay: 3000 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「你知道嗎——有時候我在想，如果議會真的封了通道，我反而解脫了。不用再假裝自己是什麼灑脫的商人。」',
+             '"You know — sometimes I think, if the Council seals the passages, I\'d actually be free. No more pretending to be some carefree merchant."'),
+      delay: 3500 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「但那樣的話——蕓兒就真的沒人管了。」她轉過頭看你，眼眶泛紅。',
+             '"But then — Yun would truly have no one." She turns to you, eyes reddening.'),
+      delay: 3000 },
+  ], [
+    { text: '通道不會封的。我會想辦法。', textEn: 'The passages won\'t be sealed. I\'ll find a way.',
+      action: () => {
+        autoExplore([
+          { tag: '對話', tagColor: 'tag-npc',
+            text: L('灰鶴盯著你看了好一會兒。然後她笑了——這次是真的笑，不是商人的假笑。',
+                   'Grey Crane stares at you for a long time. Then she smiles — a real one, not the merchant\'s mask.'),
+            delay: 3000 },
+          { tag: '對話', tagColor: 'tag-npc',
+            text: L('「你這個人真奇怪。」她說。「明明自己都快石化了，還在替別人操心。」',
+                   '"You\'re a strange one," she says. "Already half-petrified yourself, and still worrying about others."'),
+            delay: 3000 },
+          { tag: '效果', tagColor: 'tag-system',
+            text: L('灰鶴好感 ↑↑↑', 'Grey Crane bond ↑↑↑'),
+            delay: 1500 },
+        ], [
+          { text: '返回', textEn: 'Back', action: () => loadNode('r3_crane') },
+        ], { label: L('灰鶴的真名', 'Grey Crane\'s real name') });
+      }},
+    { text: '你還可以回去的', textEn: 'You can still go back',
+      action: () => {
+        autoExplore([
+          { tag: '對話', tagColor: 'tag-npc',
+            text: L('「回去？」灰鶴苦笑。「帶著一身刀疤和一堆爛帳？」',
+                   '"Go back?" Grey Crane laughs bitterly. "With these scars and a mountain of debt?"'),
+            delay: 2800 },
+          { tag: '對話', tagColor: 'tag-npc',
+            text: L('「……但如果有人能替我跟追債人談……如果通道還開著的話……也許吧。」',
+                   '"...But if someone could negotiate with the collectors... if the passages stay open... maybe."'),
+            delay: 3000 },
+        ], [
+          { text: '返回', textEn: 'Back', action: () => loadNode('r3_crane') },
+        ], { label: L('灰鶴的真名', 'Grey Crane\'s real name') });
+      }},
+  ], { label: L('灰鶴的真名', 'Grey Crane\'s real name') });
+});
+
+// --- r3_crane_deal: Crane donates all supplies for amnesty ---
+registerNode('r3_crane_deal', () => {
+  state.flags.r3CraneDeal = true;
+  autoExplore([
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('你再次找到灰鶴時，她正站在自己的秘密倉庫門口，一臉嚴肅。',
+             'When you find Grey Crane again, she\'s standing outside her secret cache, expression dead serious.'),
+      delay: 2500 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「我想好了。」灰鶴看著你，語氣比你聽過的任何一次都堅定。',
+             '"I\'ve decided." Grey Crane looks at you, her voice firmer than you\'ve ever heard.'),
+      delay: 2500 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「這些東西——全部——我要捐給議會。條件只有一個：讓通道保持開放。」',
+             '"All of it — everything — I\'m donating to the Council. One condition: keep the passages open."'),
+      delay: 3000 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('她苦笑了一下。「半年的心血。我走私的每一瓶藥、每一塊結晶、每一把刀。全部。」',
+             'She smiles wryly. "Half a year\'s work. Every potion, every crystal, every blade I smuggled. All of it."'),
+      delay: 3000 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「但如果這能讓議會看到，下層通道有商業價值——就不只是一堆等著被封死的坑洞……」',
+             '"But if this shows the Council that the lower passages have trade value — that they\'re not just holes waiting to be sealed..."'),
+      delay: 3200 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('灰鶴深吸了一口氣。「那我妹妹的藥錢，以後再想辦法。」',
+             'Grey Crane takes a deep breath. "My sister\'s medicine money — I\'ll figure that out later."'),
+      delay: 2800 },
+  ], [
+    { text: '我替你跟銅鐘說', textEn: 'I\'ll talk to Bronze Bell for you',
+      action: () => {
+        state.flags.r3CraneDealDone = true;
+        autoExplore([
+          { tag: '對話', tagColor: 'tag-npc',
+            text: L('灰鶴把倉庫的鑰匙遞給你。她的手微微發抖。',
+                   'Grey Crane hands you the warehouse key. Her hand trembles slightly.'),
+            delay: 2500 },
+          { tag: '對話', tagColor: 'tag-npc',
+            text: L('「拜託你了。」她說。沒有商人的笑容，沒有玩笑。只是一個叫秋蘅的女人在拜託你。',
+                   '"Please." She says. No merchant\'s grin, no joke. Just a woman named Qiu Heng asking you for help.'),
+            delay: 3200 },
+          { tag: '效果', tagColor: 'tag-system',
+            text: L('獲得「灰鶴的倉庫鑰匙」| 經驗 +15 | 意志 +1', 'Acquired "Grey Crane\'s Cache Key" | XP +15 | WIL +1'),
+            delay: 2000, effect: () => {
+              addItem(L('灰鶴的倉庫鑰匙', 'Grey Crane\'s Cache Key'));
+              gainXp(15);
+              changeStat('wil', 1);
+            }},
+          { tag: '系統', tagColor: 'tag-system',
+            text: L('（此物資捐贈將影響議會投票結果）', '(This donation will affect the Council vote)'),
+            delay: 2000 },
+        ], [
+          { text: '返回', textEn: 'Back', action: () => loadNode('r3_crane') },
+        ], { label: L('灰鶴的決定', 'Grey Crane\'s decision') });
+      }},
+    { text: '你確定嗎？這是你的全部身家', textEn: 'Are you sure? This is everything you have',
+      action: () => {
+        autoExplore([
+          { tag: '對話', tagColor: 'tag-npc',
+            text: L('灰鶴看著你，然後笑了。這次的笑容裡有一種你從未在她臉上見過的東西——釋然。',
+                   'Grey Crane looks at you, then smiles. This smile holds something you\'ve never seen on her face before — relief.'),
+            delay: 3000 },
+          { tag: '對話', tagColor: 'tag-npc',
+            text: L('「全部身家？」她搖搖頭。「我逃進深淵的時候身無分文。這些東西是地底給我的。還回去，剛剛好。」',
+                   '"Everything I have?" She shakes her head. "I had nothing when I fled into the abyss. The underground gave me all this. Returning it feels right."'),
+            delay: 3500 },
+        ], [
+          { text: '好——我替你跟銅鐘說', textEn: 'Alright — I\'ll talk to Bell for you',
+            action: () => {
+              state.flags.r3CraneDealDone = true;
+              autoExplore([
+                { tag: '對話', tagColor: 'tag-npc',
+                  text: L('灰鶴把鑰匙塞進你手裡。「替我謝謝銅鐘。順便告訴她——灰鶴的本名叫秋蘅，以後不躲了。」',
+                         'Grey Crane presses the key into your hand. "Thank Bell for me. And tell her — Grey Crane\'s real name is Qiu Heng. No more hiding."'),
+                  delay: 3500 },
+                { tag: '效果', tagColor: 'tag-system',
+                  text: L('獲得「灰鶴的倉庫鑰匙」| 經驗 +15 | 意志 +1', 'Acquired "Grey Crane\'s Cache Key" | XP +15 | WIL +1'),
+                  delay: 2000, effect: () => {
+                    addItem(L('灰鶴的倉庫鑰匙', 'Grey Crane\'s Cache Key'));
+                    gainXp(15);
+                    changeStat('wil', 1);
+                  }},
+                { tag: '系統', tagColor: 'tag-system',
+                  text: L('（此物資捐贈將影響議會投票結果）', '(This donation will affect the Council vote)'),
+                  delay: 2000 },
+              ], [
+                { text: '返回', textEn: 'Back', action: () => loadNode('r3_crane') },
+              ], { label: L('灰鶴的決定', 'Grey Crane\'s decision') });
+            }},
+        ], { label: L('灰鶴的決定', 'Grey Crane\'s decision') });
+      }},
+  ], { label: L('灰鶴的決定', 'Grey Crane\'s decision') });
+});
+
+// ═══════════════════════════════════════════════════
+//  NPC Sidequest — 灰鶴 (Grey Crane) Deep Arc (R3)
+// ═══════════════════════════════════════════════════
+
+// --- r3_crane_merchant: Secret warehouse with high-purity purifier ---
+registerNode('r3_crane_merchant', () => {
+  state.flags.r3CraneMerchant = true;
+  autoExplore([
+    { art: `<pre class="ascii-art gold">
+  ╔═══════════════════════════════╗
+  ║  河城暗巷 · 秘密倉庫          ║
+  ╠═══════════════════════════════╣
+  ║                               ║
+  ║   ┌─────────────────┐        ║
+  ║   │ ◆ ◆ ◆ ◆ ◆ ◆ ◆ │        ║
+  ║   │ 瓶 瓶 箱 箱 瓶  │        ║
+  ║   │ ◆ 走私物資 ◆    │        ║
+  ║   └─────────────────┘        ║
+  ║          灰鶴 ↓               ║
+  ║           ╱═╲                 ║
+  ║          │·˚·│                ║
+  ╚═══════════════════════════════╝
+</pre>`, artEn: `<pre class="ascii-art gold">
+  ╔═══════════════════════════════╗
+  ║  RIVER CITY ALLEY · WAREHOUSE ║
+  ╠═══════════════════════════════╣
+  ║                               ║
+  ║   ┌─────────────────┐        ║
+  ║   │ ◆ ◆ ◆ ◆ ◆ ◆ ◆ │        ║
+  ║   │ btl btl crt crt │        ║
+  ║   │ ◆ Smuggled ◆    │        ║
+  ║   └─────────────────┘        ║
+  ║        Grey Crane ↓           ║
+  ║           ╱═╲                 ║
+  ║          │·˚·│                ║
+  ╚═══════════════════════════════╝
+</pre>`, delay: 800 },
+    { tag: '灰鶴', tagColor: 'tag-npc', text: '灰鶴左右看了看，確認沒人跟蹤，然後從市場後面的暗巷一個接一個轉彎，最後在一扇鏽蝕的鐵門前停下。', textEn: 'Grey Crane checks both ways, confirms no one follows, then weaves through alleys behind the market, stopping at a rusted iron door.', delay: 3000 },
+    { tag: '灰鶴', tagColor: 'tag-npc', text: '「你救了我一次。我不習慣欠人情。」她掏出一把鑰匙。「所以——讓你看看我的真正家底。」', textEn: '"You saved me once. I don\'t like owing debts." She pulls out a key. "So — let me show you my real stock."', delay: 3000 },
+    { tag: '環境', tagColor: 'tag-sense', text: '門打開。裡面是一個不大的石室，但堆滿了箱子和瓶子。空氣裡瀰漫著一股濃烈的藥草味。', textEn: 'The door opens. Inside: a small stone room packed with crates and bottles. The air reeks of potent herbs.', delay: 2800 },
+    { tag: '灰鶴', tagColor: 'tag-npc', html: '灰鶴拿起一個深藍色的瓶子：「<b>高濃度淨化劑</b>——地表配方，不是河城那種稀釋貨。一瓶能把石化度壓二十個百分點。」', htmlEn: 'Grey Crane picks up a deep blue bottle: "<b>High-purity Purifier</b> — surface formula, not River City\'s diluted stuff. One bottle suppresses petrification by twenty percent."', delay: 3200 },
+    { tag: '物品', tagColor: 'tag-item', text: '她把瓶子塞到你手裡。「拿著。算是還你在採石場的人情。」', textEn: 'She pushes the bottle into your hands. "Take it. Pays back what you did at the quarry."', delay: 2500, effect: () => { addItem(L('高濃度淨化劑', 'High-purity Purifier')); changePetri(-20); } },
+    { tag: '效果', tagColor: 'tag-system', text: L('獲得高濃度淨化劑，石化度 -20%', 'Acquired High-purity Purifier, Petri -20%'), delay: 1500 },
+    { tag: '灰鶴', tagColor: 'tag-npc', text: '她看著滿倉的物資，表情有些複雜。「這些東西……都是走私的。藥劑、食物、工具。夠養活下面幾百個人一個月。」', textEn: 'She surveys the warehouse, expression conflicted. "All of this... smuggled. Medicine, food, tools. Enough to sustain hundreds below for a month."', delay: 3200 },
+    { tag: '灰鶴', tagColor: 'tag-npc', text: '「但如果議會知道了，我就完了。走私可是重罪。」她苦笑。「所以一直藏著。」', textEn: '"But if the Council finds out, I\'m done. Smuggling is a capital offense." She smiles bitterly. "So I kept it hidden."', delay: 3000 },
+  ], [
+    { text: '這些物資可以救很多人', textEn: 'These supplies could save many lives', action: () => {
+      gainXp(10);
+      notify(L('經驗 +10（灰鶴的秘密倉庫）', 'XP +10 (Grey Crane\'s secret warehouse)'));
+      loadNode('r3_crane');
+    }},
+  ], { label: L('秘密倉庫', 'Secret Warehouse') });
+});
+
+// --- r3_crane_past: Real name and someone on the surface ---
+registerNode('r3_crane_past', () => {
+  state.flags.r3CranePast = true;
+  autoExplore([
+    { art: npcPortrait.art('crane', { subtitle: '……' }) || `<pre class="ascii-art gold">
+       ·  ˚  灰鶴 — 月光下  ˚  ·
+              ╱═══╲
+             ╱ ·˚· ╲
+            │ ─  ─  │  ← 眼眶濕潤
+            │  ╲─╱  │
+             ╲──┬──╱
+          ╱░░░╲ │ ╱░░░╲
+         ╱░░░░░╲│╱░░░░░╲
+        │░  ╱──┤├──╲  ░│
+         ╲╱    ╲╱    ╲╱
+</pre>`, artEn: npcPortrait.art('crane', { subtitle: '...' }) || `<pre class="ascii-art gold">
+    ·  ˚  Grey Crane — Moonlight  ˚  ·
+              ╱═══╲
+             ╱ ·˚· ╲
+            │ ─  ─  │  ← eyes moist
+            │  ╲─╱  │
+             ╲──┬──╱
+          ╱░░░╲ │ ╱░░░╲
+         ╱░░░░░╲│╱░░░░░╲
+        │░  ╱──┤├──╲  ░│
+         ╲╱    ╲╱    ╲╱
+</pre>`, delay: 800 },
+    { tag: '灰鶴', tagColor: 'tag-npc', text: '灰鶴坐在碼頭邊，腳晃在水面上。她沒有喝酒——這是你第一次見她不喝酒。', textEn: 'Grey Crane sits at the dock\'s edge, feet dangling over the water. She isn\'t drinking — the first time you\'ve seen her sober.', delay: 2800 },
+    { tag: '灰鶴', tagColor: 'tag-npc', text: '「你知道追債人叫我什麼嗎？秋蘅。」她的聲音很平靜。「那是我的本名。灰鶴是做生意用的化名。」', textEn: '"You know what the debt collectors called me? Qiu Heng." Her voice is calm. "That\'s my real name. Grey Crane is just a trade alias."', delay: 3200 },
+    { tag: '灰鶴', tagColor: 'tag-npc', text: '「地表上——有一個叫秋蕓的女孩在等我回去。」她抬頭看黑暗的洞頂，像是在看天空。「我妹妹。」', textEn: '"On the surface — there\'s a girl named Qiu Yun waiting for me." She looks up at the dark cavern ceiling as if seeing sky. "My sister."', delay: 3200 },
+    { tag: '灰鶴', tagColor: 'tag-npc', text: '「她不知道我在地下。我寫信說我去遠方做生意了。」灰鶴的手指揪著衣角。「三年了。她大概以為我死了。」', textEn: '"She doesn\'t know I\'m underground. I wrote saying I went trading far away." Grey Crane twists her hem. "Three years. She probably thinks I\'m dead."', delay: 3500 },
+    { tag: '感知', tagColor: 'tag-sense', text: '碼頭的水面映著幽暗的磷光。灰鶴的表情不再是那個精明的商人——而是一個想回家的姐姐。', textEn: 'Phosphorescent light reflects off the dock water. Grey Crane\'s expression is no longer a shrewd merchant\'s — but an older sister who wants to go home.', delay: 3000 },
+    { tag: '灰鶴', tagColor: 'tag-npc', text: '「我欠的債——利滾利，現在大概是當初的十倍了。」她搖了搖頭。「但如果通道封了……我就永遠回不去了。」', textEn: '"My debt — with compounding interest, probably ten times the original by now." She shakes her head. "But if the passages are sealed... I can never go back."', delay: 3500 },
+    { tag: '灰鶴', tagColor: 'tag-npc', text: '「所以我才做走私。攢錢。想有一天……」她沒說完，但你懂了。', textEn: '"That\'s why I smuggle. Save money. Hoping one day..." She doesn\'t finish, but you understand.', delay: 2800 },
+  ], [
+    { text: '你會回去的。我幫你', textEn: 'You\'ll go back. I\'ll help you', action: () => {
+      gainXp(8);
+      notify(L('經驗 +8（灰鶴的信任）', 'XP +8 (Grey Crane\'s trust)'));
+      loadNode('r3_crane');
+    }},
+  ], { label: L('秋蘅的本名', 'Qiu Heng\'s True Name') });
+});
+
+// --- r3_crane_deal: Donate all smuggled supplies for amnesty ---
+registerNode('r3_crane_deal', () => {
+  state.flags.r3CraneDealDone = true;
+  autoExplore([
+    { tag: '灰鶴', tagColor: 'tag-npc', text: '灰鶴聽完你的提議，沉默了很久。她盯著碼頭的水面，好像在計算什麼。', textEn: 'Grey Crane listens to your proposal, then falls silent for a long time. She stares at the water, as if calculating something.', delay: 2800 },
+    { tag: '灰鶴', tagColor: 'tag-npc', text: '「把所有走私物資捐給議會？換赦免？」她重複了一遍，語氣複雜。「那可是我三年的全部家當。」', textEn: '"Donate all smuggled supplies to the Council? In exchange for amnesty?" She repeats it, tone conflicted. "That\'s everything I\'ve earned in three years."', delay: 3500 },
+    { tag: '灰鶴', tagColor: 'tag-npc', text: '「但如果銅鐘能保證議會不追究……」她捏了捏手臂上的舊疤。「我就不用再躲了。」', textEn: '"But if Bronze Bell can guarantee the Council won\'t prosecute..." She touches the old scars on her arm. "Then I won\'t need to hide anymore."', delay: 3200 },
+    { tag: '灰鶴', tagColor: 'tag-npc', text: '她站起來。眼神比你見過的任何時候都認真。', textEn: 'She stands. Her eyes are more serious than you\'ve ever seen.', delay: 2200 },
+    { tag: '灰鶴', tagColor: 'tag-npc', html: '「好。<b>全捐了</b>。藥劑、食物、工具——一箱都不留。」她的聲音在發抖，但拳頭攥得很緊。', htmlEn: '"Fine. <b>Donate everything</b>. Medicine, food, tools — not a single crate kept." Her voice shakes, but her fists are clenched tight.', delay: 3000 },
+    { tag: '灰鶴', tagColor: 'tag-npc', text: '「秋蕓在等我。我不需要錢——我需要一條回家的路。」', textEn: '"Qiu Yun is waiting for me. I don\'t need money — I need a way home."', delay: 2800 },
+    { tag: '效果', tagColor: 'tag-system', html: L('<b>灰鶴將全部走私物資捐給議會</b>。議會投票影響力 +2', '<b>Grey Crane donates all smuggled supplies to the Council</b>. Council vote influence +2'), delay: 2000 },
+    { tag: '灰鶴', tagColor: 'tag-npc', text: '灰鶴從脖子上解下一條細繩，上面掛著一枚磨損的銅幣。「這是秋蕓給我的護身符——我們從小一人一枚。」', textEn: 'Grey Crane unties a thin cord from her neck, bearing a worn copper coin. "Qiu Yun\'s charm — we each had one since childhood."', delay: 3200 },
+    { tag: '灰鶴', tagColor: 'tag-npc', text: '她把銅幣放在你掌心。「你拿著。到時候——如果我回不去——替我還給她。」', textEn: 'She places it in your palm. "Keep it. If I can\'t make it back — return it to her for me."', delay: 3000 },
+    { tag: '物品', tagColor: 'tag-item', text: L('獲得「秋蕓的銅幣」', 'Acquired "Qiu Yun\'s Coin"'), delay: 1500, effect: () => { addItem(L('秋蕓的銅幣', 'Qiu Yun\'s Coin')); } },
+  ], [
+    { text: '一言為定——你一定能回去', textEn: 'It\'s a promise — you\'ll make it back', action: () => {
+      gainXp(15);
+      changeStat('wil', 1);
+      notify(L('經驗 +15，意志 +1（灰鶴的交易）', 'XP +15, WIL +1 (Grey Crane\'s deal)'));
+      loadNode('r3_crane');
+    }},
+  ], { label: L('灰鶴的交易', 'Grey Crane\'s Deal') });
 });
 
 // ── Region 3 Patrol ──
@@ -1504,7 +2433,12 @@ registerNode('r3_vote', () => {
   if (state.flags.r3BossMethod === 'sneak') score += 1;
   if (hasItem(L('螢的護身符', 'Ying\'s Charm'))) score += 1;
   if (state.flags.r3ZhouMet) score += 1;
+  if (state.flags.r3ZhouTestimony) score += 2; // Zhou's testimony exposes Council's role in plague
+  if (state.flags.r2FrostLetterCarried) score += 1; // Iron Frost's letter reveals camp survivors + Seventh Division truth
+  if (state.flags.r3BellAllianceDeep) score += 3; // Bell's dossier exposes Council corruption — decisive evidence
+  if (state.flags.r2ChengCureData) score += 2; // Cheng's cure data proves passages must stay open
   if (state.flags.r3YingRealReport) score += 3; // Ying's true report — powerful evidence
+  if (state.flags.r3CraneDealDone) score += 2; // Grey Crane's supply donation proves trade value
   if (state.flags.ngPlus) score += 2; // NG+ past-life testimony bonus
   // Store score for ending determination
   state.flags.r3VoteScore = score;

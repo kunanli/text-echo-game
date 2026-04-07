@@ -152,6 +152,24 @@ registerNode('r2_look', () => {
     if (state.flags.r2YingArrived) {
       c.push({ text: '找螢', textEn: 'Find Ying', action: () => loadNode('r2_ying_talk') });
     }
+    if (!state.flags.r2ElevatorDone) {
+      c.push({ text: '調查廢棄升降機', textEn: 'Investigate the abandoned elevator', action: () => loadNode('r2_elevator') });
+    }
+    if (!state.flags.r2LabDone) {
+      c.push({ text: '搜索石化實驗室', textEn: 'Search the petrification lab', action: () => loadNode('r2_laboratory') });
+    }
+    if (!state.flags.r2GardenDone) {
+      c.push({ text: '前往地底花園', textEn: 'Visit the underground garden', action: () => loadNode('r2_garden') });
+    }
+    if (!state.flags.r2ArenaDone) {
+      c.push({ text: '探索角鬥場遺跡', textEn: 'Explore the gladiator ruins', action: () => loadNode('r2_arena') });
+    }
+    if (!state.flags.r2WaterfallDone) {
+      c.push({ text: '前往地下瀑布', textEn: 'Go to the underground waterfall', action: () => loadNode('r2_waterfall') });
+    }
+    if (!state.flags.r2MuralWarDone) {
+      c.push({ text: '查看戰爭壁畫', textEn: 'Examine the war mural', action: () => loadNode('r2_mural_war') });
+    }
     c.push({ text: '巡邏採石場', textEn: 'Patrol the quarry', action: () => loadNode('r2_patrol') });
     c.push({ text: '返回石脈迴廊', textEn: 'Return to Vein Corridor', action: () => loadNode('r1_deep') });
     return c;
@@ -222,6 +240,9 @@ registerNode('r2_quarry_floor', () => {
     c.push({ text: '搜索結晶密林深處', textEn: 'Search deep in the crystal thicket', action: () => loadNode('r2_crystal_deep') });
     if (state.flags.r1SurvivorMet && !state.flags.r2ZhouTrace) {
       c.push({ text: '岩壁上好像有字……', textEn: 'There seems to be writing on the rock wall...', action: () => loadNode('r2_zhou_trace') });
+    }
+    if (state.flags.r2ZhouTrace && state.flags.r1ZhouMineDisaster && !state.flags.r2ZhouTraceDeep) {
+      c.push({ text: '老周留言旁邊……還有更多刻痕', textEn: 'Beside Zhou\'s message... more carvings', action: () => loadNode('r2_zhou_trace_deep') });
     }
     c.push({ text: '返回瞭望台', textEn: 'Return to overlook', action: () => loadNode('r2_look') });
     return c;
@@ -857,9 +878,279 @@ registerNode('r2_camp_chief', () => {
     if (state.flags.r2ChengAwake && (state.flags.r2ChengTrainCount || 0) < 3) {
       c.push({ text: '◆ 和承鋼一起訓練', textEn: '◆ Train with Cheng Gang', action: () => loadNode('r2_cheng_train') });
     }
+    // Sidequest: Cheng's memory (requires awake + 1 training done)
+    if (state.flags.r2ChengAwake && (state.flags.r2ChengTrainCount || 0) >= 1 && !state.flags.r2ChengMemory) {
+      c.push({ text: '承鋼，你石化前在研究什麼？', textEn: 'Cheng, what were you researching before petrification?', action: () => loadNode('r2_cheng_memory') });
+    }
+    // Sidequest: Cheng's lab (requires memory revealed)
+    if (state.flags.r2ChengMemory && !state.flags.r2ChengLab) {
+      c.push({ text: '去承鋼的隱藏實驗室', textEn: 'Visit Cheng Gang\'s hidden lab', action: () => loadNode('r2_cheng_lab') });
+    }
+    // Sidequest: Cure dilemma (requires lab visited)
+    if (state.flags.r2ChengLab && !state.flags.r2ChengCure) {
+      c.push({ text: '承鋼，你說的逆轉方法……', textEn: 'Cheng, about that reversal method...', action: () => loadNode('r2_cheng_cure') });
+    }
+    // Sidequest: Frost's past (requires first meeting done)
+    if (state.flags.r2CampVisited && !state.flags.r2FrostPast) {
+      c.push({ text: '鐵霜，你是怎麼到這裡的？', textEn: 'Frost, how did you end up here?', action: () => loadNode('r2_frost_past') });
+    }
+    // Sidequest: Strange soldier (requires past revealed)
+    if (state.flags.r2FrostPast && !state.flags.r2FrostSoldier) {
+      c.push({ text: '營地外有人要見鐵霜……', textEn: 'Someone outside wants to see Frost...', action: () => loadNode('r2_frost_soldier') });
+    }
+    // Sidequest: Frost's letter (requires soldier resolved)
+    if (state.flags.r2FrostSoldier && !state.flags.r2FrostLetter) {
+      c.push({ text: '鐵霜在寫什麼……', textEn: 'Frost is writing something...', action: () => loadNode('r2_frost_letter') });
+    }
     c.push({ text: '返回營地', textEn: 'Return to camp', action: () => loadNode('r2_camp') });
     return c;
   })(), { label: L('與鐵霜對話', 'Talking to Iron Frost') });
+});
+
+// ═══════════════════════════════════════════════════
+//  NPC Sidequest — 鐵霜 (Iron Frost) Past
+// ═══════════════════════════════════════════════════
+
+// --- r2_frost_past: Frost reveals her surface military past ---
+registerNode('r2_frost_past', () => {
+  state.flags.r2FrostPast = true;
+  autoExplore([
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('鐵霜聽到你的問題，沉默了。營火的光在她鐵灰色的眼睛裡跳動。',
+             'Iron Frost goes silent at your question. Firelight dances in her iron-grey eyes.'),
+      delay: 2500 },
+    { art: npcPortrait.art('frost') || `<pre class="ascii-art">
+       ·  ˚  鐵霜 — 營火邊  ˚  ·
+              ╱═══╲
+             │ ─  ─ │
+             │  ──  │
+              ╲═══╱
+       ██████████│░░░░░░░░
+       ██████████│░░░░░░░░
+       ██████████│░░░░░░░░
+        █████████│░░░░░░░
+        ·█·█·█·  │  ⚒
+      石化手臂   │  戰錘
+</pre>`, artEn: npcPortrait.art('frost') || `<pre class="ascii-art">
+    ·  ˚  Iron Frost — By the fire  ˚  ·
+              ╱═══╲
+             │ ─  ─ │
+             │  ──  │
+              ╲═══╱
+       ██████████│░░░░░░░░
+       ██████████│░░░░░░░░
+       ██████████│░░░░░░░░
+        █████████│░░░░░░░
+        ·█·█·█·  │  ⚒
+     Petrified   │ Hammer
+</pre>`, delay: 800 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「我不是地底出生的。」她終於開口。「我是地表軍隊的——第七師團，邊境守備隊。」',
+             '"I wasn\'t born underground." She finally speaks. "I was surface military — Seventh Division, border garrison."'),
+      delay: 3000 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「指揮官。帶著三百人。」她用石化的手捏了捏太陽穴。「那時候……地表也不太平。」',
+             '"Commander. Three hundred under me." She rubs her temple with her petrified hand. "The surface wasn\'t peaceful either, back then."'),
+      delay: 3000 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「有一天，上面的人下了一道命令——清剿南山村。說村民勾結叛軍。」鐵霜的語氣平淡得可怕。',
+             '"One day, the brass sent an order — purge Southhill Village. Villagers accused of harboring rebels." Iron Frost\'s tone is terrifyingly flat.'),
+      delay: 3200 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「我帶隊去了。」她頓了頓。「到了村口，看到的是老人、女人、孩子。沒有叛軍。」',
+             '"I led the squad there." She pauses. "At the village gate — the elderly, women, children. No rebels."'),
+      delay: 3000 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「我拒絕了。帶著部隊撤回了駐地。」',
+             '"I refused. Pulled my troops back to base."'),
+      delay: 2500 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「三天後——軍事法庭。抗命罪。流放地底。」她看了看自己石化的左手。「三百人的命，就因為我一個人的決定。」',
+             '"Three days later — court-martial. Insubordination. Exiled underground." She looks at her petrified left hand. "Three hundred lives, changed by one person\'s decision."'),
+      delay: 3500 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「部下們有的跟我一起被流放，有的被打散編入其他部隊。」她閉上了眼。「那個村子——後來還是被清了。換了一個聽話的人去。」',
+             '"Some of my soldiers followed me into exile. Others were scattered to other units." She closes her eyes. "That village — they sent someone obedient in the end."'),
+      delay: 3500 },
+    { tag: '感知', tagColor: 'tag-sense',
+      text: L('營火噼啪作響。鐵霜睜開眼，目光比營火更亮。',
+             'The fire crackles. Iron Frost opens her eyes, their light fiercer than the flames.'),
+      delay: 2500 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「我不後悔。」她說。「到了地底之後，我找到了承鋼。找到了這些人。這就夠了。」',
+             '"I don\'t regret it." She says. "After coming underground, I found Cheng Gang. Found these people. That\'s enough."'),
+      delay: 3000 },
+  ], [
+    { text: '你做了對的事', textEn: 'You did the right thing',
+      action: () => {
+        autoExplore([
+          { tag: '對話', tagColor: 'tag-npc',
+            text: L('鐵霜看了你一眼。嘴角微微動了動——是她最接近笑容的表情。',
+                   'Iron Frost glances at you. The corner of her mouth twitches — the closest thing to a smile she has.'),
+            delay: 2800 },
+          { tag: '對話', tagColor: 'tag-npc',
+            text: L('「……謝了。」她轉過頭去。「很久沒有人這麼說了。」',
+                   '"...Thanks." She turns away. "It\'s been a long time since anyone said that."'),
+            delay: 2500 },
+          { tag: '效果', tagColor: 'tag-system',
+            text: L('鐵霜好感 ↑↑ | 經驗 +8', 'Iron Frost bond ↑↑ | XP +8'),
+            delay: 1500, effect: () => gainXp(8) },
+        ], [
+          { text: '返回', textEn: 'Back', action: () => loadNode('r2_camp_chief') },
+        ], { label: L('鐵霜的過去', 'Iron Frost\'s past') });
+      }},
+    { text: '返回', textEn: 'Back', action: () => loadNode('r2_camp_chief') },
+  ], { label: L('鐵霜的過去', 'Iron Frost\'s past') });
+});
+
+// --- r2_frost_soldier: A survivor recognizes Frost ---
+registerNode('r2_frost_soldier', () => {
+  state.flags.r2FrostSoldier = true;
+  autoExplore([
+    { tag: '緊張', tagColor: 'tag-warn',
+      text: L('你回營地時，看到入口處站著一個陌生男人——穿著破爛的軍裝，滿身石化紋路，右眼完全失明。',
+             'Returning to camp, you find a stranger at the entrance — tattered military uniform, petrification lines everywhere, right eye fully blind.'),
+      delay: 3000 },
+    { art: `<pre class="ascii-art">
+    ╔═══════════════════════════════╗
+    ║     陌生士兵                  ║
+    ╠═══════════════════════════════╣
+    ║         ╱══╲                  ║
+    ║        │╳  ─│  ← 獨眼        ║
+    ║        │ ── │                 ║
+    ║         ╲══╱                  ║
+    ║        ╱▓▓▓▓╲  ← 破舊軍裝   ║
+    ║       │▓▓▓▓▓▓│               ║
+    ║       │▓ ░░ ▓│  ← 石化紋路   ║
+    ║        ╱    ╲                 ║
+    ║       ╱      ╲               ║
+    ║                               ║
+    ║   「……鐵指揮？是你嗎？」      ║
+    ╚═══════════════════════════════╝
+</pre>`, artEn: `<pre class="ascii-art">
+    ╔═══════════════════════════════╗
+    ║     UNKNOWN SOLDIER          ║
+    ╠═══════════════════════════════╣
+    ║         ╱══╲                  ║
+    ║        │╳  ─│  ← one eye     ║
+    ║        │ ── │                 ║
+    ║         ╲══╱                  ║
+    ║        ╱▓▓▓▓╲  ← worn uniform║
+    ║       │▓▓▓▓▓▓│               ║
+    ║       │▓ ░░ ▓│  ← petri-veins║
+    ║        ╱    ╲                 ║
+    ║       ╱      ╲               ║
+    ║                               ║
+    ║   "...Commander Frost?"      ║
+    ╚═══════════════════════════════╝
+</pre>`, delay: 800 },
+    { tag: '遭遇', tagColor: 'tag-explore',
+      text: L('他看到鐵霜從帳篷裡走出來，整個人僵住了。然後他的嘴唇開始顫抖。',
+             'He sees Iron Frost emerge from her tent and freezes. Then his lips begin to tremble.'),
+      delay: 2800 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「鐵指揮……？真的是你？」他聲音沙啞。「我是方石——第七師團，第二連……」',
+             '"Commander Frost...? It\'s really you?" His voice cracks. "I\'m Fang Shi — Seventh Division, Second Company..."'),
+      delay: 3000 },
+    { tag: '感知', tagColor: 'tag-sense',
+      text: L('鐵霜的表情變了。你從未見過她臉上出現這種表情——震驚、愧疚、和一絲……恐懼。',
+             'Iron Frost\'s expression shifts. You\'ve never seen her look like this — shock, guilt, and a trace of... fear.'),
+      delay: 2800 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「方石。」鐵霜的聲音很低。「你——你怎麼在這裡？」',
+             '"Fang Shi." Iron Frost\'s voice is low. "You — how are you here?"'),
+      delay: 2500 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「跟您一樣。被流放到地底。」方石苦笑。「因為我跟著您拒絕了。上面把我們這些人都打散了——有的流放，有的失蹤。」',
+             '"Same as you. Exiled underground." Fang Shi smiles bitterly. "Because I followed your refusal. They scattered all of us — some exiled, some disappeared."'),
+      delay: 3500 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「我在下面活了三年。聽說採石場有一個營地——就一路爬上來了。」他看著鐵霜。「我不怪您，指揮。您做的是對的。」',
+             '"I survived three years down here. Heard there was a camp at the quarry — climbed all the way up." He looks at Frost. "I don\'t blame you, Commander. You did the right thing."'),
+      delay: 3500 },
+    { tag: '感知', tagColor: 'tag-sense',
+      text: L('鐵霜站在原地，一動不動。然後她走上前，伸出完好的右手——用力握住了方石的肩膀。',
+             'Iron Frost stands still for a long moment. Then she steps forward and grips Fang Shi\'s shoulder with her good right hand.'),
+      delay: 3000 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「……歡迎回來，方石。」她的聲音在微微發抖。「這裡有你的位置。」',
+             '"...Welcome back, Fang Shi." Her voice trembles faintly. "There\'s a place for you here."'),
+      delay: 3000 },
+    { tag: '效果', tagColor: 'tag-system',
+      text: L('鐵霜好感 ↑↑ | 經驗 +10', 'Iron Frost bond ↑↑ | XP +10'),
+      delay: 1500, effect: () => { gainXp(10); state.flags.r2FrostSoldierSaved = true; } },
+  ], [
+    { text: '返回營地', textEn: 'Return to camp', action: () => loadNode('r2_camp') },
+  ], { label: L('舊部重逢', 'Reunion with a soldier') });
+});
+
+// --- r2_frost_letter: Frost writes a letter for River City ---
+registerNode('r2_frost_letter', () => {
+  state.flags.r2FrostLetter = true;
+  autoExplore([
+    { tag: '感知', tagColor: 'tag-sense',
+      text: L('你注意到鐵霜坐在帳篷角落，借著燭光在寫什麼。她石化的左手壓著紙角，右手握筆的姿勢異常認真。',
+             'You notice Iron Frost sitting in a tent corner, writing by candlelight. Her petrified left hand holds the paper\'s edge, her right grips the pen with unusual care.'),
+      delay: 3000 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「別偷看。」鐵霜沒抬頭。但過了一會兒，她嘆了口氣，把紙轉向你。',
+             '"Don\'t peek." Iron Frost doesn\'t look up. But after a moment, she sighs and turns the paper toward you.'),
+      delay: 2500 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「……是寫給河城的信。你要上去，對吧？幫我帶一封。」',
+             '"...It\'s a letter for River City. You\'re going up, right? Take it for me."'),
+      delay: 2500 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「信是寫給議會的。內容是：採石場營地有十二個倖存者，加上方石十三個。我們需要物資和撤離支援。」',
+             '"It\'s for the Council. Contents: the quarry camp has twelve survivors, thirteen with Fang Shi. We need supplies and evacuation support."'),
+      delay: 3200 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('鐵霜頓了頓。「還有一段私人的。」她的鐵灰色眼睛閃了閃。',
+             'Iron Frost pauses. "And something personal." Her iron-grey eyes flash.'),
+      delay: 2500 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「信的最後寫了——如果議會裡有人記得第七師團的話，請查一下南山村事件的真相。三百個被流放的人，不該被遺忘。」',
+             '"At the end — if anyone on the Council remembers the Seventh Division, please investigate the truth about Southhill Village. Three hundred exiled people shouldn\'t be forgotten."'),
+      delay: 3500 },
+    { tag: '感知', tagColor: 'tag-sense',
+      text: L('她把信折好，用蠟封上。蠟封上壓了一個記號——是一個拳頭的形狀。',
+             'She folds the letter and seals it with wax. The seal bears a mark — the shape of a fist.'),
+      delay: 2800 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「這是第七師團的印記。如果議會裡有人認出來——他們會知道這封信是真的。」',
+             '"This is the Seventh Division\'s mark. If someone on the Council recognizes it — they\'ll know the letter is genuine."'),
+      delay: 3000 },
+  ], [
+    { text: '我一定送到', textEn: 'I\'ll deliver it',
+      action: () => {
+        state.flags.r2FrostLetterCarried = true;
+        autoExplore([
+          { tag: '對話', tagColor: 'tag-npc',
+            text: L('鐵霜把信遞給你。她的目光異常溫和。',
+                   'Iron Frost hands you the letter. Her gaze is unusually gentle.'),
+            delay: 2500 },
+          { tag: '對話', tagColor: 'tag-npc',
+            text: L('「拜託你了。」她說。「這封信不只是為了營地——是為了那三百個被丟在黑暗裡的人。」',
+                   '"I\'m counting on you." She says. "This letter isn\'t just for the camp — it\'s for the three hundred left in the dark."'),
+            delay: 3200 },
+          { tag: '物品', tagColor: 'tag-item',
+            html: L('獲得「<b>鐵霜的密封信</b>」', 'Acquired "<b>Iron Frost\'s Sealed Letter</b>"'),
+            delay: 2000, effect: () => addItem(L('鐵霜的密封信', 'Iron Frost\'s Sealed Letter')) },
+          { tag: '效果', tagColor: 'tag-system',
+            text: L('鐵霜好感 ↑↑↑ | 經驗 +12 | 敏捷 +1', 'Iron Frost bond ↑↑↑ | XP +12 | AGI +1'),
+            delay: 1500, effect: () => {
+              gainXp(12);
+              changeStat('agi', 1);
+            }},
+          { tag: '系統', tagColor: 'tag-system',
+            text: L('（此信將影響河城議會的態度）', '(This letter will affect the River City Council\'s attitude)'),
+            delay: 2000 },
+        ], [
+          { text: '返回', textEn: 'Back', action: () => loadNode('r2_camp') },
+        ], { label: L('鐵霜的信', 'Iron Frost\'s letter') });
+      }},
+    { text: '返回', textEn: 'Back', action: () => loadNode('r2_camp') },
+  ], { label: L('鐵霜的信', 'Iron Frost\'s letter') });
 });
 
 registerNode('r2_camp_smith', () => {
@@ -1798,6 +2089,202 @@ registerNode('r2_ying_nightmare', () => {
   ], { label: L('深夜的噩夢', 'Nightmare in the Dark') });
 });
 
+// ═══════════════════════════════════════════════════
+//  NPC Sidequest — 灰鶴 (Grey Crane) Scar + Debt
+// ═══════════════════════════════════════════════════
+
+registerNode('r2_crane_scar', () => {
+  state.flags.r2CraneScar = true;
+  autoExplore([
+    { art: npcPortrait.art('crane', { subtitle: '行商人' }) || `<pre class="ascii-art gold">
+       ·  ˚  灰鶴  ˚  ·
+              ╱═══╲
+             ╱ ·˚· ╲
+            │ ─  ─  │
+            │  ╲─╱  │
+             ╲──┬──╱
+         ╱░░░╲ │ ╱░░░╲
+        │░░ ╱──┤├──╲ ░░│
+        │░╱ ╳╳││╳╳ ╲░│  ← 放血刀疤
+        │╱──═╧╧═──╲│
+</pre>`, artEn: npcPortrait.art('crane', { subtitle: 'Merchant' }) || `<pre class="ascii-art gold">
+    ·  ˚  Grey Crane  ˚  ·
+              ╱═══╲
+             ╱ ·˚· ╲
+            │ ─  ─  │
+            │  ╲─╱  │
+             ╲──┬──╱
+         ╱░░░╲ │ ╱░░░╲
+        │░░ ╱──┤├──╲ ░░│
+        │░╱ ╳╳││╳╳ ╲░│  ← bloodletting scars
+        │╱──═╧╧═──╲│
+</pre>`, delay: 800 },
+    { tag: '觀察', tagColor: 'tag-sense', text: '灰鶴喝酒的時候，袖口滑落。你看見了——她前臂內側有一排整齊的刀疤，不是戰鬥留下的。', textEn: 'When Grey Crane drinks, her sleeve slips. You see it — a row of neat scars on her inner forearm. Not from combat.', delay: 3000 },
+    { tag: '對話', tagColor: 'tag-info', text: '你的目光停留了一秒太久。灰鶴注意到了，笑容消失了。', textEn: 'Your gaze lingers one second too long. Grey Crane notices. The smile vanishes.', delay: 2500 },
+    { tag: '灰鶴', tagColor: 'tag-npc', text: '「……看夠了？」她把袖子拉回去，聲音冷了下來。', textEn: '"...Seen enough?" She pulls her sleeve back. Her voice turns cold.', delay: 2500 },
+    { tag: '灰鶴', tagColor: 'tag-npc', text: '「那是地表留下的。」她又灌了一口酒。「欠了不該欠的人的錢。他們收債的方式……很有創意。」', textEn: '"Surface scars." She takes another swig. "Owed money to the wrong people. Their collection methods were... creative."', delay: 3500 },
+    { tag: '灰鶴', tagColor: 'tag-npc', text: '「每逾期一天，放一次血。說是讓你記住欠的滋味。」灰鶴的手指無意識地摩挲著前臂。', textEn: '"One bloodletting for every overdue day. Said it helps you remember the taste of debt." Her fingers absently trace her forearm.', delay: 3200 },
+    { tag: '灰鶴', tagColor: 'tag-npc', text: '「所以我跑了。跑到連陽光都照不到的地方。」她苦笑一聲。「沒想到地底反而自由。」', textEn: '"So I ran. Ran to where even sunlight can\'t reach." A bitter laugh. "Didn\'t expect the underground to feel freer."', delay: 3200 },
+    { tag: '情報', tagColor: 'tag-info', text: '她搖了搖酒瓶，裡面已經空了。「別跟其他人說。做生意最忌的是讓人覺得你弱。」', textEn: 'She shakes the bottle — empty. "Don\'t tell anyone. Worst thing in trade is looking weak."', delay: 3000 },
+  ], [
+    { text: '你的秘密我會保守', textEn: 'Your secret\'s safe with me', action: () => {
+      gainXp(5);
+      notify(L('經驗 +5（灰鶴的信任）', 'XP +5 (Grey Crane\'s trust)'));
+      loadNode('r2_crane');
+    }},
+  ], { label: L('放血刀疤', 'Bloodletting Scars') });
+});
+
+registerNode('r2_crane_debt', () => {
+  state.flags.r2CraneDebt = true;
+  autoExplore([
+    { art: `<pre class="ascii-art">
+  ╔═══════════════════════════════╗
+  ║  營 地 外 圍                  ║
+  ╠═══════════════════════════════╣
+  ║                               ║
+  ║    ╱╲  ╱╲  ╱╲                ║
+  ║   ╱  ╲╱  ╲╱  ╲   ← 帳篷    ║
+  ║  ╱────────────╲              ║
+  ║                  👤 👤 👤    ║
+  ║             ← 三個陌生人      ║
+  ║                               ║
+  ╚═══════════════════════════════╝
+</pre>`, artEn: `<pre class="ascii-art">
+  ╔═══════════════════════════════╗
+  ║  CAMP PERIMETER               ║
+  ╠═══════════════════════════════╣
+  ║                               ║
+  ║    ╱╲  ╱╲  ╱╲                ║
+  ║   ╱  ╲╱  ╲╱  ╲   ← tents   ║
+  ║  ╱────────────╲              ║
+  ║                  👤 👤 👤    ║
+  ║             ← three strangers ║
+  ║                               ║
+  ╚═══════════════════════════════╝
+</pre>`, delay: 800 },
+    { tag: '警告', tagColor: 'tag-warn', text: '營地邊緣傳來騷動。三個穿著地表風格皮甲的陌生人正在和灰鶴對峙。', textEn: 'Commotion at the camp edge. Three strangers in surface-style leather armour face off against Grey Crane.', delay: 2800 },
+    { tag: '對話', tagColor: 'tag-npc', html: '領頭的是個禿頭大漢，臉上橫肉糾結：「<b>秋蘅</b>。老規矩——要錢，還是要命。」', htmlEn: 'The leader is a bald, scarred brute: "<b>Qiu Heng</b>. The usual — money, or your life."', delay: 3000 },
+    { tag: '灰鶴', tagColor: 'tag-npc', text: '灰鶴退了一步，手按在腰間的短刀上。你從沒見她這麼緊張過。', textEn: 'Grey Crane steps back, hand on her waist knife. You\'ve never seen her this tense.', delay: 2500 },
+    { tag: '灰鶴', tagColor: 'tag-npc', text: '「我已經還了三倍了。」她的聲音在發抖。「利滾利到什麼時候是個頭？」', textEn: '"I\'ve repaid triple already." Her voice shakes. "When does the interest end?"', delay: 3000 },
+    { tag: '情報', tagColor: 'tag-info', text: '禿頭男冷笑：「地表有你家人。你要是不想讓你妹妹替你還……就乖乖跟我們走。」', textEn: 'The bald man sneers: "Your family is on the surface. If you don\'t want your sister paying your debts... come quietly."', delay: 3200 },
+  ], [
+    { text: L('用意志說服他們離開 [WIL DC8]（成功率' + checkRate('wil', 8) + '）', 'Talk them down [WIL DC8] (rate ' + checkRate('wil', 8) + ')'), textEn: 'Talk them down [WIL DC8] (rate ' + checkRate('wil', 8) + ')', action: () => {
+      var result = statCheck('wil', 8);
+      if (result !== 'fail') {
+        sfx.pass();
+        state.flags.r2CraneDebtSaved = true;
+        autoExplore([
+          { tag: '檢定', tagColor: 'tag-system', text: result === 'crit' ? L('大成功！', 'Critical success!') : L('成功！', 'Success!'), delay: 1200 },
+          { tag: '說服', tagColor: 'tag-info', text: '你站到灰鶴身前，直視禿頭男的眼睛。你的聲音很平靜，但每個字都像石頭一樣沉。', textEn: 'You step in front of Grey Crane, meeting the bald man\'s eyes. Your voice is calm, but every word lands like stone.', delay: 3000 },
+          { tag: '說服', tagColor: 'tag-info', text: '「她是這個營地的人。你們的地表規矩在這裡不管用。鐵霜的人很快就會來。」', textEn: '"She\'s one of this camp. Your surface rules don\'t apply here. Iron Frost\'s people will be here soon."', delay: 3000 },
+          { tag: '結果', tagColor: 'tag-info', text: '三個人互相看了一眼。禿頭男啐了一口：「算了。這破地方不值得待。」他們轉身消失在黑暗中。', textEn: 'The three exchange glances. The bald man spits: "Forget it. This hellhole isn\'t worth the trouble." They vanish into the dark.', delay: 3200 },
+          { tag: '灰鶴', tagColor: 'tag-npc', text: '灰鶴愣了好一會兒。然後她做了一件你從沒見過的事——她的眼眶紅了。', textEn: 'Grey Crane freezes for a long moment. Then she does something you\'ve never seen — her eyes redden.', delay: 2800 },
+          { tag: '灰鶴', tagColor: 'tag-npc', text: '「……謝了。」只有兩個字。但她的手在抖。', textEn: '"...Thanks." Just one word. But her hands are shaking.', delay: 2500 },
+        ], [
+          { text: '拍拍她肩膀', textEn: 'Pat her shoulder', action: () => {
+            gainXp(10);
+            changeStat('wil', 1);
+            notify(L('經驗 +10，意志 +1（為灰鶴挺身而出）', 'XP +10, WIL +1 (Stood up for Grey Crane)'));
+            loadNode('r2_crane');
+          }},
+        ], { label: L('追債人', 'Debt Collectors') });
+      } else {
+        sfx.fail();
+        autoExplore([
+          { tag: '檢定', tagColor: 'tag-system', text: L('失敗……', 'Failed...'), delay: 1200 },
+          { tag: '結果', tagColor: 'tag-warn', text: '禿頭男冷笑：「小鬼少管閒事。」他一把推開你，你踉蹌退了幾步。', textEn: 'The bald man sneers: "Mind your own business, kid." He shoves you back.', delay: 2500 },
+          { tag: '戰鬥', tagColor: 'tag-combat', text: '看來只能用拳頭說話了——', textEn: 'Seems words won\'t work — time to fight —', delay: 1500 },
+        ], [
+          { text: '戰鬥！', textEn: 'Fight!', action: () => {
+            var enemy = {
+              name: '追債人頭目', nameEn: 'Debt Collector Boss',
+              hp: 22, atkMin: 4, atkMax: 8, petriDmg: 0, xp: 12,
+              empathyGoal: 4,
+              art: [
+                '      ╱══╲',
+                '     │ ⊘⊘ │',
+                '     │ ═══ │',
+                '      ╲──╱',
+                '    ╱██████╲',
+                '   │ ╱    ╲ │',
+                '   │╱  拳  ╲│',
+                '    ╲══════╱',
+              ],
+              commune: [
+                { zh: '禿頭男的拳頭停頓了一下——他想起了什麼。', en: 'The bald man\'s fist hesitates — he remembers something.' },
+                { zh: '「……算了。我也是替人辦事。」他的語氣軟了。', en: '"...Forget it. I\'m just doing a job." His tone softens.' },
+              ],
+              spareText: { zh: '追債人搖搖頭，帶著手下離開了。「下次沒這麼好說話。」', en: 'The collector shakes his head and leaves with his men. "Next time won\'t be so easy."' }
+            };
+            enemy = scaleEnemyNgPlus(enemy);
+            startCombat(enemy, function() {
+              state.flags.r2CraneDebtSaved = true;
+              autoExplore([
+                { tag: '結果', tagColor: 'tag-info', text: '追債人倒在地上，他的手下慌忙把他拖走了。', textEn: 'The collector falls. His men hastily drag him away.', delay: 2200 },
+                { tag: '灰鶴', tagColor: 'tag-npc', text: '灰鶴走過來，沉默了很久。然後她輕聲說：「……你這個白癡。」', textEn: 'Grey Crane approaches, silent for a long time. Then softly: "...You idiot."', delay: 2800 },
+                { tag: '灰鶴', tagColor: 'tag-npc', text: '但她眼眶是紅的。「……謝了。真的。」', textEn: 'But her eyes are red. "...Thanks. Really."', delay: 2500 },
+              ], [
+                { text: '別客氣', textEn: 'Don\'t mention it', action: () => {
+                  changeStat('str', 1);
+                  notify(L('力量 +1（為灰鶴而戰）', 'STR +1 (Fought for Grey Crane)'));
+                  loadNode('r2_crane');
+                }},
+              ], { label: L('追債人', 'Debt Collectors') });
+            }, null);
+          }},
+        ], { label: L('追債人', 'Debt Collectors') });
+      }
+    }},
+    { text: '直接動手保護她 [戰鬥]', textEn: 'Fight to protect her [Combat]', action: () => {
+      var enemy = {
+        name: '追債人頭目', nameEn: 'Debt Collector Boss',
+        hp: 22, atkMin: 4, atkMax: 8, petriDmg: 0, xp: 12,
+        empathyGoal: 4,
+        art: [
+          '      ╱══╲',
+          '     │ ⊘⊘ │',
+          '     │ ═══ │',
+          '      ╲──╱',
+          '    ╱██████╲',
+          '   │ ╱    ╲ │',
+          '   │╱  拳  ╲│',
+          '    ╲══════╱',
+        ],
+        commune: [
+          { zh: '禿頭男的拳頭停頓了一下——他想起了什麼。', en: 'The bald man\'s fist hesitates — he remembers something.' },
+          { zh: '「……算了。我也是替人辦事。」他的語氣軟了。', en: '"...Forget it. I\'m just doing a job." His tone softens.' },
+        ],
+        spareText: { zh: '追債人搖搖頭，帶著手下離開了。「下次沒這麼好說話。」', en: 'The collector shakes his head and leaves with his men. "Next time won\'t be so easy."' }
+      };
+      enemy = scaleEnemyNgPlus(enemy);
+      startCombat(enemy, function() {
+        state.flags.r2CraneDebtSaved = true;
+        autoExplore([
+          { tag: '結果', tagColor: 'tag-info', text: '追債人倒在地上，他的手下慌忙把他拖走了。', textEn: 'The collector falls. His men hastily drag him away.', delay: 2200 },
+          { tag: '灰鶴', tagColor: 'tag-npc', text: '灰鶴走過來，沉默了很久。然後她輕聲說：「……你這個白癡。為了我去打架。」', textEn: 'Grey Crane approaches, silent for a long time. Then softly: "...You idiot. Fighting for me."', delay: 2800 },
+          { tag: '灰鶴', tagColor: 'tag-npc', text: '但她眼眶是紅的。「……謝了。真的。」', textEn: 'But her eyes are red. "...Thanks. Really."', delay: 2500 },
+        ], [
+          { text: '別客氣', textEn: 'Don\'t mention it', action: () => {
+            changeStat('str', 1);
+            notify(L('力量 +1（為灰鶴而戰）', 'STR +1 (Fought for Grey Crane)'));
+            loadNode('r2_crane');
+          }},
+        ], { label: L('追債人', 'Debt Collectors') });
+      }, null);
+    }},
+    { text: '不介入', textEn: 'Don\'t intervene', action: () => {
+      autoExplore([
+        { tag: '結果', tagColor: 'tag-info', text: '你退後一步。這是她的事——你不該插手。', textEn: 'You step back. This is her business — you shouldn\'t interfere.', delay: 2200 },
+        { tag: '灰鶴', tagColor: 'tag-npc', text: '灰鶴看了你一眼。那個眼神你會記很久——不是怨恨，而是失望。', textEn: 'Grey Crane glances at you. You\'ll remember that look — not resentment, but disappointment.', delay: 3000 },
+        { tag: '結果', tagColor: 'tag-warn', text: '她被追債人帶走了。幾個小時後她回來了，嘴角有血，但什麼都沒說。', textEn: 'They take her away. She returns hours later, blood at the corner of her mouth, but says nothing.', delay: 3000 },
+      ], [
+        { text: '……', textEn: '...', action: () => loadNode('r2_camp') },
+      ], { label: L('追債人', 'Debt Collectors') });
+    }},
+  ], { label: L('追債人來襲', 'Debt Collectors Arrive') });
+});
+
 // ── Ying: Secret notebook pages ──
 registerNode('r2_ying_secret', () => {
   var isMale = state.sex === 'male';
@@ -2032,6 +2519,14 @@ registerNode('r2_crane', () => {
       ], { label: L('吹牛骰', 'Liar\'s Dice') });
     }});
 
+    // Sidequest: Crane's scars (requires met + lore done)
+    if (state.flags.r2CraneLore && !state.flags.r2CraneScar) {
+      c.push({ text: '她手臂上的刀疤……', textEn: 'Those scars on her arms...', action: () => loadNode('r2_crane_scar') });
+    }
+    // Sidequest: Debt collector (requires scar revealed)
+    if (state.flags.r2CraneScar && !state.flags.r2CraneDebt) {
+      c.push({ text: '營地外有動靜……', textEn: 'Commotion outside the camp...', action: () => loadNode('r2_crane_debt') });
+    }
     c.push({ text: '返回營地', textEn: 'Return to camp', action: () => loadNode('r2_camp') });
     return c;
   })(), { label: L('灰鶴的攤位', 'Grey Crane\'s stall') });
@@ -2074,6 +2569,339 @@ function offerCraneSword(onDone) {
     { text: L('收下', 'Accept'), action: onDone },
   ], { label: L('灰鶴的餽贈', 'Grey Crane\'s gift') });
 }
+
+// ═══════════════════════════════════════════════════
+//  NPC Sidequest — 灰鶴 (Grey Crane) Past
+// ═══════════════════════════════════════════════════
+
+// --- r2_crane_scar: Player asks about bloodletting scars ---
+registerNode('r2_crane_scar', () => {
+  state.flags.r2CraneScar = true;
+  var isMale = state.sex === 'male';
+  var cP = isMale ? L('他','he') : L('她','she');
+  autoExplore([
+    { tag: '情報', tagColor: 'tag-info',
+      text: L('你趁灰鶴整理貨物的時候，看見她袖子滑落，露出手臂內側密密麻麻的刀疤。',
+             'While Grey Crane sorts her wares, her sleeve slips, revealing a lattice of scars along her inner arm.'),
+      delay: 2800 },
+    { tag: '情報', tagColor: 'tag-info',
+      text: L('那不是戰鬥留下的傷——太規律了，像是某種……儀式。',
+             'Not battle wounds — too regular, almost like some kind of... ritual.'),
+      delay: 2500 },
+    { tag: '對話', tagColor: 'tag-npc',
+      html: L('灰鶴注意到你的目光，迅速拉下袖子。她的笑容消失了一瞬。<br>「看夠了？」',
+             'Grey Crane notices your gaze and yanks down her sleeve. Her smile vanishes for an instant.<br>"Seen enough?"'),
+      delay: 2800 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「……那是舊帳。」灰鶴低聲說，目光移開。「地表的舊帳。」',
+             '"...Old debts." Grey Crane murmurs, looking away. "Old debts from the surface."'),
+      delay: 2800 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('她沉默了好一會兒，然後像是做了某個決定，把袖子捲了上去。',
+             'She goes quiet for a long moment, then — as if making a decision — rolls her sleeve up.'),
+      delay: 2500 },
+    { art: `<pre class="ascii-art gold">
+      ╱══════════════════════════╲
+     ╱  灰鶴的手臂               ╲
+    │                              │
+    │  ───╱╲───╱╲───╱╲───         │
+    │  ╳╳╳╳╳╳╳╳╳╳╳╳╳╳╳╳╳         │
+    │  ╱╲╱╲  放血刀疤  ╱╲╱╲      │
+    │  ╳╳╳╳╳╳╳╳╳╳╳╳╳╳╳╳╳         │
+    │  ───╱╲───╱╲───╱╲───         │
+    │                              │
+    │  ·˚· 不是戰鬥……是代價 ·˚·  │
+     ╲                            ╱
+      ╲══════════════════════════╱
+</pre>`, artEn: `<pre class="ascii-art gold">
+      ╱══════════════════════════╲
+     ╱  Grey Crane's arm          ╲
+    │                              │
+    │  ───╱╲───╱╲───╱╲───         │
+    │  ╳╳╳╳╳╳╳╳╳╳╳╳╳╳╳╳╳         │
+    │  ╱╲╱╲ Bloodletting  ╱╲╱╲   │
+    │  ╳╳╳╳╳╳╳╳╳╳╳╳╳╳╳╳╳         │
+    │  ───╱╲───╱╲───╱╲───         │
+    │                              │
+    │  ·˚·  Not battle—a price ·˚·│
+     ╲                            ╱
+      ╲══════════════════════════╱
+</pre>`, delay: 800 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「我以前不叫灰鶴。我叫——算了，那個名字已經死了。」',
+             '"I used to have a different name. I was called — forget it. That name is dead."'),
+      delay: 3000 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「在地表的時候，我跟一群人借了錢做生意。當然，做賠了。」灰鶴的語氣平淡得像在說別人的事。',
+             '"Up on the surface, I borrowed money from some people to start a business. Naturally, it went bust." Her tone is flat, like she\'s talking about someone else.'),
+      delay: 3200 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「他們的討債方式很有創意——每拖一天，就割一刀。不是要殺你，是要你記住。」',
+             '"Their collection method was creative — one cut for every day overdue. Not to kill, just to make you remember."'),
+      delay: 3200 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「所以我跑了。一頭扎進地底，想著他們總不會追到深淵裡來吧。」灰鶴苦笑了一聲。',
+             '"So I ran. Dove straight underground, figuring they\'d never chase me into the abyss." Grey Crane laughs bitterly.'),
+      delay: 3000 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「結果呢——在地底做了商人，反而比地表做得好。」她又恢復了那副商人笑容，但眼底有某種東西不一樣了。',
+             '"And then — trading underground turned out better than anything I did topside." The merchant\'s grin returns, but something in her eyes has changed.'),
+      delay: 3000 },
+  ], [
+    { text: '那些人不會追到這裡吧？', textEn: 'They won\'t follow you here, right?',
+      action: () => {
+        autoExplore([
+          { tag: '對話', tagColor: 'tag-npc',
+            text: L('灰鶴頓了一下。她沒笑了。',
+                   'Grey Crane pauses. No smile now.'),
+            delay: 2000 },
+          { tag: '對話', tagColor: 'tag-npc',
+            text: L('「……希望不會。」',
+                   '"...I hope not."'),
+            delay: 2500 },
+        ], [
+          { text: '返回', textEn: 'Back', action: () => loadNode('r2_crane') },
+        ], { label: L('灰鶴的過去', 'Grey Crane\'s past') });
+      }},
+    { text: '你不欠他們了', textEn: 'You don\'t owe them anymore',
+      action: () => {
+        autoExplore([
+          { tag: '對話', tagColor: 'tag-npc',
+            text: L('灰鶴看了你一眼，沉默了很久。',
+                   'Grey Crane looks at you for a long time, saying nothing.'),
+            delay: 2500 },
+          { tag: '對話', tagColor: 'tag-npc',
+            text: L('「……謝了。」她輕聲說。這是你第一次聽她說謝謝，不帶任何商人的算計。',
+                   '"...Thanks." She says quietly. It\'s the first time you\'ve heard her say thanks without a merchant\'s calculation behind it.'),
+            delay: 3000 },
+        ], [
+          { text: '返回', textEn: 'Back', action: () => loadNode('r2_crane') },
+        ], { label: L('灰鶴的過去', 'Grey Crane\'s past') });
+      }},
+  ], { label: L('灰鶴的刀疤', 'Grey Crane\'s scars') });
+});
+
+// --- r2_crane_debt: Debt collector arrives at quarry ---
+registerNode('r2_crane_debt', () => {
+  state.flags.r2CraneDebt = true;
+  var isMale = state.sex === 'male';
+  var playerTitle = isMale ? L('少年','youth') : L('少女','maiden');
+  autoExplore([
+    { tag: '緊張', tagColor: 'tag-warn',
+      text: L('你回到營地時，氣氛明顯不對。幾個營地居民圍在入口處竊竊私語。',
+             'The camp feels wrong when you return. Residents cluster near the entrance, whispering.'),
+      delay: 2500 },
+    { tag: '緊張', tagColor: 'tag-warn',
+      text: L('營地入口站著兩個陌生人——穿著地表款式的皮甲，手裡拿著鐵棍。一看就不是深淵的人。',
+             'Two strangers stand at the entrance — surface-style leather armor, iron clubs in hand. Clearly not from the abyss.'),
+      delay: 3000 },
+    { art: `<pre class="ascii-art">
+    ╔═══════════════════════════════╗
+    ║     追債人 × 2                ║
+    ╠═══════════════════════════════╣
+    ║                               ║
+    ║    ╱══╲      ╱══╲            ║
+    ║   │▪  ▪│    │▪  ▪│           ║
+    ║   │ ── │    │ ── │           ║
+    ║    ╲══╱      ╲══╱            ║
+    ║   ╱████╲    ╱████╲           ║
+    ║  │██████│  │██████│          ║
+    ║  │█ 鐵棍█│  │█鐵棍 █│       ║
+    ║                               ║
+    ║     「灰鶴在哪？」            ║
+    ╚═══════════════════════════════╝
+</pre>`, artEn: `<pre class="ascii-art">
+    ╔═══════════════════════════════╗
+    ║     DEBT COLLECTORS × 2      ║
+    ╠═══════════════════════════════╣
+    ║                               ║
+    ║    ╱══╲      ╱══╲            ║
+    ║   │▪  ▪│    │▪  ▪│           ║
+    ║   │ ── │    │ ── │           ║
+    ║    ╲══╱      ╲══╱            ║
+    ║   ╱████╲    ╱████╲           ║
+    ║  │██████│  │██████│          ║
+    ║  │█ club █│ │█ club █│       ║
+    ║                               ║
+    ║     "Where's Grey Crane?"    ║
+    ╚═══════════════════════════════╝
+</pre>`, delay: 800 },
+    { tag: '遭遇', tagColor: 'tag-explore',
+      text: L('「我們找一個叫灰鶴的女人——欠了地表張三爺一大筆錢。」為首的男人掃視營地。「聽說她在這附近做生意。」',
+             '"We\'re looking for a woman called Grey Crane — owes Master Zhang a fortune topside." The lead man scans the camp. "Heard she trades around here."'),
+      delay: 3500 },
+    { tag: '遭遇', tagColor: 'tag-explore',
+      text: L('你看見灰鶴躲在一堆貨箱後面，臉色慘白。她對你做了個「噓」的手勢。',
+             'You spot Grey Crane hiding behind a stack of crates, face pale. She puts a finger to her lips.'),
+      delay: 2800 },
+  ], [
+    { text: '站出來幫灰鶴（意志說服）', textEn: 'Step in and talk them down (WIL)',
+      action: () => {
+        var result = statCheck('wil', 8);
+        if (result === 'fail') {
+          autoExplore([
+            { tag: '檢定', tagColor: 'tag-warn',
+              text: L('【意志檢定 DC8 — 失敗】', '[WIL check DC8 — FAIL]'),
+              delay: 1500, effect: () => sfx.fail() },
+            { tag: '對話', tagColor: 'tag-npc',
+              text: L('「少管閒事，' + playerTitle + '。」為首的男人推了你一把。',
+                     '"Mind your own business, ' + playerTitle + '." The lead man shoves you.'),
+              delay: 2500 },
+            { tag: '戰鬥', tagColor: 'tag-combat',
+              text: L('說服失敗——追債人動手了！',
+                     'Persuasion failed — the collectors attack!'),
+              delay: 2000 },
+          ], [
+            { text: L('應戰', 'Fight'), action: () => {
+              var enemy = {
+                name: '追債人', nameEn: 'Debt Collector',
+                hp: 22, atkMin: 4, atkMax: 8, petriDmg: 0, xp: 12,
+                empathyGoal: 3,
+                art: [
+                  '   ╱══╲ ',
+                  '  │▪  ▪│',
+                  '  │ ── │',
+                  '   ╲══╱ ',
+                  '  ╱████╲',
+                  ' │██████│',
+                  ' │█鐵棍█│',
+                ],
+                commune: [
+                  { zh: '追債人猶豫了一下——他似乎也不想在這麼深的地方打架。', en: 'The collector hesitates — he doesn\'t want to fight this deep underground either.' },
+                  { zh: '「……你替她還錢的話，也不是不行。」', en: '"...If you pay her debt, that works too."' },
+                ],
+                spareText: { zh: '追債人罵罵咧咧地走了：「跟張三爺說，找不到人。」', en: 'The collectors leave cursing: "Tell Master Zhang we couldn\'t find her."' }
+              };
+              enemy = scaleEnemyNgPlus(enemy);
+              startCombat(enemy, function() {
+                autoExplore([
+                  { tag: '結果', tagColor: 'tag-info',
+                    text: L('追債人被你打跑了。灰鶴從貨箱後面走出來，手還在發抖。',
+                           'The collectors flee. Grey Crane emerges from behind the crates, hands still shaking.'),
+                    delay: 2500 },
+                  { tag: '對話', tagColor: 'tag-npc',
+                    text: L('「……我欠你一條命。」灰鶴的聲音很輕。這不是商人在談交易。',
+                           '"...I owe you my life." Grey Crane\'s voice is barely a whisper. This isn\'t a merchant making a deal.'),
+                    delay: 3000 },
+                  { tag: '效果', tagColor: 'tag-system',
+                    text: L('灰鶴好感 ↑↑ | 經驗 +12', 'Grey Crane bond ↑↑ | XP +12'),
+                    delay: 1500, effect: () => { state.flags.r2CraneDebtSaved = true; gainXp(12); } },
+                ], [
+                  { text: '返回', textEn: 'Back', action: () => loadNode('r2_crane') },
+                ], { label: L('灰鶴的債', 'Grey Crane\'s debt') });
+              }, null);
+            }},
+          ], { label: L('追債人', 'Debt collectors') });
+        } else {
+          autoExplore([
+            { tag: '檢定', tagColor: 'tag-info',
+              text: L('【意志檢定 DC8 — ' + (result === 'crit' ? '大成功' : '成功') + '】',
+                     '[WIL check DC8 — ' + (result === 'crit' ? 'CRITICAL' : 'PASS') + ']'),
+              delay: 1500, effect: () => sfx.pass() },
+            { tag: '對話', tagColor: 'tag-npc',
+              text: L('你攔住追債人，直視他的眼睛。「灰鶴不在這裡。你們走錯路了。」',
+                     'You block the collectors, staring him down. "Grey Crane isn\'t here. You took a wrong turn."'),
+              delay: 2800 },
+            { tag: '對話', tagColor: 'tag-npc',
+              text: result === 'crit'
+                ? L('追債人被你的氣場鎮住了。「……算了，跟張三爺說這條路死了人，沒找到。」他們退後了幾步。',
+                   'Your presence overwhelms them. "...Forget it, tell Master Zhang the route caved in, nobody found." They back off.')
+                : L('為首的男人遲疑了。「……你認識她？」他看了看身後的深淵隧道，又看了看你。「在這種鬼地方打架不值得。」',
+                   'The lead man hesitates. "...You know her?" He looks at the abyss tunnel behind him, then back at you. "Not worth fighting in a place like this."'),
+              delay: 3500 },
+            { tag: '遭遇', tagColor: 'tag-explore',
+              text: L('追債人互相看了一眼，轉身離開了。你聽到他們的腳步聲漸漸遠去。',
+                     'The collectors exchange a glance and turn to leave. Their footsteps fade into the distance.'),
+              delay: 2800 },
+            { tag: '對話', tagColor: 'tag-npc',
+              text: L('灰鶴從貨箱後面走出來。她的商人笑容不見了——取而代之的是你從未見過的表情。',
+                     'Grey Crane steps out from behind the crates. The merchant\'s grin is gone — replaced by an expression you\'ve never seen from her.'),
+              delay: 3000 },
+            { tag: '對話', tagColor: 'tag-npc',
+              text: L('「……你不用幫我的。」灰鶴低聲說。「我的爛帳，跟你沒關係。」',
+                     '"...You didn\'t have to do that." Grey Crane says quietly. "My mess, nothing to do with you."'),
+              delay: 3000 },
+            { tag: '對話', tagColor: 'tag-npc',
+              text: L('她沉默了一會兒，然後做了一件你意想不到的事——灰鶴抱了你一下。很快，就一下。',
+                     'She\'s silent for a moment, then does something unexpected — Grey Crane hugs you. Brief, just once.'),
+              delay: 3000 },
+            { tag: '對話', tagColor: 'tag-npc',
+              text: L('「謝了。」她放開你，又恢復了那副吊兒郎當的語氣。「但你要是跟別人說我哭了——我宰了你。」',
+                     '"Thanks." She lets go, slipping back to her casual tone. "But if you tell anyone I cried — I\'ll gut you."'),
+              delay: 3200 },
+            { tag: '效果', tagColor: 'tag-system',
+              text: L('灰鶴好感 ↑↑↑ | 經驗 +15 | 意志 +1', 'Grey Crane bond ↑↑↑ | XP +15 | WIL +1'),
+              delay: 1500, effect: () => {
+                state.flags.r2CraneDebtSaved = true;
+                gainXp(15);
+                changeStat('wil', 1);
+              }},
+          ], [
+            { text: '返回', textEn: 'Back', action: () => loadNode('r2_crane') },
+          ], { label: L('灰鶴的債', 'Grey Crane\'s debt') });
+        }
+      }},
+    { text: '直接動手趕走他們（力量）', textEn: 'Physically drive them off (STR)',
+      action: () => {
+        var enemy = {
+          name: '追債人', nameEn: 'Debt Collector',
+          hp: 22, atkMin: 4, atkMax: 8, petriDmg: 0, xp: 12,
+          empathyGoal: 3,
+          art: [
+            '   ╱══╲ ',
+            '  │▪  ▪│',
+            '  │ ── │',
+            '   ╲══╱ ',
+            '  ╱████╲',
+            ' │██████│',
+            ' │█鐵棍█│',
+          ],
+          commune: [
+            { zh: '追債人猶豫了一下——他似乎也不想在這麼深的地方打架。', en: 'The collector hesitates — he doesn\'t want to fight this deep underground either.' },
+            { zh: '「……你替她還錢的話，也不是不行。」', en: '"...If you pay her debt, that works too."' },
+          ],
+          spareText: { zh: '追債人罵罵咧咧地走了：「跟張三爺說，找不到人。」', en: 'The collectors leave cursing: "Tell Master Zhang we couldn\'t find her."' }
+        };
+        enemy = scaleEnemyNgPlus(enemy);
+        startCombat(enemy, function() {
+          autoExplore([
+            { tag: '結果', tagColor: 'tag-info',
+              text: L('追債人被你打跑了。灰鶴從貨箱後面走出來，手還在發抖。',
+                     'The collectors flee. Grey Crane emerges from behind the crates, hands still shaking.'),
+              delay: 2500 },
+            { tag: '對話', tagColor: 'tag-npc',
+              text: L('「……你還真是直接。」灰鶴勉強擠出一個笑容。「我欠你一條命。不開玩笑的那種。」',
+                     '"...You really are direct." Grey Crane manages a smile. "I owe you my life. No joke this time."'),
+              delay: 3000 },
+            { tag: '效果', tagColor: 'tag-system',
+              text: L('灰鶴好感 ↑↑ | 經驗 +12', 'Grey Crane bond ↑↑ | XP +12'),
+              delay: 1500, effect: () => { state.flags.r2CraneDebtSaved = true; gainXp(12); } },
+          ], [
+            { text: '返回', textEn: 'Back', action: () => loadNode('r2_crane') },
+          ], { label: L('灰鶴的債', 'Grey Crane\'s debt') });
+        }, null);
+      }},
+    { text: '不介入', textEn: 'Don\'t get involved',
+      action: () => {
+        autoExplore([
+          { tag: '遭遇', tagColor: 'tag-explore',
+            text: L('你退到一邊，看著事態發展。追債人最終在營地裡搜了一圈，沒找到灰鶴——她躲得很好。',
+                   'You step aside and watch. The collectors search the camp but don\'t find Grey Crane — she hides well.'),
+            delay: 3000 },
+          { tag: '遭遇', tagColor: 'tag-explore',
+            text: L('他們走後，灰鶴從暗處鑽出來。她看了你一眼，什麼也沒說。',
+                   'After they leave, Grey Crane slips out of the shadows. She looks at you once, says nothing.'),
+            delay: 2500 },
+          { tag: '對話', tagColor: 'tag-npc',
+            text: L('商人的笑容回到她臉上——但這一次，你知道那只是面具。',
+                   'The merchant\'s grin returns — but this time, you know it\'s just a mask.'),
+            delay: 2500 },
+        ], [
+          { text: '返回', textEn: 'Back', action: () => loadNode('r2_crane') },
+        ], { label: L('灰鶴的債', 'Grey Crane\'s debt') });
+      }},
+  ], { label: L('追債人來了', 'The debt collectors') });
+});
 
 // ═══════════════════════════════════════════════════
 //  NPC Continuation — 老周 (Old Zhou) traces
@@ -2121,6 +2949,101 @@ registerNode('r2_zhou_trace', () => {
     }},
     { text: '點頭，繼續', textEn: 'Nod, continue', action: () => loadNode('r2_quarry_floor') },
   ], { label: L('老周的留言', 'Old Zhou\'s message') });
+});
+
+// ── NPC Sidequest: Old Zhou's Deeper Truth ──
+registerNode('r2_zhou_trace_deep', () => {
+  state.flags.r2ZhouTraceDeep = true;
+  autoExplore([
+    { tag: '探索', tagColor: 'tag-explore',
+      text: L('你回到老周留言的那面岩壁。這一次，你蹲下來仔細看——在大字下方，還有一片密密麻麻的小字。',
+             'You return to the wall where Zhou carved his message. This time you crouch down — beneath the large text, there\'s a dense patch of tiny characters.'),
+      delay: 3000 },
+    { art: `<pre class="ascii-art">
+  ░▓█▓░▓█▓░▓█▓░▓█▓░▓█▓░▓█▓░▓█▓░
+  █                              █
+  ▓  ╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱   ▓
+  █  ╱ 監工K真名：孔德業     ╱   █
+  ▓  ╱ 不是礦業公司的人      ╱   ▓
+  █  ╱ 是議會派來的          ╱   █
+  ▓  ╱ 任務：開採石化結晶    ╱   ▓
+  █  ╱ 供河城軍事用途        ╱   █
+  ▓  ╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱   ▓
+  █  ╱ 我偷聽到他跟上面通話  ╱   █
+  ▓  ╱ 「封印後面的結晶      ╱   ▓
+  █  ╱   足夠武裝一支軍隊」  ╱   █
+  ▓  ╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱   ▓
+  █   ↑ 刮得很深 像是用盡全力    █
+  ░▓█▓░▓█▓░▓█▓░▓█▓░▓█▓░▓█▓░▓█▓░
+</pre>`, artEn: `<pre class="ascii-art">
+  ░▓█▓░▓█▓░▓█▓░▓█▓░▓█▓░▓█▓░▓█▓░
+  █                              █
+  ▓  ╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱   ▓
+  █  ╱ Overseer K, real name: ╱   █
+  ▓  ╱ Kong De-ye             ╱   ▓
+  █  ╱ Not from mining co.    ╱   █
+  ▓  ╱ Sent by the Council    ╱   ▓
+  █  ╱ Mission: mine petri-   ╱   █
+  ▓  ╱ crystals for River     ╱   ▓
+  █  ╱ City military use      ╱   █
+  ▓  ╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱   ▓
+  █  ╱ I overheard him call:  ╱   █
+  ▓  ╱ "Crystals behind seal  ╱   ▓
+  █  ╱ enough to arm a force" ╱   █
+  ▓  ╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱   ▓
+  █    ↑ Deeply gouged, as if     █
+  ░▓█▓░▓█▓░▓█▓░▓█▓░▓█▓░▓█▓░▓█▓░
+</pre>`, delay: 800 },
+    { tag: '調查', tagColor: 'tag-info',
+      text: L('這些字比上面的留言刻得更深，像是用盡了全身力氣。有幾處石化的粉末堵住了筆畫——老周刻這些的時候，手已經開始石化了。',
+             'These characters are gouged far deeper than the message above, as if carved with every ounce of strength. Petrification dust clogs some strokes — Zhou\'s hand was already turning when he wrote this.'),
+      delay: 3500 },
+    { tag: '調查', tagColor: 'tag-info',
+      html: L('「監工 K 真名<b>孔德業</b>。不是礦業公司的人——是<b>議會派來的</b>。」',
+             '"Overseer K, real name <b>Kong De-ye</b>. Not from the mining company — <b>sent by the Council</b>."'),
+      delay: 3000 },
+    { tag: '調查', tagColor: 'tag-info',
+      text: L('「任務：開採封印後的石化結晶。供河城軍事用途。」',
+             '"Mission: mine petrification crystals behind the seal. For River City military use."'),
+      delay: 2800 },
+    { tag: '調查', tagColor: 'tag-info',
+      text: L('「我偷聽到他跟上面通話——『封印後面的結晶足夠武裝一支軍隊。』」',
+             '"I overheard him report topside — \'Crystals behind the seal, enough to arm a force.\'"'),
+      delay: 3000 },
+    { tag: '感知', tagColor: 'tag-sense',
+      text: L('你站起來，腦子裡在飛速運轉。如果老周說的是真的——石化瘟疫不是天災，而是河城議會為了軍事目的引發的人禍。',
+             'You stand up, mind racing. If what Zhou carved is true — the petrification plague wasn\'t a natural disaster, but a catastrophe triggered by the River City Council for military ends.'),
+      delay: 3500 },
+    { tag: '系統', tagColor: 'tag-system',
+      text: L('這份證詞可能改變一切——如果能帶到河城。',
+             'This testimony could change everything — if you can bring it to River City.'),
+      delay: 2500 },
+  ], [
+    { text: '用石板拓印這些刻痕', textEn: 'Make a rubbing of the carvings',
+      action: () => {
+        state.flags.r2ZhouEvidence = true;
+        autoExplore([
+          { tag: '行動', tagColor: 'tag-move',
+            text: L('你找了一塊薄石板，用木炭小心翼翼地把所有刻痕拓印下來。',
+                   'You find a thin slate and carefully rub charcoal over all the carvings to copy them.'),
+            delay: 2500 },
+          { tag: '物品', tagColor: 'tag-item',
+            html: L('獲得「<b>老周的礦難證詞拓片</b>」——監工 K 的真實身分與議會的命令。',
+                   'Acquired "<b>Zhou\'s Disaster Testimony Rubbing</b>" — Overseer K\'s true identity and the Council\'s orders.'),
+            delay: 2500, effect: () => addItem(L('老周的礦難證詞', 'Zhou\'s Disaster Testimony')) },
+          { tag: '效果', tagColor: 'tag-system',
+            text: L('經驗 +12（關鍵證據）', 'XP +12 (Key evidence)'),
+            delay: 1500, effect: () => gainXp(12) },
+        ], [
+          { text: '返回', textEn: 'Back', action: () => loadNode('r2_quarry_floor') },
+        ], { label: L('拓印證詞', 'Copying testimony') });
+      }},
+    { text: '記在心裡就好', textEn: 'Just remember it',
+      action: () => {
+        state.flags.r2ZhouEvidence = true;
+        loadNode('r2_quarry_floor');
+      }},
+  ], { label: L('老周的深層真相', 'Zhou\'s deeper truth') });
 });
 
 // ── Region 2 Patrol ──
@@ -2440,4 +3363,258 @@ registerNode('r2_cheng_train', () => {
   autoExplore(steps, [
     { text: '返回營地', textEn: 'Return to camp', action: () => loadNode('r2_camp') },
   ], { label: L('力量訓練 ' + (trainCount + 1) + '/3', 'Strength Training ' + (trainCount + 1) + '/3') });
+});
+
+// ═══════════════════════════════════════════════════
+//  NPC Sidequest — 承鋼 (Cheng Gang) Research
+// ═══════════════════════════════════════════════════
+
+// --- r2_cheng_memory: Cheng recalls his pre-petrification research ---
+registerNode('r2_cheng_memory', () => {
+  state.flags.r2ChengMemory = true;
+  autoExplore([
+    { art: npcPortrait.art('cheng', { subtitle: '研究員' }) || `<pre class="ascii-art">
+       ·  ˚  承鋼 — 研究員  ˚  ·
+            ╱═══╲
+           │ ─  ─ │
+           │  ──  │
+            ╲═══╱
+       ╱───┤     ├───╲
+      │    │     │    │
+      │  ╱─┤     ├─╲  │
+      │ ╱  │     │  ╲ │
+       ╱   │     │   ╲
+</pre>`, artEn: npcPortrait.art('cheng', { subtitle: 'Researcher' }) || `<pre class="ascii-art">
+    ·  ˚  Cheng Gang — Researcher  ˚  ·
+            ╱═══╲
+           │ ─  ─ │
+           │  ──  │
+            ╲═══╱
+       ╱───┤     ├───╲
+      │    │     │    │
+      │  ╱─┤     ├─╲  │
+      │ ╱  │     │  ╲ │
+       ╱   │     │   ╲
+</pre>`, delay: 800 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('承鋼聽到你的問題，沉默了很久。他的手指下意識地在膝蓋上敲著——像是在回憶某種序列。',
+             'Cheng Gang goes quiet at your question for a long while. His fingers tap his knee unconsciously — as if recalling some sequence.'),
+      delay: 2800 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「……我不只是機甲駕駛員。」他終於說。「我是守備軍的——兼職科學研究員。」',
+             '"...I wasn\'t just a mech pilot." He says at last. "I was the garrison\'s — part-time science researcher."'),
+      delay: 2800 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「瘟疫爆發前一年，我在研究石化結晶的性質。那些結晶不是死物——它們有能量場，而且可以跟人體共振。」',
+             '"A year before the plague, I was studying petrification crystal properties. Those crystals aren\'t inert — they have energy fields, and they can resonate with human bodies."'),
+      delay: 3500 },
+    { tag: '對話', tagColor: 'tag-npc',
+      html: L('「我發現——石化不是<b>破壞</b>，是<b>轉換</b>。結晶在用自己的結構替換人體的有機組織。」',
+             '"I discovered — petrification isn\'t <b>destruction</b>, it\'s <b>conversion</b>. The crystals are replacing human organic tissue with their own structure."'),
+      delay: 3200 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「理論上——如果能找到逆轉共振的頻率——石化可以被<b>反轉</b>。」承鋼的眼睛亮了起來。',
+             '"In theory — if you could find the reverse resonance frequency — petrification could be <b>reversed</b>." Cheng Gang\'s eyes light up.'),
+      delay: 3000 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「但我還沒來得及完成研究，瘟疫就爆發了。我駕著三號戰甲去封堵裂口——然後就跟機甲一起被石化了。」',
+             '"But I never finished the research before the plague hit. I piloted Mech 3 to plug the breach — then petrified along with the machine."'),
+      delay: 3200 },
+    { tag: '對話', tagColor: 'tag-npc',
+      html: L('「我的研究數據還在——<b>實驗室裡</b>。古代密道的深處有一個我設立的實驗站。如果數據還完好的話……」',
+             '"My research data is still there — in <b>my lab</b>. Deep in the ancient tunnel, there\'s a station I set up. If the data is intact..."'),
+      delay: 3200 },
+    { tag: '效果', tagColor: 'tag-system',
+      text: L('經驗 +10（石化研究情報）', 'XP +10 (Petrification research intel)'),
+      delay: 1500, effect: () => gainXp(10) },
+  ], [
+    { text: '帶我去你的實驗室', textEn: 'Take me to your lab', action: () => loadNode('r2_camp_chief') },
+    { text: '返回', textEn: 'Back', action: () => loadNode('r2_camp_chief') },
+  ], { label: L('承鋼的記憶', 'Cheng Gang\'s memory') });
+});
+
+// --- r2_cheng_lab: Hidden lab in ancient tunnel ---
+registerNode('r2_cheng_lab', () => {
+  state.flags.r2ChengLab = true;
+  autoExplore([
+    { tag: '移動', tagColor: 'tag-move',
+      text: L('承鋼帶你穿過古代密道，在一個岔路口停了下來。他推開了一扇被灰塵覆蓋的金屬門。',
+             'Cheng Gang leads you through the ancient tunnel, stopping at a fork. He pushes open a metal door coated in dust.'),
+      delay: 2800 },
+    { art: `<pre class="ascii-art gold">
+  ╔═════════════════════════════════╗
+  ║   承鋼的隱藏實驗室              ║
+  ╠═════════════════════════════════╣
+  ║                                 ║
+  ║  ┌─────┐  ╔══════╗  ◇ ◇ ◇    ║
+  ║  │ 顯微 │  ║ 石化  ║  結晶樣本 ║
+  ║  │ 鏡台 │  ║ 結晶  ║           ║
+  ║  └──┬──┘  ║ 切片  ║  ◆ ◆ ◆   ║
+  ║     │     ╚══════╝  共振器    ║
+  ║  ┌──┴──────────────┐           ║
+  ║  │  研 究 筆 記     │           ║
+  ║  │  (3 年前的數據)  │           ║
+  ║  └─────────────────┘           ║
+  ║                                 ║
+  ║   ·˚· 一切都還在原處 ·˚·      ║
+  ╚═════════════════════════════════╝
+</pre>`, artEn: `<pre class="ascii-art gold">
+  ╔═════════════════════════════════╗
+  ║   CHENG GANG'S HIDDEN LAB      ║
+  ╠═════════════════════════════════╣
+  ║                                 ║
+  ║  ┌──────┐  ╔══════╗  ◇ ◇ ◇   ║
+  ║  │Micro- │  ║Petri-║  Crystal  ║
+  ║  │ scope │  ║Crystal║  Samples ║
+  ║  └──┬───┘  ║Slides ║           ║
+  ║     │      ╚══════╝  ◆ ◆ ◆   ║
+  ║  ┌──┴──────────────┐ Resonator ║
+  ║  │ Research Notes   │           ║
+  ║  │ (3 years old)    │           ║
+  ║  └─────────────────┘           ║
+  ║                                 ║
+  ║   ·˚· Everything untouched ·˚· ║
+  ╚═════════════════════════════════╝
+</pre>`, delay: 800 },
+    { tag: '探索', tagColor: 'tag-explore',
+      text: L('門後是一個不大的房間——金屬牆壁，古代照明裝置自動亮起。中央是一張實驗台，上面整齊地擺放著石化結晶切片、一台奇怪的共振裝置、和一本厚厚的筆記。',
+             'Behind the door — a small room with metal walls, ancient lights flickering on automatically. A workbench in the center holds neatly arranged crystal slides, a strange resonance device, and a thick notebook.'),
+      delay: 3500 },
+    { tag: '感知', tagColor: 'tag-sense',
+      text: L('承鋼走進去，用手指滑過實驗台。三年的灰塵在指尖堆積。',
+             'Cheng Gang enters, drawing a finger along the bench. Three years of dust gathers at his fingertip.'),
+      delay: 2500 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「……都還在。」他拿起筆記本，快速翻了幾頁。「數據完好。共振器也沒壞——只是沒有能源了。」',
+             '"...It\'s all here." He picks up the notebook, rapidly flipping pages. "Data intact. Resonator\'s fine — just out of power."'),
+      delay: 3000 },
+    { tag: '對話', tagColor: 'tag-npc',
+      html: L('「<b>逆轉石化是可能的。</b>」承鋼把筆記本攤開，指著一頁圖表。「但需要大量的——」他頓住了。',
+             '"<b>Reversing petrification is possible.</b>" Cheng Gang opens the notebook to a chart. "But it requires a massive amount of —" He stops.'),
+      delay: 3200 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「……活體石化能量。」他的聲音變低了。「逆轉一個人的石化，需要從另一個活著的石化者身上抽取能量。」',
+             '"...Living petrification energy." His voice drops. "Reversing one person\'s petrification requires extracting energy from another living petrified person."'),
+      delay: 3500 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('他合上筆記本。「這就是我三年前停下來的原因。不是因為瘟疫——是因為我算完了公式之後，發現代價太大了。」',
+             'He closes the notebook. "That\'s why I stopped three years ago. Not because of the plague — because after finishing the calculations, I realized the cost was too high."'),
+      delay: 3200 },
+    { tag: '效果', tagColor: 'tag-system',
+      text: L('獲得「承鋼的研究筆記」| 經驗 +12', 'Acquired "Cheng Gang\'s Research Notes" | XP +12'),
+      delay: 2000, effect: () => {
+        addItem(L('承鋼的研究筆記', 'Cheng Gang\'s Research Notes'));
+        gainXp(12);
+      }},
+  ], [
+    { text: '返回營地', textEn: 'Return to camp', action: () => loadNode('r2_camp') },
+  ], { label: L('承鋼的實驗室', 'Cheng Gang\'s lab') });
+});
+
+// --- r2_cheng_cure: The ethical dilemma of the cure ---
+registerNode('r2_cheng_cure', () => {
+  state.flags.r2ChengCure = true;
+  autoExplore([
+    { art: npcPortrait.art('cheng', { subtitle: '研究員' }) || `<pre class="ascii-art">
+       ·  ˚  承鋼 — 研究員  ˚  ·
+            ╱═══╲
+           │ ─  ─ │
+           │  ──  │
+            ╲═══╱
+       ╱───┤     ├───╲
+      │    │     │    │
+</pre>`, artEn: npcPortrait.art('cheng', { subtitle: 'Researcher' }) || `<pre class="ascii-art">
+    ·  ˚  Cheng Gang — Researcher  ˚  ·
+            ╱═══╲
+           │ ─  ─ │
+           │  ──  │
+            ╲═══╱
+       ╱───┤     ├───╲
+      │    │     │    │
+</pre>`, delay: 800 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「你還是想問那件事。」承鋼看出了你的來意。他坐在營火旁，火光在他的臉上跳動。',
+             '"You still want to ask about that." Cheng Gang reads your intent. He sits by the fire, flames dancing across his face.'),
+      delay: 2800 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「逆轉石化——理論上，需要一個高石化度的活人自願獻出石化能量。過程不可逆。那個人……會死。」',
+             '"Reversing petrification — theoretically, requires a highly petrified living person to willingly donate their petrification energy. The process is irreversible. That person... will die."'),
+      delay: 3500 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「一個人的死，換另一個人的治癒。這就是代價。」',
+             '"One person\'s death, in exchange for another\'s cure. That\'s the price."'),
+      delay: 2800 },
+    { tag: '感知', tagColor: 'tag-sense',
+      text: L('承鋼看著自己的手——石化的紋路已經褪去大半，但指尖的灰色還在。',
+             'Cheng Gang looks at his hands — petrification lines have mostly faded, but grey lingers at his fingertips.'),
+      delay: 2500 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「但——」他深吸了一口氣。「如果能找到封印的源頭——古代封印裝置本身就是一個巨大的石化能量儲存器。」',
+             '"But —" He draws a deep breath. "If we could find the source of the seal — the ancient seal device itself is a massive petrification energy reservoir."'),
+      delay: 3200 },
+    { tag: '對話', tagColor: 'tag-npc',
+      html: L('「<b>如果能把封印裝置的能量逆轉——不需要犧牲任何人。</b>整個地底的石化都能被治癒。」',
+             '"<b>If the seal device\'s energy could be reversed — no sacrifice needed.</b> All petrification underground could be cured."'),
+      delay: 3200 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「但那意味著——要打開封印。而上一次有人打開封印，就是瘟疫爆發的原因。」',
+             '"But that means — opening the seal. And the last time someone opened a seal, it caused the plague."'),
+      delay: 3000 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「所以我需要你把這些數據帶到河城。如果議會不封鎖通道——我們才有機會找到真正的封印裝置。如果他們封了……一切就完了。」',
+             '"So I need you to bring this data to River City. If the Council doesn\'t seal the passages — we\'ll have a chance to find the true seal device. If they seal them... it\'s over."'),
+      delay: 3500 },
+  ], [
+    { text: '我會讓議會看到這些數據', textEn: 'I\'ll make the Council see this data',
+      action: () => {
+        state.flags.r2ChengCureData = true;
+        autoExplore([
+          { tag: '對話', tagColor: 'tag-npc',
+            text: L('承鋼把筆記本中最關鍵的幾頁撕了下來，折好遞給你。',
+                   'Cheng Gang tears out the notebook\'s most critical pages, folds them, and hands them over.'),
+            delay: 2500 },
+          { tag: '對話', tagColor: 'tag-npc',
+            text: L('「這是三年的研究。也是幾千個石化者唯一的希望。」他的聲音很穩，但你看到他的手在微微顫抖。',
+                   '"Three years of research. And the only hope for thousands of petrified people." His voice is steady, but you see his hands faintly trembling.'),
+            delay: 3200 },
+          { tag: '效果', tagColor: 'tag-system',
+            text: L('獲得「石化逆轉研究報告」| 經驗 +15 | 意志 +1', 'Acquired "Petri-Reversal Research Report" | XP +15 | WIL +1'),
+            delay: 2000, effect: () => {
+              addItem(L('石化逆轉研究報告', 'Petri-Reversal Report'));
+              gainXp(15);
+              changeStat('wil', 1);
+            }},
+          { tag: '系統', tagColor: 'tag-system',
+            text: L('（此研究報告將在議會投票中成為決定性證據）', '(This report will serve as decisive evidence in the Council vote)'),
+            delay: 2000 },
+        ], [
+          { text: '返回', textEn: 'Back', action: () => loadNode('r2_camp') },
+        ], { label: L('承鋼的研究', 'Cheng Gang\'s research') });
+      }},
+    { text: '犧牲一個人來救一個人——真的不行嗎？', textEn: 'Sacrificing one to save one — is it truly impossible?',
+      action: () => {
+        autoExplore([
+          { tag: '對話', tagColor: 'tag-npc',
+            text: L('承鋼看了你很久。然後他搖了搖頭。',
+                   'Cheng Gang looks at you for a long time. Then shakes his head.'),
+            delay: 2500 },
+          { tag: '對話', tagColor: 'tag-npc',
+            text: L('「不是不行。是不應該。」他的聲音很輕。「如果為了治癒石化就殺人——我們跟那個炸開封印的監工有什麼區別？」',
+                   '"It\'s not impossible. It\'s wrong." His voice is quiet. "If we kill to cure petrification — how are we different from the overseer who blasted open the seal?"'),
+            delay: 3500 },
+          { tag: '對話', tagColor: 'tag-npc',
+            text: L('「找到封印裝置。那才是正確的路。」',
+                   '"Find the seal device. That\'s the right path."'),
+            delay: 2500 },
+        ], [
+          { text: '你說得對', textEn: 'You\'re right', action: () => {
+            state.flags.r2ChengCureData = true;
+            addItem(L('石化逆轉研究報告', 'Petri-Reversal Report'));
+            gainXp(15);
+            changeStat('wil', 1);
+            loadNode('r2_camp');
+          }},
+        ], { label: L('承鋼的倫理', 'Cheng Gang\'s ethics') });
+      }},
+  ], { label: L('石化的治癒', 'Curing petrification') });
 });
