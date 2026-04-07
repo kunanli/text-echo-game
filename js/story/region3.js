@@ -2135,6 +2135,397 @@ registerNode('r3_crane_deal', () => {
   ], { label: L('灰鶴的交易', 'Grey Crane\'s Deal') });
 });
 
+
+// ── Underground Tunnels ──
+registerNode('r3_underground', () => {
+  state.flags.r3UndergroundDone = true;
+  var steps = [];
+  steps.push({ art: `<pre class="ascii-art">
+  ╔═══════════════════════════════════╗
+  ║  地 下 通 道                      ║
+  ╠═══════════════════════════════════╣
+  ║  ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  ║
+  ║  ░  ┌──┐  ┌──┐  ┌──┐  ┌──┐  ░  ║
+  ║  ░  │攤│──│攤│──│攤│──│攤│  ░  ║
+  ║  ░  └──┘  └──┘  └──┘  └──┘  ░  ║
+  ║  ░░░░░│░░░░░│░░░░░│░░░░░│░░░░  ║
+  ║  ═════╧═════╧═════╧═════╧═════  ║
+  ║   ·  火把  ·  暗影  ·  低語  ·   ║
+  ╚═══════════════════════════════════╝
+</pre>`, artEn: `<pre class="ascii-art">
+  ╔═══════════════════════════════════╗
+  ║  U N D E R G R O U N D            ║
+  ╠═══════════════════════════════════╣
+  ║  ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  ║
+  ║  ░  ┌──┐  ┌──┐  ┌──┐  ┌──┐  ░  ║
+  ║  ░  │ST│──│ST│──│ST│──│ST│  ░  ║
+  ║  ░  └──┘  └──┘  └──┘  └──┘  ░  ║
+  ║  ░░░░░│░░░░░│░░░░░│░░░░░│░░░░  ║
+  ║  ═════╧═════╧═════╧═════╧═════  ║
+  ║  · Torches · Shadows · Whispers · ║
+  ╚═══════════════════════════════════╝
+</pre>`, delay: 800 });
+  steps.push({ tag: '移動', tagColor: 'tag-move', text: '你從市場後巷的一道暗門溜進了地下通道。空氣又濕又悶，火把映著低矮的石壁。', textEn: 'You slip through a hidden door behind the market into the underground tunnels. The air is damp and stuffy, torchlight flickering on low stone walls.', delay: 2500 });
+  steps.push({ tag: '感知', tagColor: 'tag-sense', text: '兩側擺滿了簡陋的攤位——有人賣來路不明的藥劑，有人低聲兜售情報。這是河城的黑市。', textEn: 'Crude stalls line both sides — someone sells dubious potions, others whisper offers of information. This is River City\'s black market.', delay: 2500 });
+  steps.push({ tag: '情報', tagColor: 'tag-info', text: '一個蒙面商人向你招手：「想知道議會投票的內幕？有價碼的。」', textEn: 'A masked merchant beckons: "Want the inside scoop on the Council vote? Everything has a price."', delay: 2200 });
+
+  var gold = state.flags.gold || 0;
+  autoExplore(steps, [
+    { text: '付 10 金幣買情報', textEn: 'Pay 10 gold for intel', action: function() {
+      var g = state.flags.gold || 0;
+      if (g < 10) {
+        notify(L('金幣不足（需要 10，目前 ' + g + '）', 'Not enough gold (need 10, have ' + g + ')'));
+        loadNode('r3_underground');
+        return;
+      }
+      state.flags.gold = g - 10;
+      state.flags.r3BlackMarketVisited = true;
+      gainXp(8);
+      sfx.item();
+      notify(L('金幣 -10，獲得議會情報，經驗 +8', 'Gold -10, acquired Council intel, XP +8'));
+      autoExplore([
+        { tag: '情報', tagColor: 'tag-info', text: '商人壓低聲音：「議會五人裡有兩個已經被鏽刃收買了。銅鐘是唯一還在抵抗的——但她需要證據。」', textEn: 'The merchant lowers his voice: "Two of the five council members are already bought by Rust Blade. Bronze Bell is the only one still resisting — but she needs evidence."', delay: 3000 },
+        { tag: '情報', tagColor: 'tag-info', text: '「投票結果取決於你能帶多少證據和盟友。數字就是一切。」', textEn: '"The vote outcome depends on how much evidence and how many allies you bring. Numbers are everything."', delay: 2500 },
+      ], [
+        { text: '記住了。返回渡口', textEn: 'Noted. Return to the docks', action: function() { loadNode('r3_look'); } },
+      ], { label: L('黑市情報', 'Black Market Intel') });
+    }},
+    { text: '自己打聽（免費）', textEn: 'Gather info yourself (free)', action: function() {
+      state.flags.r3BlackMarketVisited = true;
+      gainXp(8);
+      sfx.pass();
+      notify(L('經驗 +8', 'XP +8'));
+      autoExplore([
+        { tag: '探索', tagColor: 'tag-explore', text: '你在攤位間遊走，豎起耳朵聽各種對話。拼湊出一些零碎的線索——議會內部似乎有分歧。', textEn: 'You wander among the stalls, ears pricked. You piece together fragments — the Council seems divided internally.', delay: 2500 },
+        { tag: '情報', tagColor: 'tag-info', text: '雖然不如付費情報完整，但至少你知道了議會不是鐵板一塊。', textEn: 'Not as complete as the paid intel, but at least you know the Council isn\'t monolithic.', delay: 2200 },
+      ], [
+        { text: '返回渡口', textEn: 'Return to the docks', action: function() { loadNode('r3_look'); } },
+      ], { label: L('地下通道', 'Underground Tunnels') });
+    }},
+    { text: '離開', textEn: 'Leave', action: function() { loadNode('r3_look'); } },
+  ], { label: L('地下通道', 'Underground Tunnels') });
+});
+
+// ── Petrification Temple ──
+registerNode('r3_temple', () => {
+  state.flags.r3TempleDone = true;
+  var steps = [];
+  steps.push({ art: `<pre class="ascii-art">
+  ╔═══════════════════════════════════╗
+  ║       石  化  神  殿              ║
+  ╠═══════════════════════════════════╣
+  ║            ╱    ╲                 ║
+  ║           ╱  ◆◆  ╲                ║
+  ║          ╱  ◆石◆  ╲               ║
+  ║         ╱  ◆ 母 ◆  ╲              ║
+  ║        ╱  ◆◆◆◆◆◆  ╲             ║
+  ║       ╱──────────────╲            ║
+  ║      │  ✦  祭壇  ✦  │           ║
+  ║  ─┬──┴────────────────┴──┬─      ║
+  ║   │ 蠟燭 ·  香爐 · 蠟燭 │       ║
+  ╚═══════════════════════════════════╝
+</pre>`, artEn: `<pre class="ascii-art">
+  ╔═══════════════════════════════════╗
+  ║     PETRIFICATION  TEMPLE         ║
+  ╠═══════════════════════════════════╣
+  ║            ╱    ╲                 ║
+  ║           ╱  ◆◆  ╲                ║
+  ║          ╱ ◆Stone◆ ╲              ║
+  ║         ╱ ◆Mother◆  ╲             ║
+  ║        ╱  ◆◆◆◆◆◆  ╲             ║
+  ║       ╱──────────────╲            ║
+  ║      │  ✦  Altar  ✦  │          ║
+  ║  ─┬──┴────────────────┴──┬─      ║
+  ║   │Candle · Censer · Candle│     ║
+  ╚═══════════════════════════════════╝
+</pre>`, delay: 800 });
+  steps.push({ tag: '移動', tagColor: 'tag-move', text: '你走進一座鑿入岩壁的神殿。空氣中瀰漫著苦澀的焚香。', textEn: 'You enter a temple carved into the rock face. Bitter incense saturates the air.', delay: 2200 });
+  steps.push({ tag: '感知', tagColor: 'tag-sense', text: '祭壇上方矗立著一尊半石化的女性雕像——「石之母」。河城居民信仰她能緩解石化之苦。', textEn: 'Above the altar stands a half-petrified female statue — the "Stone Mother." River City residents believe she can ease the suffering of petrification.', delay: 2800 });
+  steps.push({ tag: '情報', tagColor: 'tag-info', text: '一名老祭司向你示意：「跪下禱告吧。石之母會聆聽的——但她的恩典需要堅定的意志。」', textEn: 'An old priest beckons: "Kneel and pray. The Stone Mother listens — but her grace demands a steadfast will."', delay: 2500 });
+  var rate = checkRate('wil', 8);
+  steps.push({ tag: '情報', tagColor: 'tag-info', text: L('（意志檢定 DC8，成功率 ' + rate + '%）', '(WIL check DC8, success rate ' + rate + '%)'), delay: 1500 });
+
+  autoExplore(steps, [
+    { text: '跪下禱告（WIL DC8）', textEn: 'Kneel and pray (WIL DC8)', action: function() {
+      var result = statCheck('wil', 8);
+      if (result !== 'fail') {
+        sfx.pass();
+        changePetri(-10);
+        notify(L('石化度 -10%（石之母的祝福）', 'Petrification -10% (Stone Mother\'s blessing)'));
+        autoExplore([
+          { tag: '效果', tagColor: 'tag-petri', text: '你感受到一股溫暖從祭壇流入身體。石化的皮膚微微鬆動，像冰雪融化。', textEn: 'Warmth flows from the altar into your body. Petrified skin loosens slightly, like melting ice.', delay: 2500 },
+          { tag: '系統', tagColor: 'tag-system', text: L('石化度 -10%', 'Petrification -10%'), delay: 1500 },
+        ], [
+          { text: '感謝石之母，離開', textEn: 'Thank the Stone Mother and leave', action: function() { loadNode('r3_look'); } },
+        ], { label: L('石化神殿', 'Petrification Temple') });
+      } else {
+        sfx.fail();
+        changePetri(5);
+        notify(L('禱告失敗，石化度 +5%', 'Prayer failed, petrification +5%'));
+        autoExplore([
+          { tag: '警告', tagColor: 'tag-warn', text: '你閉眼禱告，但腦海中充斥著恐懼和雜念。祭壇上的結晶突然碎裂，石化粉塵撲面而來。', textEn: 'You close your eyes to pray, but fear and distraction flood your mind. The altar crystals shatter, petrification dust blasting your face.', delay: 2800 },
+          { tag: '系統', tagColor: 'tag-system', text: L('石化度 +5%（儀式反噬）', 'Petrification +5% (ritual backlash)'), delay: 1500 },
+        ], [
+          { text: '匆匆離開', textEn: 'Leave hurriedly', action: function() { loadNode('r3_look'); } },
+        ], { label: L('石化神殿', 'Petrification Temple') });
+      }
+    }},
+    { text: '不冒險，離開', textEn: 'Don\'t risk it, leave', action: function() { loadNode('r3_look'); } },
+  ], { label: L('石化神殿', 'Petrification Temple') });
+});
+
+// ── City Library ──
+registerNode('r3_library', () => {
+  state.flags.r3LibraryDone = true;
+  var steps = [];
+  steps.push({ art: `<pre class="ascii-art">
+  ╔═══════════════════════════════════╗
+  ║        河 城 圖 書 館             ║
+  ╠═══════════════════════════════════╣
+  ║  ┌─┐ ┌─┐ ┌─┐ ┌─┐ ┌─┐ ┌─┐      ║
+  ║  │█│ │█│ │█│ │█│ │█│ │█│      ║
+  ║  │█│ │█│ │█│ │█│ │█│ │█│      ║
+  ║  │█│ │█│ │█│ │█│ │█│ │█│      ║
+  ║  └─┘ └─┘ └─┘ └─┘ └─┘ └─┘      ║
+  ║  ···  灰塵  ···  蛛網  ···       ║
+  ║     ┌──────────────┐             ║
+  ║     │ ✦ 閱覽桌 ✦  │             ║
+  ║     └──────────────┘             ║
+  ╚═══════════════════════════════════╝
+</pre>`, artEn: `<pre class="ascii-art">
+  ╔═══════════════════════════════════╗
+  ║        CITY  LIBRARY              ║
+  ╠═══════════════════════════════════╣
+  ║  ┌─┐ ┌─┐ ┌─┐ ┌─┐ ┌─┐ ┌─┐      ║
+  ║  │█│ │█│ │█│ │█│ │█│ │█│      ║
+  ║  │█│ │█│ │█│ │█│ │█│ │█│      ║
+  ║  │█│ │█│ │█│ │█│ │█│ │█│      ║
+  ║  └─┘ └─┘ └─┘ └─┘ └─┘ └─┘      ║
+  ║  ···  Dust  ···  Cobwebs  ···    ║
+  ║     ┌──────────────┐             ║
+  ║     │ ✦ Read Desk ✦│             ║
+  ║     └──────────────┘             ║
+  ╚═══════════════════════════════════╝
+</pre>`, delay: 800 });
+  steps.push({ tag: '移動', tagColor: 'tag-move', text: '你推開圖書館厚重的石門。裡面堆滿了落灰的書架，空氣中飄著紙張腐朽的氣味。', textEn: 'You push open the library\'s heavy stone door. Dusty bookshelves fill the space, the air thick with the scent of decaying paper.', delay: 2500 });
+  steps.push({ tag: '探索', tagColor: 'tag-explore', text: '你翻閱了幾本歷史記錄——石化瘟疫的爆發始於三百年前，最初只在深層礦區蔓延。', textEn: 'You browse several historical records — the petrification plague began three hundred years ago, initially spreading only in deep mining areas.', delay: 2800 });
+  steps.push({ tag: '情報', tagColor: 'tag-info', text: '一本泛黃的年鑑記載：「議會初代成員曾試圖封鎖所有通往深層的通道，但遭到礦工工會的激烈反對。」', textEn: 'A yellowed almanac records: "The first Council attempted to seal all passages to the deep levels, but faced fierce opposition from the miners\' union."', delay: 3000 },
+  { tag: '系統', tagColor: 'tag-system', text: L('經驗 +10（歷史知識）', 'XP +10 (historical knowledge)'), delay: 1500, effect: function() { gainXp(10); } });
+  var rate = checkRate('agi', 7);
+  steps.push({ tag: '情報', tagColor: 'tag-info', text: L('書架深處似乎有一個上鎖的抽屜……（敏捷 DC7 撬鎖，成功率 ' + rate + '%）', 'Deep in the shelves, a locked drawer... (AGI DC7 to pick the lock, success rate ' + rate + '%)'), delay: 2200 });
+
+  autoExplore(steps, [
+    { text: '嘗試撬開抽屜（AGI DC7）', textEn: 'Try to pick the lock (AGI DC7)', action: function() {
+      var result = statCheck('agi', 7);
+      if (result !== 'fail') {
+        sfx.pass();
+        state.flags.r3LibrarySecret = true;
+        notify(L('發現議會醜聞文件！', 'Discovered Council scandal documents!'));
+        autoExplore([
+          { tag: '發現', tagColor: 'tag-info', html: L('抽屜裡是一份密封的文件——<b>議會早在十年前就知道石化結晶的軍事用途</b>，卻對外隱瞞。', 'Inside is a sealed document — <b>the Council knew about the military applications of petrification crystals ten years ago</b>, but concealed it.'), delay: 3000 },
+          { tag: '情報', tagColor: 'tag-info', text: '這份文件如果交給銅鐘，可能會改變一切。', textEn: 'If given to Bronze Bell, this document could change everything.', delay: 2200 },
+        ], [
+          { text: '帶走文件，返回渡口', textEn: 'Take the document and return', action: function() { loadNode('r3_look'); } },
+        ], { label: L('圖書館', 'Library') });
+      } else {
+        sfx.fail();
+        autoExplore([
+          { tag: '失敗', tagColor: 'tag-warn', text: '鎖太複雜了，你的手指不夠靈巧。抽屜紋絲不動。', textEn: 'The lock is too complex for your fingers. The drawer doesn\'t budge.', delay: 2200 },
+        ], [
+          { text: '放棄，返回渡口', textEn: 'Give up and return', action: function() { loadNode('r3_look'); } },
+        ], { label: L('圖書館', 'Library') });
+      }
+    }},
+    { text: '不動抽屜，離開', textEn: 'Leave the drawer alone', action: function() { loadNode('r3_look'); } },
+  ], { label: L('圖書館', 'Library') });
+});
+
+// ── Lower District Slum ──
+registerNode('r3_slum', () => {
+  state.flags.r3SlumDone = true;
+  var steps = [];
+  steps.push({ art: `<pre class="ascii-art">
+  ╔═══════════════════════════════════╗
+  ║        下  城  區                 ║
+  ╠═══════════════════════════════════╣
+  ║   ╱╲  ╱╲  ╱╲     ╱╲  ╱╲        ║
+  ║  ╱░░╲╱░░╲╱░░╲   ╱░░╲╱░░╲       ║
+  ║  │棚││棚││棚│   │棚││棚│       ║
+  ║  └──┘└──┘└──┘   └──┘└──┘       ║
+  ║    ·  水窪  · 碎石路 · 煙霧  ·   ║
+  ║  ╱╲          ╱╲                  ║
+  ║  │棚│  ···   │棚│   ···          ║
+  ║  └──┘        └──┘                ║
+  ╚═══════════════════════════════════╝
+</pre>`, artEn: `<pre class="ascii-art">
+  ╔═══════════════════════════════════╗
+  ║      LOWER  DISTRICT              ║
+  ╠═══════════════════════════════════╣
+  ║   ╱╲  ╱╲  ╱╲     ╱╲  ╱╲        ║
+  ║  ╱░░╲╱░░╲╱░░╲   ╱░░╲╱░░╲       ║
+  ║  │Sh││Sh││Sh│   │Sh││Sh│       ║
+  ║  └──┘└──┘└──┘   └──┘└──┘       ║
+  ║   · Puddles · Gravel · Smoke ·   ║
+  ║  ╱╲          ╱╲                  ║
+  ║  │Sh│  ···   │Sh│   ···          ║
+  ║  └──┘        └──┘                ║
+  ╚═══════════════════════════════════╝
+</pre>`, delay: 800 });
+  steps.push({ tag: '移動', tagColor: 'tag-move', text: '你走進下城區。這裡的空氣更加渾濁，石化度較高的居民聚居在用廢料搭建的棚屋裡。', textEn: 'You enter the lower district. The air is fouler here — residents with high petrification levels huddle in shanties built from scrap.', delay: 2500 });
+  steps.push({ tag: '感知', tagColor: 'tag-sense', text: '一個老婦人蹲在路邊，半張臉已經石化。她的孫子用破布幫她擦拭石化裂紋中滲出的灰色液體。', textEn: 'An old woman crouches by the road, half her face petrified. Her grandson wipes grey fluid seeping from the cracks with a torn rag.', delay: 3000 });
+  steps.push({ tag: '感知', tagColor: 'tag-sense', text: '你看到更多這樣的人——被石化侵蝕但還活著的人。他們的眼神裡沒有絕望，只有麻木。', textEn: 'You see more like her — eroded by petrification yet still alive. Their eyes hold no despair, only numbness.', delay: 2800 });
+
+  var hasItems = state.inventory.length > 0;
+  autoExplore(steps, (function() {
+    var c = [];
+    if (hasItems) {
+      c.push({ text: '捐出一份物資（失去 1 件物品，WIL+1）', textEn: 'Donate supplies (lose 1 item, WIL+1)', action: function() {
+        var item = state.inventory[0];
+        removeItem(item);
+        changeStat('wil', 1);
+        sfx.pass();
+        notify(L('捐出「' + item + '」，意志 +1', 'Donated "' + item + '", WIL +1'));
+        autoExplore([
+          { tag: '行動', tagColor: 'tag-info', text: '你把物資遞給了老婦人的孫子。男孩接過去，眼睛亮了一下：「謝謝……謝謝你。」', textEn: 'You hand supplies to the old woman\'s grandson. The boy takes them, eyes lighting up: "Thank you... thank you."', delay: 2800 },
+          { tag: '效果', tagColor: 'tag-system', text: L('意志 +1（慈悲之心）', 'WIL +1 (compassionate heart)'), delay: 1500 },
+        ], [
+          { text: '返回渡口', textEn: 'Return to the docks', action: function() { loadNode('r3_look'); } },
+        ], { label: L('下城區', 'Lower District') });
+      }});
+    }
+    c.push({ text: '默默觀察後離開（XP+5）', textEn: 'Observe silently and leave (XP+5)', action: function() {
+      gainXp(5);
+      sfx.pass();
+      notify(L('經驗 +5', 'XP +5'));
+      autoExplore([
+        { tag: '感知', tagColor: 'tag-sense', text: '你沒有說話，只是把這一切記在心裡。如果議會看到這些……也許投票結果會不同。', textEn: 'You say nothing, committing everything to memory. If the Council could see this... perhaps the vote would be different.', delay: 2500 },
+      ], [
+        { text: '返回渡口', textEn: 'Return to the docks', action: function() { loadNode('r3_look'); } },
+      ], { label: L('下城區', 'Lower District') });
+    }});
+    return c;
+  })(), { label: L('下城區', 'Lower District') });
+});
+
+// ── Council Garden ──
+registerNode('r3_garden_r3', () => {
+  state.flags.r3GardenDone = true;
+  var steps = [];
+  steps.push({ art: `<pre class="ascii-art">
+  ╔═══════════════════════════════════╗
+  ║       議 會 花 園                 ║
+  ╠═══════════════════════════════════╣
+  ║                                   ║
+  ║    ⌒⌒   ✿  ⌒⌒   ✿  ⌒⌒        ║
+  ║   ╱  ╲ ╱╲ ╱  ╲ ╱╲ ╱  ╲       ║
+  ║   │樹│ │花│ │樹│ │花│ │樹│       ║
+  ║   └──┘ └──┘ └──┘ └──┘ └──┘       ║
+  ║  ─────── 石板路 ───────          ║
+  ║     ◇ 燈籠 ◇    ◇ 燈籠 ◇        ║
+  ║  ≈≈≈≈≈ 小溪 ≈≈≈≈≈≈≈≈≈≈          ║
+  ╚═══════════════════════════════════╝
+</pre>`, artEn: `<pre class="ascii-art">
+  ╔═══════════════════════════════════╗
+  ║      COUNCIL  GARDEN              ║
+  ╠═══════════════════════════════════╣
+  ║                                   ║
+  ║    ⌒⌒   ✿  ⌒⌒   ✿  ⌒⌒        ║
+  ║   ╱  ╲ ╱╲ ╱  ╲ ╱╲ ╱  ╲       ║
+  ║   │Tr│ │Fl│ │Tr│ │Fl│ │Tr│       ║
+  ║   └──┘ └──┘ └──┘ └──┘ └──┘       ║
+  ║  ─────── Stone Path ───────      ║
+  ║    ◇ Lantern ◇  ◇ Lantern ◇     ║
+  ║  ≈≈≈≈≈ Stream ≈≈≈≈≈≈≈≈≈≈        ║
+  ╚═══════════════════════════════════╝
+</pre>`, delay: 800 });
+  steps.push({ tag: '移動', tagColor: 'tag-move', text: '你走進議會廳後方的花園。石板路蜿蜒在低矮的灌木和發光苔蘚之間，紙燈籠掛在枝頭，映著一條淺淺的溪流。', textEn: 'You enter the garden behind the Council Hall. A flagstone path winds through low shrubs and luminescent moss, paper lanterns hanging from branches over a shallow stream.', delay: 2800 });
+  steps.push({ tag: '感知', tagColor: 'tag-sense', text: '這是河城最安靜的角落。水聲和蟲鳴交織，讓你幾乎忘了自己身在地底。', textEn: 'This is the quietest corner of River City. Water and insects weave together, making you almost forget you\'re underground.', delay: 2200 });
+
+  if (state.flags.r1YingCompanion) {
+    steps.push({ tag: '螢', tagColor: 'tag-npc', art: npcPortrait.art('ying', { subtitle: '記錄員' }) || '', artEn: npcPortrait.art('ying', { subtitle: 'Chronicler' }) || '', delay: 500 });
+    steps.push({ tag: '螢', tagColor: 'tag-npc', text: '螢不知什麼時候也來了。她坐在溪邊的石頭上，把腳泡在水裡。「這裡真好。」她輕聲說。', textEn: 'Ying appears at some point. She sits on a rock by the stream, feet in the water. "It\'s nice here," she says softly.', delay: 2800 });
+    steps.push({ tag: '螢', tagColor: 'tag-npc', text: '你在她旁邊坐下。兩個人就這樣靜靜地聽了一會兒水聲。', textEn: 'You sit beside her. The two of you listen to the water in silence for a while.', delay: 2500 });
+    steps.push({ tag: '效果', tagColor: 'tag-system', text: L('HP +10，石化度 -5%（片刻安寧）', 'HP +10, Petrification -5% (a moment of peace)'), delay: 1500, effect: function() { changeHp(10); changePetri(-5); } });
+  } else if (state.flags.r3BellAlliance) {
+    steps.push({ tag: '銅鐘', tagColor: 'tag-npc', art: npcPortrait.art('bell', { subtitle: '議會代表' }) || '', artEn: npcPortrait.art('bell', { subtitle: 'Council Rep' }) || '', delay: 500 });
+    steps.push({ tag: '銅鐘', tagColor: 'tag-npc', text: '銅鐘也在花園裡散步。她看到你，停下腳步。石化的右手不自覺地握緊又鬆開。', textEn: 'Bronze Bell is also walking in the garden. She stops when she sees you. Her petrified right hand clenches and unclenches unconsciously.', delay: 2800 });
+    steps.push({ tag: '銅鐘', tagColor: 'tag-npc', text: '「偶爾需要透口氣。」她淡淡地說。「議會的牆壁太厚了，厚到讓人喘不過氣。」', textEn: '"Sometimes I need air," she says flatly. "The Council walls are too thick — thick enough to suffocate."', delay: 2800 });
+    steps.push({ tag: '效果', tagColor: 'tag-system', text: L('經驗 +5（與銅鐘的交流）', 'XP +5 (interaction with Bronze Bell)'), delay: 1500, effect: function() { gainXp(5); } });
+  } else {
+    steps.push({ tag: '探索', tagColor: 'tag-explore', text: '你一個人在花園裡走了走。雖然什麼也沒發生，但身體和精神都放鬆了不少。', textEn: 'You walk the garden alone. Nothing happens, but your body and mind relax noticeably.', delay: 2200 });
+    steps.push({ tag: '效果', tagColor: 'tag-system', text: L('經驗 +5', 'XP +5'), delay: 1500, effect: function() { gainXp(5); } });
+  }
+
+  autoExplore(steps, [
+    { text: '返回渡口', textEn: 'Return to the docks', action: function() { loadNode('r3_look'); } },
+  ], { label: L('議會花園', 'Council Garden') });
+});
+
+// ── City Prison ──
+registerNode('r3_prison', () => {
+  state.flags.r3PrisonDone = true;
+  var steps = [];
+  steps.push({ art: `<pre class="ascii-art">
+  ╔═══════════════════════════════════╗
+  ║       河 城 監 獄                 ║
+  ╠═══════════════════════════════════╣
+  ║  ┌───┐ ┌───┐ ┌───┐ ┌───┐       ║
+  ║  │ ╳ │ │ ╳ │ │ ╳ │ │ ╳ │       ║
+  ║  │牢房│ │牢房│ │牢房│ │牢房│       ║
+  ║  │   │ │   │ │   │ │   │       ║
+  ║  ├───┤ ├───┤ ├───┤ ├───┤       ║
+  ║  │鎖 │ │鎖 │ │鎖 │ │鎖 │       ║
+  ║  └───┘ └───┘ └───┘ └───┘       ║
+  ║     ⚔ 守衛 ⚔     · 鐵鏈 ·       ║
+  ╚═══════════════════════════════════╝
+</pre>`, artEn: `<pre class="ascii-art">
+  ╔═══════════════════════════════════╗
+  ║        CITY  PRISON               ║
+  ╠═══════════════════════════════════╣
+  ║  ┌───┐ ┌───┐ ┌───┐ ┌───┐       ║
+  ║  │ ╳ │ │ ╳ │ │ ╳ │ │ ╳ │       ║
+  ║  │Cell│ │Cell│ │Cell│ │Cell│       ║
+  ║  │   │ │   │ │   │ │   │       ║
+  ║  ├───┤ ├───┤ ├───┤ ├───┤       ║
+  ║  │Lck│ │Lck│ │Lck│ │Lck│       ║
+  ║  └───┘ └───┘ └───┘ └───┘       ║
+  ║    ⚔ Guard ⚔    · Chains ·      ║
+  ╚═══════════════════════════════════╝
+</pre>`, delay: 800 });
+  steps.push({ tag: '移動', tagColor: 'tag-move', text: '你找到了河城監獄的入口。潮濕的石壁上掛著生鏽的鐵鏈，空氣中瀰漫著腐臭。', textEn: 'You find the entrance to City Prison. Rusty chains hang on damp stone walls, the air thick with decay.', delay: 2500 });
+  steps.push({ tag: '感知', tagColor: 'tag-sense', text: '一名守衛攔住你：「外人不得進入。裡面關的都是反對議會決議的危險分子。」', textEn: 'A guard blocks your path: "No outsiders. The inmates are dangerous dissidents who opposed Council decisions."', delay: 2500 });
+  var rate = checkRate('wil', 8);
+  steps.push({ tag: '情報', tagColor: 'tag-info', text: L('（意志檢定 DC8 說服守衛，成功率 ' + rate + '%）', '(WIL check DC8 to persuade the guard, success rate ' + rate + '%)'), delay: 1500 });
+
+  autoExplore(steps, [
+    { text: '說服守衛讓你進去（WIL DC8）', textEn: 'Persuade the guard to let you in (WIL DC8)', action: function() {
+      var result = statCheck('wil', 8);
+      if (result !== 'fail') {
+        sfx.pass();
+        state.flags.r3PrisonInfo = true;
+        notify(L('獲得議會腐敗證據', 'Acquired Council corruption evidence'));
+        autoExplore([
+          { tag: '行動', tagColor: 'tag-info', text: '守衛猶豫了一下，終於側身讓開。「五分鐘。別讓我的長官看到。」', textEn: 'The guard hesitates, then steps aside. "Five minutes. Don\'t let my superior see."', delay: 2200 },
+          { tag: '感知', tagColor: 'tag-sense', text: '你走進牢房區。一個滿臉傷痕的中年男人從鐵欄後面看著你。', textEn: 'You enter the cell block. A scarred middle-aged man watches you through the iron bars.', delay: 2200 },
+          { tag: '囚犯', tagColor: 'tag-npc', text: '「你是外面來的？」他壓低聲音。「聽好——議會投票是做樣子的。鏽刃早就和兩個議員簽了密約。」', textEn: '"You\'re from outside?" He lowers his voice. "Listen — the Council vote is theater. Rust Blade already has a secret deal with two members."', delay: 3000 },
+          { tag: '囚犯', tagColor: 'tag-npc', text: '「密約的副本就在議會廳的地下室。我親眼看到的——所以他們把我關在這裡。」', textEn: '"A copy of the deal is in the Council Hall basement. I saw it with my own eyes — that\'s why they locked me up."', delay: 2800 },
+          { tag: '效果', tagColor: 'tag-system', html: L('<b>獲得議會腐敗線索</b>（可在作證時使用，投票 +2）', '<b>Acquired Council corruption lead</b> (can be used in testimony, vote +2)'), delay: 2000 },
+        ], [
+          { text: '記住了。返回渡口', textEn: 'Noted. Return to the docks', action: function() { loadNode('r3_look'); } },
+        ], { label: L('河城監獄', 'City Prison') });
+      } else {
+        sfx.fail();
+        autoExplore([
+          { tag: '失敗', tagColor: 'tag-warn', text: '守衛面無表情地搖頭。「走吧。別讓我叫人。」你只能離開。', textEn: 'The guard shakes his head expressionlessly. "Leave. Don\'t make me call for backup." You have no choice but to go.', delay: 2200 },
+        ], [
+          { text: '離開', textEn: 'Leave', action: function() { loadNode('r3_look'); } },
+        ], { label: L('河城監獄', 'City Prison') });
+      }
+    }},
+    { text: '算了，不惹麻煩', textEn: 'Never mind, don\'t cause trouble', action: function() { loadNode('r3_look'); } },
+  ], { label: L('河城監獄', 'City Prison') });
+});
+
 // ── Region 3 Patrol ──
 registerNode('r3_patrol', () => {
   autoExplore([
