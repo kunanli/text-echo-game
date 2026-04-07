@@ -625,6 +625,7 @@ registerNode('r1_guard_fight', () => {
 </pre>`, delay: 800 },
         { tag: '勝利', tagColor: 'tag-explore', text: '守衛轟然倒地，石化碎片四散飛濺。', textEn: 'The guardian crashes to the ground, petrified fragments scattering.', delay: 2000 },
         { tag: '發現', tagColor: 'tag-item', html: '它胸口的核心碎裂了，露出裡面一塊<b>守衛核心石</b>。', htmlEn: 'Its chest core cracks open, revealing a <b>Guardian Core Stone</b>.', delay: 2200, effect: () => addItem(L('守衛核心石', 'Guardian Core Stone')) },
+        { tag: '感知', tagColor: 'tag-sense', text: '你蹲下檢查殘骸。它的石化紋路不像其他怪物那樣混亂——而是完美對稱的，像工業模具壓出來的。這東西不是自然產物。它是被製造出來的。', textEn: 'You crouch to examine the wreckage. Its petrification patterns aren\'t chaotic like other creatures — they\'re perfectly symmetrical, like an industrial mold pressed them. This thing wasn\'t natural. It was manufactured.', delay: 3200, effect: function() { state.flags.r1GuardClue = true; } },
         { tag: '情報', tagColor: 'tag-info', text: '通往迴廊深處的道路打開了。', textEn: 'The path deeper into the corridor is now open.', delay: 1800 },
       ], [{ text: '繼續前進', textEn: 'Continue forward', action: () => loadNode('r1_look') }]);
     },
@@ -1281,6 +1282,10 @@ registerNode('r1_zhou_memory', () => {
              '"He said behind the seal lay massive petrification crystals — highest purity. Worth a fortune." Old Zhou clenches his fists.'),
       delay: 3000 },
     { tag: '對話', tagColor: 'tag-npc',
+      text: L('「但奇怪的是——K 怎麼知道封印後面有什麼？」老周皺眉。「他來之前帶了一份密封圖紙。黑色封蠟，上面有個我沒見過的徽章。他看完就燒掉了。」',
+             '"But the strange thing is — how did K know what was behind the seal?" Old Zhou frowns. "He brought sealed blueprints with him. Black wax seal, with an emblem I\'d never seen. He burned them after reading."'),
+      delay: 3500, effect: function() { state.flags.r1ZhouBlueprintClue = true; } },
+    { tag: '對話', tagColor: 'tag-npc',
       text: L('「我們第三班被派去炸開封印。十七個人。」他的聲音開始發抖。',
              '"Our Crew 3 was ordered to blast the seal open. Seventeen men." His voice starts shaking.'),
       delay: 2800 },
@@ -1890,6 +1895,12 @@ registerNode('r1_ying_talk', () => {
     steps.push({ tag: '情報', tagColor: 'tag-info', html: '「第十七任爐灶' + (isMale ? '少年' : '少女') + '，從祭獻坑生還，正在向大採石場前進。<b>這是三百年來第一個活著回來的。</b>」', htmlEn: '"The 17th ' + (isMale ? 'Hearth-Youth' : 'Hearth-Maiden') + ', survived the Sacrificial Pit, advancing toward the Great Quarry. <b>The first to return alive in three hundred years.</b>"', delay: 3500 });
     steps.push({ tag: '感知', tagColor: 'tag-sense', text: yingPronoun + '抬起頭看著你，眼神裡有一種你說不清楚的溫度。', textEn: yingPronounCap + ' looks up at you, eyes carrying a warmth you can\'t quite name.', delay: 2500 });
     steps.push({ tag: '情報', tagColor: 'tag-info', text: '「……要是以後有人讀到這段記錄，他們會知道你的名字。」', textEn: '"...If anyone reads these records someday, they\'ll know your name."', delay: 2800 });
+  } else if (companion && state.flags.r1YingLore2 && !state.flags.r1YingLore3) {
+    state.flags.r1YingLore3 = true;
+    steps.push({ tag: '感知', tagColor: 'tag-sense', text: '你注意到螢翻筆記本的時候愣了一下。' + yingPronoun + '反覆翻了好幾次同一個位置。', textEn: 'You notice Ying pause while flipping through ' + (isMale ? 'her' : 'his') + ' notebook. ' + yingPronounCap + ' flips back and forth over the same spot.', delay: 2500 });
+    steps.push({ tag: '對話', tagColor: 'tag-npc', text: '「……這裡少了一頁。」螢皺起眉頭。「被撕掉的。但我不記得自己撕過。」', textEn: '"...There\'s a page missing here." Ying frowns. "Torn out. But I don\'t remember tearing it."', delay: 3000 });
+    steps.push({ tag: '對話', tagColor: 'tag-npc', text: '螢把殘留的紙邊湊到微光石下看了半天。「只能看到幾個字……『受控轉化』、『成功率』……還有一個被墨水蓋住的印章。」', textEn: 'Ying holds the torn edge under the glowstone. "I can only make out a few words... \'controlled conversion\', \'success rate\'... and a stamp covered by ink."', delay: 3500 });
+    steps.push({ tag: '感知', tagColor: 'tag-sense', text: yingPronoun + '沉默了很久，然後慢慢合上筆記本。「……這本手冊是我從上面帶下來的官方記錄。誰會撕掉官方記錄的一頁？」', textEn: yingPronounCap + ' goes silent for a long time, then slowly closes the notebook. "...This handbook is an official record I brought from above. Who would tear a page from an official record?"', delay: 3500, effect: function() { state.flags.r1YingTornPage = true; } });
   }
 
   autoExplore(steps, (function() {
