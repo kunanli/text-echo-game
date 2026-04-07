@@ -3641,3 +3641,364 @@ registerNode('r2_cheng_cure', () => {
   ], { label: L('石化的治癒', 'Curing petrification') });
 });
 
+// ============================================================
+// R2 Exploration Nodes (v2.1) — 6 new optional locations
+// ============================================================
+
+// ---------- r2_elevator ----------
+registerNode('r2_elevator', function() {
+  state.flags.r2ElevatorDone = true;
+  var elevatorArt = [
+    '        ╔══════════╗',
+    '        ║ ▓▓▓▓▓▓▓▓ ║',
+    '        ║ ║      ║ ║',
+    '        ║ ║ ⛓  ⛓ ║ ║',
+    '        ║ ║      ║ ║',
+    '     ═══╬═╬══════╬═╬═══',
+    '        ║ ╠══════╣ ║',
+    '        ║ ║ ░░░░ ║ ║',
+    '        ║ ║ ░░░░ ║ ║',
+    '        ╚═╩══════╩═╝',
+    '       ┄┄┄╱╱╱╱╱╱┄┄┄',
+    '          LIFT △',
+  ].join('\n');
+
+  var artHtml = '<pre class="ascii-art">' + elevatorArt + '</pre>';
+  var passed = false;
+
+  autoExplore([
+    { tag: '探索', tagColor: 'tag-sense',
+      art: artHtml, artEn: artHtml,
+      text: L('採石場東側的岩壁上嵌著一部廢棄升降機，鏽跡斑斑的鐵鏈從黑暗的豎井中垂下。',
+             'An abandoned lift is embedded in the east wall of the quarry. Rusted chains dangle from a dark shaft above.'),
+      delay: 2800 },
+    { tag: '環境', tagColor: 'tag-sense',
+      text: L('升降台的木板大多腐朽，但核心的鑄鐵框架依然堅固。齒輪組被石化粉塵凝住了，需要用蠻力扳開。',
+             'Most of the platform planks have rotted, but the cast-iron frame remains solid. The gearwork is seized with petri-dust — brute force is needed.'),
+      delay: 2500 },
+    { tag: '檢定', tagColor: 'tag-info',
+      text: L('你握住鏽蝕的操縱桿，用力扳動。（力量檢定 DC7，成功率 ' + checkRate('str', 7) + '%）',
+             'You grip the corroded lever and heave. (STR check DC7, ' + checkRate('str', 7) + '% chance)'),
+      delay: 2000,
+      effect: function() {
+        var result = statCheck('str', 7);
+        if (result === 'fail') {
+          passed = false;
+          changeHp(-6);
+          sfx.fail();
+          notify(L('機關卡死，反彈的操縱桿擊中你！HP-6', 'The mechanism jams — the lever kicks back! HP-6'));
+        } else {
+          passed = true;
+          sfx.pass();
+        }
+      }},
+    { tag: '結果', tagColor: 'tag-info',
+      text: L('齒輪嘎吱作響，升降台緩緩上升——或者操縱桿猛然反彈。',
+             'The gears grind — the platform rises, or the lever snaps back.'),
+      delay: 2500,
+      effect: function() {
+        if (passed) {
+          addItem(L('望遠鏡', 'Spyglass'));
+          changeStat('agi', 1);
+          sfx.item();
+          notify(L('你抵達觀景平台！獲得「望遠鏡」，AGI+1', 'You reach the observation deck! Obtained "Spyglass", AGI+1'));
+        }
+      }},
+  ], [
+    { text: '返回採石場', textEn: 'Return to the quarry', action: function() { loadNode('r2_look'); }},
+  ], { label: L('廢棄升降機', 'Abandoned Lift') });
+});
+
+// ---------- r2_laboratory ----------
+registerNode('r2_laboratory', function() {
+  state.flags.r2LabDone = true;
+  var labArt = [
+    '    ┌──────────────────────────┐',
+    '    │  ⚗   ░░  📋  ░░   ⚗   │',
+    '    │  ║    ▒▒▒▒▒▒▒▒    ║    │',
+    '    │  ╠════╤════════╤════╣   │',
+    '    │  ║  ◇ │ NOTES  │ ◇  ║  │',
+    '    │  ╠════╧════════╧════╣   │',
+    '    │  ║  ░░░░░░░░░░░░░  ║   │',
+    '    │  ╚══════════════════╝   │',
+    '    │  broken glass · dust    │',
+    '    └──────────────────────────┘',
+  ].join('\n');
+
+  var artHtml = '<pre class="ascii-art">' + labArt + '</pre>';
+
+  autoExplore([
+    { tag: '探索', tagColor: 'tag-sense',
+      art: artHtml, artEn: artHtml,
+      text: L('你推開一扇半脫落的鐵門，裡面是一間被遺棄的石化研究實驗室。空氣中漂浮著細微的結晶粉塵。',
+             'You push open a half-detached iron door. Inside is an abandoned petrification research lab. Fine crystal dust floats in the air.'),
+      delay: 2800 },
+    { tag: '環境', tagColor: 'tag-sense',
+      text: L('玻璃器皿碎了一地，但幾本厚重的筆記本被鎖在防潮鐵櫃裡，保存得相當完好。',
+             'Glassware litters the floor in shards, but several thick notebooks sit in a moisture-proof iron cabinet, remarkably intact.'),
+      delay: 2500 },
+    { tag: '情報', tagColor: 'tag-info',
+      text: L('筆記記載了石化結晶的軍事用途——研究者試圖將結晶研磨成粉末，塗覆在武器表面，製造「石化彈頭」。',
+             'The notes detail military applications of petri-crystals — researchers ground crystals into powder and coated weapon surfaces to create "petrification warheads."'),
+      delay: 3200 },
+    { tag: '情報', tagColor: 'tag-info',
+      text: L('最後一頁的日期已經模糊，但結論觸目驚心：「結晶武器的附帶損害無法控制。建議立即中止計畫。」',
+             'The last page\'s date is smudged, but the conclusion is chilling: "Collateral damage from crystal weapons cannot be contained. Recommend immediate termination of the project."'),
+      delay: 3000 },
+    { tag: '警告', tagColor: 'tag-warn',
+      text: L('然而計畫顯然沒有被中止。這些研究數據至今仍在被某些人利用。',
+             'Yet the project was clearly never terminated. Someone is still exploiting this research.'),
+      delay: 2500 },
+    { tag: '系統', tagColor: 'tag-system',
+      text: L('你仔細翻閱筆記，記住了關鍵資訊。', 'You study the notes carefully, committing key details to memory.'),
+      delay: 2000,
+      effect: function() {
+        state.flags.r2LabNotesFound = true;
+        gainXp(10);
+        notify(L('獲得情報！XP+10', 'Intel acquired! XP+10'));
+      }},
+  ], [
+    { text: '返回採石場', textEn: 'Return to the quarry', action: function() { loadNode('r2_look'); }},
+  ], { label: L('石化研究實驗室', 'Petrification Research Lab') });
+});
+
+// ---------- r2_garden ----------
+registerNode('r2_garden', function() {
+  state.flags.r2GardenDone = true;
+  var gardenArt = [
+    '      ·  ✦  ˚  ·  ✦  ˚  ·',
+    '     ~  .:*  ✿  *:.  ~',
+    '    ╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌',
+    '    ░ ✿ ░ ❀ ░ ✿ ░ ❀ ░ ✿ ░',
+    '    ░░░░░░░░░░░░░░░░░░░░░░░',
+    '    ░ ❀ ░ ✿ ░ ❀ ░ ✿ ░ ❀ ░',
+    '    ╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌',
+    '      ~ phosphor garden ~',
+  ].join('\n');
+
+  var artHtml = '<pre class="ascii-art cyan">' + gardenArt + '</pre>';
+
+  autoExplore([
+    { tag: '探索', tagColor: 'tag-sense',
+      art: artHtml, artEn: artHtml,
+      text: L('沿著一條濕潤的側道走下去，你發現了一片令人難以置信的景象——地底花園。',
+             'Following a damp side passage downward, you discover an incredible sight — an underground garden.'),
+      delay: 2800 },
+    { tag: '環境', tagColor: 'tag-sense',
+      text: L('磷光苔蘚覆蓋了天花板，散發出柔和的青綠色光芒。倖存者在石化土壤中種下了草藥和根莖植物。',
+             'Phosphorescent moss coats the ceiling, casting a soft teal glow. Survivors have planted herbs and root vegetables in the petrified soil.'),
+      delay: 2800 },
+    { tag: '感受', tagColor: 'tag-sense',
+      text: L('這裡的空氣不一樣。潮濕、乾淨，帶著泥土和青草的氣味。你深深吸了一口氣，感覺胸口的沉重感減輕了。',
+             'The air is different here. Moist, clean, carrying the scent of earth and green. You breathe deeply and the weight in your chest lightens.'),
+      delay: 2500 },
+    { tag: '治癒', tagColor: 'tag-info',
+      text: L('你在花園中休息，採集了一些新鮮草藥。這片綠意驅散了石化帶來的絕望感。',
+             'You rest in the garden and gather fresh herbs. This oasis of green dispels the despair that petrification brings.'),
+      delay: 2500,
+      effect: function() {
+        changeHp(15);
+        changePetri(-5);
+        addItem(L('新鮮草藥', 'Fresh Herbs'));
+        sfx.item();
+        notify(L('HP+15，石化度-5%，獲得「新鮮草藥」', 'HP+15, Petri -5%, obtained "Fresh Herbs"'));
+      }},
+  ], [
+    { text: '返回採石場', textEn: 'Return to the quarry', action: function() { loadNode('r2_look'); }},
+  ], { label: L('地底花園', 'Underground Garden') });
+});
+
+// ---------- r2_arena ----------
+registerNode('r2_arena', function() {
+  state.flags.r2ArenaDone = true;
+  var arenaArt = [
+    '    ╔═══╦═══════════╦═══╗',
+    '    ║ ▓ ║           ║ ▓ ║',
+    '    ║   ║   ARENA   ║   ║',
+    '    ║ ▓ ║           ║ ▓ ║',
+    '    ╠═══╝           ╚═══╣',
+    '    ║   ·  ░░░░░  ·     ║',
+    '    ║      ░░░░░        ║',
+    '    ║   ·  ░░░░░  ·     ║',
+    '    ╠═══╗           ╔═══╣',
+    '    ║ ▓ ║           ║ ▓ ║',
+    '    ╚═══╩═══════════╩═══╝',
+  ].join('\n');
+
+  var artHtml = '<pre class="ascii-art">' + arenaArt + '</pre>';
+
+  var golemArt = [
+    '       ╔═══╗',
+    '       ║◆ ◆║',
+    '       ╚═╤═╝',
+    '     ╔═══╪═══╗',
+    '    ═╣ ░░░░░ ╠═',
+    '     ║ ░░░░░ ║',
+    '     ║ ░░░░░ ║',
+    '     ╚═╤═══╤═╝',
+    '       ║   ║',
+    '      ═╩═ ═╩═',
+  ];
+
+  var golem = {
+    name: '結晶魔像', nameEn: 'Crystal Golem',
+    hp: 30, atkMin: 5, atkMax: 10, petriDmg: 3, xp: 18,
+    empathyGoal: 4,
+    art: golemArt,
+    commune: [
+      { zh: '魔像的結晶核心發出微弱的脈動，似乎在回應你的聲音。', en: 'The golem\'s crystal core pulses faintly, as if responding to your voice.' },
+      { zh: '它的攻擊動作慢了下來，石拳在半空中猶豫。', en: 'Its attacks slow, stone fists hesitating mid-swing.' },
+      { zh: '結晶表面浮現出古老的銘文——這曾是某人的守護者。', en: 'Ancient inscriptions surface across its crystal shell — it was once someone\'s guardian.' },
+    ],
+    spareText: { zh: '結晶魔像緩緩跪下，回歸了沉睡。核心的光芒柔和地熄滅。', en: 'The Crystal Golem slowly kneels and returns to dormancy. The light in its core dims gently.' }
+  };
+
+  autoExplore([
+    { tag: '探索', tagColor: 'tag-sense',
+      art: artHtml, artEn: artHtml,
+      text: L('採石場底部有一座圓形競技場遺跡。四根石柱矗立在角落，中央的地面被磨得光滑——無數場戰鬥的痕跡。',
+             'At the quarry floor lies a circular arena ruin. Four stone pillars stand at the corners, the central floor worn smooth by countless battles.'),
+      delay: 3000 },
+    { tag: '環境', tagColor: 'tag-sense',
+      text: L('壁畫描繪了古代文明用石化生物進行角鬥的場景。觀眾席已經崩塌，但場中央的結晶魔像依然佇立。',
+             'Murals depict an ancient civilization pitting petrified creatures in gladiatorial combat. The stands have crumbled, but a Crystal Golem still stands in the center.'),
+      delay: 2800 },
+    { tag: '警告', tagColor: 'tag-warn',
+      text: L('魔像的結晶核心閃爍著微光。它還活著——或者說，它從未真正死去。',
+             'The golem\'s crystal core flickers with dim light. It\'s still alive — or rather, it never truly died.'),
+      delay: 2500 },
+  ], [
+    { text: '挑戰結晶魔像', textEn: 'Challenge the Crystal Golem', action: function() {
+      startCombat(scaleEnemyNgPlus(golem), function() {
+        loadNode('r2_look');
+      }, function() {
+        loadNode('r2_look');
+      });
+    }},
+    { text: '不打擾它，離開', textEn: 'Leave it undisturbed', action: function() { loadNode('r2_look'); }},
+  ], { label: L('角鬥場遺跡', 'Arena Ruins') });
+});
+
+// ---------- r2_waterfall ----------
+registerNode('r2_waterfall', function() {
+  state.flags.r2WaterfallDone = true;
+  var waterfallArt = [
+    '        ╔══════════╗',
+    '        ║~~~~~~~~~~║',
+    '      ~~║~~~~~~~~~~║~~',
+    '    ~~~~╚══╗    ╔══╝~~~~',
+    '   ~~~~~~~~~║  ║~~~~~~~~~',
+    '   ░░░░░░░░░╚══╝░░░░░░░░',
+    '   ░░░  · cave ·  ░░░░░░',
+    '   ░░░░░░░░░░░░░░░░░░░░░',
+    '     ˚   ·  ✦  ·   ˚',
+  ].join('\n');
+
+  var artHtml = '<pre class="ascii-art cyan">' + waterfallArt + '</pre>';
+
+  var steps = [
+    { tag: '探索', tagColor: 'tag-sense',
+      art: artHtml, artEn: artHtml,
+      text: L('你聽見水聲。循著聲音穿過一條狹窄的石縫，眼前出現了一道地下瀑布——清澈的水流從高處傾瀉而下。',
+             'You hear water. Following the sound through a narrow cleft, you emerge before an underground waterfall — clear water cascading from high above.'),
+      delay: 3000 },
+    { tag: '環境', tagColor: 'tag-sense',
+      text: L('瀑布後面有一個乾燥的洞穴，地面鋪著柔軟的苔蘚。水霧帶來涼爽的空氣，洗去了石化粉塵的刺鼻味道。',
+             'Behind the falls is a dry cave, its floor carpeted with soft moss. The mist carries cool air, washing away the acrid scent of petri-dust.'),
+      delay: 2800 },
+    { tag: '休息', tagColor: 'tag-info',
+      text: L('你在瀑布的白噪音中坐下休息。水聲隔絕了外面的一切——恐懼、石化、死亡。此刻只有平靜。',
+             'You sit and rest amid the waterfall\'s white noise. The sound walls off everything outside — fear, petrification, death. Only peace remains.'),
+      delay: 2800,
+      effect: function() {
+        changeHp(20);
+        changePetri(-8);
+        notify(L('HP+20，石化度-8%', 'HP+20, Petri -8%'));
+      }},
+  ];
+
+  if (state.flags.r1YingCompanion) {
+    steps.push({
+      tag: '螢', tagColor: 'tag-npc',
+      text: L('螢坐在你身旁，把鞋子脫了，光腳踩進淺水裡。她閉上眼睛，嘴角微微上揚。「……就這樣待一會兒吧。」',
+             'Ying sits beside you, slips off her shoes, and dips her bare feet in the shallow water. Eyes closed, she smiles faintly. "...Let\'s just stay like this a while."'),
+      delay: 3200,
+      effect: function() {
+        changeHp(5);
+        notify(L('螢的陪伴令你安心。HP+5', 'Ying\'s company puts you at ease. HP+5'));
+      }
+    });
+  }
+
+  steps.push({
+    tag: '系統', tagColor: 'tag-system',
+    text: L('你感覺精力充沛了許多。', 'You feel greatly refreshed.'),
+    delay: 1800
+  });
+
+  autoExplore(steps, [
+    { text: '返回採石場', textEn: 'Return to the quarry', action: function() { loadNode('r2_look'); }},
+  ], { label: L('地下瀑布', 'Underground Waterfall') });
+});
+
+// ---------- r2_mural_war ----------
+registerNode('r2_mural_war', function() {
+  state.flags.r2MuralWarDone = true;
+  var muralArt = [
+    '    ╔══════════════════════════╗',
+    '    ║ ⚔ ░▓░ ☠ ░▓░ ⚔ ░▓░ ☠  ║',
+    '    ║━━━━━━━━━━━━━━━━━━━━━━━━━║',
+    '    ║  ╱╲  warriors  ╱╲      ║',
+    '    ║ ╱  ╲ vs stone ╱  ╲     ║',
+    '    ║╱    ╲         ╱    ╲    ║',
+    '    ║━━━━━━━━━━━━━━━━━━━━━━━━━║',
+    '    ║ ░▓░ ancient war ░▓░    ║',
+    '    ╚══════════════════════════╝',
+  ].join('\n');
+
+  var artHtml = '<pre class="ascii-art">' + muralArt + '</pre>';
+
+  var steps = [
+    { tag: '探索', tagColor: 'tag-sense',
+      art: artHtml, artEn: artHtml,
+      text: L('採石場深處的一面巨大石壁上，刻滿了精緻的浮雕——一幅描繪古代戰爭的壁畫。',
+             'Deep in the quarry, a massive stone wall is covered in intricate relief carvings — a mural depicting an ancient war.'),
+      delay: 2800 },
+    { tag: '情報', tagColor: 'tag-info',
+      text: L('壁畫分為三段。第一段：士兵手持發光的石化結晶武器衝鋒。第二段：敵軍在結晶光芒中化為石像。第三段：石化反噬，勝利者也開始僵化。',
+             'The mural has three panels. First: soldiers charge wielding glowing crystal weapons. Second: enemies turn to stone in the crystal light. Third: petrification rebounds — the victors begin to petrify too.'),
+      delay: 3500 },
+    { tag: '警告', tagColor: 'tag-warn',
+      text: L('最底下刻著一行古文，翻譯過來大意是：「以石為劍者，終為石所噬。」',
+             'At the bottom, an ancient inscription roughly translates to: "He who wields stone as a blade shall be devoured by stone."'),
+      delay: 2800 },
+    { tag: '感受', tagColor: 'tag-sense',
+      text: L('你伸手觸摸壁畫，石面冰涼。這場戰爭或許就是石化瘟疫的真正起源。',
+             'You reach out and touch the mural. The stone is cold. This war may be the true origin of the petrification plague.'),
+      delay: 2500,
+      effect: function() {
+        gainXp(8);
+        notify(L('獲得知識！XP+8', 'Knowledge gained! XP+8'));
+      }},
+  ];
+
+  if (state.flags.ngPlus) {
+    steps.push({
+      tag: '記憶', tagColor: 'tag-petri',
+      text: L('你的石化紋路突然隱隱作痛。壁畫中戰士使用結晶能量的姿態……你的身體認得。那是「石脈共振」的原型——前世的戰鬥記憶與古老壁畫重疊了。',
+             'Your petrification veins suddenly throb. The stance of the warriors channeling crystal energy in the mural... your body recognizes it. It\'s the prototype of "Vein Resonance" — memories of past battles overlap with the ancient carvings.'),
+      delay: 3500
+    });
+  }
+
+  steps.push({
+    tag: '系統', tagColor: 'tag-system',
+    text: L('壁畫的內容已深深刻入你的記憶。', 'The mural\'s content is etched deep into your memory.'),
+    delay: 1800
+  });
+
+  autoExplore(steps, [
+    { text: '返回採石場', textEn: 'Return to the quarry', action: function() { loadNode('r2_look'); }},
+  ], { label: L('戰爭壁畫', 'War Mural') });
+});
+
