@@ -860,6 +860,18 @@ registerNode('r2_camp_chief', () => {
     if (state.flags.r2ChengAwake && (state.flags.r2ChengTrainCount || 0) < 3) {
       c.push({ text: '◆ 和承鋼一起訓練', textEn: '◆ Train with Cheng Gang', action: () => loadNode('r2_cheng_train') });
     }
+    // Sidequest: Cheng's memory (requires awake + 1 training done)
+    if (state.flags.r2ChengAwake && (state.flags.r2ChengTrainCount || 0) >= 1 && !state.flags.r2ChengMemory) {
+      c.push({ text: '承鋼，你石化前在研究什麼？', textEn: 'Cheng, what were you researching before petrification?', action: () => loadNode('r2_cheng_memory') });
+    }
+    // Sidequest: Cheng's lab (requires memory revealed)
+    if (state.flags.r2ChengMemory && !state.flags.r2ChengLab) {
+      c.push({ text: '去承鋼的隱藏實驗室', textEn: 'Visit Cheng Gang\'s hidden lab', action: () => loadNode('r2_cheng_lab') });
+    }
+    // Sidequest: Cure dilemma (requires lab visited)
+    if (state.flags.r2ChengLab && !state.flags.r2ChengCure) {
+      c.push({ text: '承鋼，你說的逆轉方法……', textEn: 'Cheng, about that reversal method...', action: () => loadNode('r2_cheng_cure') });
+    }
     // Sidequest: Frost's past (requires first meeting done)
     if (state.flags.r2CampVisited && !state.flags.r2FrostPast) {
       c.push({ text: '鐵霜，你是怎麼到這裡的？', textEn: 'Frost, how did you end up here?', action: () => loadNode('r2_frost_past') });
@@ -3137,4 +3149,258 @@ registerNode('r2_cheng_train', () => {
   autoExplore(steps, [
     { text: '返回營地', textEn: 'Return to camp', action: () => loadNode('r2_camp') },
   ], { label: L('力量訓練 ' + (trainCount + 1) + '/3', 'Strength Training ' + (trainCount + 1) + '/3') });
+});
+
+// ═══════════════════════════════════════════════════
+//  NPC Sidequest — 承鋼 (Cheng Gang) Research
+// ═══════════════════════════════════════════════════
+
+// --- r2_cheng_memory: Cheng recalls his pre-petrification research ---
+registerNode('r2_cheng_memory', () => {
+  state.flags.r2ChengMemory = true;
+  autoExplore([
+    { art: npcPortrait.art('cheng', { subtitle: '研究員' }) || `<pre class="ascii-art">
+       ·  ˚  承鋼 — 研究員  ˚  ·
+            ╱═══╲
+           │ ─  ─ │
+           │  ──  │
+            ╲═══╱
+       ╱───┤     ├───╲
+      │    │     │    │
+      │  ╱─┤     ├─╲  │
+      │ ╱  │     │  ╲ │
+       ╱   │     │   ╲
+</pre>`, artEn: npcPortrait.art('cheng', { subtitle: 'Researcher' }) || `<pre class="ascii-art">
+    ·  ˚  Cheng Gang — Researcher  ˚  ·
+            ╱═══╲
+           │ ─  ─ │
+           │  ──  │
+            ╲═══╱
+       ╱───┤     ├───╲
+      │    │     │    │
+      │  ╱─┤     ├─╲  │
+      │ ╱  │     │  ╲ │
+       ╱   │     │   ╲
+</pre>`, delay: 800 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('承鋼聽到你的問題，沉默了很久。他的手指下意識地在膝蓋上敲著——像是在回憶某種序列。',
+             'Cheng Gang goes quiet at your question for a long while. His fingers tap his knee unconsciously — as if recalling some sequence.'),
+      delay: 2800 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「……我不只是機甲駕駛員。」他終於說。「我是守備軍的——兼職科學研究員。」',
+             '"...I wasn\'t just a mech pilot." He says at last. "I was the garrison\'s — part-time science researcher."'),
+      delay: 2800 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「瘟疫爆發前一年，我在研究石化結晶的性質。那些結晶不是死物——它們有能量場，而且可以跟人體共振。」',
+             '"A year before the plague, I was studying petrification crystal properties. Those crystals aren\'t inert — they have energy fields, and they can resonate with human bodies."'),
+      delay: 3500 },
+    { tag: '對話', tagColor: 'tag-npc',
+      html: L('「我發現——石化不是<b>破壞</b>，是<b>轉換</b>。結晶在用自己的結構替換人體的有機組織。」',
+             '"I discovered — petrification isn\'t <b>destruction</b>, it\'s <b>conversion</b>. The crystals are replacing human organic tissue with their own structure."'),
+      delay: 3200 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「理論上——如果能找到逆轉共振的頻率——石化可以被<b>反轉</b>。」承鋼的眼睛亮了起來。',
+             '"In theory — if you could find the reverse resonance frequency — petrification could be <b>reversed</b>." Cheng Gang\'s eyes light up.'),
+      delay: 3000 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「但我還沒來得及完成研究，瘟疫就爆發了。我駕著三號戰甲去封堵裂口——然後就跟機甲一起被石化了。」',
+             '"But I never finished the research before the plague hit. I piloted Mech 3 to plug the breach — then petrified along with the machine."'),
+      delay: 3200 },
+    { tag: '對話', tagColor: 'tag-npc',
+      html: L('「我的研究數據還在——<b>實驗室裡</b>。古代密道的深處有一個我設立的實驗站。如果數據還完好的話……」',
+             '"My research data is still there — in <b>my lab</b>. Deep in the ancient tunnel, there\'s a station I set up. If the data is intact..."'),
+      delay: 3200 },
+    { tag: '效果', tagColor: 'tag-system',
+      text: L('經驗 +10（石化研究情報）', 'XP +10 (Petrification research intel)'),
+      delay: 1500, effect: () => gainXp(10) },
+  ], [
+    { text: '帶我去你的實驗室', textEn: 'Take me to your lab', action: () => loadNode('r2_camp_chief') },
+    { text: '返回', textEn: 'Back', action: () => loadNode('r2_camp_chief') },
+  ], { label: L('承鋼的記憶', 'Cheng Gang\'s memory') });
+});
+
+// --- r2_cheng_lab: Hidden lab in ancient tunnel ---
+registerNode('r2_cheng_lab', () => {
+  state.flags.r2ChengLab = true;
+  autoExplore([
+    { tag: '移動', tagColor: 'tag-move',
+      text: L('承鋼帶你穿過古代密道，在一個岔路口停了下來。他推開了一扇被灰塵覆蓋的金屬門。',
+             'Cheng Gang leads you through the ancient tunnel, stopping at a fork. He pushes open a metal door coated in dust.'),
+      delay: 2800 },
+    { art: `<pre class="ascii-art gold">
+  ╔═════════════════════════════════╗
+  ║   承鋼的隱藏實驗室              ║
+  ╠═════════════════════════════════╣
+  ║                                 ║
+  ║  ┌─────┐  ╔══════╗  ◇ ◇ ◇    ║
+  ║  │ 顯微 │  ║ 石化  ║  結晶樣本 ║
+  ║  │ 鏡台 │  ║ 結晶  ║           ║
+  ║  └──┬──┘  ║ 切片  ║  ◆ ◆ ◆   ║
+  ║     │     ╚══════╝  共振器    ║
+  ║  ┌──┴──────────────┐           ║
+  ║  │  研 究 筆 記     │           ║
+  ║  │  (3 年前的數據)  │           ║
+  ║  └─────────────────┘           ║
+  ║                                 ║
+  ║   ·˚· 一切都還在原處 ·˚·      ║
+  ╚═════════════════════════════════╝
+</pre>`, artEn: `<pre class="ascii-art gold">
+  ╔═════════════════════════════════╗
+  ║   CHENG GANG'S HIDDEN LAB      ║
+  ╠═════════════════════════════════╣
+  ║                                 ║
+  ║  ┌──────┐  ╔══════╗  ◇ ◇ ◇   ║
+  ║  │Micro- │  ║Petri-║  Crystal  ║
+  ║  │ scope │  ║Crystal║  Samples ║
+  ║  └──┬───┘  ║Slides ║           ║
+  ║     │      ╚══════╝  ◆ ◆ ◆   ║
+  ║  ┌──┴──────────────┐ Resonator ║
+  ║  │ Research Notes   │           ║
+  ║  │ (3 years old)    │           ║
+  ║  └─────────────────┘           ║
+  ║                                 ║
+  ║   ·˚· Everything untouched ·˚· ║
+  ╚═════════════════════════════════╝
+</pre>`, delay: 800 },
+    { tag: '探索', tagColor: 'tag-explore',
+      text: L('門後是一個不大的房間——金屬牆壁，古代照明裝置自動亮起。中央是一張實驗台，上面整齊地擺放著石化結晶切片、一台奇怪的共振裝置、和一本厚厚的筆記。',
+             'Behind the door — a small room with metal walls, ancient lights flickering on automatically. A workbench in the center holds neatly arranged crystal slides, a strange resonance device, and a thick notebook.'),
+      delay: 3500 },
+    { tag: '感知', tagColor: 'tag-sense',
+      text: L('承鋼走進去，用手指滑過實驗台。三年的灰塵在指尖堆積。',
+             'Cheng Gang enters, drawing a finger along the bench. Three years of dust gathers at his fingertip.'),
+      delay: 2500 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「……都還在。」他拿起筆記本，快速翻了幾頁。「數據完好。共振器也沒壞——只是沒有能源了。」',
+             '"...It\'s all here." He picks up the notebook, rapidly flipping pages. "Data intact. Resonator\'s fine — just out of power."'),
+      delay: 3000 },
+    { tag: '對話', tagColor: 'tag-npc',
+      html: L('「<b>逆轉石化是可能的。</b>」承鋼把筆記本攤開，指著一頁圖表。「但需要大量的——」他頓住了。',
+             '"<b>Reversing petrification is possible.</b>" Cheng Gang opens the notebook to a chart. "But it requires a massive amount of —" He stops.'),
+      delay: 3200 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「……活體石化能量。」他的聲音變低了。「逆轉一個人的石化，需要從另一個活著的石化者身上抽取能量。」',
+             '"...Living petrification energy." His voice drops. "Reversing one person\'s petrification requires extracting energy from another living petrified person."'),
+      delay: 3500 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('他合上筆記本。「這就是我三年前停下來的原因。不是因為瘟疫——是因為我算完了公式之後，發現代價太大了。」',
+             'He closes the notebook. "That\'s why I stopped three years ago. Not because of the plague — because after finishing the calculations, I realized the cost was too high."'),
+      delay: 3200 },
+    { tag: '效果', tagColor: 'tag-system',
+      text: L('獲得「承鋼的研究筆記」| 經驗 +12', 'Acquired "Cheng Gang\'s Research Notes" | XP +12'),
+      delay: 2000, effect: () => {
+        addItem(L('承鋼的研究筆記', 'Cheng Gang\'s Research Notes'));
+        gainXp(12);
+      }},
+  ], [
+    { text: '返回營地', textEn: 'Return to camp', action: () => loadNode('r2_camp') },
+  ], { label: L('承鋼的實驗室', 'Cheng Gang\'s lab') });
+});
+
+// --- r2_cheng_cure: The ethical dilemma of the cure ---
+registerNode('r2_cheng_cure', () => {
+  state.flags.r2ChengCure = true;
+  autoExplore([
+    { art: npcPortrait.art('cheng', { subtitle: '研究員' }) || `<pre class="ascii-art">
+       ·  ˚  承鋼 — 研究員  ˚  ·
+            ╱═══╲
+           │ ─  ─ │
+           │  ──  │
+            ╲═══╱
+       ╱───┤     ├───╲
+      │    │     │    │
+</pre>`, artEn: npcPortrait.art('cheng', { subtitle: 'Researcher' }) || `<pre class="ascii-art">
+    ·  ˚  Cheng Gang — Researcher  ˚  ·
+            ╱═══╲
+           │ ─  ─ │
+           │  ──  │
+            ╲═══╱
+       ╱───┤     ├───╲
+      │    │     │    │
+</pre>`, delay: 800 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「你還是想問那件事。」承鋼看出了你的來意。他坐在營火旁，火光在他的臉上跳動。',
+             '"You still want to ask about that." Cheng Gang reads your intent. He sits by the fire, flames dancing across his face.'),
+      delay: 2800 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「逆轉石化——理論上，需要一個高石化度的活人自願獻出石化能量。過程不可逆。那個人……會死。」',
+             '"Reversing petrification — theoretically, requires a highly petrified living person to willingly donate their petrification energy. The process is irreversible. That person... will die."'),
+      delay: 3500 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「一個人的死，換另一個人的治癒。這就是代價。」',
+             '"One person\'s death, in exchange for another\'s cure. That\'s the price."'),
+      delay: 2800 },
+    { tag: '感知', tagColor: 'tag-sense',
+      text: L('承鋼看著自己的手——石化的紋路已經褪去大半，但指尖的灰色還在。',
+             'Cheng Gang looks at his hands — petrification lines have mostly faded, but grey lingers at his fingertips.'),
+      delay: 2500 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「但——」他深吸了一口氣。「如果能找到封印的源頭——古代封印裝置本身就是一個巨大的石化能量儲存器。」',
+             '"But —" He draws a deep breath. "If we could find the source of the seal — the ancient seal device itself is a massive petrification energy reservoir."'),
+      delay: 3200 },
+    { tag: '對話', tagColor: 'tag-npc',
+      html: L('「<b>如果能把封印裝置的能量逆轉——不需要犧牲任何人。</b>整個地底的石化都能被治癒。」',
+             '"<b>If the seal device\'s energy could be reversed — no sacrifice needed.</b> All petrification underground could be cured."'),
+      delay: 3200 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「但那意味著——要打開封印。而上一次有人打開封印，就是瘟疫爆發的原因。」',
+             '"But that means — opening the seal. And the last time someone opened a seal, it caused the plague."'),
+      delay: 3000 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「所以我需要你把這些數據帶到河城。如果議會不封鎖通道——我們才有機會找到真正的封印裝置。如果他們封了……一切就完了。」',
+             '"So I need you to bring this data to River City. If the Council doesn\'t seal the passages — we\'ll have a chance to find the true seal device. If they seal them... it\'s over."'),
+      delay: 3500 },
+  ], [
+    { text: '我會讓議會看到這些數據', textEn: 'I\'ll make the Council see this data',
+      action: () => {
+        state.flags.r2ChengCureData = true;
+        autoExplore([
+          { tag: '對話', tagColor: 'tag-npc',
+            text: L('承鋼把筆記本中最關鍵的幾頁撕了下來，折好遞給你。',
+                   'Cheng Gang tears out the notebook\'s most critical pages, folds them, and hands them over.'),
+            delay: 2500 },
+          { tag: '對話', tagColor: 'tag-npc',
+            text: L('「這是三年的研究。也是幾千個石化者唯一的希望。」他的聲音很穩，但你看到他的手在微微顫抖。',
+                   '"Three years of research. And the only hope for thousands of petrified people." His voice is steady, but you see his hands faintly trembling.'),
+            delay: 3200 },
+          { tag: '效果', tagColor: 'tag-system',
+            text: L('獲得「石化逆轉研究報告」| 經驗 +15 | 意志 +1', 'Acquired "Petri-Reversal Research Report" | XP +15 | WIL +1'),
+            delay: 2000, effect: () => {
+              addItem(L('石化逆轉研究報告', 'Petri-Reversal Report'));
+              gainXp(15);
+              changeStat('wil', 1);
+            }},
+          { tag: '系統', tagColor: 'tag-system',
+            text: L('（此研究報告將在議會投票中成為決定性證據）', '(This report will serve as decisive evidence in the Council vote)'),
+            delay: 2000 },
+        ], [
+          { text: '返回', textEn: 'Back', action: () => loadNode('r2_camp') },
+        ], { label: L('承鋼的研究', 'Cheng Gang\'s research') });
+      }},
+    { text: '犧牲一個人來救一個人——真的不行嗎？', textEn: 'Sacrificing one to save one — is it truly impossible?',
+      action: () => {
+        autoExplore([
+          { tag: '對話', tagColor: 'tag-npc',
+            text: L('承鋼看了你很久。然後他搖了搖頭。',
+                   'Cheng Gang looks at you for a long time. Then shakes his head.'),
+            delay: 2500 },
+          { tag: '對話', tagColor: 'tag-npc',
+            text: L('「不是不行。是不應該。」他的聲音很輕。「如果為了治癒石化就殺人——我們跟那個炸開封印的監工有什麼區別？」',
+                   '"It\'s not impossible. It\'s wrong." His voice is quiet. "If we kill to cure petrification — how are we different from the overseer who blasted open the seal?"'),
+            delay: 3500 },
+          { tag: '對話', tagColor: 'tag-npc',
+            text: L('「找到封印裝置。那才是正確的路。」',
+                   '"Find the seal device. That\'s the right path."'),
+            delay: 2500 },
+        ], [
+          { text: '你說得對', textEn: 'You\'re right', action: () => {
+            state.flags.r2ChengCureData = true;
+            addItem(L('石化逆轉研究報告', 'Petri-Reversal Report'));
+            gainXp(15);
+            changeStat('wil', 1);
+            loadNode('r2_camp');
+          }},
+        ], { label: L('承鋼的倫理', 'Cheng Gang\'s ethics') });
+      }},
+  ], { label: L('石化的治癒', 'Curing petrification') });
 });
