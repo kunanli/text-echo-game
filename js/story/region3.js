@@ -598,9 +598,280 @@ registerNode('r3_bell', () => {
     if (state.flags.r3BellQuest) {
       c.push({ text: '回報任務進度', textEn: 'Report quest progress', action: () => loadNode('r3_quest_check') });
     }
+    // Sidequest: Bell's night (requires alliance formed)
+    if (state.flags.r3BellAlliance && !state.flags.r3BellNight) {
+      c.push({ text: '深夜拜訪銅鐘', textEn: 'Visit Bell at night', action: () => loadNode('r3_bell_night') });
+    }
+    // Sidequest: Bell's secret (requires night visit + has letter or testimony)
+    if (state.flags.r3BellNight && !state.flags.r3BellSecret && (state.flags.r2FrostLetterCarried || state.flags.r3ZhouTestimony)) {
+      c.push({ text: '銅鐘，你知道封鎖的真正原因嗎？', textEn: 'Bell, do you know the real reason for the lockdown?', action: () => loadNode('r3_bell_secret') });
+    }
+    // Sidequest: Bell's deep alliance (requires secret revealed)
+    if (state.flags.r3BellSecret && !state.flags.r3BellAllianceDeep) {
+      c.push({ text: '銅鐘，我們需要一起面對這件事', textEn: 'Bell, we need to face this together', action: () => loadNode('r3_bell_alliance_deep') });
+    }
     c.push({ text: '離開', textEn: 'Leave', action: () => loadNode(state.flags.r3BellQuest ? 'r3_look' : 'r3_council') });
     return c;
   })(), { label: L('銅鐘', 'Bronze Bell') });
+});
+
+// ═══════════════════════════════════════════════════
+//  NPC Sidequest — 銅鐘 (Bronze Bell) Deep Arc
+// ═══════════════════════════════════════════════════
+
+// --- r3_bell_night: Late-night visit, discovering Bell's vulnerability ---
+registerNode('r3_bell_night', () => {
+  state.flags.r3BellNight = true;
+  autoExplore([
+    { tag: '移動', tagColor: 'tag-move',
+      text: L('深夜。議會廳的走廊空無一人。銅鐘辦公室的門縫裡還透著燭光。',
+             'Late at night. The Council hall corridors are empty. Candlelight seeps through the crack beneath Bronze Bell\'s office door.'),
+      delay: 2800 },
+    { tag: '感知', tagColor: 'tag-sense',
+      text: L('你推門的時候聽到了一聲壓抑的——是呻吟嗎？不是。是痛苦的低語。',
+             'As you push the door, you hear a stifled — a moan? No. A murmur of pain.'),
+      delay: 2500 },
+    { art: npcPortrait.art('bell', { subtitle: '……' }) || `<pre class="ascii-art">
+       ·  ˚  銅鐘 — 深夜辦公室  ˚  ·
+              ╱═══╲
+             │ ─  ─ │  ← 閉眼
+             │  ───  │
+              ╲═══╱
+        ╱───┤  ░▓█  ├───╲
+       ╱    │  ▓██  │    ╲
+      ╱  ╱──┤  ░▓█  ├──╲  ╲
+           石化右手
+           正在疼痛……
+</pre>`, artEn: npcPortrait.art('bell', { subtitle: '...' }) || `<pre class="ascii-art">
+    ·  ˚  Bronze Bell — Late night  ˚  ·
+              ╱═══╲
+             │ ─  ─ │  ← eyes shut
+             │  ───  │
+              ╲═══╱
+        ╱───┤  ░▓█  ├───╲
+       ╱    │  ▓██  │    ╲
+      ╱  ╱──┤  ░▓█  ├──╲  ╲
+        Petrified hand
+        in agony...
+</pre>`, delay: 800 },
+    { tag: '感知', tagColor: 'tag-sense',
+      text: L('銅鐘跪在桌旁，左手用力按住石化的右手腕。她的額頭上全是冷汗。石化的右手指節發出細微的碎裂聲——像是石頭在膨脹。',
+             'Bronze Bell kneels beside her desk, left hand pressing hard on her petrified right wrist. Cold sweat covers her forehead. Her stone fingers emit faint cracking sounds — as if the rock is expanding.'),
+      delay: 3500 },
+    { tag: '感知', tagColor: 'tag-sense',
+      text: L('她聽到你的腳步聲，猛地抬頭——琥珀色的眼睛裡沒有平時的從容。只有赤裸裸的痛苦。和一瞬間的……羞恥。',
+             'She hears your footsteps and snaps her head up — no composure in those amber eyes. Just raw pain. And a flash of... shame.'),
+      delay: 3000 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「出去。」她的聲音嘶啞。「我沒讓你進來。」',
+             '"Get out." Her voice is hoarse. "I didn\'t invite you in."'),
+      delay: 2500 },
+    { tag: '感知', tagColor: 'tag-sense',
+      text: L('但她的左手沒有鬆開石化的右手腕——你看到她的手在發抖。疼痛讓她無法維持那副鐵面孔。',
+             'But her left hand doesn\'t release her petrified wrist — you see her hand trembling. The pain strips away her iron mask.'),
+      delay: 3000 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「……每天晚上都會這樣。」沉默了很久，她才小聲開口。「石化在擴散的時候，就像——有人在用熱鐵從裡面燒你的骨頭。」',
+             '"...It happens every night." After a long silence, she whispers. "When the petrification spreads, it feels like — someone burning your bones from the inside with a hot iron."'),
+      delay: 3500 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「白天我撐得住。議會的人不能看到我疼。」她苦笑了一聲。「夜裡……就沒辦法了。」',
+             '"During the day I hold it together. The Council can\'t see me in pain." She laughs bitterly. "At night... I can\'t."'),
+      delay: 3200 },
+  ], [
+    { text: '幫她按住手腕', textEn: 'Help hold her wrist',
+      action: () => {
+        autoExplore([
+          { tag: '行動', tagColor: 'tag-move',
+            text: L('你蹲到她身邊，伸手覆上她的左手——幫她一起按住石化的手腕。你的體溫透過她的手指傳了過去。',
+                   'You kneel beside her, your hand covering hers — helping press down on the petrified wrist. Your warmth passes through her fingers.'),
+            delay: 3000 },
+          { tag: '感知', tagColor: 'tag-sense',
+            text: L('銅鐘的身體僵了一瞬。然後——你感覺她的手指慢慢放鬆了。不是不疼了，而是不再逞強了。',
+                   'Bronze Bell\'s body stiffens for a heartbeat. Then — you feel her fingers slowly relax. Not because the pain stopped, but because she stopped pretending.'),
+            delay: 3200 },
+          { tag: '對話', tagColor: 'tag-npc',
+            text: L('「……你手很暖。」她低聲說。語氣裡沒有了白天那個鐵面議員的影子。只是一個疼痛中的女人在感謝一雙溫暖的手。',
+                   '"...Your hand is warm." She whispers. The iron councilor from daylight is gone. Just a woman in pain, grateful for a warm hand.'),
+            delay: 3200 },
+          { tag: '感知', tagColor: 'tag-sense',
+            text: L('你們就這樣坐在黑暗的辦公室裡，很久。燭光在石化的手指上閃爍。',
+                   'The two of you sit like that in the dark office for a long time. Candlelight flickers on petrified fingers.'),
+            delay: 3000 },
+          { tag: '效果', tagColor: 'tag-system',
+            text: L('銅鐘好感 ↑↑↑ | 經驗 +10 | HP +15', 'Bronze Bell bond ↑↑↑ | XP +10 | HP +15'),
+            delay: 2000, effect: () => { gainXp(10); changeHp(15); } },
+        ], [
+          { text: '返回', textEn: 'Back', action: () => loadNode('r3_council') },
+        ], { label: L('銅鐘的夜晚', 'Bronze Bell\'s night') });
+      }},
+    { text: '默默陪著她', textEn: 'Stay silently beside her',
+      action: () => {
+        autoExplore([
+          { tag: '感知', tagColor: 'tag-sense',
+            text: L('你沒有說話。只是坐到她旁邊，靠著牆壁。痛苦的時候，有時候沉默比安慰更有用。',
+                   'You say nothing. Just sit beside her, leaning against the wall. In pain, sometimes silence is more useful than comfort.'),
+            delay: 3000 },
+          { tag: '對話', tagColor: 'tag-npc',
+            text: L('過了很久，銅鐘輕聲說了一句：「……謝謝你沒走。」',
+                   'After a long while, Bronze Bell murmurs: "...Thank you for not leaving."'),
+            delay: 2800 },
+          { tag: '效果', tagColor: 'tag-system',
+            text: L('銅鐘好感 ↑↑ | 經驗 +8', 'Bronze Bell bond ↑↑ | XP +8'),
+            delay: 1500, effect: () => gainXp(8) },
+        ], [
+          { text: '返回', textEn: 'Back', action: () => loadNode('r3_council') },
+        ], { label: L('銅鐘的夜晚', 'Bronze Bell\'s night') });
+      }},
+  ], { label: L('銅鐘的夜晚', 'Bronze Bell\'s night') });
+});
+
+// --- r3_bell_secret: Bell knows the real reason for lockdown ---
+registerNode('r3_bell_secret', () => {
+  state.flags.r3BellSecret = true;
+  autoExplore([
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('你提到了監工 K 的真名、議會的軍事命令、以及鐵霜的信。銅鐘聽著，表情一點點變了。',
+             'You mention Overseer K\'s real name, the Council\'s military orders, and Iron Frost\'s letter. Bronze Bell listens, her expression shifting slowly.'),
+      delay: 3000 },
+    { tag: '感知', tagColor: 'tag-sense',
+      text: L('她沒有震驚。她的表情是——確認。像是某個一直懷疑的事情，終於得到了證實。',
+             'She doesn\'t look shocked. Her expression is — confirmation. As if something long suspected has finally been verified.'),
+      delay: 2800 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「……我知道。」銅鐘閉上了眼睛。「不是全部，但我知道一些。」',
+             '"...I know." Bronze Bell closes her eyes. "Not everything, but some of it."'),
+      delay: 2800 },
+    { tag: '對話', tagColor: 'tag-npc',
+      html: L('「議會裡有一個派系——以<b>鏽刃</b>為首。他們一直在推動封鎖通道。我以為只是為了安全。」',
+             '"There\'s a faction in the Council — led by <b>Rust Blade</b>. They\'ve been pushing to seal the passages. I assumed it was for safety."'),
+      delay: 3200 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「但半年前我在鏽刃的私人文件裡看到了一份採購清單。」她的聲音壓得很低。',
+             '"But six months ago I saw a procurement list in Rust Blade\'s private files." Her voice drops low.'),
+      delay: 2800 },
+    { tag: '對話', tagColor: 'tag-npc',
+      html: L('「<b>石化結晶</b>——大量的、精煉過的石化結晶。不是用來研究治療的，是用來<b>製造武器</b>的。」',
+             '"<b>Petrification crystals</b> — refined, in massive quantities. Not for researching a cure. For <b>manufacturing weapons</b>."'),
+      delay: 3200 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「封鎖通道的真正目的不是防止瘟疫擴散——是壟斷下層的石化結晶資源。封了通道，就沒人能跟他們搶。」',
+             '"The real purpose of sealing the passages isn\'t to stop plague spread — it\'s to monopolize the lower levels\' petrification crystal resources. Seal the routes, and no one competes."'),
+      delay: 3500 },
+    { tag: '感知', tagColor: 'tag-sense',
+      text: L('銅鐘的眼睛睜開了。琥珀色的瞳孔裡燃燒著某種你從未見過的東西——不是恐懼，是憤怒。',
+             'Bronze Bell\'s eyes open. Something you\'ve never seen before burns in those amber irises — not fear, but fury.'),
+      delay: 2800 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「我一個人的話——查不動。鏽刃在議會裡的勢力太大了。」她看著你。「但現在……有你的證據，有老周的證詞，有鐵霜的信——也許夠了。」',
+             '"Alone — I can\'t investigate. Rust Blade\'s influence in the Council is too strong." She looks at you. "But now... with your evidence, Zhou\'s testimony, Frost\'s letter — maybe it\'s enough."'),
+      delay: 3500 },
+    { tag: '效果', tagColor: 'tag-system',
+      text: L('經驗 +12', 'XP +12'),
+      delay: 1500, effect: () => gainXp(12) },
+  ], [
+    { text: '我們一起揭露真相', textEn: 'Let\'s expose the truth together', action: () => loadNode('r3_bell') },
+    { text: '返回', textEn: 'Back', action: () => loadNode('r3_council') },
+  ], { label: L('銅鐘的秘密', 'Bronze Bell\'s secret') });
+});
+
+// --- r3_bell_alliance_deep: Bell shows all her cards ---
+registerNode('r3_bell_alliance_deep', () => {
+  state.flags.r3BellAllianceDeep = true;
+  autoExplore([
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('銅鐘把辦公室的門鎖上了。她走到桌旁，從一個暗格裡取出一疊文件。',
+             'Bronze Bell locks the office door. She walks to her desk and retrieves a stack of documents from a hidden compartment.'),
+      delay: 2800 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「這些是我這半年偷偷收集的。」她把文件攤在桌上。「鏽刃的私人信件、結晶交易記錄、議會內部的表決分析——」',
+             '"These are what I\'ve secretly gathered over six months." She spreads the files across the desk. "Rust Blade\'s private letters, crystal trade records, Council vote analyses —"'),
+      delay: 3500 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「全部。我的底牌。現在給你看。」銅鐘直視你的眼睛。她的目光裡沒有了考驗，沒有了保留。只有信任。',
+             '"Everything. My hand of cards. Showing it to you now." Bronze Bell meets your eyes directly. No more testing, no more holding back. Only trust.'),
+      delay: 3200 },
+    { art: `<pre class="ascii-art">
+  ╔═════════════════════════════════╗
+  ║   銅鐘的秘密檔案                ║
+  ╠═════════════════════════════════╣
+  ║                                 ║
+  ║  ┌───────┐ ┌───────┐           ║
+  ║  │鏽刃信件│ │結晶帳目│          ║
+  ║  └───┬───┘ └───┬───┘           ║
+  ║  ┌───┴───┐ ┌───┴───┐           ║
+  ║  │表決紀錄│ │軍事訂單│          ║
+  ║  └───┬───┘ └───┬───┘           ║
+  ║  ┌───┴─────────┴───┐           ║
+  ║  │ 議會腐敗的完整證據 │         ║
+  ║  └─────────────────┘           ║
+  ║                                 ║
+  ║    ·˚· 她的全部底牌 ·˚·        ║
+  ╚═════════════════════════════════╝
+</pre>`, artEn: `<pre class="ascii-art">
+  ╔═════════════════════════════════╗
+  ║   BELL'S SECRET DOSSIER        ║
+  ╠═════════════════════════════════╣
+  ║                                 ║
+  ║  ┌────────┐ ┌────────┐         ║
+  ║  │Rust Blade│ │Crystal  │       ║
+  ║  │ Letters  │ │Ledgers  │       ║
+  ║  └────┬───┘ └────┬───┘         ║
+  ║  ┌────┴───┐ ┌────┴───┐         ║
+  ║  │  Vote   │ │Military │        ║
+  ║  │Records  │ │ Orders  │        ║
+  ║  └────┬───┘ └────┬───┘         ║
+  ║  ┌────┴──────────┴────┐        ║
+  ║  │ Complete corruption │        ║
+  ║  │      evidence       │        ║
+  ║  └────────────────────┘        ║
+  ║                                 ║
+  ║    ·˚· All her cards ·˚·       ║
+  ╚═════════════════════════════════╝
+</pre>`, delay: 800 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「我一個人能做的到此為止了。」她的聲音很輕，但很穩。「鏽刃在議會有三票。我只有一票。加上你帶來的證據——也許能翻盤。」',
+             '"This is as far as I can go alone." Her voice is quiet but steady. "Rust Blade has three votes. I have one. With the evidence you\'ve brought — maybe we can turn it around."'),
+      delay: 3500 },
+    { tag: '對話', tagColor: 'tag-npc',
+      html: L('「但如果失敗了——」銅鐘頓了頓。「我會被議會開除，或者更糟。鏽刃不會放過知道真相的人。」',
+             '"But if we fail —" Bronze Bell pauses. "I\'ll be expelled from the Council, or worse. Rust Blade doesn\'t forgive those who know the truth."'),
+      delay: 3200 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('她伸出左手——完好的那隻，不是石化的那隻。掌心向上。',
+             'She extends her left hand — the unpetrified one. Palm up.'),
+      delay: 2500 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「一起？」她問。只有一個字。但你從她的眼睛裡看到了你見過的最真誠的表情。',
+             '"Together?" she asks. A single word. But in her eyes you see the most sincere expression you\'ve ever witnessed from her.'),
+      delay: 3000 },
+  ], [
+    { text: '握住她的手', textEn: 'Take her hand',
+      action: () => {
+        autoExplore([
+          { tag: '感知', tagColor: 'tag-sense',
+            text: L('你握住了銅鐘的手。她的手指收緊了——用力，但不疼。像是在握住一個承諾。',
+                   'You take Bronze Bell\'s hand. Her fingers tighten — firmly, but not painfully. As if holding onto a promise.'),
+            delay: 3000 },
+          { tag: '對話', tagColor: 'tag-npc',
+            text: L('「……好。」她的嘴角勾起了一個弧度——不是白天那種精心計算的微笑。是真的。「那就一起把這個爛攤子收拾乾淨。」',
+                   '"...Good." Her lips curve — not the calculated daytime smile. A real one. "Then let\'s clean up this mess together."'),
+            delay: 3200 },
+          { tag: '效果', tagColor: 'tag-system',
+            text: L('銅鐘好感 MAX | 獲得「銅鐘的秘密檔案」| 經驗 +15 | 意志 +2', 'Bronze Bell bond MAX | Acquired "Bell\'s Secret Dossier" | XP +15 | WIL +2'),
+            delay: 2000, effect: () => {
+              addItem(L('銅鐘的秘密檔案', 'Bell\'s Secret Dossier'));
+              gainXp(15);
+              changeStat('wil', 2);
+            }},
+          { tag: '系統', tagColor: 'tag-system',
+            text: L('（銅鐘的檔案將在議會投票中起決定性作用）', '(Bell\'s dossier will play a decisive role in the Council vote)'),
+            delay: 2000 },
+        ], [
+          { text: '返回', textEn: 'Back', action: () => loadNode('r3_council') },
+        ], { label: L('深度同盟', 'Deep alliance') });
+      }},
+  ], { label: L('銅鐘的底牌', 'Bronze Bell\'s cards') });
 });
 
 // ═══════════════════════════════════════════════════
@@ -2025,6 +2296,7 @@ registerNode('r3_vote', () => {
   if (state.flags.r3ZhouMet) score += 1;
   if (state.flags.r3ZhouTestimony) score += 2; // Zhou's testimony exposes Council's role in plague
   if (state.flags.r2FrostLetterCarried) score += 1; // Iron Frost's letter reveals camp survivors + Seventh Division truth
+  if (state.flags.r3BellAllianceDeep) score += 3; // Bell's dossier exposes Council corruption — decisive evidence
   if (state.flags.r3YingRealReport) score += 3; // Ying's true report — powerful evidence
   if (state.flags.r3CraneDealDone) score += 2; // Grey Crane's supply donation proves trade value
   if (state.flags.ngPlus) score += 2; // NG+ past-life testimony bonus
