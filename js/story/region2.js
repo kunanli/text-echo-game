@@ -152,6 +152,24 @@ registerNode('r2_look', () => {
     if (state.flags.r2YingArrived) {
       c.push({ text: '找螢', textEn: 'Find Ying', action: () => loadNode('r2_ying_talk') });
     }
+    if (!state.flags.r2ElevatorDone) {
+      c.push({ text: '調查廢棄升降機', textEn: 'Investigate the abandoned elevator', action: () => loadNode('r2_elevator') });
+    }
+    if (!state.flags.r2LabDone) {
+      c.push({ text: '搜索石化實驗室', textEn: 'Search the petrification lab', action: () => loadNode('r2_laboratory') });
+    }
+    if (!state.flags.r2GardenDone) {
+      c.push({ text: '前往地底花園', textEn: 'Visit the underground garden', action: () => loadNode('r2_garden') });
+    }
+    if (!state.flags.r2ArenaDone) {
+      c.push({ text: '探索角鬥場遺跡', textEn: 'Explore the gladiator ruins', action: () => loadNode('r2_arena') });
+    }
+    if (!state.flags.r2WaterfallDone) {
+      c.push({ text: '前往地下瀑布', textEn: 'Go to the underground waterfall', action: () => loadNode('r2_waterfall') });
+    }
+    if (!state.flags.r2MuralWarDone) {
+      c.push({ text: '查看戰爭壁畫', textEn: 'Examine the war mural', action: () => loadNode('r2_mural_war') });
+    }
     c.push({ text: '巡邏採石場', textEn: 'Patrol the quarry', action: () => loadNode('r2_patrol') });
     c.push({ text: '返回石脈迴廊', textEn: 'Return to Vein Corridor', action: () => loadNode('r1_deep') });
     return c;

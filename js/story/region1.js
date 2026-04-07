@@ -134,6 +134,24 @@ registerNode('r1_look', () => {
     if (state.flags.r1ForgeVisited && state.flags.r1GuardDefeated) {
       c.push({ text: '沿鐵軌深入迴廊', textEn: 'Follow the rails deeper', action: () => loadNode('r1_deep') });
     }
+    if (!state.flags.r1MinecartDone) {
+      c.push({ text: '查看廢棄礦車軌道', textEn: 'Check the abandoned mine cart track', action: () => loadNode('r1_minecart') });
+    }
+    if (!state.flags.r1RiverDone) {
+      c.push({ text: '循水聲探索地下河', textEn: 'Follow the sound of water to an underground river', action: () => loadNode('r1_underground_river') });
+    }
+    if (!state.flags.r1CollapseDone) {
+      c.push({ text: '冒險穿越坍塌區域', textEn: 'Risk passage through the collapsed area', action: () => loadNode('r1_collapse') });
+    }
+    if (!state.flags.r1ShrineDone) {
+      c.push({ text: '前往礦工祠堂', textEn: 'Visit the miner\'s shrine', action: () => loadNode('r1_shrine') });
+    }
+    if (!state.flags.r1VeinDeepDone) {
+      c.push({ text: '深入高密度結晶區', textEn: 'Venture into the dense crystal vein', action: () => loadNode('r1_vein_deep') });
+    }
+    if (!state.flags.r1GhostDone) {
+      c.push({ text: '靠近那個半透明的身影', textEn: 'Approach the translucent figure', action: () => loadNode('r1_ghost') });
+    }
     c.push({ text: '在迴廊中巡邏練級', textEn: 'Patrol the corridor for experience', action: () => loadNode('r1_patrol') });
     return c;
   })(), { label: L('觀察迴廊', 'Surveying corridor') });

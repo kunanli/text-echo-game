@@ -248,6 +248,22 @@ registerNode('r0_look', () => {
     }
     c.push({ text: '查看北面攀爬痕跡', textEn: 'Check the climbing marks to the north', action: () => loadNode('r0_climb_check') });
     c.push({ text: '探索南面裂縫', textEn: 'Explore the southern crack', action: () => loadNode('r0_crack') });
+    // Extra exploration nodes
+    if (!state.flags.r0PoolExplored) {
+      c.push({ text: '坑底積水處閃爍著微光……', textEn: 'Something glimmers in the pool at the pit\'s bottom...', action: () => loadNode('r0_pool') });
+    }
+    if (!state.flags.r0EchoDone) {
+      c.push({ text: '東側洞壁傳來迴音', textEn: 'Echoes from the eastern wall', action: () => loadNode('r0_echo') });
+    }
+    if (!state.flags.r0BonesSearched) {
+      c.push({ text: '角落的骨堆裡似乎有東西', textEn: 'Something in the bone pile', action: () => loadNode('r0_bones') });
+    }
+    if (!state.flags.r0AltarUsed) {
+      c.push({ text: '調查破損的祭壇', textEn: 'Investigate the broken altar', action: () => loadNode('r0_altar') });
+    }
+    if (!state.flags.r0MuralSeen) {
+      c.push({ text: '岩壁上似乎刻著什麼圖案', textEn: 'Patterns carved into the rock wall', action: () => loadNode('r0_mural') });
+    }
     // Ferryman route — always visible, but blocked if no ending achieved
     c.push({ text: '◇ 走向深處傳來的低語……', textEn: '◇ Follow the whispers from below...', action: () => loadNode('r0_ferryman_gate') });
     return c;
@@ -1711,4 +1727,358 @@ registerNode('r0_path', () => {
     { text: '先仔細觀察環境再說', textEn: 'Survey the area first', action: () => loadNode('r0_look') },
     { text: '不管了，直接爬', textEn: 'Forget it, just climb', action: () => loadNode('r0_climb_str') },
   ], { label: L('尋找出路', 'Finding exit') });
+});
+
+// ═══════════════════════════════════════════
+// r0_pool — 積水池探索
+// ═══════════════════════════════════════════
+registerNode('r0_pool', function() {
+  state.flags.r0PoolExplored = true;
+  autoExplore([
+    { tag: '探索', tagColor: 'tag-explore',
+      art: `<pre class="ascii-art">
+        ～～～～～～～～～～～～～
+      ～～  ○    ～～   ○  ～～
+    ～～  ～～  ○  ～～  ～～  ～～
+    ║  ～～～～～～～～～～～～～  ║
+    ║    ○  ～～～～～  ○       ║
+    ║  ～～～～～～～～～～～～～  ║
+    ║░░░░░░░░░░░░░░░░░░░░░░░░░║
+    ╚═════════════════════════╝
+</pre>`, artEn: `<pre class="ascii-art">
+        ～～～～～～～～～～～～～
+      ～～  ○    ～～   ○  ～～
+    ～～  ～～  ○  ～～  ～～  ～～
+    ║  ～～～～～～～～～～～～～  ║
+    ║    ○  ～～～～～  ○       ║
+    ║  ～～～～～～～～～～～～～  ║
+    ║░░░░░░░░░░░░░░░░░░░░░░░░░║
+    ╚═════════════════════════╝
+</pre>`,
+      text: '坑底的角落裡積了一灘混濁的水，水面偶爾泛起微弱的漣漪——彷彿底下有什麼東西。',
+      textEn: 'A murky pool has collected in the corner of the pit. Faint ripples occasionally disturb its surface — as if something lurks beneath.',
+      delay: 2800 },
+    { tag: '環境', tagColor: 'tag-sense',
+      text: '你蹲下來仔細觀察。水底隱約閃著暗金色的光芒，像是有古老的祭品沉在下面。',
+      textEn: 'You crouch down for a closer look. A faint golden glimmer shines from the depths — perhaps ancient offerings lie submerged.',
+      delay: 2500 },
+  ], [
+    { text: L('潛入水底 [STR DC6]（成功率' + checkRate('str', 6) + '）', 'Dive deep [STR DC6] (rate ' + checkRate('str', 6) + ')'),
+      textEn: 'Dive deep [STR DC6] (rate ' + checkRate('str', 6) + ')',
+      action: function() {
+        var result = statCheck('str', 6);
+        if (result !== 'fail') {
+          autoExplore([
+            { tag: '檢定', tagColor: 'tag-system',
+              text: L('成功！你屏住呼吸潛入水底，手指觸碰到了冰冷的金屬。', 'Success! You hold your breath and dive, fingers touching cold metal.'),
+              delay: 1500, effect: function() { sfx.pass(); } },
+            { tag: '獲得', tagColor: 'tag-info',
+              text: '你從淤泥中撈出一枚古老的金幣和一瓶密封完好的藥水。',
+              textEn: 'You pull an ancient gold coin and a sealed potion from the silt.',
+              delay: 2200, effect: function() { addItem(L('金幣', 'Gold Coin')); addItem(L('HP 藥水', 'HP Potion')); sfx.item(); } },
+          ], [
+            { text: '返回', textEn: 'Return', action: function() { loadNode('r0_look'); } },
+          ], { label: L('積水池', 'Pool') });
+        } else {
+          autoExplore([
+            { tag: '檢定', tagColor: 'tag-warn',
+              text: L('失敗……你嗆了一口髒水，胃裡翻江倒海。', 'Failed... You swallow a mouthful of dirty water and retch.'),
+              delay: 1500, effect: function() { sfx.fail(); changeHp(-5); } },
+          ], [
+            { text: '返回', textEn: 'Return', action: function() { loadNode('r0_look'); } },
+          ], { label: L('積水池', 'Pool') });
+        }
+      }
+    },
+    { text: '算了，不值得冒險', textEn: 'Not worth the risk', action: function() { loadNode('r0_look'); } },
+  ], { label: L('積水池', 'Pool') });
+});
+
+// ═══════════════════════════════════════════
+// r0_echo — 迴音走廊
+// ═══════════════════════════════════════════
+registerNode('r0_echo', function() {
+  state.flags.r0EchoDone = true;
+  autoExplore([
+    { tag: '探索', tagColor: 'tag-explore',
+      art: `<pre class="ascii-art">
+    ║                           ║
+    ║   )))  )))  )))  )))      ║
+    ║  ·                   ·    ║
+    ╠═══╗                 ╔═══╣
+    ║   ║  ))) ～ ))) ～  ║   ║
+    ║   ║    ～ ))) ～    ║   ║
+    ║   ║  ))) ～ ))) ～  ║   ║
+    ╠═══╝                 ╚═══╣
+    ║   )))  )))  )))  )))      ║
+    ║  ·                   ·    ║
+    ╚═══════════════════════════╝
+</pre>`, artEn: `<pre class="ascii-art">
+    ║                           ║
+    ║   )))  )))  )))  )))      ║
+    ║  ·                   ·    ║
+    ╠═══╗                 ╔═══╣
+    ║   ║  ))) ～ ))) ～  ║   ║
+    ║   ║    ～ ))) ～    ║   ║
+    ║   ║  ))) ～ ))) ～  ║   ║
+    ╠═══╝                 ╚═══╣
+    ║   )))  )))  )))  )))      ║
+    ║  ·                   ·    ║
+    ╚═══════════════════════════╝
+</pre>`,
+      text: '東面岩壁上有一條狹窄的裂隙，走近時你聽到奇異的回聲——像是無數人在低語。',
+      textEn: 'A narrow fissure splits the eastern wall. As you approach, strange echoes reach you — like countless voices whispering.',
+      delay: 2800 },
+    { tag: '感知', tagColor: 'tag-sense',
+      text: '那些聲音越來越清晰——是過去祭獻者的呢喃，痛苦、懇求、絕望交織在一起。',
+      textEn: 'The voices grow clearer — murmurs of past sacrificial victims, woven with pain, pleas, and despair.',
+      delay: 3000 },
+    { tag: '警告', tagColor: 'tag-warn',
+      text: '低語像潮水般湧入你的腦海，你必須集中意志才能抵抗它們的侵蝕。',
+      textEn: 'The whispers flood into your mind like a tide. You must focus your will to resist their erosion.',
+      delay: 2500 },
+  ], [
+    { text: L('集中精神抵抗 [WIL DC6]（成功率' + checkRate('wil', 6) + '）', 'Focus and resist [WIL DC6] (rate ' + checkRate('wil', 6) + ')'),
+      textEn: 'Focus and resist [WIL DC6] (rate ' + checkRate('wil', 6) + ')',
+      action: function() {
+        var result = statCheck('wil', 6);
+        if (result !== 'fail') {
+          autoExplore([
+            { tag: '檢定', tagColor: 'tag-system',
+              text: L('成功！你閉上雙眼，將低語擋在意識之外。那些聲音漸漸消散。', 'Success! You close your eyes and shut the whispers out. They fade away.'),
+              delay: 1800, effect: function() { sfx.pass(); changeStat('wil', 1); } },
+            { tag: '成長', tagColor: 'tag-info',
+              text: '抵抗亡者的意志讓你的精神變得更加堅韌。（WIL+1）',
+              textEn: 'Resisting the will of the dead tempers your spirit. (WIL+1)',
+              delay: 2200 },
+          ], [
+            { text: '返回', textEn: 'Return', action: function() { loadNode('r0_look'); } },
+          ], { label: L('迴音走廊', 'Echo Corridor') });
+        } else {
+          autoExplore([
+            { tag: '檢定', tagColor: 'tag-warn',
+              text: L('失敗……恐懼攫住了你，石化的刺痛在皮膚上蔓延。', 'Failed... Fear grips you, and petrification stings across your skin.'),
+              delay: 1800, effect: function() { sfx.fail(); changePetri(3); } },
+            { tag: '警告', tagColor: 'tag-petri',
+              text: '你跌跌撞撞地退出裂隙，心臟還在狂跳。（石化+3）',
+              textEn: 'You stumble out of the fissure, heart still pounding. (Petri+3)',
+              delay: 2200 },
+          ], [
+            { text: '返回', textEn: 'Return', action: function() { loadNode('r0_look'); } },
+          ], { label: L('迴音走廊', 'Echo Corridor') });
+        }
+      }
+    },
+    { text: '不去理會那些聲音', textEn: 'Ignore the voices', action: function() { loadNode('r0_look'); } },
+  ], { label: L('迴音走廊', 'Echo Corridor') });
+});
+
+// ═══════════════════════════════════════════
+// r0_bones — 骨堆日記
+// ═══════════════════════════════════════════
+registerNode('r0_bones', function() {
+  state.flags.r0BonesSearched = true;
+  autoExplore([
+    { tag: '探索', tagColor: 'tag-explore',
+      art: `<pre class="ascii-art">
+      ·   ·   ✦   ·   ·
+    ╱╱╲  ╱╱╲  ╱╱╲  ╱╱╲
+   ☠  ╲╱╱  ╲╱╱  ╲╱╱  ☠
+   ║ ⚬ ⚬ ⚬ ⚬ ⚬ ⚬ ⚬ ⚬ ║
+   ║  ╱══╗ ☠ ╱══╗  ☠  ║
+   ║ ║▓▓▓║  ║▓▓▓║     ║
+   ║ ║日記║  ╚══╝  ⚬  ║
+   ║ ╚══╝   ☠   ⚬  ☠ ║
+   ╚═══════════════════╝
+</pre>`, artEn: `<pre class="ascii-art">
+      ·   ·   ✦   ·   ·
+    ╱╱╲  ╱╱╲  ╱╱╲  ╱╱╲
+   ☠  ╲╱╱  ╲╱╱  ╲╱╱  ☠
+   ║ ⚬ ⚬ ⚬ ⚬ ⚬ ⚬ ⚬ ⚬ ║
+   ║  ╱══╗ ☠ ╱══╗  ☠  ║
+   ║ ║▓▓▓║  ║▓▓▓║     ║
+   ║ ║DIARY  ╚══╝  ⚬  ║
+   ║ ╚══╝   ☠   ⚬  ☠ ║
+   ╚═══════════════════╝
+</pre>`,
+      text: '你在堆積如山的白骨之間翻找，指尖碰到了一本半腐爛的皮革日記。',
+      textEn: 'You dig through the towering bone pile, your fingertips brushing against a half-rotted leather diary.',
+      delay: 2800 },
+    { tag: '發現', tagColor: 'tag-info',
+      text: '日記的主人是第一批感染者之一。字跡歪斜地記載了早期症狀：指尖發灰、關節僵硬、皮膚出現結晶紋路……',
+      textEn: 'The diary belonged to one of the first infected. Shaky handwriting records early symptoms: greying fingertips, stiff joints, crystalline patterns on the skin...',
+      delay: 3200 },
+    { tag: '線索', tagColor: 'tag-sense',
+      text: '最後幾頁反覆出現一個名字——「守護者K」。日記寫道：「K說封印會保護我們，但他在說謊。」',
+      textEn: 'The last few pages repeat a name — "Guardian K". The diary reads: "K said the seal would protect us, but he was lying."',
+      delay: 3500, effect: function() { state.flags.r0DiaryFound = true; gainXp(5); sfx.item(); } },
+    { tag: '經驗', tagColor: 'tag-system',
+      text: '這份記錄或許能派上用場。（XP+5）',
+      textEn: 'This record may prove useful. (XP+5)',
+      delay: 1500 },
+  ], [
+    { text: '返回', textEn: 'Return', action: function() { loadNode('r0_look'); } },
+  ], { label: L('骨堆搜索', 'Bone Pile Search') });
+});
+
+// ═══════════════════════════════════════════
+// r0_altar — 破損祭壇
+// ═══════════════════════════════════════════
+registerNode('r0_altar', function() {
+  state.flags.r0AltarUsed = true;
+  autoExplore([
+    { tag: '探索', tagColor: 'tag-explore',
+      art: `<pre class="ascii-art">
+          ✦         ✦
+      ·       ✦       ·
+    ╔═══════════════════╗
+    ║   ╱▓▓▓▓▓▓▓╲     ║
+    ║  ╱▓▓╱══╲▓▓▓╲    ║
+    ║ ║▓▓║ ◇◇ ║▓▓▓║   ║
+    ║ ║▓▓║ ◇◇ ║▓▓▓║   ║
+    ║  ╲▓▓╲══╱▓▓▓╱    ║
+    ║   ╲▓▓▓▓▓▓▓╱     ║
+    ╠═══╧═══════╧═════╣
+    ║ ░░ ·  ░░ · ░░   ║
+    ╚═══════════════════╝
+</pre>`, artEn: `<pre class="ascii-art">
+          ✦         ✦
+      ·       ✦       ·
+    ╔═══════════════════╗
+    ║   ╱▓▓▓▓▓▓▓╲     ║
+    ║  ╱▓▓╱══╲▓▓▓╲    ║
+    ║ ║▓▓║ ◇◇ ║▓▓▓║   ║
+    ║ ║▓▓║ ◇◇ ║▓▓▓║   ║
+    ║  ╲▓▓╲══╱▓▓▓╱    ║
+    ║   ╲▓▓▓▓▓▓▓╱     ║
+    ╠═══╧═══════╧═════╣
+    ║ ░░ ·  ░░ · ░░   ║
+    ╚═══════════════════╝
+</pre>`,
+      text: '一座古老的祭壇半埋在碎石中，上方嵌著一顆裂開的石化結晶，仍散發著微弱的能量脈動。',
+      textEn: 'An ancient altar lies half-buried in rubble. A cracked petrification crystal sits atop it, still pulsing with faint energy.',
+      delay: 3000 },
+    { tag: '判斷', tagColor: 'tag-info',
+      text: '你可以嘗試砸碎結晶釋放殘餘能量，或者靜心冥想試圖引導它。',
+      textEn: 'You could try smashing the crystal to release its residual energy, or meditate to channel it.',
+      delay: 2500 },
+  ], [
+    { text: L('砸碎結晶 [STR DC7]（成功率' + checkRate('str', 7) + '）', 'Smash the crystal [STR DC7] (rate ' + checkRate('str', 7) + ')'),
+      textEn: 'Smash the crystal [STR DC7] (rate ' + checkRate('str', 7) + ')',
+      action: function() {
+        var result = statCheck('str', 7);
+        if (result !== 'fail') {
+          autoExplore([
+            { tag: '檢定', tagColor: 'tag-system',
+              text: L('成功！結晶在你的重擊下碎裂，溫暖的能量湧入你的身體。', 'Success! The crystal shatters under your blow, warm energy flooding into you.'),
+              delay: 1800, effect: function() { sfx.pass(); changePetri(-5); changeHp(10); } },
+            { tag: '效果', tagColor: 'tag-info',
+              text: '石化感減退，身體也恢復了一些活力。（石化-5，HP+10）',
+              textEn: 'The petrification recedes and vitality returns. (Petri-5, HP+10)',
+              delay: 2200 },
+          ], [
+            { text: '返回', textEn: 'Return', action: function() { loadNode('r0_look'); } },
+          ], { label: L('破損祭壇', 'Broken Altar') });
+        } else {
+          autoExplore([
+            { tag: '檢定', tagColor: 'tag-warn',
+              text: L('失敗……結晶沒碎，反而爆出一陣石化粉塵！', 'Failed... The crystal holds, and a burst of petri-dust erupts!'),
+              delay: 1800, effect: function() { sfx.fail(); changePetri(3); } },
+            { tag: '警告', tagColor: 'tag-petri',
+              text: '粉塵沾上了你的皮膚，刺痛蔓延開來。（石化+3）',
+              textEn: 'The dust coats your skin, stinging as it spreads. (Petri+3)',
+              delay: 2200 },
+          ], [
+            { text: '返回', textEn: 'Return', action: function() { loadNode('r0_look'); } },
+          ], { label: L('破損祭壇', 'Broken Altar') });
+        }
+      }
+    },
+    { text: L('靜心冥想 [WIL DC7]（成功率' + checkRate('wil', 7) + '）', 'Meditate [WIL DC7] (rate ' + checkRate('wil', 7) + ')'),
+      textEn: 'Meditate [WIL DC7] (rate ' + checkRate('wil', 7) + ')',
+      action: function() {
+        var result = statCheck('wil', 7);
+        if (result !== 'fail') {
+          autoExplore([
+            { tag: '檢定', tagColor: 'tag-system',
+              text: L('成功！你將意識沉入結晶的脈動中，感受到古老的淨化之力。', 'Success! You sink your consciousness into the crystal\'s pulse and feel an ancient purifying force.'),
+              delay: 1800, effect: function() { sfx.pass(); changePetri(-8); changeStat('wil', 1); } },
+            { tag: '成長', tagColor: 'tag-info',
+              text: '石化能量被引導排出體外，你的意志也因此更加堅定。（石化-8，WIL+1）',
+              textEn: 'Petrification energy is channeled out of your body, and your will hardens. (Petri-8, WIL+1)',
+              delay: 2500 },
+          ], [
+            { text: '返回', textEn: 'Return', action: function() { loadNode('r0_look'); } },
+          ], { label: L('破損祭壇', 'Broken Altar') });
+        } else {
+          autoExplore([
+            { tag: '檢定', tagColor: 'tag-warn',
+              text: L('失敗……你無法控制結晶的能量，它反噬了你。', 'Failed... You cannot control the crystal\'s energy, and it lashes back.'),
+              delay: 1800, effect: function() { sfx.fail(); changePetri(5); } },
+            { tag: '警告', tagColor: 'tag-petri',
+              text: '石化感猛烈地侵蝕你的四肢。（石化+5）',
+              textEn: 'Petrification surges violently through your limbs. (Petri+5)',
+              delay: 2200 },
+          ], [
+            { text: '返回', textEn: 'Return', action: function() { loadNode('r0_look'); } },
+          ], { label: L('破損祭壇', 'Broken Altar') });
+        }
+      }
+    },
+    { text: '不碰祭壇', textEn: 'Leave the altar alone', action: function() { loadNode('r0_look'); } },
+  ], { label: L('破損祭壇', 'Broken Altar') });
+});
+
+// ═══════════════════════════════════════════
+// r0_mural — 壁畫牆
+// ═══════════════════════════════════════════
+registerNode('r0_mural', function() {
+  state.flags.r0MuralSeen = true;
+  autoExplore([
+    { tag: '探索', tagColor: 'tag-explore',
+      art: `<pre class="ascii-art">
+    ╔═══════╦═══════╦═══════╗
+    ║ ☀  ♦  ║ ◇◇◇  ║ ░░░░ ║
+    ║♦  ☀ ♦ ║◇ ⚗ ◇ ║░ ☠ ░ ║
+    ║ ♦ ♦ ♦ ║ ◇◇◇  ║░░░░░ ║
+    ║ 繁  榮 ║ 實  驗 ║ 瘟  疫 ║
+    ╠═══════╬═══════╬═══════╣
+    ║ ·  ·  ║  · ·  ║ · ·  ║
+    ║ 人 人  ║ 人◇人 ║ ░人░ ║
+    ║ 人 人  ║ ◇◇◇  ║░░░░░ ║
+    ╚═══════╩═══════╩═══════╝
+</pre>`, artEn: `<pre class="ascii-art">
+    ╔═══════╦═══════╦═══════╗
+    ║ ☀  ♦  ║ ◇◇◇  ║ ░░░░ ║
+    ║♦  ☀ ♦ ║◇ ⚗ ◇ ║░ ☠ ░ ║
+    ║ ♦ ♦ ♦ ║ ◇◇◇  ║░░░░░ ║
+    ║PROSPER ║EXPRMNT║PLAGUE ║
+    ╠═══════╬═══════╬═══════╣
+    ║ ·  ·  ║  · ·  ║ · ·  ║
+    ║ ♦  ♦  ║ ♦◇♦  ║ ░♦░  ║
+    ║ ♦  ♦  ║ ◇◇◇  ║░░░░░ ║
+    ╚═══════╩═══════╩═══════╝
+</pre>`,
+      text: '牆壁上刻著三幅巨大的浮雕壁畫，從左到右講述了一個文明的興衰。',
+      textEn: 'Three massive carved reliefs span the wall, telling the rise and fall of a civilization from left to right.',
+      delay: 3000 },
+    { tag: '壁畫', tagColor: 'tag-sense',
+      text: '第一幅：繁榮——高塔林立，人們在陽光下歡笑。地底的結晶為城市提供無盡的能量。',
+      textEn: 'Panel one: Prosperity — tall towers rise, people laugh in the sunlight. Underground crystals provide the city with boundless energy.',
+      delay: 3200 },
+    { tag: '壁畫', tagColor: 'tag-sense',
+      text: '第二幅：實驗——穿長袍的學者圍繞著巨大的結晶裝置。他們在嘗試用石化能量改造人體。',
+      textEn: 'Panel two: Experiments — robed scholars surround an enormous crystal apparatus. They attempt to reshape the human body with petrification energy.',
+      delay: 3500 },
+    { tag: '壁畫', tagColor: 'tag-warn',
+      text: '第三幅：瘟疫——結晶失控，石化從裝置中心爆發。人們一個接一個變成石像，城市化為廢墟。',
+      textEn: 'Panel three: Plague — the crystals spiral out of control, petrification erupts from the apparatus. People turn to stone one by one, the city crumbles to ruins.',
+      delay: 3500 },
+    { tag: '領悟', tagColor: 'tag-info',
+      text: '石化瘟疫不是天災——而是古代文明的傲慢所釀成的災難。這段歷史不該被遺忘。（XP+8）',
+      textEn: 'The petrification plague was no natural disaster — it was born of an ancient civilization\'s hubris. This history must not be forgotten. (XP+8)',
+      delay: 3000, effect: function() { gainXp(8); } },
+  ], [
+    { text: '返回', textEn: 'Return', action: function() { loadNode('r0_look'); } },
+  ], { label: L('壁畫牆', 'Wall Mural') });
 });

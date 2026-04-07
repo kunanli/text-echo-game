@@ -145,6 +145,24 @@ registerNode('r3_look', () => {
     if (state.flags.r3BellQuest && !state.flags.r3Ending) {
       c.push({ text: '回報銅鐘（任務進度）', textEn: 'Report to Bronze Bell (quest progress)', action: () => loadNode('r3_quest_check') });
     }
+    if (!state.flags.r3UndergroundDone) {
+      c.push({ text: '地下通道', textEn: 'Underground Tunnels', action: () => loadNode('r3_underground') });
+    }
+    if (!state.flags.r3TempleDone) {
+      c.push({ text: '石化神殿', textEn: 'Petrification Temple', action: () => loadNode('r3_temple') });
+    }
+    if (!state.flags.r3LibraryDone) {
+      c.push({ text: '圖書館', textEn: 'Library', action: () => loadNode('r3_library') });
+    }
+    if (!state.flags.r3SlumDone) {
+      c.push({ text: '下城區', textEn: 'Lower District', action: () => loadNode('r3_slum') });
+    }
+    if (!state.flags.r3GardenDone) {
+      c.push({ text: '議會花園', textEn: 'Council Garden', action: () => loadNode('r3_garden_r3') });
+    }
+    if (!state.flags.r3PrisonDone) {
+      c.push({ text: '河城監獄', textEn: 'City Prison', action: () => loadNode('r3_prison') });
+    }
     c.push({ text: '巡邏（練級）', textEn: 'Patrol (grind)', action: () => loadNode('r3_patrol') });
     c.push({ text: '返回上升通道', textEn: 'Return to ascent shaft', action: () => loadNode('r2_gate') });
     return c;
