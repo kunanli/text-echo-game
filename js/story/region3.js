@@ -697,8 +697,14 @@ registerNode('r3_ying_talk', () => {
         ], { label: L('分工合作', 'Division of labor') });
       }});
     }
-    if (state.flags.r3YingInn && !state.flags.r3YingRiver) {
+    if (state.flags.r3YingInn && state.flags.r2YingPast && !state.flags.r3YingConflict) {
+      c.push({ text: '螢……你的報告寫好了嗎？', textEn: 'Ying... is your report finished?', action: () => loadNode('r3_ying_conflict') });
+    }
+    if (state.flags.r3YingInn && !state.flags.r3YingRiver && (!state.flags.r2YingPast || state.flags.r3YingConflict)) {
       c.push({ text: '螢，要不要去河邊走走？', textEn: 'Ying, want to walk by the river?', action: () => loadNode('r3_ying_river') });
+    }
+    if (state.flags.r3YingRiver && state.flags.r2YingPast && !state.flags.r3YingConfession) {
+      c.push({ text: '螢，有些話我想跟你說', textEn: 'Ying, there\'s something I want to say', action: () => loadNode('r3_ying_confession') });
     }
     c.push({ text: '離開', textEn: 'Leave', action: () => loadNode('r3_look') });
     return c;
@@ -857,6 +863,116 @@ registerNode('r3_ying_river', () => {
       ], { label: L('私密的一頁', 'A Private Page') });
     }},
   ], { label: L('河邊的月光', 'Moonlight by the River') });
+});
+
+// ── Ying: Conflict — her standing vs her report ──
+registerNode('r3_ying_conflict', () => {
+  var isMale = state.sex === 'male';
+  var yP = isMale ? L('她', 'she') : L('他', 'he');
+  var yPC = isMale ? 'She' : 'He';
+  var yPo = isMale ? 'her' : 'his';
+
+  state.flags.r3YingConflict = true;
+  autoExplore([
+    { art: npcPortrait.art('ying', { subtitle: '調查員' }) || npcPortrait.art('ying', { subtitle: '記錄員' }), artEn: npcPortrait.art('ying', { subtitle: 'Investigator' }) || npcPortrait.art('ying', { subtitle: 'Chronicler' }), delay: 800 },
+    { tag: '感知', tagColor: 'tag-sense', text: '螢沒有馬上回答。' + yP + '把手冊翻到最後幾頁——你看見上面寫滿了密密麻麻的字，又劃掉，又重寫。', textEn: 'Ying doesn\'t answer right away. ' + yPC + ' flips to the last few pages — you see dense writing, crossed out, rewritten.', delay: 3000 },
+    { tag: '情報', tagColor: 'tag-info', text: '「寫了……又撕了……又重寫了。」' + yP + '的聲音很疲憊。「三版了。每一版都不對。」', textEn: '"Written... torn up... rewritten." ' + yPC + '\'s voice is exhausted. "Third draft. None of them are right."', delay: 3000 },
+    { tag: '感知', tagColor: 'tag-sense', text: '你看見' + yP + '的眼底有深深的黑眼圈。螢沒有告訴你——' + yP + '已經好幾天沒睡了。', textEn: 'You notice deep circles under ' + yPo + ' eyes. Ying didn\'t tell you — ' + yP + ' hasn\'t slept in days.', delay: 2800 },
+    { tag: '情報', tagColor: 'tag-info', text: '「如果我寫真話——議會裡有人會把我的調查員資格撤掉。我再也不能做記錄員了。」', textEn: '"If I write the truth — someone on the Council will revoke my investigator status. I\'ll never be a chronicler again."', delay: 3500 },
+    { tag: '情報', tagColor: 'tag-info', text: '「但如果我寫假報告——幾千個人會被封死在下面。老周、鐵霜、清露——所有人。」', textEn: '"But if I write a false report — thousands will be sealed underground. Old Zhou, Iron Frost, Dew — everyone."', delay: 3200 },
+    { tag: '感知', tagColor: 'tag-sense', text: yP + '抬頭看你。琥珀色的眼睛裡滿是掙扎——你看到了那個在迴廊裡對你臉紅的人，也看到了那個被任務壓垮的調查員。', textEn: yPC + ' looks up. Amber eyes full of turmoil — you see the person who blushed at you in the corridor, and the investigator crushed under duty.', delay: 3500 },
+    { tag: '情報', tagColor: 'tag-info', text: '「你覺得……我應該怎麼做？」', textEn: '"What do you think... I should do?"', delay: 2200 },
+  ], [
+    { text: '寫真話。不管付出什麼代價', textEn: 'Write the truth. No matter the cost', action: () => {
+      state.flags.r3YingTruth = true;
+      autoExplore([
+        { tag: '感知', tagColor: 'tag-sense', text: '螢看著你，沉默了很長時間。然後——' + yP + '笑了。那種笑你只在石脈迴廊裡見過一次——如釋重負的、破碎的笑。', textEn: 'Ying stares at you for a long silence. Then — ' + yP + ' smiles. The kind of smile you saw only once, in the Vein Corridor — broken, relieved.', delay: 3200 },
+        { tag: '情報', tagColor: 'tag-info', text: '「……我就知道你會這麼說。」' + yP + '低下頭，在手冊上重新寫下了第一行字。', textEn: '"...I knew you\'d say that." ' + yPC + ' bows ' + yPo + ' head and writes the first line of a new page.', delay: 3000 },
+        { tag: '感知', tagColor: 'tag-sense', text: '你看到' + yP + '寫的第一句話：「致議會——以下是下層的真實狀況。」筆跡不再顫抖。', textEn: 'You see the first sentence: "To the Council — the following is the true condition of the lower levels." The handwriting no longer shakes.', delay: 3500 },
+      ], [
+        { text: '繼續', textEn: 'Continue', action: () => {
+          changeStat('wil', 1);
+          notify(L('意志 +1（引導螢走向真相）', 'WIL +1 (Guiding Ying toward truth)'));
+          loadNode('r3_look');
+        }},
+      ], { label: L('真話的代價', 'The cost of truth') });
+    }},
+    { text: '你自己決定。不管你選什麼，我都在', textEn: 'It\'s your choice. Whatever you decide, I\'m here', action: () => {
+      state.flags.r3YingTruth = true;
+      autoExplore([
+        { tag: '感知', tagColor: 'tag-sense', text: yP + '的嘴唇動了一下。你看見' + yP + '的眼眶在泛紅——但這次' + yP + '沒有別過頭去。', textEn: yPC + '\'s lips tremble. You see ' + yPo + ' eyes reddening — but this time ' + yP + ' doesn\'t look away.', delay: 3000 },
+        { tag: '感知', tagColor: 'tag-sense', text: '「……你這個人。」螢用手背擦了擦眼角，聲音帶著鼻音。「說這種話的時候，可不可以不要用那種眼神看我。」', textEn: '"...You." Ying rubs ' + yPo + ' eyes with the back of ' + yPo + ' hand, voice nasally. "When you say things like that, could you not look at me with those eyes."', delay: 3500 },
+        { tag: '感知', tagColor: 'tag-sense', text: yP + '深吸一口氣，翻開手冊。「好吧。那我就做一件讓自己驕傲的事。」', textEn: yPC + ' takes a deep breath and opens the notebook. "Fine. Then I\'ll do something I can be proud of."', delay: 3000 },
+      ], [
+        { text: '繼續', textEn: 'Continue', action: () => {
+          changeHp(10);
+          changePetri(-5);
+          notify(L('HP +10，石化度 -5%（溫柔的堅定）', 'HP +10, Petri -5% (Gentle resolve)'));
+          loadNode('r3_look');
+        }},
+      ], { label: L('溫柔的堅定', 'Gentle resolve') });
+    }},
+  ], { label: L('螢的立場', 'Ying\'s standing') });
+});
+
+// ── Ying: Confession — the full truth at last ──
+registerNode('r3_ying_confession', () => {
+  var isMale = state.sex === 'male';
+  var yP = isMale ? L('她', 'she') : L('他', 'he');
+  var yPC = isMale ? 'She' : 'He';
+  var yPo = isMale ? 'her' : 'his';
+
+  state.flags.r3YingConfession = true;
+  autoExplore([
+    { art: npcPortrait.art('ying', { subtitle: '記錄員' }), artEn: npcPortrait.art('ying', { subtitle: 'Chronicler' }), delay: 800 },
+    { tag: '感知', tagColor: 'tag-sense', text: '螢停下了腳步。' + yP + '把手冊抱在胸前，背對著你。河風吹動' + yP + '的頭髮。', textEn: 'Ying stops walking. ' + yPC + ' holds the notebook to ' + yPo + ' chest, back to you. River wind lifts ' + yPo + ' hair.', delay: 2800 },
+    { tag: '感知', tagColor: 'tag-sense', text: '「有一件事……我一直沒告訴你。」' + yP + '的聲音很小。你聽得出來——' + yP + '在害怕。', textEn: '"There\'s something... I never told you." ' + yPC + '\'s voice is small. You can tell — ' + yP + ' is afraid.', delay: 3000 },
+    { tag: '情報', tagColor: 'tag-info', text: '「在石脈迴廊——我遇見你的那天。那不是偶然。」', textEn: '"In the Vein Corridor — the day I met you. It wasn\'t coincidence."', delay: 2800 },
+    { tag: '情報', tagColor: 'tag-info', text: '「我的任務書上寫著：觀察從祭獻坑上來的倖存者，評估其威脅等級。如果必要——」' + yP + '的聲音顫了一下。「阻止他們到達河城。」', textEn: '"My orders read: observe survivors ascending from the Sacrificial Pit. Assess threat level. If necessary —" ' + yPC + '\'s voice wavers. "Prevent them from reaching River Port."', delay: 4000 },
+    { tag: '感知', tagColor: 'tag-sense', text: '你的血冷了半截。「阻止」——那是什麼意思？', textEn: 'Your blood runs half-cold. "Prevent" — what does that mean?', delay: 2500 },
+    { tag: '情報', tagColor: 'tag-info', text: '螢轉過身來。' + yP + '的眼眶是紅的，但眼神很直接。', textEn: 'Ying turns around. ' + yPC + '\'s eyes are red, but ' + yPo + ' gaze is direct.', delay: 2500 },
+    { tag: '情報', tagColor: 'tag-info', text: '「我原本——應該封鎖你們的通道。把你們困在下面。一個人都不放上來。」', textEn: '"I was supposed to — seal your passage. Trap you below. Not let a single person up."', delay: 3500 },
+    { tag: '感知', tagColor: 'tag-sense', text: '沉默。河水在你們之間流過。你聽見自己的心跳。', textEn: 'Silence. River water flows between you. You hear your own heartbeat.', delay: 2800 },
+    { tag: '情報', tagColor: 'tag-info', text: '「但我沒有。因為——」' + yP + '的聲音碎了。「因為我在石脈迴廊裡遇見了你。你分了食物給我。你讓我睡在你旁邊。你把我當人看。」', textEn: '"But I didn\'t. Because —" ' + yPC + '\'s voice breaks. "Because I met you in the Corridor. You shared food with me. You let me sleep beside you. You treated me like a person."', delay: 4000 },
+    { tag: '感知', tagColor: 'tag-sense', text: yP + '往前走了一步。月光映在' + yP + '濕潤的臉上。', textEn: yPC + ' takes a step forward. Moonlight catches ' + yPo + ' wet face.', delay: 2500 },
+    { tag: '情報', tagColor: 'tag-info', text: '「我是來殺你們的人。而你救了我的命。」' + yP + '的聲音微弱得像是在對自己說。「你有權利恨我。」', textEn: '"I came to kill your people. And you saved my life." ' + yPC + '\'s voice is barely audible, as if speaking to ' + yPo + 'self. "You have every right to hate me."', delay: 3500 },
+  ], [
+    { text: '我不恨你', textEn: 'I don\'t hate you', action: () => loadNode('r3_ying_resolve') },
+    { text: '（沉默。然後伸出手。）', textEn: '(Silence. Then extend your hand.)', action: () => loadNode('r3_ying_resolve') },
+  ], { label: L('螢的告白', 'Ying\'s confession') });
+});
+
+// ── Ying: Resolve — her final choice affects ending score ──
+registerNode('r3_ying_resolve', () => {
+  var isMale = state.sex === 'male';
+  var yP = isMale ? L('她', 'she') : L('他', 'he');
+  var yPC = isMale ? 'She' : 'He';
+  var yPo = isMale ? 'her' : 'his';
+
+  state.flags.r3YingResolve = true;
+  autoExplore([
+    { tag: '感知', tagColor: 'tag-sense', text: '螢看著你。月光下，' + yP + '的表情從恐懼慢慢變成了一種你沒見過的柔軟。', textEn: 'Ying looks at you. Under the moonlight, ' + yPo + ' expression shifts from fear to a softness you\'ve never seen.', delay: 3000 },
+    { tag: '感知', tagColor: 'tag-sense', text: '然後' + yP + '笑了——不是害羞的笑、不是掩飾的笑。是哭過之後，終於放下了什麼的笑。', textEn: 'Then ' + yP + ' smiles — not shy, not deflecting. The smile of someone who, after crying, has finally let something go.', delay: 3200 },
+    { tag: '感知', tagColor: 'tag-sense', text: yP + '走上前，把額頭靠在你的肩膀上。你能感受到' + yP + '的呼吸，溫熱的、微微顫抖的。', textEn: yPC + ' steps forward and rests ' + yPo + ' forehead against your shoulder. You feel ' + yPo + ' breath — warm, faintly trembling.', delay: 3200 },
+    { tag: '情報', tagColor: 'tag-info', text: '「……謝謝你。」' + yP + '的聲音悶在你的衣服裡。「不是因為你原諒我。是因為——你讓我有勇氣做正確的事。」', textEn: '"...Thank you." ' + yPC + '\'s voice is muffled against your clothes. "Not because you forgave me. Because — you gave me the courage to do the right thing."', delay: 3500 },
+    { tag: '感知', tagColor: 'tag-sense', text: '你伸手環住' + yP + '的肩膀。' + yP + '的身體僵了一瞬——然後，慢慢地，放鬆了。', textEn: 'You put your arm around ' + yPo + ' shoulders. ' + yPC + '\'s body tenses for a heartbeat — then, slowly, relaxes.', delay: 3000 },
+    { tag: '感知', tagColor: 'tag-sense', text: '你們就這樣站著。河風吹過，月亮很亮。不知道過了多久。', textEn: 'You stand like that. Wind off the river, the moon bright. You lose track of time.', delay: 3000 },
+    { tag: '情報', tagColor: 'tag-info', text: '螢最終退後一步，用袖子擦了擦臉。' + yP + '的眼睛紅紅的，但裡面有了光。', textEn: 'Ying finally steps back, rubbing ' + yPo + ' face with a sleeve. ' + yPC + '\'s eyes are red, but there\'s light in them.', delay: 2800 },
+    { tag: '情報', tagColor: 'tag-info', html: L('「明天——我會把<b>真實的報告</b>交給銅鐘。不是議會要我寫的那份。是我親眼看到的一切。」', '"Tomorrow — I\'ll deliver the <b>real report</b> to Bronze Bell. Not the one the Council wanted. Everything I\'ve seen with my own eyes."'), delay: 3200 },
+    { tag: '情報', tagColor: 'tag-info', text: yP + '舉起手冊，在月光下讓你看封面。你看到' + yP + '在封面上新添了一行字——', textEn: yPC + ' holds up the notebook in the moonlight for you to see the cover. You notice a new line added —', delay: 2800 },
+    { tag: '情報', tagColor: 'tag-info', html: L('<b>「為了那些在黑暗中堅持活著的人。」</b>', '<b>"For those who persevere in the dark."</b>'), delay: 2500 },
+  ], [
+    { text: '（你什麼也沒說。但你覺得——一切都值得了。）', textEn: '(You say nothing. But you feel — it was all worth it.)', action: () => {
+      sfx.levelUp();
+      changeStat('wil', 2);
+      changeHp(20);
+      changePetri(-10);
+      // This is a major ending score boost — Ying's real report is powerful evidence
+      state.flags.r3YingRealReport = true;
+      notify(L('意志 +2，HP +20，石化度 -10%（螢的決心）', 'WIL +2, HP +20, Petri -10% (Ying\'s resolve)'));
+      loadNode('r3_look');
+    }},
+  ], { label: L('螢的決心', 'Ying\'s resolve') });
 });
 
 // ═══════════════════════════════════════════════════
@@ -1388,6 +1504,7 @@ registerNode('r3_vote', () => {
   if (state.flags.r3BossMethod === 'sneak') score += 1;
   if (hasItem(L('螢的護身符', 'Ying\'s Charm'))) score += 1;
   if (state.flags.r3ZhouMet) score += 1;
+  if (state.flags.r3YingRealReport) score += 3; // Ying's true report — powerful evidence
   if (state.flags.ngPlus) score += 2; // NG+ past-life testimony bonus
   // Store score for ending determination
   state.flags.r3VoteScore = score;
