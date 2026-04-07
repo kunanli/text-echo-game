@@ -956,6 +956,7 @@ registerNode('r1_rest', () => {
 // ── NPC: Old Zhou — Surviving Miner ──
 registerNode('r1_survivor', () => {
   state.flags.r1SurvivorMet = true;
+  addNpcAffinity('zhou', 10);
   autoExplore([
     { art: npcPortrait.art('zhou', { subtitle: '倖存者' }) || `<pre class="ascii-art">
        ╭──╮
@@ -1010,6 +1011,7 @@ registerNode('r1_survivor', () => {
 
 registerNode('r1_survivor_bread', () => {
   state.flags.r1SurvivorFed = true;
+  addNpcAffinity('zhou', 8);
   removeItem(L('黑麵包', 'Black Bread'));
   autoExplore([
     { art: npcPortrait.art('zhou', { subtitle: '倖存者' }) || `<pre class="ascii-art">
@@ -1082,6 +1084,7 @@ registerNode('r1_survivor_reward', () => {
       changeStat('wil', 1);
       notify(L('意志 +1', 'WIL +1'));
       state.flags.r1SurvivorFullTrust = true;
+      addNpcAffinity('zhou', 10);
       loadNode('r1_quarters');
     }},
   ], { label: L('老周的回報', 'Zhou\'s reward') });
@@ -1352,6 +1355,7 @@ registerNode('r1_zhou_memory', () => {
 // ── NPC: The Wanderer — 灰鶴 (Grey Crane) ──
 registerNode('r1_wanderer', () => {
   state.flags.r1WandererMet = true;
+  addNpcAffinity('crane', 8);
   autoExplore([
     { tag: '感知', tagColor: 'tag-sense', text: '鐵軌旁傳來輕微的腳步聲——不是石化生物那種僵硬的步伐。', textEn: 'Light footsteps by the rails — not the rigid gait of a petrified creature.', delay: 2000 },
     { tag: '遭遇', tagColor: 'tag-combat', text: '你立刻壓低身體，握緊武器——', textEn: 'You crouch immediately, weapon ready —', delay: 1500 },
@@ -1454,6 +1458,7 @@ registerNode('r1_wanderer_lore', () => {
       ], [
         { text: '謝謝你告訴我這些', textEn: 'Thank you for telling me this', action: () => {
           state.flags.r1WandererLore = true;
+          addNpcAffinity('crane', 10);
           changeStat('wil', 1);
           notify(L('意志 +1', 'WIL +1'));
           loadNode('r1_wanderer_trade');
@@ -1557,6 +1562,7 @@ registerNode('r1_wanderer_trade', () => {
 // ── First encounter: chasing the figure ──
 registerNode('r1_ying_encounter', () => {
   state.flags.r1YingMet = true;
+  addNpcAffinity('ying', 10);
   var isMale = state.sex === 'male';
   var yingGender = isMale ? L('女孩', 'girl') : L('少年', 'young man');
   var yingPronoun = isMale ? L('她', 'she') : L('他', 'he');
@@ -1639,6 +1645,7 @@ registerNode('r1_ying_truth', () => {
   var yingPronoun = isMale ? L('她', 'she') : L('他', 'he');
   var yingPronounCap = isMale ? 'She' : 'He';
   state.flags.r1YingTrustUp = true;
+  addNpcAffinity('ying', 8);
   autoExplore([
     { art: npcPortrait.art('ying', { subtitle: '記錄員' }) || `<pre class="ascii-art cyan">
          ·  ✦  ·
@@ -1806,6 +1813,7 @@ registerNode('r1_ying_share', () => {
   ], [
     { text: '那就一起走吧', textEn: 'Then let\'s go together', action: () => {
       state.flags.r1YingCompanion = true;
+      addNpcAffinity('ying', 12);
       addItem(L('螢的筆記抄本', 'Ying\'s Note Copy'));
       autoExplore([
         { tag: '行動', tagColor: 'tag-move', text: '你伸出手。螢看著你的手——那隻左手指尖泛灰，石化紋路蜿蜒。', textEn: 'You extend your hand. Ying looks at it — your left hand, grey at the fingertips, petrification patterns winding up.', delay: 2500 },
@@ -1920,6 +1928,7 @@ registerNode('r1_ying_herb', () => {
   var yingPronoun = isMale ? L('她', 'she') : L('他', 'he');
   var yingPronounCap = isMale ? 'She' : 'He';
   state.flags.r1YingHerb = true;
+  addNpcAffinity('ying', 8);
   removeItem(L('乾燥草藥', 'Dried Herbs'));
   autoExplore([
     { art: npcPortrait.art('ying', { subtitle: '記錄員' }) || `<pre class="ascii-art cyan">
@@ -2077,6 +2086,7 @@ registerNode('r1_ying_warmth', () => {
   var yingPronounCap = isMale ? 'She' : 'He';
   var yPo = isMale ? 'her' : 'his';
   state.flags.r1YingWarmth = true;
+  addNpcAffinity('ying', 15);
 
   autoExplore([
     { art: npcPortrait.art('ying', { subtitle: '記錄員' }), artEn: npcPortrait.art('ying', { subtitle: 'Chronicler' }), delay: 800 },

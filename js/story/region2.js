@@ -832,6 +832,7 @@ registerNode('r2_camp_chief', () => {
   // ── Phase 2: Return later — Cheng Gang awakens, gives passcode ──
   if (state.flags.r2BossSpared && state.flags.r2ReunionSeen && !state.flags.r2ChengAwake) {
     state.flags.r2ChengAwake = true;
+    addNpcAffinity('cheng', 5);
     steps.push({ art: npcPortrait.art('cheng', { subtitle: '甦醒' }) || `<pre class="ascii-art gold">
       ˚  ·  ˚  甦醒  ˚  ·  ˚
 
@@ -885,6 +886,7 @@ registerNode('r2_camp_chief', () => {
 
   if (!state.flags.r2ChiefTalked) {
     state.flags.r2ChiefTalked = true;
+    addNpcAffinity('frost', 10);
     steps.push({ art: npcPortrait.art('frost', { subtitle: '營地隊長' }) || `<pre class="ascii-art">
           ·  ˚  鐵霜 — 營地隊長  ˚  ·
             ╱─────────╲
@@ -977,6 +979,7 @@ registerNode('r2_camp_chief', () => {
 // --- r2_frost_past: Frost reveals her surface military past ---
 registerNode('r2_frost_past', () => {
   state.flags.r2FrostPast = true;
+  addNpcAffinity('frost', 10);
   autoExplore([
     { tag: '對話', tagColor: 'tag-npc',
       text: L('鐵霜聽到你的問題，沉默了。營火的光在她鐵灰色的眼睛裡跳動。',
@@ -1141,7 +1144,7 @@ registerNode('r2_frost_soldier', () => {
       delay: 3000 },
     { tag: '效果', tagColor: 'tag-system',
       text: L('鐵霜好感 ↑↑ | 經驗 +10', 'Iron Frost bond ↑↑ | XP +10'),
-      delay: 1500, effect: () => { gainXp(10); state.flags.r2FrostSoldierSaved = true; } },
+      delay: 1500, effect: () => { gainXp(10); state.flags.r2FrostSoldierSaved = true; addNpcAffinity('frost', 12); } },
   ], [
     { text: '返回營地', textEn: 'Return to camp', action: () => loadNode('r2_camp') },
   ], { label: L('舊部重逢', 'Reunion with a soldier') });
@@ -1187,6 +1190,7 @@ registerNode('r2_frost_letter', () => {
     { text: '我一定送到', textEn: 'I\'ll deliver it',
       action: () => {
         state.flags.r2FrostLetterCarried = true;
+        addNpcAffinity('frost', 10);
         autoExplore([
           { tag: '對話', tagColor: 'tag-npc',
             text: L('鐵霜把信遞給你。她的目光異常溫和。',
@@ -1941,6 +1945,7 @@ registerNode('r2_ying_night', () => {
   var yPC = isMale ? 'She' : 'He';
   var yPo = isMale ? 'her' : 'his';
   state.flags.r2YingNight = true;
+  addNpcAffinity('ying', 10);
   autoExplore([
     { art: npcPortrait.art('ying', { subtitle: '記錄員' }) || `<pre class="ascii-art cyan">
        ·✦· 螢 — 記錄員少女 ·✦·
@@ -2036,6 +2041,7 @@ registerNode('r2_ying_promise', () => {
   var yPC = isMale ? 'She' : 'He';
   var yPo = isMale ? 'her' : 'his';
   state.flags.r2YingPromise = true;
+  addNpcAffinity('ying', 10);
   autoExplore([
     { art: npcPortrait.art('ying', { subtitle: '記錄員' }) || `<pre class="ascii-art cyan">
        ·✦· 螢 — 記錄員少女 ·✦·
@@ -2106,6 +2112,7 @@ registerNode('r2_ying_nightmare', () => {
   var yPC = isMale ? 'She' : 'He';
   var yPo = isMale ? 'her' : 'his';
   state.flags.r2YingNightmare = true;
+  addNpcAffinity('ying', 12);
 
   autoExplore([
     { tag: '環境', tagColor: 'tag-system', text: '深夜。營火已經熄滅，只剩灰燼中偶爾閃爍的餘溫。', textEn: 'Deep night. The campfire has died, leaving only the occasional ember glowing in the ash.', delay: 2200 },
@@ -2180,6 +2187,7 @@ registerNode('r2_ying_nightmare', () => {
 
 registerNode('r2_crane_scar', () => {
   state.flags.r2CraneScar = true;
+  addNpcAffinity('crane', 12);
   autoExplore([
     { art: npcPortrait.art('crane', { subtitle: '行商人' }) || `<pre class="ascii-art gold">
        ·  ˚  灰鶴  ˚  ·
@@ -2259,6 +2267,7 @@ registerNode('r2_crane_debt', () => {
       if (result !== 'fail') {
         sfx.pass();
         state.flags.r2CraneDebtSaved = true;
+        addNpcAffinity('crane', 15);
         autoExplore([
           { tag: '檢定', tagColor: 'tag-system', text: result === 'crit' ? L('大成功！', 'Critical success!') : L('成功！', 'Success!'), delay: 1200 },
           { tag: '說服', tagColor: 'tag-info', text: '你站到灰鶴身前，直視禿頭男的眼睛。你的聲音很平靜，但每個字都像石頭一樣沉。', textEn: 'You step in front of Grey Crane, meeting the bald man\'s eyes. Your voice is calm, but every word lands like stone.', delay: 3000 },
@@ -2305,6 +2314,7 @@ registerNode('r2_crane_debt', () => {
             enemy = scaleEnemyNgPlus(enemy);
             startCombat(enemy, function() {
               state.flags.r2CraneDebtSaved = true;
+              addNpcAffinity('crane', 15);
               autoExplore([
                 { tag: '結果', tagColor: 'tag-info', text: '追債人倒在地上，他的手下慌忙把他拖走了。', textEn: 'The collector falls. His men hastily drag him away.', delay: 2200 },
                 { tag: '灰鶴', tagColor: 'tag-npc', text: '灰鶴走過來，沉默了很久。然後她輕聲說：「……你這個白癡。」', textEn: 'Grey Crane approaches, silent for a long time. Then softly: "...You idiot."', delay: 2800 },
@@ -2345,6 +2355,7 @@ registerNode('r2_crane_debt', () => {
       enemy = scaleEnemyNgPlus(enemy);
       startCombat(enemy, function() {
         state.flags.r2CraneDebtSaved = true;
+        addNpcAffinity('crane', 15);
         autoExplore([
           { tag: '結果', tagColor: 'tag-info', text: '追債人倒在地上，他的手下慌忙把他拖走了。', textEn: 'The collector falls. His men hastily drag him away.', delay: 2200 },
           { tag: '灰鶴', tagColor: 'tag-npc', text: '灰鶴走過來，沉默了很久。然後她輕聲說：「……你這個白癡。為了我去打架。」', textEn: 'Grey Crane approaches, silent for a long time. Then softly: "...You idiot. Fighting for me."', delay: 2800 },
@@ -3457,6 +3468,7 @@ registerNode('r2_cheng_train', () => {
 // --- r2_cheng_memory: Cheng recalls his pre-petrification research ---
 registerNode('r2_cheng_memory', () => {
   state.flags.r2ChengMemory = true;
+  addNpcAffinity('cheng', 8);
   autoExplore([
     { art: npcPortrait.art('cheng', { subtitle: '研究員' }) || `<pre class="ascii-art">
        ·  ˚  承鋼 — 研究員  ˚  ·
@@ -3521,6 +3533,7 @@ registerNode('r2_cheng_memory', () => {
 // --- r2_cheng_lab: Hidden lab in ancient tunnel ---
 registerNode('r2_cheng_lab', () => {
   state.flags.r2ChengLab = true;
+  addNpcAffinity('cheng', 8);
   autoExplore([
     { tag: '移動', tagColor: 'tag-move',
       text: L('承鋼帶你穿過古代密道，在一個岔路口停了下來。他推開了一扇被灰塵覆蓋的金屬門。',
@@ -3653,6 +3666,7 @@ registerNode('r2_cheng_cure', () => {
     { text: '我會讓議會看到這些數據', textEn: 'I\'ll make the Council see this data',
       action: () => {
         state.flags.r2ChengCureData = true;
+        addNpcAffinity('cheng', 10);
         autoExplore([
           { tag: '對話', tagColor: 'tag-npc',
             text: L('承鋼把筆記本中最關鍵的幾頁撕了下來，折好遞給你。',

@@ -596,6 +596,7 @@ registerNode('r3_bell', () => {
 </pre>`, delay: 800 });
   if (!state.flags.r3BellMet) {
     state.flags.r3BellMet = true;
+    addNpcAffinity('bell', 3);
     // NG+ memory: recognizing Bronze Bell
     if (state.flags.ngPlus) {
       steps.push({ tag: '記憶', tagColor: 'tag-petri', text: '你還沒走進房間，就已經知道裡面坐的是誰——銅鐘。那個石化了右手卻依然握筆不停的女人。', textEn: 'Before entering, you already know who sits inside — Bronze Bell. The woman whose right hand turned to stone yet never stopped writing.', delay: 2800 });
@@ -721,6 +722,7 @@ registerNode('r3_bell', () => {
 // --- r3_bell_night: Late-night visit, discovering Bell's vulnerability ---
 registerNode('r3_bell_night', () => {
   state.flags.r3BellNight = true;
+  addNpcAffinity('bell', 15);
   autoExplore([
     { tag: '移動', tagColor: 'tag-move',
       text: L('深夜。議會廳的走廊空無一人。銅鐘辦公室的門縫裡還透著燭光。',
@@ -828,6 +830,7 @@ registerNode('r3_bell_night', () => {
 // --- r3_bell_secret: Bell knows the real reason for lockdown ---
 registerNode('r3_bell_secret', () => {
   state.flags.r3BellSecret = true;
+  addNpcAffinity('bell', 10);
   autoExplore([
     { tag: '對話', tagColor: 'tag-npc',
       text: L('你提到了監工 K 的真名、議會的軍事命令、以及鐵霜的信。銅鐘聽著，表情一點點變了。',
@@ -877,6 +880,7 @@ registerNode('r3_bell_secret', () => {
 // --- r3_bell_alliance_deep: Bell shows all her cards ---
 registerNode('r3_bell_alliance_deep', () => {
   state.flags.r3BellAllianceDeep = true;
+  addNpcAffinity('bell', 12);
   autoExplore([
     { tag: '對話', tagColor: 'tag-npc',
       text: L('銅鐘把辦公室的門鎖上了。她走到桌旁，從一個暗格裡取出一疊文件。',
@@ -1088,6 +1092,7 @@ registerNode('r3_ying_inn', () => {
   var yPC = isMale ? 'She' : 'He';
   var yPo = isMale ? 'her' : 'his';
   state.flags.r3YingInn = true;
+  addNpcAffinity('ying', 8);
   autoExplore([
     { art: npcPortrait.art('ying', { subtitle: '記錄員' }) || `<pre class="ascii-art cyan">
            ╲ · ˚
@@ -1145,6 +1150,7 @@ registerNode('r3_ying_river', () => {
   var yPC = isMale ? 'She' : 'He';
   var yPo = isMale ? 'her' : 'his';
   state.flags.r3YingRiver = true;
+  addNpcAffinity('ying', 15);
 
   autoExplore([
     { art: `<pre class="ascii-art cyan">
@@ -1293,6 +1299,7 @@ registerNode('r3_ying_confession', () => {
   var yPo = isMale ? 'her' : 'his';
 
   state.flags.r3YingConfession = true;
+  addNpcAffinity('ying', 10);
   autoExplore([
     { art: npcPortrait.art('ying', { subtitle: '記錄員' }), artEn: npcPortrait.art('ying', { subtitle: 'Chronicler' }), delay: 800 },
     { tag: '感知', tagColor: 'tag-sense', text: '螢停下了腳步。' + yP + '把手冊抱在胸前，背對著你。河風吹動' + yP + '的頭髮。', textEn: 'Ying stops walking. ' + yPC + ' holds the notebook to ' + yPo + ' chest, back to you. River wind lifts ' + yPo + ' hair.', delay: 2800 },
@@ -1339,6 +1346,7 @@ registerNode('r3_ying_resolve', () => {
       changePetri(-10);
       // This is a major ending score boost — Ying's real report is powerful evidence
       state.flags.r3YingRealReport = true;
+      addNpcAffinity('ying', 10);
       notify(L('意志 +2，HP +20，石化度 -10%（螢的決心）', 'WIL +2, HP +20, Petri -10% (Ying\'s resolve)'));
       loadNode('r3_look');
     }},
@@ -1351,6 +1359,7 @@ registerNode('r3_ying_resolve', () => {
 
 registerNode('r3_zhou', () => {
   state.flags.r3ZhouMet = true;
+  addNpcAffinity('zhou', 8);
   autoExplore([
     { art: npcPortrait.art('zhou', { subtitle: '倖存者' }) || `<pre class="ascii-art">
           ╭───────╮
@@ -1443,6 +1452,7 @@ registerNode('r3_zhou', () => {
 // ── NPC Sidequest: Old Zhou's Truth (R3) ──
 registerNode('r3_zhou_truth', () => {
   state.flags.r3ZhouTruth = true;
+  addNpcAffinity('zhou', 10);
   autoExplore([
     { tag: '對話', tagColor: 'tag-npc',
       text: L('你把在採石場岩壁上發現的深層刻痕告訴老周——監工 K 的真名、議會的命令、軍事用途。',
@@ -1595,6 +1605,7 @@ registerNode('r3_zhou_justice', () => {
     { text: '我會帶到議會去', textEn: 'I\'ll bring this to the Council',
       action: () => {
         state.flags.r3ZhouTestimony = true;
+        addNpcAffinity('zhou', 15);
         autoExplore([
           { tag: '對話', tagColor: 'tag-npc',
             text: L('老周點了點頭。然後他做了一件讓你意外的事——他用力站了起來，甩開了拐杖。',
@@ -1624,6 +1635,7 @@ registerNode('r3_zhou_justice', () => {
     { text: '太危險了，讓我替你說', textEn: 'Too dangerous — let me speak for you',
       action: () => {
         state.flags.r3ZhouTestimony = true;
+        addNpcAffinity('zhou', 12);
         autoExplore([
           { tag: '對話', tagColor: 'tag-npc',
             text: L('老周沉默了。他低頭看了看自己石化的腿，然後苦笑了。',
@@ -1685,6 +1697,7 @@ registerNode('r3_crane', () => {
 </pre>`, delay: 800 });
   if (!state.flags.r3CraneMet3) {
     state.flags.r3CraneMet3 = true;
+    addNpcAffinity('crane', 5);
     steps.push({ tag: '遭遇', tagColor: 'tag-explore', text: '市場的角落裡，一面灰色斗篷在貨箱堆間若隱若現。', textEn: 'In a market corner, a grey cloak flickers between stacked crates.', delay: 2000 });
     steps.push({ tag: '情報', tagColor: 'tag-info', text: '「喲——你也到這兒了？」灰鶴從貨堆後探出頭，一臉不意外的笑容。', textEn: '"Well — you made it here too?" Grey Crane peeks from behind the crates, unsurprised and smiling.', delay: 2500 });
     steps.push({ tag: '情報', tagColor: 'tag-info', text: '「我走暗渠比你快。在這裡已經做了好幾筆生意了。」', textEn: '"My culvert route is faster. Already closed several deals here."', delay: 2500 });
@@ -1789,6 +1802,7 @@ registerNode('r3_crane', () => {
 // --- r3_crane_merchant: Secret warehouse in River City ---
 registerNode('r3_crane_merchant', () => {
   state.flags.r3CraneMerchant = true;
+  addNpcAffinity('crane', 8);
   autoExplore([
     { tag: '對話', tagColor: 'tag-npc',
       text: L('灰鶴聽到你的問題，先是一愣，然後發出一聲低笑。',
@@ -1880,6 +1894,7 @@ registerNode('r3_crane_merchant', () => {
 // --- r3_crane_past: Crane's real identity + someone on the surface ---
 registerNode('r3_crane_past', () => {
   state.flags.r3CranePast = true;
+  addNpcAffinity('crane', 12);
   autoExplore([
     { tag: '對話', tagColor: 'tag-npc',
       text: L('你在灰鶴收攤之後找到她。傍晚的碼頭很安靜，河水拍打著石壁。',
@@ -2013,6 +2028,7 @@ registerNode('r3_crane_deal', () => {
     { text: '我替你跟銅鐘說', textEn: 'I\'ll talk to Bronze Bell for you',
       action: () => {
         state.flags.r3CraneDealDone = true;
+        addNpcAffinity('crane', 10);
         autoExplore([
           { tag: '對話', tagColor: 'tag-npc',
             text: L('灰鶴把倉庫的鑰匙遞給你。她的手微微發抖。',
@@ -2051,6 +2067,7 @@ registerNode('r3_crane_deal', () => {
           { text: '好——我替你跟銅鐘說', textEn: 'Alright — I\'ll talk to Bell for you',
             action: () => {
               state.flags.r3CraneDealDone = true;
+              addNpcAffinity('crane', 10);
               autoExplore([
                 { tag: '對話', tagColor: 'tag-npc',
                   text: L('灰鶴把鑰匙塞進你手裡。「替我謝謝銅鐘。順便告訴她——灰鶴的本名叫秋蘅，以後不躲了。」',
@@ -2082,6 +2099,7 @@ registerNode('r3_crane_deal', () => {
 // --- r3_crane_merchant: Secret warehouse with high-purity purifier ---
 registerNode('r3_crane_merchant', () => {
   state.flags.r3CraneMerchant = true;
+  addNpcAffinity('crane', 8);
   autoExplore([
     { art: `<pre class="ascii-art gold">
   ╔═══════════════════════════════╗
@@ -2132,6 +2150,7 @@ registerNode('r3_crane_merchant', () => {
 // --- r3_crane_past: Real name and someone on the surface ---
 registerNode('r3_crane_past', () => {
   state.flags.r3CranePast = true;
+  addNpcAffinity('crane', 12);
   autoExplore([
     { art: npcPortrait.art('crane', { subtitle: '……' }) || `<pre class="ascii-art gold">
        ·  ˚  灰鶴 — 月光下  ˚  ·
@@ -2175,6 +2194,7 @@ registerNode('r3_crane_past', () => {
 // --- r3_crane_deal: Donate all smuggled supplies for amnesty ---
 registerNode('r3_crane_deal', () => {
   state.flags.r3CraneDealDone = true;
+  addNpcAffinity('crane', 10);
   autoExplore([
     { tag: '灰鶴', tagColor: 'tag-npc', text: '灰鶴聽完你的提議，沉默了很久。她盯著碼頭的水面，好像在計算什麼。', textEn: 'Grey Crane listens to your proposal, then falls silent for a long time. She stares at the water, as if calculating something.', delay: 2800 },
     { tag: '灰鶴', tagColor: 'tag-npc', text: '「把所有走私物資捐給議會？換赦免？」她重複了一遍，語氣複雜。「那可是我三年的全部家當。」', textEn: '"Donate all smuggled supplies to the Council? In exchange for amnesty?" She repeats it, tone conflicted. "That\'s everything I\'ve earned in three years."', delay: 3500 },
