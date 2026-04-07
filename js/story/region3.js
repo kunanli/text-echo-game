@@ -2024,6 +2024,7 @@ registerNode('r3_vote', () => {
   if (hasItem(L('螢的護身符', 'Ying\'s Charm'))) score += 1;
   if (state.flags.r3ZhouMet) score += 1;
   if (state.flags.r3ZhouTestimony) score += 2; // Zhou's testimony exposes Council's role in plague
+  if (state.flags.r2FrostLetterCarried) score += 1; // Iron Frost's letter reveals camp survivors + Seventh Division truth
   if (state.flags.r3YingRealReport) score += 3; // Ying's true report — powerful evidence
   if (state.flags.r3CraneDealDone) score += 2; // Grey Crane's supply donation proves trade value
   if (state.flags.ngPlus) score += 2; // NG+ past-life testimony bonus

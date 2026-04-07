@@ -860,9 +860,267 @@ registerNode('r2_camp_chief', () => {
     if (state.flags.r2ChengAwake && (state.flags.r2ChengTrainCount || 0) < 3) {
       c.push({ text: '◆ 和承鋼一起訓練', textEn: '◆ Train with Cheng Gang', action: () => loadNode('r2_cheng_train') });
     }
+    // Sidequest: Frost's past (requires first meeting done)
+    if (state.flags.r2CampVisited && !state.flags.r2FrostPast) {
+      c.push({ text: '鐵霜，你是怎麼到這裡的？', textEn: 'Frost, how did you end up here?', action: () => loadNode('r2_frost_past') });
+    }
+    // Sidequest: Strange soldier (requires past revealed)
+    if (state.flags.r2FrostPast && !state.flags.r2FrostSoldier) {
+      c.push({ text: '營地外有人要見鐵霜……', textEn: 'Someone outside wants to see Frost...', action: () => loadNode('r2_frost_soldier') });
+    }
+    // Sidequest: Frost's letter (requires soldier resolved)
+    if (state.flags.r2FrostSoldier && !state.flags.r2FrostLetter) {
+      c.push({ text: '鐵霜在寫什麼……', textEn: 'Frost is writing something...', action: () => loadNode('r2_frost_letter') });
+    }
     c.push({ text: '返回營地', textEn: 'Return to camp', action: () => loadNode('r2_camp') });
     return c;
   })(), { label: L('與鐵霜對話', 'Talking to Iron Frost') });
+});
+
+// ═══════════════════════════════════════════════════
+//  NPC Sidequest — 鐵霜 (Iron Frost) Past
+// ═══════════════════════════════════════════════════
+
+// --- r2_frost_past: Frost reveals her surface military past ---
+registerNode('r2_frost_past', () => {
+  state.flags.r2FrostPast = true;
+  autoExplore([
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('鐵霜聽到你的問題，沉默了。營火的光在她鐵灰色的眼睛裡跳動。',
+             'Iron Frost goes silent at your question. Firelight dances in her iron-grey eyes.'),
+      delay: 2500 },
+    { art: npcPortrait.art('frost') || `<pre class="ascii-art">
+       ·  ˚  鐵霜 — 營火邊  ˚  ·
+              ╱═══╲
+             │ ─  ─ │
+             │  ──  │
+              ╲═══╱
+       ██████████│░░░░░░░░
+       ██████████│░░░░░░░░
+       ██████████│░░░░░░░░
+        █████████│░░░░░░░
+        ·█·█·█·  │  ⚒
+      石化手臂   │  戰錘
+</pre>`, artEn: npcPortrait.art('frost') || `<pre class="ascii-art">
+    ·  ˚  Iron Frost — By the fire  ˚  ·
+              ╱═══╲
+             │ ─  ─ │
+             │  ──  │
+              ╲═══╱
+       ██████████│░░░░░░░░
+       ██████████│░░░░░░░░
+       ██████████│░░░░░░░░
+        █████████│░░░░░░░
+        ·█·█·█·  │  ⚒
+     Petrified   │ Hammer
+</pre>`, delay: 800 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「我不是地底出生的。」她終於開口。「我是地表軍隊的——第七師團，邊境守備隊。」',
+             '"I wasn\'t born underground." She finally speaks. "I was surface military — Seventh Division, border garrison."'),
+      delay: 3000 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「指揮官。帶著三百人。」她用石化的手捏了捏太陽穴。「那時候……地表也不太平。」',
+             '"Commander. Three hundred under me." She rubs her temple with her petrified hand. "The surface wasn\'t peaceful either, back then."'),
+      delay: 3000 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「有一天，上面的人下了一道命令——清剿南山村。說村民勾結叛軍。」鐵霜的語氣平淡得可怕。',
+             '"One day, the brass sent an order — purge Southhill Village. Villagers accused of harboring rebels." Iron Frost\'s tone is terrifyingly flat.'),
+      delay: 3200 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「我帶隊去了。」她頓了頓。「到了村口，看到的是老人、女人、孩子。沒有叛軍。」',
+             '"I led the squad there." She pauses. "At the village gate — the elderly, women, children. No rebels."'),
+      delay: 3000 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「我拒絕了。帶著部隊撤回了駐地。」',
+             '"I refused. Pulled my troops back to base."'),
+      delay: 2500 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「三天後——軍事法庭。抗命罪。流放地底。」她看了看自己石化的左手。「三百人的命，就因為我一個人的決定。」',
+             '"Three days later — court-martial. Insubordination. Exiled underground." She looks at her petrified left hand. "Three hundred lives, changed by one person\'s decision."'),
+      delay: 3500 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「部下們有的跟我一起被流放，有的被打散編入其他部隊。」她閉上了眼。「那個村子——後來還是被清了。換了一個聽話的人去。」',
+             '"Some of my soldiers followed me into exile. Others were scattered to other units." She closes her eyes. "That village — they sent someone obedient in the end."'),
+      delay: 3500 },
+    { tag: '感知', tagColor: 'tag-sense',
+      text: L('營火噼啪作響。鐵霜睜開眼，目光比營火更亮。',
+             'The fire crackles. Iron Frost opens her eyes, their light fiercer than the flames.'),
+      delay: 2500 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「我不後悔。」她說。「到了地底之後，我找到了承鋼。找到了這些人。這就夠了。」',
+             '"I don\'t regret it." She says. "After coming underground, I found Cheng Gang. Found these people. That\'s enough."'),
+      delay: 3000 },
+  ], [
+    { text: '你做了對的事', textEn: 'You did the right thing',
+      action: () => {
+        autoExplore([
+          { tag: '對話', tagColor: 'tag-npc',
+            text: L('鐵霜看了你一眼。嘴角微微動了動——是她最接近笑容的表情。',
+                   'Iron Frost glances at you. The corner of her mouth twitches — the closest thing to a smile she has.'),
+            delay: 2800 },
+          { tag: '對話', tagColor: 'tag-npc',
+            text: L('「……謝了。」她轉過頭去。「很久沒有人這麼說了。」',
+                   '"...Thanks." She turns away. "It\'s been a long time since anyone said that."'),
+            delay: 2500 },
+          { tag: '效果', tagColor: 'tag-system',
+            text: L('鐵霜好感 ↑↑ | 經驗 +8', 'Iron Frost bond ↑↑ | XP +8'),
+            delay: 1500, effect: () => gainXp(8) },
+        ], [
+          { text: '返回', textEn: 'Back', action: () => loadNode('r2_camp_chief') },
+        ], { label: L('鐵霜的過去', 'Iron Frost\'s past') });
+      }},
+    { text: '返回', textEn: 'Back', action: () => loadNode('r2_camp_chief') },
+  ], { label: L('鐵霜的過去', 'Iron Frost\'s past') });
+});
+
+// --- r2_frost_soldier: A survivor recognizes Frost ---
+registerNode('r2_frost_soldier', () => {
+  state.flags.r2FrostSoldier = true;
+  autoExplore([
+    { tag: '緊張', tagColor: 'tag-warn',
+      text: L('你回營地時，看到入口處站著一個陌生男人——穿著破爛的軍裝，滿身石化紋路，右眼完全失明。',
+             'Returning to camp, you find a stranger at the entrance — tattered military uniform, petrification lines everywhere, right eye fully blind.'),
+      delay: 3000 },
+    { art: `<pre class="ascii-art">
+    ╔═══════════════════════════════╗
+    ║     陌生士兵                  ║
+    ╠═══════════════════════════════╣
+    ║         ╱══╲                  ║
+    ║        │╳  ─│  ← 獨眼        ║
+    ║        │ ── │                 ║
+    ║         ╲══╱                  ║
+    ║        ╱▓▓▓▓╲  ← 破舊軍裝   ║
+    ║       │▓▓▓▓▓▓│               ║
+    ║       │▓ ░░ ▓│  ← 石化紋路   ║
+    ║        ╱    ╲                 ║
+    ║       ╱      ╲               ║
+    ║                               ║
+    ║   「……鐵指揮？是你嗎？」      ║
+    ╚═══════════════════════════════╝
+</pre>`, artEn: `<pre class="ascii-art">
+    ╔═══════════════════════════════╗
+    ║     UNKNOWN SOLDIER          ║
+    ╠═══════════════════════════════╣
+    ║         ╱══╲                  ║
+    ║        │╳  ─│  ← one eye     ║
+    ║        │ ── │                 ║
+    ║         ╲══╱                  ║
+    ║        ╱▓▓▓▓╲  ← worn uniform║
+    ║       │▓▓▓▓▓▓│               ║
+    ║       │▓ ░░ ▓│  ← petri-veins║
+    ║        ╱    ╲                 ║
+    ║       ╱      ╲               ║
+    ║                               ║
+    ║   "...Commander Frost?"      ║
+    ╚═══════════════════════════════╝
+</pre>`, delay: 800 },
+    { tag: '遭遇', tagColor: 'tag-explore',
+      text: L('他看到鐵霜從帳篷裡走出來，整個人僵住了。然後他的嘴唇開始顫抖。',
+             'He sees Iron Frost emerge from her tent and freezes. Then his lips begin to tremble.'),
+      delay: 2800 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「鐵指揮……？真的是你？」他聲音沙啞。「我是方石——第七師團，第二連……」',
+             '"Commander Frost...? It\'s really you?" His voice cracks. "I\'m Fang Shi — Seventh Division, Second Company..."'),
+      delay: 3000 },
+    { tag: '感知', tagColor: 'tag-sense',
+      text: L('鐵霜的表情變了。你從未見過她臉上出現這種表情——震驚、愧疚、和一絲……恐懼。',
+             'Iron Frost\'s expression shifts. You\'ve never seen her look like this — shock, guilt, and a trace of... fear.'),
+      delay: 2800 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「方石。」鐵霜的聲音很低。「你——你怎麼在這裡？」',
+             '"Fang Shi." Iron Frost\'s voice is low. "You — how are you here?"'),
+      delay: 2500 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「跟您一樣。被流放到地底。」方石苦笑。「因為我跟著您拒絕了。上面把我們這些人都打散了——有的流放，有的失蹤。」',
+             '"Same as you. Exiled underground." Fang Shi smiles bitterly. "Because I followed your refusal. They scattered all of us — some exiled, some disappeared."'),
+      delay: 3500 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「我在下面活了三年。聽說採石場有一個營地——就一路爬上來了。」他看著鐵霜。「我不怪您，指揮。您做的是對的。」',
+             '"I survived three years down here. Heard there was a camp at the quarry — climbed all the way up." He looks at Frost. "I don\'t blame you, Commander. You did the right thing."'),
+      delay: 3500 },
+    { tag: '感知', tagColor: 'tag-sense',
+      text: L('鐵霜站在原地，一動不動。然後她走上前，伸出完好的右手——用力握住了方石的肩膀。',
+             'Iron Frost stands still for a long moment. Then she steps forward and grips Fang Shi\'s shoulder with her good right hand.'),
+      delay: 3000 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「……歡迎回來，方石。」她的聲音在微微發抖。「這裡有你的位置。」',
+             '"...Welcome back, Fang Shi." Her voice trembles faintly. "There\'s a place for you here."'),
+      delay: 3000 },
+    { tag: '效果', tagColor: 'tag-system',
+      text: L('鐵霜好感 ↑↑ | 經驗 +10', 'Iron Frost bond ↑↑ | XP +10'),
+      delay: 1500, effect: () => { gainXp(10); state.flags.r2FrostSoldierSaved = true; } },
+  ], [
+    { text: '返回營地', textEn: 'Return to camp', action: () => loadNode('r2_camp') },
+  ], { label: L('舊部重逢', 'Reunion with a soldier') });
+});
+
+// --- r2_frost_letter: Frost writes a letter for River City ---
+registerNode('r2_frost_letter', () => {
+  state.flags.r2FrostLetter = true;
+  autoExplore([
+    { tag: '感知', tagColor: 'tag-sense',
+      text: L('你注意到鐵霜坐在帳篷角落，借著燭光在寫什麼。她石化的左手壓著紙角，右手握筆的姿勢異常認真。',
+             'You notice Iron Frost sitting in a tent corner, writing by candlelight. Her petrified left hand holds the paper\'s edge, her right grips the pen with unusual care.'),
+      delay: 3000 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「別偷看。」鐵霜沒抬頭。但過了一會兒，她嘆了口氣，把紙轉向你。',
+             '"Don\'t peek." Iron Frost doesn\'t look up. But after a moment, she sighs and turns the paper toward you.'),
+      delay: 2500 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「……是寫給河城的信。你要上去，對吧？幫我帶一封。」',
+             '"...It\'s a letter for River City. You\'re going up, right? Take it for me."'),
+      delay: 2500 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「信是寫給議會的。內容是：採石場營地有十二個倖存者，加上方石十三個。我們需要物資和撤離支援。」',
+             '"It\'s for the Council. Contents: the quarry camp has twelve survivors, thirteen with Fang Shi. We need supplies and evacuation support."'),
+      delay: 3200 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('鐵霜頓了頓。「還有一段私人的。」她的鐵灰色眼睛閃了閃。',
+             'Iron Frost pauses. "And something personal." Her iron-grey eyes flash.'),
+      delay: 2500 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「信的最後寫了——如果議會裡有人記得第七師團的話，請查一下南山村事件的真相。三百個被流放的人，不該被遺忘。」',
+             '"At the end — if anyone on the Council remembers the Seventh Division, please investigate the truth about Southhill Village. Three hundred exiled people shouldn\'t be forgotten."'),
+      delay: 3500 },
+    { tag: '感知', tagColor: 'tag-sense',
+      text: L('她把信折好，用蠟封上。蠟封上壓了一個記號——是一個拳頭的形狀。',
+             'She folds the letter and seals it with wax. The seal bears a mark — the shape of a fist.'),
+      delay: 2800 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「這是第七師團的印記。如果議會裡有人認出來——他們會知道這封信是真的。」',
+             '"This is the Seventh Division\'s mark. If someone on the Council recognizes it — they\'ll know the letter is genuine."'),
+      delay: 3000 },
+  ], [
+    { text: '我一定送到', textEn: 'I\'ll deliver it',
+      action: () => {
+        state.flags.r2FrostLetterCarried = true;
+        autoExplore([
+          { tag: '對話', tagColor: 'tag-npc',
+            text: L('鐵霜把信遞給你。她的目光異常溫和。',
+                   'Iron Frost hands you the letter. Her gaze is unusually gentle.'),
+            delay: 2500 },
+          { tag: '對話', tagColor: 'tag-npc',
+            text: L('「拜託你了。」她說。「這封信不只是為了營地——是為了那三百個被丟在黑暗裡的人。」',
+                   '"I\'m counting on you." She says. "This letter isn\'t just for the camp — it\'s for the three hundred left in the dark."'),
+            delay: 3200 },
+          { tag: '物品', tagColor: 'tag-item',
+            html: L('獲得「<b>鐵霜的密封信</b>」', 'Acquired "<b>Iron Frost\'s Sealed Letter</b>"'),
+            delay: 2000, effect: () => addItem(L('鐵霜的密封信', 'Iron Frost\'s Sealed Letter')) },
+          { tag: '效果', tagColor: 'tag-system',
+            text: L('鐵霜好感 ↑↑↑ | 經驗 +12 | 敏捷 +1', 'Iron Frost bond ↑↑↑ | XP +12 | AGI +1'),
+            delay: 1500, effect: () => {
+              gainXp(12);
+              changeStat('agi', 1);
+            }},
+          { tag: '系統', tagColor: 'tag-system',
+            text: L('（此信將影響河城議會的態度）', '(This letter will affect the River City Council\'s attitude)'),
+            delay: 2000 },
+        ], [
+          { text: '返回', textEn: 'Back', action: () => loadNode('r2_camp') },
+        ], { label: L('鐵霜的信', 'Iron Frost\'s letter') });
+      }},
+    { text: '返回', textEn: 'Back', action: () => loadNode('r2_camp') },
+  ], { label: L('鐵霜的信', 'Iron Frost\'s letter') });
 });
 
 registerNode('r2_camp_smith', () => {
