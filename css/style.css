@@ -1696,6 +1696,20 @@
     margin-left: 6px;
     flex-shrink: 0;
   }
+  .npc-romance-tag {
+    font-size: .66rem;
+    color: #e06080;
+    margin-left: 4px;
+    flex-shrink: 0;
+    text-shadow: 0 0 6px rgba(224,96,128,.4);
+  }
+  .npc-level-tag {
+    font-size: .62rem;
+    color: #8888a0;
+    margin-left: 4px;
+    flex-shrink: 0;
+    opacity: .7;
+  }
 
   /* Gift dialogue */
   .gift-dialogue {

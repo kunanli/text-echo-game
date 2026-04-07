@@ -18,6 +18,8 @@ var globalStats = {
   fastestRunMs: 0,
   currentRunStartMs: 0,
   bankedPoints: 0,
+  romanceHistory: {},     // { ying: { maxAffinity: 85, timesRomanced: 1 }, ... }
+  romanceCarryOver: null, // last-run romance NPC id (for NG+ inheritance)
 };
 
 function loadGlobalStats() {
@@ -111,6 +113,8 @@ function statsRecordEnding(endingType) {
       globalStats.fastestRunMs = runTime;
     }
   }
+  // Romance stats
+  if (typeof recordRomanceStats === 'function') recordRomanceStats();
   saveGlobalStats();
   return runTime;
 }
