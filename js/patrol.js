@@ -1181,6 +1181,239 @@ var R2_EVENTS = [
 
 registerPatrolEvents(2, R2_EVENTS);
 
+// ═══════════════════════════════════════════════════
+//  Narrative Patrol Events — R3 河城渡口
+// ═══════════════════════════════════════════════════
+
+var R3_EVENTS = [
+  // ── Event 1: 碼頭賭局 (金幣+冒險) ──
+  {
+    id: 'r3_gamble', flag: '_evt_r3_gamble', region: 3,
+    buildQueue: function(queue) {
+      queue.push({ art: '<pre class="ascii-art">\n' +
+        '     ╔═══════════════╗\n' +
+        '     ║  ⚄ 碼頭賭局 ⚃ ║\n' +
+        '     ╠═══════════════╣\n' +
+        '     ║  「來一把？」   ║\n' +
+        '     ║   ⚀⚁⚂⚃⚄⚅   ║\n' +
+        '     ╚═══════════════╝\n' +
+        '</pre>', delay: 800 });
+      queue.push({ tag: L('感知','Sense'), color: 'tag-sense',
+        text: L('碼頭角落有幾個碼頭工人圍成一圈，蹲在地上擲骰子。看到你走過來，一個光頭大漢抬起頭：「有種來一把？」', 'Dock workers huddle in a circle, throwing dice on the ground. A bald bruiser looks up as you approach: "Got the nerve for a round?"'),
+        delay: 2800 });
+      queue.push({ tag: L('感知','Sense'), color: 'tag-sense',
+        text: L('賭注不大——三枚金幣入場。但碼頭上的賭局從來不只是賭錢。這是融入河城最快的方式。', 'The stakes are modest — three gold to enter. But dock games are never just about money. It\'s the fastest way to fit in at River Port.'),
+        delay: 2500 });
+      queue.push({ tag: L('抉擇','Choice'), color: 'tag-event',
+        text: L('你要參加嗎？', 'Join?'),
+        choices: [
+          { text: (state.flags._gold || 0) >= 3
+              ? L('加入（3 金幣）', 'Join (3 gold)')
+              : L('金幣不夠（需要 3 枚）', 'Not enough gold (need 3)'),
+            textEn: (state.flags._gold || 0) >= 3
+              ? 'Join (3 gold)'
+              : 'Not enough gold (need 3)',
+            action: function() {
+              if ((state.flags._gold || 0) < 3) {
+                patrolAppend(L('系統','System'), 'tag-system',
+                  L('你攤了攤手。光頭大漢嗤笑了一聲：「沒錢就別來湊熱鬧。」', 'You show empty palms. The bruiser snorts: "No coin, no game."'), false);
+                return;
+              }
+              state.flags._gold -= 3;
+              var roll = rng(1, 6);
+              sfx.click();
+              patrolAppend(L('事件','Event'), 'tag-event',
+                L('你投入三枚金幣，抓起骰子——擲出了 ' + roll + ' 點。', 'You toss in three gold, grab the dice — and roll a ' + roll + '.'), false);
+              if (roll >= 5) {
+                sfx.pass();
+                var win = roll === 6 ? 8 : 5;
+                state.flags._gold = (state.flags._gold || 0) + win;
+                patrolAppend(L('事件','Event'), 'tag-item',
+                  L(roll === 6
+                    ? '六點！滿堂彩！碼頭工人們鼓掌叫好。光頭大漢把一大把金幣推到你面前：「手氣不錯嘛。」'
+                    : '贏了。光頭大漢咂了咂嘴，把金幣推過來：「運氣不錯。」',
+                    roll === 6
+                    ? 'Six! Full marks! The dock workers cheer. The bruiser shoves a pile of coins your way: "Lucky hand."'
+                    : 'You win. The bruiser clicks his tongue and pushes coins over: "Not bad."'), false);
+                patrolAppend(L('系統','System'), 'tag-system',
+                  L('金幣 +' + win + '。', 'Gold +' + win + '.'), false);
+              } else {
+                sfx.fail();
+                patrolAppend(L('事件','Event'), 'tag-warn',
+                  L('輸了。光頭大漢把你的金幣掃走，朝你咧嘴笑：「下次再來。」周圍的人哄笑一片。', 'You lose. The bruiser sweeps your coins away, grinning: "Come again." Laughter all around.'), false);
+                patrolAppend(L('系統','System'), 'tag-system',
+                  L('金幣 -3。', 'Gold -3.'), false);
+              }
+              renderStatus();
+            }
+          },
+          { text: L('搖頭離開', 'Shake your head and leave'), textEn: 'Shake your head and leave',
+            action: function() {
+              patrolAppend(L('巡邏','Patrol'), 'tag-move',
+                L('你擺了擺手，繼續巡邏。身後傳來嘲弄的口哨聲。', 'You wave them off and move on. A mocking whistle trails behind you.'), false);
+            }
+          }
+        ]
+      });
+    }
+  },
+
+  // ── Event 2: 偷東西的小孩 (道德+調查+羈絆) ──
+  {
+    id: 'r3_thief_kid', flag: '_evt_r3_thief_kid', region: 3,
+    buildQueue: function(queue) {
+      queue.push({ art: '<pre class="ascii-art">\n' +
+        '      ╭──╮\n' +
+        '      │··│    ╔═══╗\n' +
+        '      │▿ │ ←──║蘋果║\n' +
+        '    ╭─┤  ├─╮  ╚═══╝\n' +
+        '    │ ╰──╯ │  攤位\n' +
+        '    │      │  ═══════\n' +
+        '    ╰─┬──┬─╯\n' +
+        '      │  │\n' +
+        '</pre>', delay: 800 });
+      queue.push({ tag: L('感知','Sense'), color: 'tag-sense',
+        text: L('市場的水果攤旁，一個瘦得皮包骨的小孩正把一顆蘋果塞進破爛的衣服裡。動作很快——但不夠快。', 'By the market fruit stall, a skeletal child is stuffing an apple into their ragged clothes. Quick — but not quick enough.'),
+        delay: 2800 });
+      queue.push({ tag: L('感知','Sense'), color: 'tag-sense',
+        text: L('攤主還沒發現。但按照河城的規矩，偷竊者會被砍掉一隻手——即使是小孩。', 'The vendor hasn\'t noticed yet. But by River Port law, thieves lose a hand — even children.'),
+        delay: 2800 });
+      queue.push({ tag: L('感知','Sense'), color: 'tag-sense',
+        text: L('小孩的眼睛和你對上了。那雙眼裡沒有恐懼——只有一種超越年齡的冷靜：「你要怎麼辦？」', 'The child\'s eyes meet yours. No fear in them — only a calm beyond their years: "So what are you going to do?"'),
+        delay: 3000 });
+      queue.push({ tag: L('抉擇','Choice'), color: 'tag-event',
+        text: L('你的選擇——', 'Your choice —'),
+        choices: [
+          { text: L('幫忙掩護', 'Cover for the kid'), textEn: 'Cover for the kid',
+            action: function() {
+              state.flags.r3KidHelped = true;
+              sfx.pass();
+              patrolAppend(L('事件','Event'), 'tag-event',
+                L('你不動聲色地擋住攤主的視線，假裝在挑選水果。小孩趁機溜進了人群。', 'You casually block the vendor\'s line of sight, pretending to browse. The child slips into the crowd.'), false);
+              patrolAppend(L('感知','Sense'), 'tag-sense',
+                L('幾秒後，一隻小手從你的袖口裡塞了一張紙條進去。你低頭看——上面寫著一個地址，還有一行字：「晚上來，有你想知道的事。」', 'Seconds later, a small hand slips a note into your sleeve. You read: an address, and one line: "Come at night. I have what you want to know."'), false);
+              patrolAppend(L('調查','Clue'), 'tag-info',
+                L('這個地址……在河城的下城區。那裡住的都是石化度最高的人——被遺棄的人。', 'This address... is in the lower quarter. That\'s where the most petrified live — the abandoned ones.'), false);
+              patrolAppend(L('系統','System'), 'tag-system',
+                L('小孩可能是底層的重要證人。', 'The child may be an important witness from below.'), false);
+              renderStatus();
+            }
+          },
+          { text: L('向攤主舉報', 'Report to the vendor'), textEn: 'Report to the vendor',
+            action: function() {
+              state.flags._gold = (state.flags._gold || 0) + 3;
+              sfx.click();
+              patrolAppend(L('事件','Event'), 'tag-event',
+                L('你指了指小孩。攤主一把抓住了那條瘦弱的手臂。「小兔崽子——！」', 'You point at the child. The vendor grabs that skinny arm. "You little rat — !"'), false);
+              patrolAppend(L('感知','Sense'), 'tag-sense',
+                L('小孩被拖走的時候回頭看了你一眼。那雙眼睛裡終於有了情緒——不是恨，是失望。', 'As the child is dragged away, they look back at you. Finally, emotion in those eyes — not hatred. Disappointment.'), false);
+              patrolAppend(L('系統','System'), 'tag-system',
+                L('攤主感謝你，給了你 3 金幣。', 'The vendor thanks you with 3 gold.'), false);
+              renderStatus();
+            }
+          },
+          { text: L('假裝沒看到', 'Pretend you didn\'t see'), textEn: 'Pretend you didn\'t see',
+            action: function() {
+              patrolAppend(L('巡邏','Patrol'), 'tag-move',
+                L('你移開視線，繼續走你的路。河城的規矩不關你的事。', 'You look away and continue on your path. River Port\'s rules aren\'t your concern.'), false);
+            }
+          }
+        ]
+      });
+    }
+  },
+
+  // ── Event 3: 匿名信 (調查+懸疑+愛情) ──
+  {
+    id: 'r3_letter', flag: '_evt_r3_letter', region: 3,
+    buildQueue: function(queue) {
+      queue.push({ art: '<pre class="ascii-art">\n' +
+        '     ╔═══════════════╗\n' +
+        '     ║  ╭──────────╮ ║\n' +
+        '     ║  │ 致：外來者│ ║\n' +
+        '     ║  │          │ ║\n' +
+        '     ║  │ ？？？？ │ ║\n' +
+        '     ║  │          │ ║\n' +
+        '     ║  ╰──────────╯ ║\n' +
+        '     ║    ＊密封＊    ║\n' +
+        '     ╚═══════════════╝\n' +
+        '</pre>', delay: 800 });
+      queue.push({ tag: L('感知','Sense'), color: 'tag-sense',
+        text: L('你在客棧門口發現一封信。沒有署名，只寫著「致：外來者」——顯然是給你的。信封用蠟封了口。', 'At the inn\'s doorstep, you find a letter. No signature — just "To: The Outsider." Obviously for you. Wax-sealed.'),
+        delay: 2800 });
+      queue.push({ tag: L('感知','Sense'), color: 'tag-sense',
+        text: L('蠟封的圖案是一隻閉上眼睛的貓頭鷹——你在議會廳的牆壁上見過同樣的標誌。', 'The seal bears a closed-eyed owl — the same emblem you\'ve seen on the Council Hall walls.'),
+        delay: 2500 });
+      queue.push({ tag: L('抉擇','Choice'), color: 'tag-event',
+        text: L('你要打開它嗎？', 'Open it?'),
+        choices: [
+          { text: L('拆開信封', 'Break the seal'), textEn: 'Break the seal',
+            pauseQueue: true,
+            action: function() {
+              state.flags.r3AnonLetter = true;
+              sfx.item();
+              patrolAppend(L('調查','Clue'), 'tag-info',
+                L('信紙上的字跡工整而急促，像是在很短的時間裡寫完的——', 'The handwriting is neat but hurried, as if dashed off in stolen minutes —'), false);
+              patrolTimers.push(setTimeout(function() {
+                patrolAppend(L('情報','Intel'), 'tag-info',
+                  L('「封鎖通道的提案不是鏽刃一個人的主意。議會裡有人在暗中推動——他們需要封鎖通道來壟斷石化結晶的開採權。下層死多少人不重要。重要的是利潤。」', '"The sealing proposal isn\'t Rust Blade\'s idea alone. Someone on the Council is pushing it from the shadows — they need the passages sealed to monopolize petri-crystal mining rights. How many die below doesn\'t matter. Only profit does."'), false);
+                patrolTimers.push(setTimeout(function() {
+                  patrolAppend(L('情報','Intel'), 'tag-info',
+                    L('「你找到的那個人——銅鐘——是唯一一個反對的。但她不知道真正的敵人是誰。告訴她，查查玉秤的帳本。」', '"The one you found — Bronze Bell — is the only one opposed. But she doesn\'t know who the real enemy is. Tell her to check Jade Scale\'s ledger."'), false);
+                  patrolTimers.push(setTimeout(function() {
+                    patrolAppend(L('調查','Clue'), 'tag-info',
+                      L('信的末尾只有一行小字：「毀掉這封信。看完就忘。——一個還有良心的人。」', 'At the bottom, one small line: "Burn this letter. Forget you read it. — Someone with a conscience still."'), false);
+                    changeStat('wil', 1);
+                    patrolAppend(L('系統','System'), 'tag-system',
+                      L('意志 +1。獲得議會陰謀線索。（銅鐘對話時可使用）', 'WIL +1. Gained Council conspiracy clue. (Use in Bronze Bell dialogue)'), false);
+                    notify(L('意志 +1（真相的重量）', 'WIL +1 (The weight of truth)'));
+                    // Ying romance moment
+                    if (state.flags.r1YingCompanion) {
+                      patrolTimers.push(setTimeout(function() {
+                        patrolAppend(L('同伴','Ally'), 'tag-ally',
+                          L('螢從你身後湊過來看信。她的肩膀碰到了你的手臂——她沒有避開。', 'Ying leans over your shoulder to read. Her shoulder touches your arm — she doesn\'t pull away.'), false);
+                        patrolTimers.push(setTimeout(function() {
+                          patrolAppend(L('同伴','Ally'), 'tag-ally',
+                            L('「……有人在幫我們。」她的聲音很輕，呼吸拂在你的耳邊。你突然意識到她靠得有多近。', '"...Someone\'s helping us." Her voice is quiet, breath brushing your ear. You suddenly realize how close she is.'), false);
+                          patrolTimers.push(setTimeout(function() {
+                            patrolAppend(L('同伴','Ally'), 'tag-ally',
+                              L('她注意到你的視線，耳尖微微泛紅，但沒有退開。「看什麼……專心看信。」', 'She notices your gaze, ear tips flushing, but doesn\'t retreat. "What are you looking at... focus on the letter."'), false);
+                            renderStatus();
+                            $choices.innerHTML = '';
+                            var sb = document.createElement('button');
+                            sb.className = 'choice-btn'; sb.textContent = L('停下腳步','Stop and rest');
+                            sb.addEventListener('click', stopPatrol); $choices.appendChild(sb);
+                            patrolTimers.push(setTimeout(runPatrolCycle, 2500));
+                          }, 2800));
+                        }, 3000));
+                      }, 2500));
+                    } else {
+                      renderStatus();
+                      $choices.innerHTML = '';
+                      var sb = document.createElement('button');
+                      sb.className = 'choice-btn'; sb.textContent = L('停下腳步','Stop and rest');
+                      sb.addEventListener('click', stopPatrol); $choices.appendChild(sb);
+                      patrolTimers.push(setTimeout(runPatrolCycle, 2000));
+                    }
+                  }, 3200));
+                }, 3500));
+              }, 2800));
+            }
+          },
+          { text: L('丟掉它', 'Discard it'), textEn: 'Discard it',
+            action: function() {
+              patrolAppend(L('巡邏','Patrol'), 'tag-move',
+                L('你把信扔進了路邊的火盆。匿名信從來不是好東西。', 'You toss the letter into a roadside brazier. Anonymous letters are never good news.'), false);
+            }
+          }
+        ]
+      });
+    }
+  }
+];
+
+registerPatrolEvents(3, R3_EVENTS);
+
 // Region-aware helpers — now delegate to registry for R4+ extensibility
 var PATROL_TEXTS = R0_PATROL_TEXTS; // kept for backwards compat
 function getPatrolMonsters() { return getMonsterPool(); }
