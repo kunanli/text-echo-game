@@ -1181,9 +1181,314 @@ registerNode('r3_crane', () => {
       ], { label: L('吹牛骰', 'Liar\'s Dice') });
     }});
 
+    // Sidequest: Crane's secret warehouse (requires debt saved in R2)
+    if (state.flags.r2CraneDebtSaved && !state.flags.r3CraneMerchant) {
+      c.push({ text: '灰鶴，你在河城有秘密倉庫？', textEn: 'Crane, do you have a stash in River City?', action: () => loadNode('r3_crane_merchant') });
+    }
+    // Sidequest: Crane's real name (requires warehouse visited)
+    if (state.flags.r3CraneMerchant && !state.flags.r3CranePast) {
+      c.push({ text: '那個等你回去的人……', textEn: 'The person waiting for you...', action: () => loadNode('r3_crane_past') });
+    }
+    // Sidequest: Crane's deal (requires past revealed + Bell alliance)
+    if (state.flags.r3CranePast && state.flags.r3BellAlliance && !state.flags.r3CraneDeal) {
+      c.push({ text: '灰鶴，你考慮好了嗎？', textEn: 'Crane, have you decided?', action: () => loadNode('r3_crane_deal') });
+    }
     c.push({ text: '離開', textEn: 'Leave', action: () => loadNode('r3_market') });
     return c;
   })(), { label: L('灰鶴', 'Grey Crane') });
+});
+
+// ═══════════════════════════════════════════════════
+//  NPC Sidequest — 灰鶴 (Grey Crane) R3 arc
+// ═══════════════════════════════════════════════════
+
+// --- r3_crane_merchant: Secret warehouse in River City ---
+registerNode('r3_crane_merchant', () => {
+  state.flags.r3CraneMerchant = true;
+  autoExplore([
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('灰鶴聽到你的問題，先是一愣，然後發出一聲低笑。',
+             'Grey Crane freezes at your question, then lets out a low laugh.'),
+      delay: 2500 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「你怎麼知道的？——算了，你都幫我趕走追債人了，告訴你也無所謂。」',
+             '"How did you know? — Never mind, you chased off the collectors for me. Might as well tell you."'),
+      delay: 3000 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('灰鶴帶你穿過市場後巷，在一堵牆上推開了一塊活動石板。',
+             'Grey Crane leads you through back alleys, pushing open a loose stone panel in a wall.'),
+      delay: 2500 },
+    { art: `<pre class="ascii-art gold">
+    ╔═══════════════════════════════╗
+    ║   灰鶴的秘密倉庫             ║
+    ╠═══════════════════════════════╣
+    ║                               ║
+    ║  ┌─────┐ ┌─────┐ ┌─────┐    ║
+    ║  │ 藥水 │ │ 糧食 │ │ 武器 │   ║
+    ║  └──┬──┘ └──┬──┘ └──┬──┘    ║
+    ║  ┌──┴──┐ ┌──┴──┐ ┌──┴──┐    ║
+    ║  │ 結晶 │ │ 工具 │ │ 布匹 │   ║
+    ║  └─────┘ └─────┘ └─────┘    ║
+    ║                               ║
+    ║   ·˚· 走私半年的全部家當 ·˚· ║
+    ╚═══════════════════════════════╝
+</pre>`, artEn: `<pre class="ascii-art gold">
+    ╔═══════════════════════════════╗
+    ║   GREY CRANE'S SECRET CACHE  ║
+    ╠═══════════════════════════════╣
+    ║                               ║
+    ║  ┌─────┐ ┌─────┐ ┌─────┐    ║
+    ║  │Potion│ │ Food │ │Weapon│   ║
+    ║  └──┬──┘ └──┬──┘ └──┬──┘    ║
+    ║  ┌──┴──┐ ┌──┴──┐ ┌──┴──┐    ║
+    ║  │Cryst.│ │Tools │ │Cloth │   ║
+    ║  └─────┘ └─────┘ └─────┘    ║
+    ║                               ║
+    ║  ·˚· Half a year's smuggling ║
+    ╚═══════════════════════════════╝
+</pre>`, delay: 800 },
+    { tag: '情報', tagColor: 'tag-info',
+      text: L('石板後面是一個不大的洞穴，裡面堆滿了木箱和布袋。這是灰鶴走私半年的全部家當。',
+             'Behind the panel lies a small cave packed with crates and sacks. Grey Crane\'s entire half-year smuggling haul.'),
+      delay: 3000 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「藥水、結晶、鍛造材料、甚至還有幾把像樣的武器。」灰鶴拍了拍箱子。「夠養活半個市場的人。」',
+             '"Potions, crystals, forging materials, even a few decent weapons." Grey Crane pats a crate. "Enough to sustain half the market."'),
+      delay: 3200 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「我一直在等價格漲到最高再出手。」她靠在箱子上，語氣突然變得安靜。',
+             '"I\'ve been waiting for prices to peak before selling." She leans against a crate, her voice suddenly quiet.'),
+      delay: 2800 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「但看到那兩個追債人之後，我在想……也許不應該再囤了。也許應該做點別的。」',
+             '"But after those collectors showed up, I\'m thinking... maybe I shouldn\'t keep hoarding. Maybe it\'s time for something else."'),
+      delay: 3200 },
+    { tag: '物品', tagColor: 'tag-item',
+      html: L('灰鶴遞給你一小瓶液體。「<b>高濃度淨化劑</b>——我最好的貨。算我謝你的。」',
+             'Grey Crane hands you a small vial. "<b>Concentrated Purifier</b> — my best stock. Consider it thanks."'),
+      delay: 2800, effect: () => {
+        addItem(L('高濃度淨化劑', 'Concentrated Purifier'));
+        changePetri(-8);
+      }},
+    { tag: '效果', tagColor: 'tag-system',
+      text: L('石化度 -8%', 'Petrification -8%'),
+      delay: 1000 },
+  ], [
+    { text: '這些東西能幫到很多人', textEn: 'These supplies could help a lot of people',
+      action: () => {
+        autoExplore([
+          { tag: '對話', tagColor: 'tag-npc',
+            text: L('灰鶴看著那些箱子，沉默了好一會兒。',
+                   'Grey Crane stares at the crates for a long time.'),
+            delay: 2500 },
+          { tag: '對話', tagColor: 'tag-npc',
+            text: L('「……我知道。」她輕聲說。「讓我再想想。」',
+                   '"...I know." She says softly. "Let me think about it."'),
+            delay: 2500 },
+        ], [
+          { text: '返回', textEn: 'Back', action: () => loadNode('r3_crane') },
+        ], { label: L('灰鶴的倉庫', 'Grey Crane\'s cache') });
+      }},
+    { text: '返回', textEn: 'Back', action: () => loadNode('r3_crane') },
+  ], { label: L('灰鶴的倉庫', 'Grey Crane\'s cache') });
+});
+
+// --- r3_crane_past: Crane's real identity + someone on the surface ---
+registerNode('r3_crane_past', () => {
+  state.flags.r3CranePast = true;
+  autoExplore([
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('你在灰鶴收攤之後找到她。傍晚的碼頭很安靜，河水拍打著石壁。',
+             'You find Grey Crane after she closes her stall. The evening dock is quiet, river lapping against stone.'),
+      delay: 2500 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「你之前說，你以前不叫灰鶴。」你直接切入正題。',
+             '"You said before — you used to have a different name." You get straight to the point.'),
+      delay: 2500 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('灰鶴的笑容僵住了一瞬。她轉過頭看著暗河。',
+             'Grey Crane\'s smile freezes for a beat. She turns to look at the dark river.'),
+      delay: 2500 },
+    { art: npcPortrait.art('crane', { subtitle: '……' }) || `<pre class="ascii-art gold">
+       ·  ˚  灰鶴 — 碼頭  ˚  ·
+              ╱═══╲
+             ╱ ·˚· ╲
+            │ ─  ─  │
+            │  ───  │  ← 沒有笑
+             ╲──┬──╱
+          ╱░░░╲ │ ╱░░░╲
+         ╱░░░░░╲│╱░░░░░╲
+        │░░░░░░░░░░░░░░░│
+        │░░░░░░░░░░░░░░░│
+</pre>`, artEn: npcPortrait.art('crane', { subtitle: '...' }) || `<pre class="ascii-art gold">
+    ·  ˚  Grey Crane — Dock  ˚  ·
+              ╱═══╲
+             ╱ ·˚· ╲
+            │ ─  ─  │
+            │  ───  │  ← no smile
+             ╲──┬──╱
+          ╱░░░╲ │ ╱░░░╲
+         ╱░░░░░╲│╱░░░░░╲
+        │░░░░░░░░░░░░░░░│
+        │░░░░░░░░░░░░░░░│
+</pre>`, delay: 800 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「……我叫秋蘅。」她的聲音很輕，像是在說一個不屬於自己的名字。「地表的名字。」',
+             '"...My name is Qiu Heng." Her voice is barely audible, as if speaking a name that belongs to someone else. "My surface name."'),
+      delay: 3500 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「我在地表有一個妹妹。秋蕓。借錢做生意，就是為了給她治病。」灰鶴——秋蘅——看著河面的漣漪。',
+             '"I have a younger sister on the surface. Qiu Yun. I borrowed to start that business — to pay for her treatment." Grey Crane — Qiu Heng — watches the river ripples.'),
+      delay: 3500 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「結果生意賠了，追債人來了，我跑了。」她咬了咬嘴唇。「丟下她一個人。」',
+             '"Business failed, collectors came, I ran." She bites her lip. "Left her all alone."'),
+      delay: 3000 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「我在地底做商人賺的錢，大部分都託人帶上去給她了。但我不敢回去——回去就會被抓。」',
+             '"Most of what I earn trading underground, I send up to her through middlemen. But I can\'t go back — they\'d catch me."'),
+      delay: 3200 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('灰鶴沉默了。河風吹過她的斗篷，在暮光裡看起來比平時小了一圈。',
+             'Grey Crane goes silent. River wind catches her cloak; in the fading light she looks smaller than usual.'),
+      delay: 3000 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「你知道嗎——有時候我在想，如果議會真的封了通道，我反而解脫了。不用再假裝自己是什麼灑脫的商人。」',
+             '"You know — sometimes I think, if the Council seals the passages, I\'d actually be free. No more pretending to be some carefree merchant."'),
+      delay: 3500 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「但那樣的話——蕓兒就真的沒人管了。」她轉過頭看你，眼眶泛紅。',
+             '"But then — Yun would truly have no one." She turns to you, eyes reddening.'),
+      delay: 3000 },
+  ], [
+    { text: '通道不會封的。我會想辦法。', textEn: 'The passages won\'t be sealed. I\'ll find a way.',
+      action: () => {
+        autoExplore([
+          { tag: '對話', tagColor: 'tag-npc',
+            text: L('灰鶴盯著你看了好一會兒。然後她笑了——這次是真的笑，不是商人的假笑。',
+                   'Grey Crane stares at you for a long time. Then she smiles — a real one, not the merchant\'s mask.'),
+            delay: 3000 },
+          { tag: '對話', tagColor: 'tag-npc',
+            text: L('「你這個人真奇怪。」她說。「明明自己都快石化了，還在替別人操心。」',
+                   '"You\'re a strange one," she says. "Already half-petrified yourself, and still worrying about others."'),
+            delay: 3000 },
+          { tag: '效果', tagColor: 'tag-system',
+            text: L('灰鶴好感 ↑↑↑', 'Grey Crane bond ↑↑↑'),
+            delay: 1500 },
+        ], [
+          { text: '返回', textEn: 'Back', action: () => loadNode('r3_crane') },
+        ], { label: L('灰鶴的真名', 'Grey Crane\'s real name') });
+      }},
+    { text: '你還可以回去的', textEn: 'You can still go back',
+      action: () => {
+        autoExplore([
+          { tag: '對話', tagColor: 'tag-npc',
+            text: L('「回去？」灰鶴苦笑。「帶著一身刀疤和一堆爛帳？」',
+                   '"Go back?" Grey Crane laughs bitterly. "With these scars and a mountain of debt?"'),
+            delay: 2800 },
+          { tag: '對話', tagColor: 'tag-npc',
+            text: L('「……但如果有人能替我跟追債人談……如果通道還開著的話……也許吧。」',
+                   '"...But if someone could negotiate with the collectors... if the passages stay open... maybe."'),
+            delay: 3000 },
+        ], [
+          { text: '返回', textEn: 'Back', action: () => loadNode('r3_crane') },
+        ], { label: L('灰鶴的真名', 'Grey Crane\'s real name') });
+      }},
+  ], { label: L('灰鶴的真名', 'Grey Crane\'s real name') });
+});
+
+// --- r3_crane_deal: Crane donates all supplies for amnesty ---
+registerNode('r3_crane_deal', () => {
+  state.flags.r3CraneDeal = true;
+  autoExplore([
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('你再次找到灰鶴時，她正站在自己的秘密倉庫門口，一臉嚴肅。',
+             'When you find Grey Crane again, she\'s standing outside her secret cache, expression dead serious.'),
+      delay: 2500 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「我想好了。」灰鶴看著你，語氣比你聽過的任何一次都堅定。',
+             '"I\'ve decided." Grey Crane looks at you, her voice firmer than you\'ve ever heard.'),
+      delay: 2500 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「這些東西——全部——我要捐給議會。條件只有一個：讓通道保持開放。」',
+             '"All of it — everything — I\'m donating to the Council. One condition: keep the passages open."'),
+      delay: 3000 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('她苦笑了一下。「半年的心血。我走私的每一瓶藥、每一塊結晶、每一把刀。全部。」',
+             'She smiles wryly. "Half a year\'s work. Every potion, every crystal, every blade I smuggled. All of it."'),
+      delay: 3000 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「但如果這能讓議會看到，下層通道有商業價值——就不只是一堆等著被封死的坑洞……」',
+             '"But if this shows the Council that the lower passages have trade value — that they\'re not just holes waiting to be sealed..."'),
+      delay: 3200 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('灰鶴深吸了一口氣。「那我妹妹的藥錢，以後再想辦法。」',
+             'Grey Crane takes a deep breath. "My sister\'s medicine money — I\'ll figure that out later."'),
+      delay: 2800 },
+  ], [
+    { text: '我替你跟銅鐘說', textEn: 'I\'ll talk to Bronze Bell for you',
+      action: () => {
+        state.flags.r3CraneDealDone = true;
+        autoExplore([
+          { tag: '對話', tagColor: 'tag-npc',
+            text: L('灰鶴把倉庫的鑰匙遞給你。她的手微微發抖。',
+                   'Grey Crane hands you the warehouse key. Her hand trembles slightly.'),
+            delay: 2500 },
+          { tag: '對話', tagColor: 'tag-npc',
+            text: L('「拜託你了。」她說。沒有商人的笑容，沒有玩笑。只是一個叫秋蘅的女人在拜託你。',
+                   '"Please." She says. No merchant\'s grin, no joke. Just a woman named Qiu Heng asking you for help.'),
+            delay: 3200 },
+          { tag: '效果', tagColor: 'tag-system',
+            text: L('獲得「灰鶴的倉庫鑰匙」| 經驗 +15 | 意志 +1', 'Acquired "Grey Crane\'s Cache Key" | XP +15 | WIL +1'),
+            delay: 2000, effect: () => {
+              addItem(L('灰鶴的倉庫鑰匙', 'Grey Crane\'s Cache Key'));
+              gainXp(15);
+              changeStat('wil', 1);
+            }},
+          { tag: '系統', tagColor: 'tag-system',
+            text: L('（此物資捐贈將影響議會投票結果）', '(This donation will affect the Council vote)'),
+            delay: 2000 },
+        ], [
+          { text: '返回', textEn: 'Back', action: () => loadNode('r3_crane') },
+        ], { label: L('灰鶴的決定', 'Grey Crane\'s decision') });
+      }},
+    { text: '你確定嗎？這是你的全部身家', textEn: 'Are you sure? This is everything you have',
+      action: () => {
+        autoExplore([
+          { tag: '對話', tagColor: 'tag-npc',
+            text: L('灰鶴看著你，然後笑了。這次的笑容裡有一種你從未在她臉上見過的東西——釋然。',
+                   'Grey Crane looks at you, then smiles. This smile holds something you\'ve never seen on her face before — relief.'),
+            delay: 3000 },
+          { tag: '對話', tagColor: 'tag-npc',
+            text: L('「全部身家？」她搖搖頭。「我逃進深淵的時候身無分文。這些東西是地底給我的。還回去，剛剛好。」',
+                   '"Everything I have?" She shakes her head. "I had nothing when I fled into the abyss. The underground gave me all this. Returning it feels right."'),
+            delay: 3500 },
+        ], [
+          { text: '好——我替你跟銅鐘說', textEn: 'Alright — I\'ll talk to Bell for you',
+            action: () => {
+              state.flags.r3CraneDealDone = true;
+              autoExplore([
+                { tag: '對話', tagColor: 'tag-npc',
+                  text: L('灰鶴把鑰匙塞進你手裡。「替我謝謝銅鐘。順便告訴她——灰鶴的本名叫秋蘅，以後不躲了。」',
+                         'Grey Crane presses the key into your hand. "Thank Bell for me. And tell her — Grey Crane\'s real name is Qiu Heng. No more hiding."'),
+                  delay: 3500 },
+                { tag: '效果', tagColor: 'tag-system',
+                  text: L('獲得「灰鶴的倉庫鑰匙」| 經驗 +15 | 意志 +1', 'Acquired "Grey Crane\'s Cache Key" | XP +15 | WIL +1'),
+                  delay: 2000, effect: () => {
+                    addItem(L('灰鶴的倉庫鑰匙', 'Grey Crane\'s Cache Key'));
+                    gainXp(15);
+                    changeStat('wil', 1);
+                  }},
+                { tag: '系統', tagColor: 'tag-system',
+                  text: L('（此物資捐贈將影響議會投票結果）', '(This donation will affect the Council vote)'),
+                  delay: 2000 },
+              ], [
+                { text: '返回', textEn: 'Back', action: () => loadNode('r3_crane') },
+              ], { label: L('灰鶴的決定', 'Grey Crane\'s decision') });
+            }},
+        ], { label: L('灰鶴的決定', 'Grey Crane\'s decision') });
+      }},
+  ], { label: L('灰鶴的決定', 'Grey Crane\'s decision') });
 });
 
 // ── Region 3 Patrol ──
@@ -1505,6 +1810,7 @@ registerNode('r3_vote', () => {
   if (hasItem(L('螢的護身符', 'Ying\'s Charm'))) score += 1;
   if (state.flags.r3ZhouMet) score += 1;
   if (state.flags.r3YingRealReport) score += 3; // Ying's true report — powerful evidence
+  if (state.flags.r3CraneDealDone) score += 2; // Grey Crane's supply donation proves trade value
   if (state.flags.ngPlus) score += 2; // NG+ past-life testimony bonus
   // Store score for ending determination
   state.flags.r3VoteScore = score;
