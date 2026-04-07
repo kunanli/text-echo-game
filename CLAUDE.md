@@ -101,6 +101,78 @@ assets/
 - 全頁面禁止文字選取（v2.0）：防止電腦端點擊全選
 - 隨機敘事事件系統（v2.0.2）：12 個巡邏敘事事件（每區 3 個），含道德抉擇、屬性檢定、NPC 羈絆、調查線索、愛情互動
 - 銅鐘信任弧線重寫（v2.0.2）：初見懷疑 → 考驗任務 → 完成後才認可同盟，取代原本的一見如故
+- NPC 支線任務鏈（v2.0.3）：6 位 NPC 共 21 個支線節點，影響議會投票分數，詳見下方「NPC 支線任務系統」
+
+## ✅ 已完成：NPC 支線任務系統（v2.0.3）
+
+6 位 NPC 各有 3~5 個支線節點，揭露背景故事並影響議會投票結果。
+
+### 螢（Ying）支線（3 節點，R2→R3）
+
+| 節點 ID | 區域 | 說明 | 前置 | 關鍵 flags |
+|---------|------|------|------|-----------|
+| `r2_ying_secret` | R2 | 發現手冊隱藏頁，質問或放過 | `r2YingLore3 + r2YingSketch` | — |
+| `r2_ying_past` | R2 | 螢揭露議會調查員身分 | `r2_ying_secret` | `r2YingPast` |
+| `r2_ying_choice` | R2 | 撕毀假報告，決心寫真相 | `r2_ying_past` | — |
+| `r3_ying_conflict` | R3 | 螢面臨立場衝突 | `r3YingInn + r2YingPast` | `r3YingConflict` |
+| `r3_ying_confession` | R3 | 螢坦白「我是來封鎖你們的」 | `r3YingRiver + r2YingPast` | `r3YingConfession` |
+| `r3_ying_resolve` | R3 | 擁抱場景，承諾寫真報告 | `r3_ying_confession` | `r3YingRealReport` (+3 score) |
+
+### 灰鶴（Grey Crane）支線（5 節點，R2→R3）
+
+| 節點 ID | 區域 | 說明 | 前置 | 關鍵 flags |
+|---------|------|------|------|-----------|
+| `r2_crane_scar` | R2 | 手臂放血刀疤，地表逃債往事 | `r2CraneLore` | `r2CraneScar` |
+| `r2_crane_debt` | R2 | 追債人來襲，WIL說服/STR戰鬥/不介入 | `r2CraneScar` | `r2CraneDebtSaved` |
+| `r3_crane_merchant` | R3 | 秘密倉庫，高濃度淨化劑 | `r2CraneDebtSaved` | `r3CraneMerchant` |
+| `r3_crane_past` | R3 | 真名秋蘅，地表妹妹秋蕓 | `r3CraneMerchant` | `r3CranePast` |
+| `r3_crane_deal` | R3 | 全部走私物資捐給議會換赦免 | `r3CranePast + r3BellAlliance` | `r3CraneDealDone` (+2 score) |
+
+### 老周（Old Zhou）支線（4 節點，R1→R2→R3）
+
+| 節點 ID | 區域 | 說明 | 前置 | 關鍵 flags |
+|---------|------|------|------|-----------|
+| `r1_zhou_memory` | R1 | 揭露礦難真相：監工K炸封印 | `r1SurvivorFullTrust` | `r1ZhouMineDisaster` |
+| `r2_zhou_trace_deep` | R2 | 深層刻痕：監工K=孔德業=議會特派 | `r2ZhouTrace + r1ZhouMineDisaster` | `r2ZhouEvidence` |
+| `r3_zhou_truth` | R3 | 老周發現孔德業現為議會顧問 | `r2ZhouEvidence` | `r3ZhouTruth` |
+| `r3_zhou_justice` | R3 | 16人名單證詞，一起/代念 | `r3ZhouTruth` | `r3ZhouTestimony` (+2 score) |
+
+### 鐵霜（Iron Frost）支線（3 節點，R2）
+
+| 節點 ID | 區域 | 說明 | 前置 | 關鍵 flags |
+|---------|------|------|------|-----------|
+| `r2_frost_past` | R2 | 地表第七師團指揮官，拒絕屠村被流放 | `r2CampVisited` | `r2FrostPast` |
+| `r2_frost_soldier` | R2 | 舊部方石到營地重逢 | `r2FrostPast` | `r2FrostSoldierSaved` |
+| `r2_frost_letter` | R2 | 寫密封信給議會，請求撤離+調查第七師團 | `r2FrostSoldier` | `r2FrostLetterCarried` (+1 score) |
+
+### 銅鐘（Bronze Bell）支線（3 節點，R3）
+
+| 節點 ID | 區域 | 說明 | 前置 | 關鍵 flags |
+|---------|------|------|------|-----------|
+| `r3_bell_night` | R3 | 深夜辦公室，石化右手疼痛，脆弱面 | `r3BellAlliance` | `r3BellNight` |
+| `r3_bell_secret` | R3 | 鏽刃壟斷石化結晶製造武器的真相 | `r3BellNight + (FrostLetter or ZhouTestimony)` | `r3BellSecret` |
+| `r3_bell_alliance_deep` | R3 | 攤底牌，腐敗檔案全交出 | `r3BellSecret` | `r3BellAllianceDeep` (+3 score) |
+
+### 承鋼（Cheng Gang）支線（3 節點，R2）
+
+| 節點 ID | 區域 | 說明 | 前置 | 關鍵 flags |
+|---------|------|------|------|-----------|
+| `r2_cheng_memory` | R2 | 石化前研究：結晶是轉換非破壞 | `r2ChengAwake + train≥1` | `r2ChengMemory` |
+| `r2_cheng_lab` | R2 | 古代密道隱藏實驗室，3年數據完好 | `r2ChengMemory` | `r2ChengLab` |
+| `r2_cheng_cure` | R2 | 倫理困境：犧牲活人 vs 找封印裝置逆轉 | `r2ChengLab` | `r2ChengCureData` (+2 score) |
+
+### 議會投票 score 更新（v2.0.3）
+
+```javascript
+// 新增支線任務加分
+if (state.flags.r3YingRealReport) score += 3;  // 螢的真報告
+if (state.flags.r3CraneDealDone) score += 2;   // 灰鶴物資捐贈
+if (state.flags.r3ZhouTestimony) score += 2;   // 老周礦難證詞
+if (state.flags.r2FrostLetterCarried) score += 1; // 鐵霜密封信
+if (state.flags.r3BellAllianceDeep) score += 3; // 銅鐘腐敗檔案
+if (state.flags.r2ChengCureData) score += 2;   // 承鋼治癒研究
+// 理論最高：+13 分（支線全通）
+```
 
 ## ✅ 已完成：New Game+ 系統（v1.6）
 
