@@ -1057,9 +1057,223 @@ registerNode('r3_zhou', () => {
         ], { label: L('老周的留言', 'Zhou\'s message') });
       }});
     }
+    // Sidequest: Zhou tells the full truth (requires R2 evidence)
+    if (state.flags.r2ZhouEvidence && !state.flags.r3ZhouTruth) {
+      c.push({ text: '老周，我找到了你刻的那些字……', textEn: 'Zhou, I found those carvings you made...', action: () => loadNode('r3_zhou_truth') });
+    }
+    // Sidequest: Zhou's justice (requires truth told)
+    if (state.flags.r3ZhouTruth && !state.flags.r3ZhouJustice) {
+      c.push({ text: '老周，你想好了嗎？', textEn: 'Zhou, have you decided?', action: () => loadNode('r3_zhou_justice') });
+    }
     c.push({ text: '離開', textEn: 'Leave', action: () => loadNode('r3_market') });
     return c;
   })(), { label: L('老周', 'Old Zhou') });
+});
+
+// ── NPC Sidequest: Old Zhou's Truth (R3) ──
+registerNode('r3_zhou_truth', () => {
+  state.flags.r3ZhouTruth = true;
+  autoExplore([
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('你把在採石場岩壁上發現的深層刻痕告訴老周——監工 K 的真名、議會的命令、軍事用途。',
+             'You tell Old Zhou about the deeper carvings you found on the quarry wall — Overseer K\'s real name, the Council\'s orders, the military purpose.'),
+      delay: 3000 },
+    { tag: '感知', tagColor: 'tag-sense',
+      text: L('老周聽完，整個人像被抽走了力氣。他慢慢靠回牆上，用石化的手捂住了臉。',
+             'Old Zhou listens, then seems to deflate. He slowly leans against the wall, covering his face with his petrified hand.'),
+      delay: 3000 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「……你都看到了。」他的聲音像是從石頭裡擠出來的。',
+             '"...You saw it all." His voice sounds like it\'s being squeezed from stone.'),
+      delay: 2500 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「我刻那些字的時候，以為自己快死了。想著就算死了，也不能讓真相爛在地底。」',
+             '"When I carved those words, I thought I was dying. Figured even if I died, the truth shouldn\'t rot underground."'),
+      delay: 3200 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「結果我沒死。我到了河城。然後我才發現——」他抬起頭，完好的左眼裡燃燒著某種東西。',
+             '"Turns out I didn\'t die. I made it to River City. And then I found out —" He looks up, something burning in his good eye.'),
+      delay: 3000 },
+    { tag: '對話', tagColor: 'tag-npc',
+      html: L('「監工 K——<b>孔德業</b>——現在是河城議會的顧問。坐在議會廳裡，穿著乾淨的衣服，說著漂亮的話。」',
+             '"Overseer K — <b>Kong De-ye</b> — is now an advisor on the River City Council. Sitting in the Council chamber, wearing clean clothes, speaking pretty words."'),
+      delay: 3500 },
+    { tag: '感知', tagColor: 'tag-sense',
+      text: L('老周的拳頭捏得咯咯作響。石化的右手上裂開了幾道細紋。',
+             'Old Zhou\'s fists creak. Hairline cracks spiderweb across his petrified right hand.'),
+      delay: 2500 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「十六條人命。我的腿。整個地底幾千人的石化。全是因為他。」',
+             '"Sixteen lives. My legs. Thousands petrified underground. All because of him."'),
+      delay: 3000 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「而他在上面活得好好的。」老周閉上眼，深深吸了一口氣。',
+             '"And he\'s doing just fine up here." Old Zhou closes his eyes, draws a deep breath.'),
+      delay: 2800 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「我想公開這件事。在議會上。讓所有人知道瘟疫的真相。」',
+             '"I want to go public. At the Council. Let everyone know the truth about the plague."'),
+      delay: 3000 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('他看著你，那隻深棕色的眼睛異常清醒。「但我需要你幫我。一個瘸腿老礦工的話，沒人會信。」',
+             'He looks at you, that deep brown eye unusually lucid. "But I need your help. No one will believe a crippled old miner alone."'),
+      delay: 3200 },
+  ], [
+    { text: '我幫你', textEn: 'I\'ll help you',
+      action: () => {
+        autoExplore([
+          { tag: '對話', tagColor: 'tag-npc',
+            text: L('老周看了你很久。然後他伸出那隻完好的手——不是握手，是用力攥住了你的前臂。',
+                   'Old Zhou stares at you a long while. Then he extends his good hand — not a handshake, but a firm grip on your forearm.'),
+            delay: 3000 },
+          { tag: '對話', tagColor: 'tag-npc',
+            text: L('「……我老周這輩子不欠人情。但這個情，我欠了。」',
+                   '"...Old Zhou doesn\'t owe favors in this life. But this one — I owe."'),
+            delay: 2800 },
+          { tag: '效果', tagColor: 'tag-system',
+            text: L('老周好感 ↑↑↑ | 經驗 +10', 'Old Zhou bond ↑↑↑ | XP +10'),
+            delay: 1500, effect: () => gainXp(10) },
+        ], [
+          { text: '返回', textEn: 'Back', action: () => loadNode('r3_zhou') },
+        ], { label: L('老周的請求', 'Zhou\'s request') });
+      }},
+    { text: '你確定嗎？議會的人可能不好惹', textEn: 'Are you sure? The Council won\'t take it well',
+      action: () => {
+        autoExplore([
+          { tag: '對話', tagColor: 'tag-npc',
+            text: L('「不好惹？」老周冷笑了一聲。「我半個身子都石化了，還有什麼好怕的？」',
+                   '"Won\'t take it well?" Old Zhou laughs coldly. "Half my body is stone. What\'s left to be afraid of?"'),
+            delay: 3000 },
+          { tag: '對話', tagColor: 'tag-npc',
+            text: L('「那十六個人沒有怕的機會。我至少還能站著說話。」',
+                   '"Those sixteen men didn\'t get a chance to be afraid. At least I can still stand and speak."'),
+            delay: 2800 },
+        ], [
+          { text: '好，我幫你', textEn: 'Alright, I\'ll help', action: () => {
+            gainXp(10);
+            loadNode('r3_zhou');
+          }},
+        ], { label: L('老周的決心', 'Zhou\'s resolve') });
+      }},
+  ], { label: L('老周的真相', 'Zhou\'s truth') });
+});
+
+// ── NPC Sidequest: Old Zhou's Justice (R3) ──
+registerNode('r3_zhou_justice', () => {
+  state.flags.r3ZhouJustice = true;
+  autoExplore([
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('老周坐在工具台旁，手裡攥著一張寫滿字的紙。看到你來，他站了起來——靠著拐杖，但脊背挺得很直。',
+             'Old Zhou sits by the workbench, clutching a paper covered in writing. When he sees you, he stands — leaning on his crutch, but spine ramrod straight.'),
+      delay: 3000 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「我寫好了。」他把紙遞給你。「第三班十六個人的名字。礦難的經過。監工 K 的真名和議會的命令。全部。」',
+             '"I\'ve written it all." He hands you the paper. "The names of all sixteen men from Crew 3. What happened. Overseer K\'s real name and the Council\'s orders. Everything."'),
+      delay: 3500 },
+    { art: `<pre class="ascii-art">
+  ╔═════════════════════════════════╗
+  ║     老周的證詞書                ║
+  ╠═════════════════════════════════╣
+  ║                                 ║
+  ║  第三班 十六人名單：            ║
+  ║  張大山、李鐵柱、王石根、      ║
+  ║  趙礦生、錢得福、孫大力、      ║
+  ║  劉黑臉、陳老實、楊二蛋、      ║
+  ║  馬驢子、朱小胖、黃石頭、      ║
+  ║  林木根、吳長命、鄭方圓、      ║
+  ║  何來福                         ║
+  ║                                 ║
+  ║  ——以上十六人死於東翼B-7       ║
+  ║  ——監工孔德業下令炸開封印     ║
+  ║  ——受河城議會軍事部門指派     ║
+  ║                                 ║
+  ║  證人：第三班·周  [手印]        ║
+  ╚═════════════════════════════════╝
+</pre>`, artEn: `<pre class="ascii-art">
+  ╔═════════════════════════════════╗
+  ║     ZHOU'S WRITTEN TESTIMONY   ║
+  ╠═════════════════════════════════╣
+  ║                                 ║
+  ║  Crew 3, 16 names:             ║
+  ║  Zhang Dashan, Li Tiezhu,      ║
+  ║  Wang Shigen, Zhao Kuangsheng, ║
+  ║  Qian Defu, Sun Dali,          ║
+  ║  Liu Heilian, Chen Laoshi,     ║
+  ║  Yang Erdan, Ma Lvzi,          ║
+  ║  Zhu Xiaopang, Huang Shitou,   ║
+  ║  Lin Mugen, Wu Changming,      ║
+  ║  Zheng Fangyuan, He Laifu      ║
+  ║                                 ║
+  ║  —Died at East Wing B-7        ║
+  ║  —Overseer Kong De-ye ordered  ║
+  ║   the seal destroyed           ║
+  ║  —Under River City Council     ║
+  ║   military division orders     ║
+  ║                                 ║
+  ║  Witness: Crew 3 · Zhou [mark] ║
+  ╚═════════════════════════════════╝
+</pre>`, delay: 800 },
+    { tag: '感知', tagColor: 'tag-sense',
+      text: L('你看到紙的最下方按了一個手印——半邊是墨跡，半邊是石化的灰色。老周用石化的手指蘸了墨水，留下了他的印記。',
+             'At the bottom of the page — a handprint, half ink, half grey stone. Old Zhou dipped his petrified fingers in ink to leave his mark.'),
+      delay: 3200 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「我不知道議會會不會聽。但至少——十六個名字不再是沒人知道的秘密。」',
+             '"I don\'t know if the Council will listen. But at least — sixteen names will no longer be a secret no one knows."'),
+      delay: 3000 },
+  ], [
+    { text: '我會帶到議會去', textEn: 'I\'ll bring this to the Council',
+      action: () => {
+        state.flags.r3ZhouTestimony = true;
+        autoExplore([
+          { tag: '對話', tagColor: 'tag-npc',
+            text: L('老周點了點頭。然後他做了一件讓你意外的事——他用力站了起來，甩開了拐杖。',
+                   'Old Zhou nods. Then he does something unexpected — he forces himself up, casting aside his crutch.'),
+            delay: 2800 },
+          { tag: '對話', tagColor: 'tag-npc',
+            text: L('「不。我自己去。」石化的雙腿在發抖，但他站住了。「十六個人的名字，不該由別人代念。」',
+                   '"No. I\'ll go myself." His petrified legs shake, but he stands. "Sixteen names shouldn\'t be read by a stranger."'),
+            delay: 3500 },
+          { tag: '感知', tagColor: 'tag-sense',
+            text: L('他朝你伸出完好的那隻手。掌心粗糙溫熱。「一起去。」',
+                   'He extends his good hand toward you. The palm is rough and warm. "Together."'),
+            delay: 2800 },
+          { tag: '效果', tagColor: 'tag-system',
+            text: L('老周好感 MAX | 經驗 +15 | 力量 +1', 'Old Zhou bond MAX | XP +15 | STR +1'),
+            delay: 2000, effect: () => {
+              gainXp(15);
+              changeStat('str', 1);
+            }},
+          { tag: '系統', tagColor: 'tag-system',
+            text: L('（老周的證詞將影響議會投票結果）', '(Zhou\'s testimony will affect the Council vote)'),
+            delay: 2000 },
+        ], [
+          { text: '一起去', textEn: 'Together', action: () => loadNode('r3_market') },
+        ], { label: L('老周的正義', 'Zhou\'s justice') });
+      }},
+    { text: '太危險了，讓我替你說', textEn: 'Too dangerous — let me speak for you',
+      action: () => {
+        state.flags.r3ZhouTestimony = true;
+        autoExplore([
+          { tag: '對話', tagColor: 'tag-npc',
+            text: L('老周沉默了。他低頭看了看自己石化的腿，然後苦笑了。',
+                   'Old Zhou goes silent. He looks down at his petrified legs, then laughs bitterly.'),
+            delay: 2800 },
+          { tag: '對話', tagColor: 'tag-npc',
+            text: L('「……也是。我連走到議會廳都勉強。」他把紙折好塞進你手裡。「替我念那十六個名字。每一個。」',
+                   '"...True. I can barely make it to the Council chamber." He folds the paper and presses it into your hand. "Read those sixteen names for me. Every one."'),
+            delay: 3500 },
+          { tag: '效果', tagColor: 'tag-system',
+            text: L('老周好感 ↑↑ | 經驗 +12', 'Old Zhou bond ↑↑ | XP +12'),
+            delay: 1500, effect: () => gainXp(12) },
+          { tag: '系統', tagColor: 'tag-system',
+            text: L('（老周的證詞將影響議會投票結果）', '(Zhou\'s testimony will affect the Council vote)'),
+            delay: 2000 },
+        ], [
+          { text: '返回', textEn: 'Back', action: () => loadNode('r3_market') },
+        ], { label: L('老周的正義', 'Zhou\'s justice') });
+      }},
+  ], { label: L('老周的正義', 'Zhou\'s justice') });
 });
 
 // ═══════════════════════════════════════════════════
@@ -1809,6 +2023,7 @@ registerNode('r3_vote', () => {
   if (state.flags.r3BossMethod === 'sneak') score += 1;
   if (hasItem(L('螢的護身符', 'Ying\'s Charm'))) score += 1;
   if (state.flags.r3ZhouMet) score += 1;
+  if (state.flags.r3ZhouTestimony) score += 2; // Zhou's testimony exposes Council's role in plague
   if (state.flags.r3YingRealReport) score += 3; // Ying's true report — powerful evidence
   if (state.flags.r3CraneDealDone) score += 2; // Grey Crane's supply donation proves trade value
   if (state.flags.ngPlus) score += 2; // NG+ past-life testimony bonus

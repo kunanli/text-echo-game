@@ -223,6 +223,9 @@ registerNode('r2_quarry_floor', () => {
     if (state.flags.r1SurvivorMet && !state.flags.r2ZhouTrace) {
       c.push({ text: '岩壁上好像有字……', textEn: 'There seems to be writing on the rock wall...', action: () => loadNode('r2_zhou_trace') });
     }
+    if (state.flags.r2ZhouTrace && state.flags.r1ZhouMineDisaster && !state.flags.r2ZhouTraceDeep) {
+      c.push({ text: '老周留言旁邊……還有更多刻痕', textEn: 'Beside Zhou\'s message... more carvings', action: () => loadNode('r2_zhou_trace_deep') });
+    }
     c.push({ text: '返回瞭望台', textEn: 'Return to overlook', action: () => loadNode('r2_look') });
     return c;
   })(), { label: L('搜索採石台', 'Searching quarry platform') });
@@ -2462,6 +2465,101 @@ registerNode('r2_zhou_trace', () => {
     }},
     { text: '點頭，繼續', textEn: 'Nod, continue', action: () => loadNode('r2_quarry_floor') },
   ], { label: L('老周的留言', 'Old Zhou\'s message') });
+});
+
+// ── NPC Sidequest: Old Zhou's Deeper Truth ──
+registerNode('r2_zhou_trace_deep', () => {
+  state.flags.r2ZhouTraceDeep = true;
+  autoExplore([
+    { tag: '探索', tagColor: 'tag-explore',
+      text: L('你回到老周留言的那面岩壁。這一次，你蹲下來仔細看——在大字下方，還有一片密密麻麻的小字。',
+             'You return to the wall where Zhou carved his message. This time you crouch down — beneath the large text, there\'s a dense patch of tiny characters.'),
+      delay: 3000 },
+    { art: `<pre class="ascii-art">
+  ░▓█▓░▓█▓░▓█▓░▓█▓░▓█▓░▓█▓░▓█▓░
+  █                              █
+  ▓  ╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱   ▓
+  █  ╱ 監工K真名：孔德業     ╱   █
+  ▓  ╱ 不是礦業公司的人      ╱   ▓
+  █  ╱ 是議會派來的          ╱   █
+  ▓  ╱ 任務：開採石化結晶    ╱   ▓
+  █  ╱ 供河城軍事用途        ╱   █
+  ▓  ╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱   ▓
+  █  ╱ 我偷聽到他跟上面通話  ╱   █
+  ▓  ╱ 「封印後面的結晶      ╱   ▓
+  █  ╱   足夠武裝一支軍隊」  ╱   █
+  ▓  ╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱   ▓
+  █   ↑ 刮得很深 像是用盡全力    █
+  ░▓█▓░▓█▓░▓█▓░▓█▓░▓█▓░▓█▓░▓█▓░
+</pre>`, artEn: `<pre class="ascii-art">
+  ░▓█▓░▓█▓░▓█▓░▓█▓░▓█▓░▓█▓░▓█▓░
+  █                              █
+  ▓  ╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱   ▓
+  █  ╱ Overseer K, real name: ╱   █
+  ▓  ╱ Kong De-ye             ╱   ▓
+  █  ╱ Not from mining co.    ╱   █
+  ▓  ╱ Sent by the Council    ╱   ▓
+  █  ╱ Mission: mine petri-   ╱   █
+  ▓  ╱ crystals for River     ╱   ▓
+  █  ╱ City military use      ╱   █
+  ▓  ╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱   ▓
+  █  ╱ I overheard him call:  ╱   █
+  ▓  ╱ "Crystals behind seal  ╱   ▓
+  █  ╱ enough to arm a force" ╱   █
+  ▓  ╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱   ▓
+  █    ↑ Deeply gouged, as if     █
+  ░▓█▓░▓█▓░▓█▓░▓█▓░▓█▓░▓█▓░▓█▓░
+</pre>`, delay: 800 },
+    { tag: '調查', tagColor: 'tag-info',
+      text: L('這些字比上面的留言刻得更深，像是用盡了全身力氣。有幾處石化的粉末堵住了筆畫——老周刻這些的時候，手已經開始石化了。',
+             'These characters are gouged far deeper than the message above, as if carved with every ounce of strength. Petrification dust clogs some strokes — Zhou\'s hand was already turning when he wrote this.'),
+      delay: 3500 },
+    { tag: '調查', tagColor: 'tag-info',
+      html: L('「監工 K 真名<b>孔德業</b>。不是礦業公司的人——是<b>議會派來的</b>。」',
+             '"Overseer K, real name <b>Kong De-ye</b>. Not from the mining company — <b>sent by the Council</b>."'),
+      delay: 3000 },
+    { tag: '調查', tagColor: 'tag-info',
+      text: L('「任務：開採封印後的石化結晶。供河城軍事用途。」',
+             '"Mission: mine petrification crystals behind the seal. For River City military use."'),
+      delay: 2800 },
+    { tag: '調查', tagColor: 'tag-info',
+      text: L('「我偷聽到他跟上面通話——『封印後面的結晶足夠武裝一支軍隊。』」',
+             '"I overheard him report topside — \'Crystals behind the seal, enough to arm a force.\'"'),
+      delay: 3000 },
+    { tag: '感知', tagColor: 'tag-sense',
+      text: L('你站起來，腦子裡在飛速運轉。如果老周說的是真的——石化瘟疫不是天災，而是河城議會為了軍事目的引發的人禍。',
+             'You stand up, mind racing. If what Zhou carved is true — the petrification plague wasn\'t a natural disaster, but a catastrophe triggered by the River City Council for military ends.'),
+      delay: 3500 },
+    { tag: '系統', tagColor: 'tag-system',
+      text: L('這份證詞可能改變一切——如果能帶到河城。',
+             'This testimony could change everything — if you can bring it to River City.'),
+      delay: 2500 },
+  ], [
+    { text: '用石板拓印這些刻痕', textEn: 'Make a rubbing of the carvings',
+      action: () => {
+        state.flags.r2ZhouEvidence = true;
+        autoExplore([
+          { tag: '行動', tagColor: 'tag-move',
+            text: L('你找了一塊薄石板，用木炭小心翼翼地把所有刻痕拓印下來。',
+                   'You find a thin slate and carefully rub charcoal over all the carvings to copy them.'),
+            delay: 2500 },
+          { tag: '物品', tagColor: 'tag-item',
+            html: L('獲得「<b>老周的礦難證詞拓片</b>」——監工 K 的真實身分與議會的命令。',
+                   'Acquired "<b>Zhou\'s Disaster Testimony Rubbing</b>" — Overseer K\'s true identity and the Council\'s orders.'),
+            delay: 2500, effect: () => addItem(L('老周的礦難證詞', 'Zhou\'s Disaster Testimony')) },
+          { tag: '效果', tagColor: 'tag-system',
+            text: L('經驗 +12（關鍵證據）', 'XP +12 (Key evidence)'),
+            delay: 1500, effect: () => gainXp(12) },
+        ], [
+          { text: '返回', textEn: 'Back', action: () => loadNode('r2_quarry_floor') },
+        ], { label: L('拓印證詞', 'Copying testimony') });
+      }},
+    { text: '記在心裡就好', textEn: 'Just remember it',
+      action: () => {
+        state.flags.r2ZhouEvidence = true;
+        loadNode('r2_quarry_floor');
+      }},
+  ], { label: L('老周的深層真相', 'Zhou\'s deeper truth') });
 });
 
 // ── Region 2 Patrol ──
