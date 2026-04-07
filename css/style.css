@@ -374,6 +374,8 @@
   .log-tag.tag-ally    { color: #e06080; }
   .log-tag.tag-event   { color: #c8a040; }
 
+  .petri-sensory { color: #9090c0; font-style: italic; }
+
   /* ── Explore status bar (ASCII style) ── */
   .explore-bar {
     font-family: "Courier New", Courier, monospace;
