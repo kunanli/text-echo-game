@@ -216,6 +216,10 @@ var R0_PATROL_TEXTS = [
   { text: '你的手指拂過石壁——上面刻著某個早已遺忘的名字。', textEn: 'Your fingers brush the wall — someone carved a long-forgotten name here.' },
   { text: '空氣中飄著一絲硫磺的氣味，越往深處越濃。', textEn: 'A faint sulfur smell hangs in the air, growing stronger deeper in.' },
   { text: '你踩碎了一塊發光的石化結晶，碎片散發出短暫的冷光。', textEn: 'You crush a glowing petrified crystal underfoot; shards emit a brief cold light.' },
+  { text: '水滴落在你的石化手背上——你感覺不到冰涼。那片皮膚已經失去知覺了。', textEn: 'A water drop lands on the back of your petrified hand — you feel no cold. That patch of skin is numb.' },
+  { text: '空氣很薄。你每吸一口氣都能嚐到石頭的味道——乾燥的、粉末般的苦澀。', textEn: 'The air is thin. Each breath tastes of stone — dry, powdery bitterness.' },
+  { text: '你的影子在結晶的折射中變成了三個。哪一個才是真正的你？', textEn: 'Your shadow splits into three in the crystal refraction. Which one is the real you?' },
+  { text: '坑底很安靜。安靜到你能聽見自己血管裡石化粒子流動的沙沙聲。', textEn: 'The pit is so quiet you can hear petri-particles flowing through your veins — a faint hiss.' },
 ];
 
 var R1_PATROL_TEXTS = [
@@ -231,6 +235,10 @@ var R1_PATROL_TEXTS = [
   { text: '一根鏽蝕的釘子從支撐架上掉落，在寂靜中叮噹作響。', textEn: 'A rusted nail drops from a support frame, clanging in the silence.' },
   { text: '你腳下的鐵軌突然震動了一下——遠處有什麼在移動。', textEn: 'The rails beneath your feet vibrate briefly — something moves in the distance.' },
   { text: '走廊的盡頭傳來微弱的哼唱聲，但當你靠近時就消失了。', textEn: 'Faint humming echoes from the corridor\'s end, but vanishes as you approach.' },
+  { text: '礦道深處傳來有節奏的敲擊聲。不知道是石脈收縮，還是什麼東西在回應你的腳步。', textEn: 'Rhythmic tapping echoes from the deep. Hard to tell if it\'s shifting rock — or something answering your footsteps.' },
+  { text: '你拂過牆面的結晶，指尖傳來微弱的電流感——像是有什麼活的東西在裡面脈動。', textEn: 'You brush the wall crystals and feel a faint current — as if something alive pulses within.' },
+  { text: '一面完整的石化鏡面嵌在牆裡。你瞥見自己的倒影——石化紋路比你以為的更深。', textEn: 'An intact petrified mirror is set into the wall. You glimpse your reflection — the stone marks run deeper than you thought.' },
+  { text: '空氣中懸浮著細微的石化粉塵，在微光石的照射下像金色的雪。你屏住呼吸。', textEn: 'Fine petri-dust hangs in the air, catching the glowstone light like golden snow. You hold your breath.' },
 ];
 
 var R2_MONSTERS = [
@@ -357,6 +365,10 @@ var R2_PATROL_TEXTS = [
   { text: '你路過一處營火遺跡，灰燼還帶著餘溫——有人不久前來過。', textEn: 'You pass campfire remains, ashes still warm — someone was here recently.' },
   { text: '腳下的石板裂開了一條縫，從中散發出熱氣和硫磺味。', textEn: 'A flagstone cracks open, venting hot gas and sulfur from below.' },
   { text: '你抬頭看了一眼——無數石化的鐘乳石倒懸在頭頂，像凝固的雨。', textEn: 'You look up — countless petrified stalactites hang overhead, like frozen rain.' },
+  { text: '營火把影子拉得很長。你注意到你的影子手指比實際的更僵硬——或者只是錯覺。', textEn: 'The fire stretches shadows long. Your shadow fingers seem stiffer than the real ones — or maybe it\'s not an illusion.' },
+  { text: '你路過一面石壁，上面刻滿了潦草的字：「不要挖封印層」。最後幾個字被石化結晶覆蓋了。', textEn: 'You pass a wall covered in scratched words: "DO NOT DIG THE SEAL LAYER." The last few characters are buried under crystal growth.' },
+  { text: '遠處的石化戰爭機械殘骸中，有什麼東西在閃爍——很微弱，像垂死的心跳。', textEn: 'Something flickers inside distant war-machine wreckage — very faint, like a dying heartbeat.' },
+  { text: '你聞到一絲不屬於地底的氣味——花香。從某個你看不見的地方飄來，轉瞬即逝。', textEn: 'You catch a scent that doesn\'t belong underground — flowers. Drifting from somewhere unseen, then gone.' },
 ];
 
 var R3_MONSTERS = [
@@ -479,6 +491,10 @@ var R3_PATROL_TEXTS = [
   { text: '河面上漂過一盞紙燈——不知道是誰放的，也不知道它漂了多久。', textEn: 'A paper lantern drifts past on the river — no telling who set it afloat, or how long ago.' },
   { text: '你聽見遠處傳來模糊的歌聲，但旋律太古老了，你聽不出歌詞。', textEn: 'Faint singing echoes from afar, but the melody is too ancient to make out any words.' },
   { text: '碼頭的木板在你腳下發出不安的嘎吱聲，河水在下方黑暗中湧動。', textEn: 'Dock planks creak nervously beneath you, dark water surging below.' },
+  { text: '河城的燈火很亮，但你注意到每三盞燈就有一盞是壞的。沒人修理。', textEn: 'River City\'s lanterns burn bright, but every third one is broken. Nobody repairs them.' },
+  { text: '你經過一面公告牆，最新的告示寫著：「石化度超過 60% 者禁止進入上城區。」', textEn: 'You pass a notice board. The latest reads: "Persons with petrification above 60% are barred from the Upper City."' },
+  { text: '一個孩子盯著你的石化手臂看了很久，被母親拉走了。母親的眼裡寫著恐懼。', textEn: 'A child stares at your petrified arm for a long moment before their mother pulls them away. Fear is written in her eyes.' },
+  { text: '河面上倒映著頭頂岩層的結晶光，波紋讓它們看起來像在呼吸。這座城市建在一個活物的身體裡。', textEn: 'Crystal light from the ceiling reflects off the river, ripples making it look like breathing. This city is built inside something alive.' },
 ];
 
 // ── Register pools into centralized registry (from registry.js) ──
