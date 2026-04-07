@@ -3698,10 +3698,10 @@ registerNode('r2_elevator', function() {
       delay: 2500,
       effect: function() {
         if (passed) {
-          addItem(L('望遠鏡', 'Spyglass'));
+          addItem(L('望遠鏡', 'Telescope'));
           changeStat('agi', 1);
           sfx.item();
-          notify(L('你抵達觀景平台！獲得「望遠鏡」，AGI+1', 'You reach the observation deck! Obtained "Spyglass", AGI+1'));
+          notify(L('你抵達觀景平台！獲得「望遠鏡」，AGI+1', 'You reach the observation deck! Obtained "Telescope", AGI+1'));
         }
       }},
   ], [
