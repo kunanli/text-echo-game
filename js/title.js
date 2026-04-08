@@ -9,7 +9,7 @@ function showPhase(id) {
   setTimeout(function() { phase.classList.add('active'); }, 80);
 }
 
-// ── Phase 1: Splash → click to proceed ──
+// ── Phase 1: Splash ──
 // Show continue button if save exists
 (function() {
   var continueBtn = document.getElementById('continue-btn');

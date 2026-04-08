@@ -968,13 +968,14 @@
     font-family: "Courier New", Courier, monospace;
     margin-bottom: 8px;
   }
-  .click-prompt {
+  /* ── Splash: language prompt ── */
+  .splash-lang-prompt {
     color: #5a5a6a;
-    font-size: .9rem;
-    letter-spacing: 3px;
-    margin-top: 10px;
+    font-size: .85rem;
+    letter-spacing: 2px;
+    margin-top: 6px;
+    margin-bottom: 2px;
     animation: prompt-pulse 2.5s ease-in-out infinite;
-    cursor: pointer;
   }
   @keyframes prompt-pulse {
     0%, 100% { opacity: .3; }
@@ -984,13 +985,13 @@
     display: flex;
     gap: 24px;
     justify-content: center;
-    margin-top: 12px;
+    margin-top: 8px;
   }
   .lang-btn {
     background: #12121e;
     border: 1px solid #2a2a3a;
     color: #c8c8d0;
-    padding: 28px 44px;
+    padding: 20px 38px;
     font-family: inherit;
     cursor: pointer;
     border-radius: 6px;
@@ -998,7 +999,7 @@
     text-align: center;
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 4px;
   }
   .lang-btn:hover {
     border-color: #d4a843;
@@ -1006,15 +1007,52 @@
     background: #1a1a2e;
   }
   .lang-btn .lang-label {
-    font-size: 1.3rem;
+    font-size: 1.2rem;
     font-weight: bold;
   }
   .lang-btn .lang-desc {
-    font-size: .75rem;
+    font-size: .72rem;
     color: #5a5a6a;
   }
   .lang-btn:hover .lang-desc {
     color: #8a7a4a;
+  }
+
+  /* ── Splash: action buttons row (continue / chapter / NG+ / leaderboard) ── */
+  .splash-divider {
+    width: 220px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, #2a2a3a, transparent);
+    margin: 14px 0 10px;
+  }
+  .splash-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+    max-width: 420px;
+  }
+  .splash-action-btn {
+    background: none;
+    border: 1px solid #2a2a3a;
+    color: #6a6a7a;
+    padding: 8px 20px;
+    font-size: .85rem;
+    font-family: inherit;
+    cursor: pointer;
+    border-radius: 4px;
+    letter-spacing: 3px;
+    transition: all .25s;
+  }
+  .splash-action-btn:hover {
+    border-color: #d4a843;
+    color: #d4a843;
+    background: #1a1a2e;
+    text-shadow: 0 0 8px rgba(232,208,128,.2);
+  }
+  .splash-action-btn.selected {
+    border-color: #d4a843;
+    color: #d4a843;
   }
 
   /* ── Chapter Select ── */
@@ -1440,6 +1478,11 @@
     .title-ascii { font-size: .52rem; line-height: 1.15; margin-bottom: 18px; }
     .title-form { width: 90%; max-width: 340px; }
     .start-btn { padding: 14px 36px; font-size: 1rem; letter-spacing: 4px; }
+    .splash-lang-prompt { font-size: .72rem; letter-spacing: 1px; }
+    .lang-btn { padding: 14px 28px; }
+    .lang-btn .lang-label { font-size: 1rem; }
+    .splash-action-btn { padding: 6px 14px; font-size: .78rem; letter-spacing: 2px; }
+    .splash-actions { max-width: 320px; }
   }
 
   /* ══ Save Code UI ══ */
