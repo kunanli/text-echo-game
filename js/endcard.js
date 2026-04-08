@@ -36,10 +36,10 @@ var ENDING_FLAVOR = {
 
 // ── Rarity ──
 var RARITY_TIERS = [
-  { min: 120, zh: '傳說', en: 'LEGENDARY', color: '#d4a843', stars: 5 },
-  { min: 100, zh: '史詩', en: 'EPIC',      color: '#9a5ac8', stars: 4 },
-  { min: 80,  zh: '稀有', en: 'RARE',      color: '#4a8ac8', stars: 3 },
-  { min: 60,  zh: '精良', en: 'UNCOMMON',   color: '#4a9e4a', stars: 2 },
+  { min: 180, zh: '傳說', en: 'LEGENDARY', color: '#d4a843', stars: 5 },
+  { min: 140, zh: '史詩', en: 'EPIC',      color: '#9a5ac8', stars: 4 },
+  { min: 105, zh: '稀有', en: 'RARE',      color: '#4a8ac8', stars: 3 },
+  { min: 75,  zh: '精良', en: 'UNCOMMON',   color: '#4a9e4a', stars: 2 },
   { min: 0,   zh: '普通', en: 'COMMON',     color: '#6a6a7a', stars: 1 },
 ];
 
@@ -53,24 +53,86 @@ function getRarity(score) {
 // ── Scoring ──
 function calculateEndScore() {
   var s = 0;
-  s += (state.str + state.agi + state.wil) * 2;
-  s += state.level * 2;
-  s += Math.min(state.inventory.length * 2, 20);
-  if (state.flags.r1YingCompanion) s += 5;
-  if (state.flags.r3ZhouMet) s += 3;
-  if (state.flags.r3BellMet) s += 3;
-  if (state.flags.r3CraneMet3 || state.flags.r2CraneMet) s += 3;
-  if (state.flags.r3PlagueProof) s += 4;
-  if (state.flags.r3CraneTestimony) s += 4;
-  if (state.flags.r3BellAlliance) s += 3;
-  if (state.flags.r3CouncilEntry) s += 2;
-  if (state.deathCount === 0) s += 8;
-  if (state.petri <= 10) s += 5;
+  var f = state.flags;
+
+  // ── Base stats & level ──
+  s += (state.str + state.agi + state.wil) * 2;           // ~30-54
+  s += state.level * 3;                                     // ~15-30
+
+  // ── Equipment (3 slots) ──
+  if (typeof getEquipStats === 'function') {
+    var eq = getEquipStats();
+    s += Math.min((eq.dmg || 0) * 2, 12);                  // weapon dmg bonus, cap 12
+    s += Math.min(Math.floor((eq.def || 0) / 5), 4);       // armor def bonus, cap 4
+    s += Math.min((eq.petriResist || 0) * 2, 6);           // acc petri resist, cap 6
+  }
+  s += (f.weaponDmg || 0);                                  // legacy weapon bonus
+
+  // ── Inventory ──
+  s += Math.min(state.inventory.length * 1, 10);            // cap 10
+
+  // ── NPC encounters ──
+  if (f.r1YingCompanion) s += 3;
+  if (f.r3ZhouMet) s += 2;
+  if (f.r3BellMet) s += 2;
+  if (f.r3CraneMet3 || f.r2CraneMet) s += 2;
+  if (f.r2CampVisited) s += 1;
+
+  // ── Key story flags ──
+  if (f.r3PlagueProof) s += 5;
+  if (f.r3CraneTestimony) s += 3;
+  if (f.r3BellAlliance) s += 3;
+  if (f.r3CouncilEntry) s += 2;
+
+  // ── NPC side quest completions ──
+  if (f.r3YingRealReport) s += 4;       // 螢的真報告
+  if (f.r3CraneDealDone) s += 3;        // 灰鶴物資捐贈
+  if (f.r3ZhouTestimony) s += 3;        // 老周礦難證詞
+  if (f.r2FrostLetterCarried) s += 2;   // 鐵霜密封信
+  if (f.r3BellAllianceDeep) s += 4;     // 銅鐘腐敗檔案
+  if (f.r2ChengCureData) s += 3;        // 承鋼治癒研究
+
+  // ── Romance ──
+  if (state.romance) s += 8;            // 有戀人
+  if (typeof getNpcAffinityNum === 'function') {
+    var romIds = ['ying', 'crane', 'bell', 'cheng', 'zhou', 'frost'];
+    for (var i = 0; i < romIds.length; i++) {
+      var aff = getNpcAffinityNum(romIds[i]);
+      if (aff >= 80) s += 3;            // 曖昧以上
+      else if (aff >= 60) s += 2;       // 親密
+      else if (aff >= 40) s += 1;       // 信任
+    }
+  }
+
+  // ── Skills (NG+ combat skills) ──
+  s += Math.min((state.skills || []).length * 2, 20);       // cap 20
+
+  // ── NG+ cycle bonus ──
+  var ngRun = f.ngPlusRun || 0;
+  s += Math.min(ngRun * 5, 20);                             // +5/10/15/20 for cycles 2-5
+
+  // ── Survival & performance ──
+  if (state.deathCount === 0) s += 10;
+  else if (state.deathCount <= 2) s += 4;
+  if (state.petri <= 10) s += 6;
   else if (state.petri <= 30) s += 3;
-  var ending = state.flags.r3Ending || 'death';
-  if (ending === 'dawn') s += 5;
-  else if (ending === 'sacrifice') s += 4;
-  else if (ending === 'compromise') s += 2;
+
+  // ── Exploration depth ──
+  if (f.r0DiaryFound) s += 1;
+  if (f.r2LabNotesFound) s += 1;
+  if (f.r3LibrarySecret) s += 2;
+  if (f.r3PrisonInfo) s += 1;
+  if (f.r2ArenaAwakened) s += 3;         // 隱藏 Boss
+  if (f.ferrymanPassed) s += 5;          // 冥河渡江人
+
+  // ── Ending bonus ──
+  var ending = f.r3Ending || 'death';
+  if (ending === 'dawn') s += 8;
+  else if (ending === 'sacrifice') s += 6;
+  else if (ending === 'compromise') s += 3;
+  else if (ending === 'lockdown') s += 1;
+  // death = +0
+
   return s;
 }
 
