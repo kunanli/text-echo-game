@@ -103,6 +103,22 @@ function changeHp(delta) {
   return false;
 }
 
+// Append a sensory description line to the story log when crossing petri thresholds
+function _petriSensory(msg) {
+  if (!$story) return;
+  var line = document.createElement('div');
+  line.className = 'log-line petri-sensory';
+  var tagEl = document.createElement('span');
+  tagEl.className = 'log-tag tag-petri';
+  tagEl.textContent = '[' + L('身體', 'Body') + ']';
+  line.appendChild(tagEl);
+  var txt = document.createElement('span');
+  txt.textContent = ' ' + msg;
+  line.appendChild(txt);
+  $story.appendChild(line);
+  $story.scrollTop = $story.scrollHeight;
+}
+
 function changePetri(delta) {
   var prevPetri = state.petri;
   state.petri = clamp(state.petri + delta, 0, 100);
@@ -112,18 +128,40 @@ function changePetri(delta) {
     // Stage threshold warnings (5-stage system: 20/40/60/80)
     if (prevPetri < 20 && state.petri >= 20) {
       notify(L('▪ 石化 Lv.1 — 四肢僵硬，力量·敏捷 -1', '▪ Petri Lv.1 — Limbs stiffen, STR·AGI -1'));
+      _petriSensory(L(
+        '你的指尖開始發灰，關節在每次彎曲時隱隱作痛。指甲的邊緣浮現細小的石紋，像大理石的脈絡。',
+        'Your fingertips turn grey, joints aching with every bend. Tiny stone veins creep along your nail beds like marble grain.'));
       state.mood = 'petri';
     }
     if (prevPetri < 40 && state.petri >= 40) {
       notify(L('▪▪ 石化 Lv.2 — 紋路蔓延，力量·敏捷 -2，意志 -1，HP上限 -10%', '▪▪ Petri Lv.2 — Stone spreads, STR·AGI -2, WIL -1, Max HP -10%'));
+      _petriSensory(L(
+        '小臂上出現了蔓延的石紋。彎曲手肘時會聽到輕微的喀啦聲——像踩碎乾枯的樹枝。你試著握拳，發現速度明顯變慢了。',
+        'Stone veins crawl up your forearms. Your elbows crackle when you bend them — like snapping dry twigs. You try to make a fist and notice it\'s slower than before.'));
       state.mood = 'petri';
     }
     if (prevPetri < 60 && state.petri >= 60) {
       notify(L('▪▪▪ 石化 Lv.3 — 半身石化，全屬性大幅下降，HP上限 -20%', '▪▪▪ Petri Lv.3 — Half petrified, severe stat loss, Max HP -20%'));
+      _petriSensory(L(
+        '你的皮膚摸起來像磨砂紙，表面粗糙而冰冷。肋骨下方傳來沉重的壓迫感——石化正在侵蝕你的軀幹。每次深呼吸都伴隨著微弱的石裂聲。',
+        'Your skin feels like sandpaper — rough and cold to the touch. A heavy pressure builds beneath your ribs — the stone is invading your torso. Every deep breath comes with a faint cracking sound.'));
+      if (state.flags.r1YingCompanion) {
+        _petriSensory(L(
+          '螢碰到你的手臂時不自覺地縮了一下——她的眼裡閃過一絲恐懼，隨即掩飾過去。「……沒事，只是有點涼。」',
+          'Ying flinches when she touches your arm — a flash of fear in her eyes, quickly masked. "...It\'s nothing, just a bit cold."'));
+      }
       state.mood = 'danger';
     }
     if (prevPetri < 80 && state.petri >= 80) {
       notify(L('▪▪▪▪ 石化 Lv.4 — 瀕臨石化！全屬性崩潰，HP上限 -30%', '▪▪▪▪ Petri Lv.4 — Near death! Stats collapse, Max HP -30%'));
+      _petriSensory(L(
+        '呼吸變得困難——肋骨內側也開始石化了。你的視野邊緣偶爾會閃過灰色的靜態雜訊。你開始害怕睡著後就醒不過來。每走一步，膝蓋都發出碎裂的聲響。',
+        'Breathing is labored — the inside of your ribs is turning to stone. Grey static flickers at the edges of your vision. You fear falling asleep and never waking. Every step draws a grinding crack from your knees.'));
+      if (state.flags.r1YingCompanion) {
+        _petriSensory(L(
+          '螢握住你的手，用力到指節發白。她的嘴唇在發抖。「你不會變成石頭的……你答應過我的。」',
+          'Ying grips your hand so hard her knuckles go white. Her lips tremble. "You won\'t turn to stone... You promised me."'));
+      }
       state.mood = 'danger';
     }
   }

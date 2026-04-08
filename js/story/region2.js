@@ -131,7 +131,70 @@ registerNode('r2_look', () => {
     steps.push({ tag: '探索', tagColor: 'tag-explore', text: '你回到了採石場的瞭望台。暗金色的光芒依舊照亮著這片荒蕪的地下工場。', textEn: 'You return to the quarry overlook. Dark golden light still illuminates this desolate underground works.', delay: 2000 });
   }
 
+  // First-visit passive patrol: danger descriptions before mandatory patrol
+  if (!state.flags.r2PatrolCleared) {
+    steps.push({ tag: '警告', tagColor: 'tag-warn', text: '採石台之間的陰影中傳來低沉的咆哮聲——石化怪物在這片廢墟中築巢。', textEn: 'Low growls echo from shadows between quarry platforms — petrified monsters have nested in these ruins.', delay: 2500 });
+    steps.push({ tag: '感知', tagColor: 'tag-sense', text: '地面上散落著新鮮的爪痕和碎裂的石化結晶。它們很活躍——而且很近。', textEn: 'Fresh claw marks and shattered petri-crystals litter the ground. They\'re active — and close.', delay: 3000 });
+    steps.push({ tag: '判斷', tagColor: 'tag-move', text: '你必須先清除這片區域的威脅，才能安全地探索採石場。', textEn: 'You must clear the threats in this area before safely exploring the quarry.', delay: 2500 });
+  }
+
   autoExplore(steps, (function() {
+    // First visit: mandatory patrol (passive event)
+    if (!state.flags.r2PatrolCleared) {
+      return [{ text: L('穿越採石場的陰影……', 'Push through the quarry shadows...'), textEn: 'Push through the quarry shadows...', action: () => {
+        startPatrol({ firstVisit: true, onDiscovery: function() { stopPatrol(); },
+          firstVisitEvents: [
+            // Cycle 2: Encounter a wounded miner fleeing from monsters
+            { cycle: 2, buildQueue: function(queue) {
+              queue.push({ tag: L('感知','Sense'), color: 'tag-sense',
+                text: L('前方傳來急促的腳步聲——有人在逃跑。', 'Hurried footsteps ahead — someone is running.'),
+                delay: 2500, pending: true });
+              queue.push({ tag: L('遭遇','Encounter'), color: 'tag-explore',
+                text: L('一個滿身血汙的礦工跌跌撞撞地衝過來：「快跑——後面有東西追我！」',
+                  'A blood-covered miner stumbles toward you: "Run — something\'s chasing me!"'),
+                delay: 3000, pending: true });
+              queue.push({
+                text: L('你要怎麼做？', 'What do you do?'),
+                choices: [
+                  { text: L('護送他離開', 'Escort him to safety'), textEn: 'Escort him to safety', action: function() {
+                    sfx.hit();
+                    patrolAppend(L('戰鬥','Battle'), 'tag-combat',
+                      L('追兵是一隻石化蠍子——你擋在礦工前面，將它擊退！',
+                        'The pursuer: a petrified scorpion — you stand your ground and drive it back!'), false);
+                    changeHp(-3); renderStatus();
+                    setTimeout(function() {
+                      patrolAppend(L('對話','Dialogue'), 'tag-info',
+                        L('「謝、謝謝你……橋對面有營地，鐵霜大姐在那裡。你要是受傷了，可以去找清露醫師。」',
+                          '"Th-thank you... There\'s a camp across the bridge. Boss Iron Frost is there. If you\'re hurt, find Doctor Dew."'), false);
+                      state.flags.r2CampHinted = true;
+                      gainXp(5);
+                      renderStatus();
+                      patrolTimers.push(setTimeout(runPatrolCycle, 2500));
+                    }, 2800);
+                  }},
+                  { text: L('讓他自己跑', 'Let him run on his own'), textEn: 'Let him run on his own', action: function() {
+                    patrolAppend(L('感知','Sense'), 'tag-sense',
+                      L('礦工頭也不回地跑遠了。你獨自面對了追來的石化蠍子。', 'The miner flees without looking back. You face the pursuing scorpion alone.'), false);
+                    sfx.hit();
+                    changeHp(-5); renderStatus();
+                    patrolTimers.push(setTimeout(runPatrolCycle, 2000));
+                  }}
+                ]
+              });
+            }},
+            // Cycle 4: Spot campfire in the distance
+            { cycle: 4, buildQueue: function(queue) {
+              queue.push({ tag: L('發現','Discovery'), color: 'tag-explore',
+                text: L('你登上一塊巨石——遠處的黑暗中，有一團微弱的火光在搖曳。', 'You climb a boulder — far off in the darkness, a faint fire flickers.'),
+                delay: 2800, pending: true });
+              queue.push({ tag: L('情報','Intel'), color: 'tag-info',
+                text: L('那裡……有人的營地？在這個深度居然還有倖存者。', 'A camp... there? Survivors at this depth.'),
+                delay: 2200, effect: function() { state.flags.r2CampHinted = true; } });
+            }}
+          ]
+        });
+      }}];
+    }
     var c = [];
     c.push({ text: '前往採石台', textEn: 'Go to the quarry platform', action: () => loadNode('r2_quarry_floor') });
     c.push({ text: '調查石化機械殘骸', textEn: 'Investigate the petrified machine', action: () => loadNode('r2_machine') });
@@ -697,6 +760,15 @@ registerNode('r2_camp', () => {
     if (state.flags.r1WandererMet) {
       c.push({ text: state.flags.r2CraneMet ? '找灰鶴' : '角落裡有個熟悉的身影……', textEn: state.flags.r2CraneMet ? 'Find Grey Crane' : 'A familiar figure in the corner...', action: () => loadNode('r2_crane') });
     }
+    if (!state.flags.r2CampDinner) {
+      c.push({ text: '營火邊飄來飯菜香……', textEn: 'The smell of food drifts from the campfire...', action: () => loadNode('r2_camp_dinner') });
+    }
+    if (state.flags.r2CampVisited && !state.flags.r2FrostSpar) {
+      c.push({ text: '鐵霜在空地上練刀', textEn: 'Iron Frost is drilling in the clearing', action: () => loadNode('r2_frost_spar') });
+    }
+    if (state.flags.r2CampVisited && state.flags.r2FrostSpar && !state.flags.r2FrostVigil) {
+      c.push({ text: '夜深了，鐵霜還坐在營火邊', textEn: 'Late night — Iron Frost still sits by the fire', action: () => loadNode('r2_frost_vigil') });
+    }
     c.push({ text: '在營地休息', textEn: 'Rest at the camp', action: () => loadNode('r2_rest') });
     c.push({ text: '過橋返回', textEn: 'Cross back', action: () => loadNode('r2_look') });
     return c;
@@ -769,6 +841,7 @@ registerNode('r2_camp_chief', () => {
   // ── Phase 2: Return later — Cheng Gang awakens, gives passcode ──
   if (state.flags.r2BossSpared && state.flags.r2ReunionSeen && !state.flags.r2ChengAwake) {
     state.flags.r2ChengAwake = true;
+    addNpcAffinity('cheng', 5);
     steps.push({ art: npcPortrait.art('cheng', { subtitle: '甦醒' }) || `<pre class="ascii-art gold">
       ˚  ·  ˚  甦醒  ˚  ·  ˚
 
@@ -822,6 +895,7 @@ registerNode('r2_camp_chief', () => {
 
   if (!state.flags.r2ChiefTalked) {
     state.flags.r2ChiefTalked = true;
+    addNpcAffinity('frost', 10);
     steps.push({ art: npcPortrait.art('frost', { subtitle: '營地隊長' }) || `<pre class="ascii-art">
           ·  ˚  鐵霜 — 營地隊長  ˚  ·
             ╱─────────╲
@@ -890,6 +964,22 @@ registerNode('r2_camp_chief', () => {
     if (state.flags.r2ChengLab && !state.flags.r2ChengCure) {
       c.push({ text: '承鋼，你說的逆轉方法……', textEn: 'Cheng, about that reversal method...', action: () => loadNode('r2_cheng_cure') });
     }
+    // Romance: Cheng's question about emotions (requires train >= 2)
+    if (state.flags.r2ChengAwake && (state.flags.r2ChengTrainCount || 0) >= 2 && !state.flags.r2ChengQuestion) {
+      c.push({ text: '承鋼在看著天花板發呆……', textEn: 'Cheng Gang is staring at the ceiling...', action: () => loadNode('r2_cheng_question') });
+    }
+    // Romance: Frost notices the bond (requires question + frost past)
+    if (state.flags.r2ChengQuestion && state.flags.r2FrostPast && !state.flags.r2ChengFrostTalk) {
+      c.push({ text: '鐵霜似乎想跟你說什麼……', textEn: 'Iron Frost seems to want to tell you something...', action: () => loadNode('r2_cheng_frost_talk') });
+    }
+    // NG+ Romance: Cheng's first touch (requires NG+ 2nd cycle + question done)
+    if (state.flags.ngPlus && state.flags.r2ChengQuestion && !state.flags.r2ChengNg2Touch && typeof getNpcAffinityNum === 'function' && getNpcAffinityNum('cheng') >= 50) {
+      c.push({ text: '承鋼的手碰了你一下——好像是故意的……', textEn: 'Cheng\'s hand brushed yours — it seemed deliberate...', action: () => loadNode('r2_cheng_ng2_touch') });
+    }
+    // NG+ Romance: Frost lets go (requires 3+ cycles + touch + frost talk done)
+    if (state.flags.ngPlus && state.flags.r2ChengNg2Touch && state.flags.r2ChengFrostTalk && !state.flags.r2ChengNg3Frost && (state.flags.ngPlusRun || 0) >= 2 && typeof getNpcAffinityNum === 'function' && getNpcAffinityNum('cheng') >= 70) {
+      c.push({ text: '鐵霜和承鋼在營火旁低聲交談……', textEn: 'Frost and Cheng are whispering by the campfire...', action: () => loadNode('r2_cheng_ng3_frost') });
+    }
     // Sidequest: Frost's past (requires first meeting done)
     if (state.flags.r2CampVisited && !state.flags.r2FrostPast) {
       c.push({ text: '鐵霜，你是怎麼到這裡的？', textEn: 'Frost, how did you end up here?', action: () => loadNode('r2_frost_past') });
@@ -914,6 +1004,7 @@ registerNode('r2_camp_chief', () => {
 // --- r2_frost_past: Frost reveals her surface military past ---
 registerNode('r2_frost_past', () => {
   state.flags.r2FrostPast = true;
+  addNpcAffinity('frost', 10);
   autoExplore([
     { tag: '對話', tagColor: 'tag-npc',
       text: L('鐵霜聽到你的問題，沉默了。營火的光在她鐵灰色的眼睛裡跳動。',
@@ -1078,7 +1169,7 @@ registerNode('r2_frost_soldier', () => {
       delay: 3000 },
     { tag: '效果', tagColor: 'tag-system',
       text: L('鐵霜好感 ↑↑ | 經驗 +10', 'Iron Frost bond ↑↑ | XP +10'),
-      delay: 1500, effect: () => { gainXp(10); state.flags.r2FrostSoldierSaved = true; } },
+      delay: 1500, effect: () => { gainXp(10); state.flags.r2FrostSoldierSaved = true; addNpcAffinity('frost', 12); } },
   ], [
     { text: '返回營地', textEn: 'Return to camp', action: () => loadNode('r2_camp') },
   ], { label: L('舊部重逢', 'Reunion with a soldier') });
@@ -1124,6 +1215,7 @@ registerNode('r2_frost_letter', () => {
     { text: '我一定送到', textEn: 'I\'ll deliver it',
       action: () => {
         state.flags.r2FrostLetterCarried = true;
+        addNpcAffinity('frost', 10);
         autoExplore([
           { tag: '對話', tagColor: 'tag-npc',
             text: L('鐵霜把信遞給你。她的目光異常溫和。',
@@ -1618,7 +1710,47 @@ registerNode('r2_gate', () => {
         ? '"Thank you — truly." Her voice trembles slightly. "I\'ll bring everyone along."'
         : '"I\'ll bring everyone along. Go ahead — be careful."',
         delay: 2500 },
-    ], (function() {
+    ].concat(!state.flags.r2BossSpared ? [
+      // ── D4 NPC DEATH: Frost hit by Colossus debris ──
+      { tag: '異變', tagColor: 'tag-warn',
+        text: L('閘門開啟的震動讓天花板碎石紛落。你本能地抬頭——一塊巨大的石化甲片從巨像殘骸上鬆脫，直直朝鐵霜砸下。',
+               'The gate\'s vibration shakes loose debris from above. You look up instinctively — a massive petrified armor plate breaks from the colossus wreckage, plummeting toward Iron Frost.'),
+        delay: 3000 },
+      { tag: '感知', tagColor: 'tag-sense',
+        text: L('「小心——！」你喊了出來。但太遲了。甲片擊中了她的左肩，把她整個人砸倒在地。',
+               '"Watch out—!" you shout. Too late. The plate hits her left shoulder, slamming her to the ground.'),
+        delay: 2800 },
+      { tag: '感知', tagColor: 'tag-sense',
+        text: L('你衝上前去。鐵霜趴在碎石裡。她的左臂以不自然的角度扭曲——你能看到石化紋路從傷口處急速蔓延，像是碎片裡殘留的石化因子在侵蝕她。',
+               'You rush to her. Iron Frost lies in rubble. Her left arm bends at an unnatural angle — you can see petrification spreading rapidly from the wound, as if residual petri-factor from the debris is consuming her.'),
+        delay: 3500 },
+      { tag: '對話', tagColor: 'tag-npc',
+        text: L('「……別傻了，走。」鐵霜咬著牙推開你的手。她的左半身已經開始發灰——石化正在不可逆地擴散。「閘門不會開太久。」',
+               '"...Don\'t be stupid. Go." Iron Frost grits her teeth and pushes your hand away. Her left side is greying — petrification spreading irreversibly. "The gate won\'t stay open long."'),
+        delay: 3500 },
+      { tag: '感知', tagColor: 'tag-sense',
+        text: L('她的眼睛還是那雙鐵灰色的眼睛。但裡面的火——正在一點點熄滅。',
+               'Her eyes are still iron-grey. But the fire within — is going out, bit by bit.'),
+        delay: 2800 },
+      { tag: '對話', tagColor: 'tag-npc',
+        text: L('「把承鋼的事——告訴河城的人。」她的聲音越來越小。「告訴他們……這裡有過一個營地。有人活著……有人戰鬥到最後——」',
+               '"Tell the people in River City — about Cheng Gang." Her voice fades. "Tell them... there was a camp here. People survived... people fought to the end—"'),
+        delay: 3500 },
+      { tag: '石化', tagColor: 'tag-petri',
+        text: L('石化爬過了她的脖子。她的嘴唇最後動了一下——但你沒能聽清那最後一個字。',
+               'Petrification climbs past her neck. Her lips move one last time — but you don\'t catch the final word.'),
+        delay: 3000,
+        effect: function() {
+          state.flags.r2FrostDead = true;
+          sfx.death();
+          state.mood = 'hurt';
+          renderStatus();
+        }},
+      { tag: '系統', tagColor: 'tag-system',
+        text: L('鐵霜……石化了。完全石化。她的身體變成了一座跪在閘門旁的石像——手還保持著推你離開的姿勢。',
+               'Iron Frost... is petrified. Completely. Her body becomes a statue kneeling beside the gate — hand still frozen in the gesture of pushing you away.'),
+        delay: 3500 },
+    ] : []), (function() {
       var c = [];
       if (state.flags.r2BossSpared) {
         c.push({ text: '先回營地看看承鋼的情況', textEn: 'Return to camp to check on Cheng Gang first', action: () => loadNode('r2_camp') });
@@ -1763,6 +1895,13 @@ registerNode('r2_ying_talk', () => {
     if (state.flags.r2YingLore3 && state.flags.r2YingSketch && !state.flags.r2YingSecret) {
       c.push({ text: '螢……你的手冊裡還藏了什麼？', textEn: 'Ying... what else are you hiding in that notebook?', action: () => loadNode('r2_ying_secret') });
     }
+    // NG+ exclusive: Ying's notebook last page has past-life writing
+    if (state.flags.ngPlus && state.flags.r1YingNgDream && !state.flags.r2YingNgNotebook) {
+      c.push({ text: '螢，你的手冊最後一頁……', textEn: 'Ying, the last page of your notebook...', action: () => loadNode('r2_ying_ng_notebook') });
+    }
+    if (state.flags.r2CraneMet && !state.flags.r2YingJealousy) {
+      c.push({ text: '（螢看起來有些心不在焉……）', textEn: '(Ying seems distracted...)', action: () => loadNode('r2_ying_jealousy') });
+    }
     if (state.flags.r2CampVisited && !state.flags.r2YingNight) {
       c.push({ text: '要不要一起去營地休息？', textEn: 'Want to rest at the camp together?', action: () => loadNode('r2_ying_night') });
     }
@@ -1878,6 +2017,7 @@ registerNode('r2_ying_night', () => {
   var yPC = isMale ? 'She' : 'He';
   var yPo = isMale ? 'her' : 'his';
   state.flags.r2YingNight = true;
+  addNpcAffinity('ying', 10);
   autoExplore([
     { art: npcPortrait.art('ying', { subtitle: '記錄員' }) || `<pre class="ascii-art cyan">
        ·✦· 螢 — 記錄員少女 ·✦·
@@ -1973,6 +2113,7 @@ registerNode('r2_ying_promise', () => {
   var yPC = isMale ? 'She' : 'He';
   var yPo = isMale ? 'her' : 'his';
   state.flags.r2YingPromise = true;
+  addNpcAffinity('ying', 10);
   autoExplore([
     { art: npcPortrait.art('ying', { subtitle: '記錄員' }) || `<pre class="ascii-art cyan">
        ·✦· 螢 — 記錄員少女 ·✦·
@@ -2043,6 +2184,7 @@ registerNode('r2_ying_nightmare', () => {
   var yPC = isMale ? 'She' : 'He';
   var yPo = isMale ? 'her' : 'his';
   state.flags.r2YingNightmare = true;
+  addNpcAffinity('ying', 12);
 
   autoExplore([
     { tag: '環境', tagColor: 'tag-system', text: '深夜。營火已經熄滅，只剩灰燼中偶爾閃爍的餘溫。', textEn: 'Deep night. The campfire has died, leaving only the occasional ember glowing in the ash.', delay: 2200 },
@@ -2117,6 +2259,7 @@ registerNode('r2_ying_nightmare', () => {
 
 registerNode('r2_crane_scar', () => {
   state.flags.r2CraneScar = true;
+  addNpcAffinity('crane', 12);
   autoExplore([
     { art: npcPortrait.art('crane', { subtitle: '行商人' }) || `<pre class="ascii-art gold">
        ·  ˚  灰鶴  ˚  ·
@@ -2196,6 +2339,7 @@ registerNode('r2_crane_debt', () => {
       if (result !== 'fail') {
         sfx.pass();
         state.flags.r2CraneDebtSaved = true;
+        addNpcAffinity('crane', 15);
         autoExplore([
           { tag: '檢定', tagColor: 'tag-system', text: result === 'crit' ? L('大成功！', 'Critical success!') : L('成功！', 'Success!'), delay: 1200 },
           { tag: '說服', tagColor: 'tag-info', text: '你站到灰鶴身前，直視禿頭男的眼睛。你的聲音很平靜，但每個字都像石頭一樣沉。', textEn: 'You step in front of Grey Crane, meeting the bald man\'s eyes. Your voice is calm, but every word lands like stone.', delay: 3000 },
@@ -2242,6 +2386,7 @@ registerNode('r2_crane_debt', () => {
             enemy = scaleEnemyNgPlus(enemy);
             startCombat(enemy, function() {
               state.flags.r2CraneDebtSaved = true;
+              addNpcAffinity('crane', 15);
               autoExplore([
                 { tag: '結果', tagColor: 'tag-info', text: '追債人倒在地上，他的手下慌忙把他拖走了。', textEn: 'The collector falls. His men hastily drag him away.', delay: 2200 },
                 { tag: '灰鶴', tagColor: 'tag-npc', text: '灰鶴走過來，沉默了很久。然後她輕聲說：「……你這個白癡。」', textEn: 'Grey Crane approaches, silent for a long time. Then softly: "...You idiot."', delay: 2800 },
@@ -2282,6 +2427,7 @@ registerNode('r2_crane_debt', () => {
       enemy = scaleEnemyNgPlus(enemy);
       startCombat(enemy, function() {
         state.flags.r2CraneDebtSaved = true;
+        addNpcAffinity('crane', 15);
         autoExplore([
           { tag: '結果', tagColor: 'tag-info', text: '追債人倒在地上，他的手下慌忙把他拖走了。', textEn: 'The collector falls. His men hastily drag him away.', delay: 2200 },
           { tag: '灰鶴', tagColor: 'tag-npc', text: '灰鶴走過來，沉默了很久。然後她輕聲說：「……你這個白癡。為了我去打架。」', textEn: 'Grey Crane approaches, silent for a long time. Then softly: "...You idiot. Fighting for me."', delay: 2800 },
@@ -2541,6 +2687,10 @@ registerNode('r2_crane', () => {
       ], { label: L('吹牛骰', 'Liar\'s Dice') });
     }});
 
+    // Romance: Crane wound treatment (requires scar revealed + not done)
+    if (state.flags.r2CraneScar && !state.flags.r2CraneWound) {
+      c.push({ text: '灰鶴的手臂在流血……', textEn: 'Crane\'s arm is bleeding...', action: () => loadNode('r2_crane_wound') });
+    }
     // Sidequest: Crane's scars (requires met + lore done)
     if (state.flags.r2CraneLore && !state.flags.r2CraneScar) {
       c.push({ text: '她手臂上的刀疤……', textEn: 'Those scars on her arms...', action: () => loadNode('r2_crane_scar') });
@@ -3394,6 +3544,7 @@ registerNode('r2_cheng_train', () => {
 // --- r2_cheng_memory: Cheng recalls his pre-petrification research ---
 registerNode('r2_cheng_memory', () => {
   state.flags.r2ChengMemory = true;
+  addNpcAffinity('cheng', 8);
   autoExplore([
     { art: npcPortrait.art('cheng', { subtitle: '研究員' }) || `<pre class="ascii-art">
        ·  ˚  承鋼 — 研究員  ˚  ·
@@ -3458,6 +3609,7 @@ registerNode('r2_cheng_memory', () => {
 // --- r2_cheng_lab: Hidden lab in ancient tunnel ---
 registerNode('r2_cheng_lab', () => {
   state.flags.r2ChengLab = true;
+  addNpcAffinity('cheng', 8);
   autoExplore([
     { tag: '移動', tagColor: 'tag-move',
       text: L('承鋼帶你穿過古代密道，在一個岔路口停了下來。他推開了一扇被灰塵覆蓋的金屬門。',
@@ -3590,6 +3742,7 @@ registerNode('r2_cheng_cure', () => {
     { text: '我會讓議會看到這些數據', textEn: 'I\'ll make the Council see this data',
       action: () => {
         state.flags.r2ChengCureData = true;
+        addNpcAffinity('cheng', 10);
         autoExplore([
           { tag: '對話', tagColor: 'tag-npc',
             text: L('承鋼把筆記本中最關鍵的幾頁撕了下來，折好遞給你。',
@@ -3639,6 +3792,320 @@ registerNode('r2_cheng_cure', () => {
         ], { label: L('承鋼的倫理', 'Cheng Gang\'s ethics') });
       }},
   ], { label: L('石化的治癒', 'Curing petrification') });
+});
+
+// ═══════════════════════════════════════════════════
+//  Romance — 承鋼 (Cheng Gang) C4 Route
+// ═══════════════════════════════════════════════════
+
+// --- r2_cheng_question: Cheng asks what "missing someone" means ---
+registerNode('r2_cheng_question', () => {
+  state.flags.r2ChengQuestion = true;
+  addNpcAffinity('cheng', 8);
+  autoExplore([
+    { tag: '感知', tagColor: 'tag-sense',
+      text: L('你找到承鋼的時候，他正坐在營火旁，手裡拿著一塊結晶碎片反覆轉動，眼神放空。',
+             'You find Cheng Gang sitting by the fire, turning a crystal shard over and over in his hands, eyes unfocused.'),
+      delay: 2500 },
+    { art: npcPortrait.art('cheng', { subtitle: L('……', '...') }) || '<pre class="ascii-art">\n     ·˚· 承鋼 — 發呆 ·˚·\n          ╱═══╲\n         │ ─  ─ │  ← 放空\n         │  ──  │\n          ╲═══╱\n     ╱───┤  ◇  ├───╲\n           結晶碎片\n</pre>', artEn: npcPortrait.art('cheng', { subtitle: '...' }) || '<pre class="ascii-art">\n     ·˚· Cheng Gang — Lost in thought ·˚·\n          ╱═══╲\n         │ ─  ─ │  ← blank stare\n         │  ──  │\n          ╲═══╱\n     ╱───┤  ◇  ├───╲\n          Crystal shard\n</pre>', delay: 800 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「我想問你一件事。」他開口的方式像是在討論一個實驗假說。「什麼是——想念一個人？」',
+             '"I want to ask you something." He speaks as if discussing a research hypothesis. "What is — missing someone?"'),
+      delay: 3000 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「石化三年。醒來之後，鐵霜在我身邊。她說她等了我很久。但我——」他停頓了。「我不記得等待是什麼感覺了。」',
+             '"Three years petrified. When I woke, Iron Frost was beside me. She said she\'d waited a long time. But I —" He pauses. "I don\'t remember what waiting feels like."'),
+      delay: 3500 },
+    { tag: '感知', tagColor: 'tag-sense',
+      text: L('他把結晶碎片放在掌心。火光穿過碎片在他的臉上投下碎裂的光斑。',
+             'He holds the crystal shard in his palm. Firelight through the shard casts fractured light across his face.'),
+      delay: 2500 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「石化的時候——意識不是消失，而是凝固。像是被封在琥珀裡。你能聽到外面的聲音，但感覺不到任何東西。」',
+             '"During petrification — consciousness doesn\'t vanish, it solidifies. Like being sealed in amber. You hear outside sounds, but feel nothing."'),
+      delay: 3500 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「三年裡我聽到鐵霜每天來跟我說話。她的聲音。她的腳步聲。她的……哭聲。」他低頭看著自己的手。「我都聽到了。但我什麼都感覺不到。」',
+             '"For three years I heard Iron Frost come talk to me every day. Her voice. Her footsteps. Her... crying." He stares at his hands. "I heard it all. But felt nothing."'),
+      delay: 3800 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「醒來之後——感覺像是有人把我的情感凍住了三年，然後一次全部解凍。」他皺眉。「但有些東西……好像沒有解凍。」',
+             '"After waking — it feels like someone froze my emotions for three years, then thawed them all at once." He frowns. "But some things... seem to remain frozen."'),
+      delay: 3500 },
+  ], [
+    { text: '想念就是——希望一個人在身邊', textEn: 'Missing someone is — wanting them beside you',
+      action: () => {
+        addNpcAffinity('cheng', 5);
+        autoExplore([
+          { tag: '感知', tagColor: 'tag-sense',
+            text: L('承鋼認真地看著你。用一種研究者觀察樣本的眼神——但更深。',
+                   'Cheng Gang looks at you intently. With a researcher observing a specimen — but deeper.'),
+            delay: 2500 },
+          { tag: '對話', tagColor: 'tag-npc',
+            text: L('「……希望在身邊。」他重複了一遍。然後低聲說：「那你在訓練的時候——我希望你在旁邊。這算不算？」',
+                   '"...Wanting them beside you." He repeats. Then murmurs: "When we train — I want you there. Does that count?"'),
+            delay: 3200 },
+          { tag: '感知', tagColor: 'tag-sense',
+            text: L('他問這話的語氣毫無曖昧——純粹是困惑。像一個失憶的人在重新學習最基本的情感詞彙。但那份純真的困惑，比任何甜言蜜語都讓人心動。',
+                   'He asks without any ambiguity — pure confusion. Like an amnesiac re-learning the most basic emotional vocabulary. But that innocent confusion is more moving than any sweet words.'),
+            delay: 3500 },
+          { tag: '效果', tagColor: 'tag-system',
+            text: L('承鋼好感 ↑↑ | 經驗 +8', 'Cheng Gang bond ↑↑ | XP +8'),
+            delay: 1500, effect: () => { gainXp(8); } },
+        ], [
+          { text: '返回', textEn: 'Back', action: () => loadNode('r2_camp_chief') },
+        ], { label: L('什麼是想念', 'What is missing') });
+      }},
+    { text: '也許你需要更多時間', textEn: 'Maybe you need more time',
+      action: () => {
+        autoExplore([
+          { tag: '對話', tagColor: 'tag-npc',
+            text: L('承鋼點了點頭：「時間。對。石化教會我最多的就是——時間是唯一不能逆轉的東西。」',
+                   'Cheng Gang nods: "Time. Yes. Petrification taught me one thing — time is the only thing that can\'t be reversed."'),
+            delay: 3000 },
+          { tag: '效果', tagColor: 'tag-system',
+            text: L('承鋼好感 ↑ | 經驗 +5', 'Cheng Gang bond ↑ | XP +5'),
+            delay: 1500, effect: () => { gainXp(5); } },
+        ], [
+          { text: '返回', textEn: 'Back', action: () => loadNode('r2_camp_chief') },
+        ], { label: L('什麼是想念', 'What is missing') });
+      }},
+  ], { label: L('什麼是想念', 'What is missing') });
+});
+
+// --- r2_cheng_frost_talk: Iron Frost sees the bond forming ---
+registerNode('r2_cheng_frost_talk', () => {
+  state.flags.r2ChengFrostTalk = true;
+  autoExplore([
+    { tag: '移動', tagColor: 'tag-move',
+      text: L('你正要去找承鋼的時候，鐵霜攔住了你。她的表情不是敵意——而是一種更複雜的東西。',
+             'You\'re heading to see Cheng Gang when Iron Frost stops you. Her expression isn\'t hostile — it\'s something more complex.'),
+      delay: 2800 },
+    { art: npcPortrait.art('frost', { subtitle: L('……', '...') }) || '<pre class="ascii-art">\n     ·˚· 鐵霜 ·˚·\n        ╱═══╲\n       │ ─  ─ │\n       │  ──  │\n        ╲═══╱\n   ╱───┤     ├───╲\n  ╱  ╱─┤     ├─╲  ╲\n       複雜的眼神\n</pre>', artEn: npcPortrait.art('frost', { subtitle: '...' }) || '<pre class="ascii-art">\n     ·˚· Iron Frost ·˚·\n        ╱═══╲\n       │ ─  ─ │\n       │  ──  │\n        ╲═══╱\n   ╱───┤     ├───╲\n  ╱  ╱─┤     ├─╲  ╲\n      Complex gaze\n</pre>', delay: 800 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「我看到你跟承鋼在一起的樣子了。」鐵霜直截了當。她就是這樣的人——不繞彎子。',
+             '"I\'ve seen how you are with Cheng Gang." Iron Frost is blunt. That\'s who she is — no detours.'),
+      delay: 2800 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「他問你什麼是想念一個人了，對吧？」她的嘴角抽了一下。「他沒問過我。」',
+             '"He asked you what it means to miss someone, didn\'t he?" The corner of her mouth twitches. "He never asked me."'),
+      delay: 3000 },
+    { tag: '感知', tagColor: 'tag-sense',
+      text: L('鐵霜的聲音沒有憤怒。只有一種深沉的、被時間磨平了的疲憊。等一個人三年——醒來之後他問別人什麼是感情。',
+             'Iron Frost\'s voice holds no anger. Only a deep, time-worn weariness. Wait for someone three years — and when they wake, they ask someone else what feelings are.'),
+      delay: 3500 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「我不怪他。石化把他的情感凍住了。我等了三年的那個人——也許已經死在石頭裡了。醒來的是一個新的承鋼。」',
+             '"I don\'t blame him. Petrification froze his emotions. The man I waited three years for — perhaps he died inside the stone. The Cheng Gang who woke up is someone new."'),
+      delay: 3800 },
+  ], [
+    { text: '鐵霜，你……', textEn: 'Frost, you...',
+      action: () => {
+        addNpcAffinity('frost', 5);
+        autoExplore([
+          { tag: '對話', tagColor: 'tag-npc',
+            text: L('她擺了擺手打斷你：「別誤會。我不是在吃醋。我是在——」她停了一下，像是在找合適的詞。',
+                   'She waves you off: "Don\'t misunderstand. I\'m not jealous. I\'m —" She pauses, searching for words.'),
+            delay: 2800 },
+          { tag: '對話', tagColor: 'tag-npc',
+            text: L('「我是在把他交給你。」',
+                   '"I\'m entrusting him to you."'),
+            delay: 2500 },
+          { tag: '感知', tagColor: 'tag-sense',
+            text: L('這句話的重量讓空氣都凝固了。鐵霜——那個不會讓任何人看到軟弱的女人——正在放手。',
+                   'The weight of those words freezes the air. Iron Frost — the woman who never shows weakness to anyone — is letting go.'),
+            delay: 3200 },
+          { tag: '對話', tagColor: 'tag-npc',
+            text: L('「他現在需要的不是一個等了他三年的舊人。是一個能教他重新感受的新人。」她的聲音很穩。「他看你的眼神——跟以前看我的不一樣。更……好奇。更溫柔。」',
+                   '"What he needs now isn\'t someone who waited three years. It\'s someone who can teach him to feel again." Her voice is steady. "The way he looks at you — it\'s different from how he used to look at me. More... curious. More gentle."'),
+            delay: 3800 },
+          { tag: '對話', tagColor: 'tag-npc',
+            text: L('她轉過身。走了兩步，又停了下來。',
+                   'She turns. Takes two steps, then stops.'),
+            delay: 2200 },
+          { tag: '對話', tagColor: 'tag-npc',
+            text: L('「但如果你讓他難過——」她側過頭，鐵灰色的眼睛裡閃過一道冷光。「你知道我會怎麼做。」',
+                   '"But if you make him sad —" She turns her head, a cold flash in those iron-grey eyes. "You know what I\'ll do."'),
+            delay: 3000 },
+          { tag: '效果', tagColor: 'tag-system',
+            text: L('鐵霜好感 ↑ | 承鋼好感 ↑', 'Iron Frost bond ↑ | Cheng Gang bond ↑'),
+            delay: 1500, effect: () => { addNpcAffinity('cheng', 5); } },
+        ], [
+          { text: '返回', textEn: 'Back', action: () => loadNode('r2_camp_chief') },
+        ], { label: L('鐵霜的放手', 'Iron Frost lets go') });
+      }},
+    { text: '我跟承鋼只是朋友', textEn: 'Cheng and I are just friends',
+      action: () => {
+        autoExplore([
+          { tag: '對話', tagColor: 'tag-npc',
+            text: L('鐵霜看了你一眼。那個眼神說：「我帶過兵。不要在我面前撒謊。」',
+                   'Iron Frost gives you a look. That look says: "I\'ve commanded soldiers. Don\'t lie to my face."'),
+            delay: 2800 },
+          { tag: '對話', tagColor: 'tag-npc',
+            text: L('但她沒有追問。只是說：「不管怎樣——照顧好他。」然後轉身走了。',
+                   'But she doesn\'t press. Just says: "Either way — take care of him." Then turns and walks away.'),
+            delay: 2500 },
+          { tag: '效果', tagColor: 'tag-system',
+            text: L('鐵霜好感 ↑', 'Iron Frost bond ↑'),
+            delay: 1500, effect: () => { addNpcAffinity('frost', 3); } },
+        ], [
+          { text: '返回', textEn: 'Back', action: () => loadNode('r2_camp_chief') },
+        ], { label: L('鐵霜的話', 'Iron Frost\'s words') });
+      }},
+  ], { label: L('鐵霜的話', 'Iron Frost\'s words') });
+});
+
+// ═══════════════════════════════════════
+//  NG+ Romance: 承鋼的第一次觸碰 (Cheng's First Touch)
+// ═══════════════════════════════════════
+registerNode('r2_cheng_ng2_touch', () => {
+  state.flags.r2ChengNg2Touch = true;
+  addNpcAffinity('cheng', 13);
+  autoExplore([
+    { tag: '場景', tagColor: 'tag-sense',
+      art: npcPortrait.art('cheng', { subtitle: L('研究員', 'Researcher') }) || '',
+      text: '你在實驗室陪承鋼整理數據。他翻閱筆記的動作還是很僵硬——石化後的手指恢復得比腿慢。',
+      textEn: 'You\'re helping Cheng sort data in the lab. His hands are still stiff when flipping notes — fingers recovered slower than legs after petrification.',
+      delay: 2800 },
+    { tag: '感知', tagColor: 'tag-sense',
+      text: '然後他的手碰了你的。',
+      textEn: 'Then his hand touches yours.',
+      delay: 1800 },
+    { tag: '感知', tagColor: 'tag-sense',
+      text: '不是拿遞東西時的偶然接觸。是他放下筆記之後，手指留在你手背上——停了三秒。',
+      textEn: 'Not the accidental brush of passing something. He puts the notebook down and his fingers rest on the back of your hand — for three seconds.',
+      delay: 3000 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: '「你的體表溫度是 36.5°C。」承鋼說。語氣像在記錄實驗數據。「石化區域的平均溫度是 22°C。差值 14.5°C。」',
+      textEn: '"Your surface temperature is 36.5°C." Cheng says. Tone like recording experiment data. "The average temperature in petrified zones is 22°C. Differential of 14.5°C."',
+      delay: 3500 },
+    { tag: '感知', tagColor: 'tag-sense',
+      text: '他的指尖還在你手背上。你注意到他的手在微微發抖——不是石化後遺症，而是另一種原因。',
+      textEn: 'His fingertips are still on your hand. You notice them trembling slightly — not a petrification aftereffect, but for another reason.',
+      delay: 2800 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: '「很溫暖。」他安靜了一會。然後補充了一句不像科學家會說的話。',
+      textEn: '"Very warm." He\'s quiet for a moment. Then adds something a scientist wouldn\'t normally say.',
+      delay: 2500 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: '「溫暖——是不是就是那種。想念一個人的時候想要碰到的感覺？」',
+      textEn: '"Warm — is this what it feels like? What you want to touch when you miss someone?"',
+      delay: 3200 },
+  ], [
+    { text: '「是的。就是這種感覺。」', textEn: '"Yes. That\'s exactly it."',
+      action: () => {
+        autoExplore([
+          { tag: '感知', tagColor: 'tag-sense', text: '承鋼點了點頭。像是又記下了一筆數據。但他沒有收回手。', textEn: 'Cheng nods. As if noting another data point. But he doesn\'t pull his hand back.', delay: 2500 },
+          { tag: '對話', tagColor: 'tag-npc', text: '「那我再多記錄一會。」他的聲音很輕。「這個……數據很重要。」', textEn: '"Then let me record a bit longer." His voice is soft. "This... data is important."', delay: 2800 },
+          { tag: '感知', tagColor: 'tag-sense', text: '你沒有動。他的手一點一點從你的手背滑到了你的手心——然後停在那裡。不是十指相扣——他還不會那個。只是掌心貼著掌心。', textEn: 'You don\'t move. His hand slides slowly from the back of your hand to your palm — and stays. Not interlocking fingers — he doesn\'t know how yet. Just palm against palm.', delay: 3500 },
+          { tag: '感知', tagColor: 'tag-sense', text: '他的掌心有石化後留下的粗糙紋路。像砂紙，又像年輪。那些紋路裡藏著他被凍結的三年。', textEn: 'His palm has rough textures from petrification. Like sandpaper, or tree rings. Those lines hold three frozen years.', delay: 3200, effect: function() { sfx.levelUp(); } },
+        ], [{ text: '（讓手停在那裡。溫度就是最好的語言。）', textEn: '(Let your hand stay. Temperature is the best language.)', action: () => {
+          changeHp(15);
+          changePetri(-5);
+          notify(L('HP +15，石化度 -5%，承鋼好感 ↑↑（36.5°C）', 'HP +15, Petri -5%, Cheng bond ↑↑ (36.5°C)'));
+          loadNode('r2_camp_chief');
+        }}]);
+      }},
+    { text: '（把手翻過來，讓他握住。）', textEn: '(Turn your hand over, letting him hold it.)',
+      action: () => {
+        autoExplore([
+          { tag: '感知', tagColor: 'tag-sense', text: '承鋼看著你翻過來的手掌。像看一個從未見過的實驗結果。', textEn: 'Cheng stares at your upturned palm. Like seeing an experiment result he\'s never encountered.', delay: 2500 },
+          { tag: '對話', tagColor: 'tag-npc', text: '他猶豫了一下——然後把手放了上去。五根手指笨拙地對齊你的五根手指。', textEn: 'He hesitates — then places his hand on yours. Five fingers clumsily aligning with your five.', delay: 2800 },
+          { tag: '對話', tagColor: 'tag-npc', text: '「不太對。」他微微皺眉。「指頭應該——怎麼放？」', textEn: '"Not quite right." He frowns slightly. "How should the fingers — go?"', delay: 2500 },
+          { tag: '感知', tagColor: 'tag-sense', text: '你忍不住笑了。然後你幫他把手指調整成交握的姿勢。他認真地看著——像在學一種新的實驗技術。', textEn: 'You can\'t help but smile. Then you adjust his fingers into a proper clasp. He watches seriously — like learning a new lab technique.', delay: 3200 },
+          { tag: '對話', tagColor: 'tag-npc', text: '「原來是這樣。」他看著交握的手。「這個動作——讓心率加快了 12%。」', textEn: '"So that\'s how it works." He looks at the clasped hands. "This action — heart rate increased by 12%."', delay: 3000, effect: function() { sfx.levelUp(); } },
+        ], [{ text: '（讓他慢慢學。他有一輩子的時間。）', textEn: '(Let him learn slowly. He has a lifetime.)', action: () => {
+          changeHp(15);
+          changePetri(-5);
+          notify(L('HP +15，石化度 -5%，承鋼好感 ↑↑（心率 +12%）', 'HP +15, Petri -5%, Cheng bond ↑↑ (Heart rate +12%)'));
+          loadNode('r2_camp_chief');
+        }}]);
+      }},
+  ], { label: L('36.5°C', '36.5°C') });
+});
+
+// ═══════════════════════════════════════
+//  NG+ Romance: 鐵霜放手 (Frost Lets Go — Deep)
+// ═══════════════════════════════════════
+registerNode('r2_cheng_ng3_frost', () => {
+  state.flags.r2ChengNg3Frost = true;
+  addNpcAffinity('cheng', 10);
+  addNpcAffinity('frost', 8);
+  autoExplore([
+    { tag: '場景', tagColor: 'tag-sense',
+      text: '營火旁。鐵霜和承鋼坐在一起——你已經很久沒看到他們這樣了。她的手擱在他肩上。他沒有躲開。',
+      textEn: 'By the campfire. Frost and Cheng sit together — you haven\'t seen them like this in a long time. Her hand rests on his shoulder. He doesn\'t flinch.',
+      delay: 3000 },
+    { art: npcPortrait.art('frost', { subtitle: L('鐵霜', 'Iron Frost') }) || '', delay: 800 },
+    { tag: '感知', tagColor: 'tag-sense',
+      text: '你本來想走開。但鐵霜看到了你——她朝你招了招手。不是驅趕，是邀請。',
+      textEn: 'You almost turn away. But Frost spots you — she waves you over. Not dismissal, but invitation.',
+      delay: 2500 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: '「過來。」鐵霜的聲音很平靜。「有些話——要你在場才說得清楚。」',
+      textEn: '"Come here." Frost\'s voice is calm. "Some things — need you present to be said clearly."',
+      delay: 2800 },
+    { tag: '感知', tagColor: 'tag-sense',
+      text: '你在他們對面坐下。營火的光在三個人的臉上跳動。承鋼看看鐵霜，又看看你——他的眼神裡有困惑，也有一種笨拙的急切。',
+      textEn: 'You sit across from them. Firelight dances on three faces. Cheng looks at Frost, then at you — confusion in his eyes, and a clumsy urgency.',
+      delay: 3200 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: '鐵霜深吸了一口氣。然後她做了一件你在任何一世都沒見過的事——她笑了。不是營地首領的笑，是一個女人放下重擔的笑。',
+      textEn: 'Frost takes a deep breath. Then she does something you\'ve never seen in any lifetime — she smiles. Not the camp leader\'s smile, but a woman setting down a burden.',
+      delay: 3500 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: '「承鋼。」她看著他。「你還記得石化之前——我跟你說過的最後一句話嗎？」',
+      textEn: '"Cheng Gang." She looks at him. "Do you remember — the last thing I said to you before petrification?"',
+      delay: 3000 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: '承鋼搖頭。石化偷走了那段記憶。',
+      textEn: 'Cheng shakes his head. Petrification stole that memory.',
+      delay: 2000 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: '「我說——『等你醒來，我教你跳舞。』」鐵霜的聲音碎了一下。「三年了。你醒了。但你忘了跳舞。也忘了我。」',
+      textEn: '"I said — \'When you wake up, I\'ll teach you to dance.\'" Frost\'s voice cracks. "Three years. You woke up. But you forgot how to dance. And forgot me."',
+      delay: 3800 },
+    { tag: '感知', tagColor: 'tag-sense',
+      text: '承鋼的嘴唇動了動。他想說什麼——但石化凍結了太多東西，包括道歉的能力。',
+      textEn: 'Cheng\'s lips move. He wants to say something — but petrification froze too many things, including the ability to apologize.',
+      delay: 3000 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: '「但——」鐵霜把手從他肩上拿開，輕輕地放在自己膝蓋上。「他讓你快樂。那就夠了。」',
+      textEn: '"But—" Frost lifts her hand from his shoulder, placing it gently on her own knee. "' + L('他', 'They') + ' makes you happy. That\'s enough."',
+      delay: 3200 },
+  ], [
+    { text: '「鐵霜——你不必……」', textEn: '"Frost — you don\'t have to..."',
+      action: () => {
+        autoExplore([
+          { tag: '對話', tagColor: 'tag-npc', text: '「我必須。」她打斷你。眼神堅定得像鍛過的鐵。「不是因為放棄。是因為——」', textEn: '"I must." She cuts you off. Eyes steely as tempered iron. "Not because I\'m giving up. Because—"', delay: 2800 },
+          { tag: '對話', tagColor: 'tag-npc', text: '「因為我愛他。」鐵霜的聲音沒有抖。「所以我知道——他需要什麼。不是我。」', textEn: '"Because I love him." Frost\'s voice doesn\'t waver. "So I know — what he needs. It\'s not me."', delay: 3200 },
+          { tag: '感知', tagColor: 'tag-sense', text: '承鋼看著鐵霜。他的眼裡終於有了一種你認得的東西——不是實驗數據，不是體溫計算。是痛。', textEn: 'Cheng looks at Frost. Finally something recognizable in his eyes — not data, not temperature calculations. Pain.', delay: 3000 },
+          { tag: '對話', tagColor: 'tag-npc', text: '「對不起。」承鋼說了他石化醒來之後的第一句道歉。聲音生硬得像斷裂的石頭——但那是真的。', textEn: '"I\'m sorry." Cheng says his first apology since waking from petrification. Rough as cracking stone — but genuine.', delay: 3200 },
+          { tag: '對話', tagColor: 'tag-npc', text: '鐵霜站起來。走到你面前——然後做了一件所有人都沒想到的事。她抱了你一下。很快，很用力。', textEn: 'Frost stands. Walks to you — then does something no one expected. She hugs you. Brief, and fierce.', delay: 3000 },
+          { tag: '對話', tagColor: 'tag-npc', text: '「照顧好他。」她在你耳邊說。「教他跳舞。我沒來得及教的——你來教。」', textEn: '"Take care of him." She whispers. "Teach him to dance. What I never got to teach — you do it."', delay: 3200, effect: function() { sfx.levelUp(); } },
+          { tag: '感知', tagColor: 'tag-sense', text: '她放開你，轉身離開。背影筆直，沒有回頭。營火把她的影子拉得很長——像一面永遠不會倒下的牆。', textEn: 'She lets go, turns, and walks away. Back straight, no looking back. The campfire stretches her shadow long — like a wall that will never fall.', delay: 3500 },
+        ], [{ text: '（看著鐵霜離去的背影。然後看向承鋼。）', textEn: '(Watch Frost\'s retreating figure. Then look at Cheng.)', action: () => {
+          changeHp(20);
+          changePetri(-8);
+          changeStat('wil', 1);
+          notify(L('HP +20，石化度 -8%，意志 +1（教他跳舞）', 'HP +20, Petri -8%, WIL +1 (Teach him to dance)'));
+          loadNode('r2_camp_chief');
+        }}]);
+      }},
+    { text: '（沉默。有些事不需要回應——只需要見證。）', textEn: '(Silence. Some things don\'t need a response — only a witness.)',
+      action: () => {
+        autoExplore([
+          { tag: '感知', tagColor: 'tag-sense', text: '三個人在營火旁坐了很久。鐵霜最先站起來——「我去巡邏。」她的聲音恢復了營地首領的穩重。', textEn: 'Three people sit by the fire for a long time. Frost stands first — "I\'ll go patrol." Her voice regains its commander\'s steadiness.', delay: 3000 },
+          { tag: '感知', tagColor: 'tag-sense', text: '等鐵霜走遠之後，承鋼的手碰了碰你的。不是實驗——這次是主動的，笨拙的，帶著一種剛學會的溫柔。', textEn: 'After Frost is gone, Cheng\'s hand touches yours. Not an experiment — this time it\'s deliberate, clumsy, carrying a just-learned tenderness.', delay: 3200 },
+          { tag: '對話', tagColor: 'tag-npc', text: '「她說的……跳舞。」承鋼的聲音很小。「你能教我嗎？」', textEn: '"What she said... dancing." Cheng\'s voice is small. "Can you teach me?"', delay: 2800, effect: function() { sfx.levelUp(); } },
+        ], [{ text: '（站起來，伸出手。）', textEn: '(Stand up and extend your hand.)', action: () => {
+          changeHp(15);
+          changePetri(-5);
+          notify(L('HP +15，石化度 -5%（教他跳舞）', 'HP +15, Petri -5% (Teach him to dance)'));
+          loadNode('r2_camp_chief');
+        }}]);
+      }},
+  ], { label: L('教他跳舞', 'Teach Him to Dance') });
 });
 
 // ============================================================
@@ -3870,7 +4337,55 @@ registerNode('r2_arena', function() {
   ], [
     { text: '挑戰結晶魔像', textEn: 'Challenge the Crystal Golem', action: function() {
       startCombat(scaleEnemyNgPlus(golem), function() {
-        loadNode('r2_look');
+        // After defeating the basic golem, if level >= 4, the awakened form rises
+        if (state.level >= 4 && !state.flags.r2ArenaAwakened) {
+          state.flags.r2ArenaAwakened = true;
+          var awakenedGolem = {
+            name: '結晶魔像·覺醒體', nameEn: 'Crystal Golem — Awakened',
+            hp: 55, atkMin: 10, atkMax: 18, petriDmg: 5, xp: 30,
+            empathyGoal: 3,
+            art: [
+              '     ╔═══════════╗',
+              '     ║ ✦ ◆◆◆ ✦ ║',
+              '     ╚═══╤═╤═══╝',
+              '   ╔═════╪═╪═════╗',
+              '  ═╣ ▓▓▓▓▓▓▓▓▓ ╠═',
+              '   ║ ▓▓覺醒▓▓ ║',
+              '   ║ ▓▓▓▓▓▓▓▓▓ ║',
+              '   ╚═══╤═══╤═══╝',
+              '     ══╩═══╩══',
+            ],
+            commune: [
+              { zh: '覺醒體的三隻眼睛同時發光——它記得自己是誰。', en: 'The awakened form\'s three eyes glow in unison — it remembers who it was.' },
+              { zh: '「……守……護……」它的聲音像碎裂的鐘。', en: '"...Guard...ian..." Its voice sounds like a cracking bell.' },
+            ],
+            spareText: { zh: '覺醒體緩緩跪下，結晶核心碎裂。一枚戒指從碎片中滾落——「鬥士之戒」。', en: 'The awakened form slowly kneels, its crystal core cracking. A ring rolls from the fragments — the "Gladiator\'s Ring."' }
+          };
+          autoExplore([
+            { tag: '異變', tagColor: 'tag-warn',
+              text: L('魔像倒下的瞬間——地面的刻痕亮了。古代的角鬥場魔法還沒有死去。',
+                     'The moment the golem falls — the floor glyphs ignite. The ancient arena\'s magic hasn\'t died.'),
+              delay: 2500 },
+            { tag: '遭遇', tagColor: 'tag-combat',
+              text: L('碎片重新聚合，結晶核心裂開，露出三隻發光的眼睛——結晶魔像·覺醒體從廢墟中站起！',
+                     'Fragments reassemble, the crystal core splits open revealing three glowing eyes — the Crystal Golem Awakened rises from the ruins!'),
+              delay: 3000 },
+          ], [
+            { text: L('迎戰覺醒體！', 'Face the Awakened!'), textEn: 'Face the Awakened!', action: function() {
+              startCombat(scaleEnemyNgPlus(awakenedGolem), function() {
+                addItem(L('鬥士之戒', 'Gladiator\'s Ring'));
+                state.flags.weaponDmg = (state.flags.weaponDmg || 0) + 3;
+                notify(L('獲得「鬥士之戒」— 攻擊 +3！', 'Acquired "Gladiator\'s Ring" — Attack +3!'));
+                sfx.item();
+                loadNode('r2_look');
+              }, function() {
+                loadNode('r2_look');
+              });
+            }},
+          ], { label: L('覺醒體', 'Awakened Form') });
+        } else {
+          loadNode('r2_look');
+        }
       }, function() {
         loadNode('r2_look');
       });
@@ -4000,5 +4515,341 @@ registerNode('r2_mural_war', function() {
   autoExplore(steps, [
     { text: '返回採石場', textEn: 'Return to the quarry', action: function() { loadNode('r2_look'); }},
   ], { label: L('戰爭壁畫', 'War Mural') });
+});
+
+// ═══════════════════════════════════════
+//  Brotherhood: 營火晚餐 (Camp Dinner)
+// ═══════════════════════════════════════
+registerNode('r2_camp_dinner', () => {
+  state.flags.r2CampDinner = true;
+  autoExplore([
+    { tag: '場景', tagColor: 'tag-sense',
+      art: `<pre class="ascii-art gold">
+    ·  ˚  ✦  ˚  ·  ˚  ✦
+   ╭──────────────────────╮
+   │  🍲  ↑↑ 營火 ↑↑  🍲  │
+   ├──────────────────────┤
+   │ 老鑄  清露  鐵霜  你 │
+   ╰──────────────────────╯
+</pre>`, artEn: `<pre class="ascii-art gold">
+    ·  ˚  ✦  ˚  ·  ˚  ✦
+   ╭──────────────────────╮
+   │  🍲  ↑↑ FIRE ↑↑  🍲  │
+   ├──────────────────────┤
+   │ Cast  Dew  Frost You │
+   ╰──────────────────────╯
+</pre>`,
+      text: '營火邊支著一口大鍋，老鑄正用一把生鏽的鐵勺攪動裡面灰綠色的東西。',
+      textEn: 'A large pot hangs over the campfire. Old Cast stirs something grey-green with a rusted iron ladle.',
+      delay: 2800 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: '「今天的菜是石脈蘑菇湯。」老鑄宣布。清露立刻皺起眉頭：「又是蘑菇？你就不能找點別的食材嗎？」',
+      textEn: '"Tonight\'s menu: vein-mushroom soup." Old Cast announces. Dew immediately frowns: "Mushrooms again? Can\'t you find anything else?"',
+      delay: 3200 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: '「你去採石場外面種稻米啊。」老鑄頭也不抬。清露被噎了一下，哼了一聲坐到旁邊。',
+      textEn: '"Then go plant rice outside the quarry." Old Cast doesn\'t look up. Dew sputters, huffs, and sits down.',
+      delay: 2800 },
+    { tag: '感知', tagColor: 'tag-sense',
+      text: '鐵霜坐在角落，一言不發地喝湯。你以為她不會參與這種閒聊——但你注意到她嘴角有一個極淡的弧度。',
+      textEn: 'Iron Frost sits in the corner, drinking soup in silence. You think she wouldn\'t join the banter — but you notice the faintest curve at the corner of her mouth.',
+      delay: 3000 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: '老鑄遞給你一碗。味道很淡，帶著一點泥土的氣息。但是是熱的。在地底，「熱的」就已經是奢侈了。',
+      textEn: 'Old Cast hands you a bowl. The flavor is faint, with an earthy undertone. But it\'s hot. Underground, "hot" is already a luxury.',
+      delay: 3000 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: '「那個新來的，」鐵霜突然開口，目光落在你身上。「吃完了去把鍋洗了。」',
+      textEn: '"You, the new one," Iron Frost speaks up, eyes on you. "When you\'re done, go wash the pot."',
+      delay: 2500 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: '清露笑了。「歡迎加入營地——第一課：鐵霜從不洗鍋。」',
+      textEn: 'Dew laughs. "Welcome to camp — lesson one: Iron Frost never washes the pot."',
+      delay: 2500 },
+    { tag: '感知', tagColor: 'tag-sense',
+      text: '鐵霜哼了一聲，但沒有反駁。老鑄把第二碗遞給清露，她接過去的時候小聲說了句「謝謝」。他裝作沒聽見。',
+      textEn: 'Iron Frost snorts but doesn\'t deny it. Old Cast passes a second bowl to Dew, who murmurs "thanks" as she takes it. He pretends not to hear.',
+      delay: 3200 },
+    { tag: '感知', tagColor: 'tag-sense',
+      text: '火光在每個人臉上跳動。你忽然意識到——這個被石化瘟疫籠罩的營地，此刻像是一個家。',
+      textEn: 'Firelight dances on every face. You realize — this camp, shrouded by petrification plague, feels like a home right now.',
+      delay: 3500, effect: function() { changeHp(10); changePetri(-3); addNpcAffinity('frost', 5); } },
+    { tag: '效果', tagColor: 'tag-system',
+      text: L('HP+10，石化-3%。營地的人把你當自己人了。', 'HP+10, Petri-3%. The camp has accepted you as one of their own.'),
+      delay: 1500 },
+  ], [
+    { text: '返回營地', textEn: 'Return to camp', action: () => loadNode('r2_camp') },
+  ], { label: L('營火晚餐', 'Camp Dinner') });
+});
+
+// ═══════════════════════════════════════
+//  Brotherhood: 鐵霜切磋 (Sparring with Frost)
+// ═══════════════════════════════════════
+registerNode('r2_frost_spar', () => {
+  state.flags.r2FrostSpar = true;
+  addNpcAffinity('frost', 10);
+  autoExplore([
+    { tag: '場景', tagColor: 'tag-combat',
+      art: npcPortrait.art('frost', { subtitle: '營地首領' }) || `<pre class="ascii-art">
+       ╱▔▔▔▔╲
+      │ ◆  ◆ │
+      │ ╰──╯ │
+    ──┤      ├──
+   ╱  │  ⚔  │  ╲
+      ╱╲  ╱╲
+     ╱╱ ╲╱ ╲╲
+   鐵霜 · 首領
+</pre>`, artEn: npcPortrait.art('frost', { subtitle: 'Camp Leader' }) || `<pre class="ascii-art">
+       ╱▔▔▔▔╲
+      │ ◆  ◆ │
+      │ ╰──╯ │
+    ──┤      ├──
+   ╱  │  ⚔  │  ╲
+      ╱╲  ╱╲
+     ╱╱ ╲╱ ╲╲
+  Frost · Leader
+</pre>`,
+      text: '鐵霜在空地上揮刀。每一刀都精準、乾脆——但你注意到她的右肩有些僵硬，那裡的石化紋路比別處更深。',
+      textEn: 'Iron Frost drills in the clearing. Each swing is precise and clean — but you notice her right shoulder is stiff, the petrification marks deeper there.',
+      delay: 3000 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: '她感覺到你在看，停下了。「想試試？」不是邀請——是命令。',
+      textEn: 'She senses you watching and stops. "Want to try?" Not an invitation — a command.',
+      delay: 2200 },
+    { tag: '行動', tagColor: 'tag-combat',
+      text: '你拿起一根木棍應戰。鐵霜沒有留手——第一擊就把你的木棍打飛了。',
+      textEn: 'You pick up a wooden stick. Iron Frost doesn\'t hold back — her first strike sends it flying.',
+      delay: 2500 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: '「再來。」她把木棍踢回你腳邊。你撿起來，這次抓得更緊。',
+      textEn: '"Again." She kicks the stick back. You pick it up and grip tighter this time.',
+      delay: 2200 },
+    { tag: '行動', tagColor: 'tag-combat',
+      text: '第二次、第三次、第四次——你每次都被打飛。但到了第五次，你擋住了她的一擊。',
+      textEn: 'Second, third, fourth — you\'re disarmed each time. But on the fifth, you block one of her strikes.',
+      delay: 2800, effect: function() { var r = statCheck('str', 7); if (r !== 'fail') { changeStat('str', 1); sfx.pass(); } } },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: '鐵霜收刀。她看著你的眼睛，很久沒有說話。然後她露出了一個笑容——不是禮貌的那種，是久違地遇到對手的那種。',
+      textEn: 'Iron Frost sheathes her blade. She looks into your eyes, silent for a long moment. Then she smiles — not a polite one, but the kind when you finally meet a worthy opponent.',
+      delay: 3500 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: '「不錯。」只有兩個字。但從鐵霜嘴裡說出來，比任何人的十句讚美都重。',
+      textEn: '"Not bad." Just two words. But coming from Iron Frost, they outweigh ten sentences of praise from anyone else.',
+      delay: 3000 },
+    { tag: '效果', tagColor: 'tag-system',
+      text: L('STR 檢定通過時 STR+1。鐵霜認可了你的實力。', 'STR+1 on check pass. Iron Frost acknowledges your strength.'),
+      delay: 1500 },
+  ], [
+    { text: '返回營地', textEn: 'Return to camp', action: () => loadNode('r2_camp') },
+  ], { label: L('鐵霜切磋', 'Sparring with Frost') });
+});
+
+// ═══════════════════════════════════════
+//  Brotherhood: 鐵霜守夜 (Frost's Vigil)
+// ═══════════════════════════════════════
+registerNode('r2_frost_vigil', () => {
+  state.flags.r2FrostVigil = true;
+  addNpcAffinity('frost', 8);
+  autoExplore([
+    { tag: '場景', tagColor: 'tag-sense',
+      text: '夜很深了。營地的人都睡了，只有鐵霜還坐在快要熄滅的營火邊。',
+      textEn: 'Deep night. The camp sleeps. Only Iron Frost remains by the dying fire.',
+      delay: 2500 },
+    { tag: '行動', tagColor: 'tag-move',
+      text: '你走過去，在她旁邊坐下。她瞥了你一眼，沒有說話，也沒有趕你走。',
+      textEn: 'You walk over and sit beside her. She glances at you, says nothing, doesn\'t send you away.',
+      delay: 2500 },
+    { tag: '感知', tagColor: 'tag-sense',
+      text: '火光很弱了。只剩下幾顆橙色的餘燼在灰燼裡明滅。遠處石壁上的結晶散發著幽藍的冷光。',
+      textEn: 'The fire is low. A few orange embers glow and fade in the ash. Distant crystals cast cold blue light on the stone walls.',
+      delay: 3000 },
+    { tag: '感知', tagColor: 'tag-sense',
+      text: '你們就這樣坐了很久。沒有人說話。只有火的細碎聲響，和遠處石脈收縮的低鳴。',
+      textEn: 'You sit together for a long time. No words. Only the crackle of embers and the distant groan of contracting rock.',
+      delay: 3500 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: '「明天之後，」鐵霜終於開口，聲音低得像是在自言自語，「不管結果如何——謝謝你沒把他當成怪物。」',
+      textEn: '"After tomorrow," Iron Frost finally speaks, voice so low it\'s almost to herself, "regardless of the outcome — thank you for not treating him like a monster."',
+      delay: 3500 },
+    { tag: '感知', tagColor: 'tag-sense',
+      text: '她說的是承鋼——那個被石化的巨像。你點了點頭。',
+      textEn: 'She means Cheng Gang — the petrified colossus. You nod.',
+      delay: 2200 },
+    { tag: '感知', tagColor: 'tag-sense',
+      text: '鐵霜沒有再說話。但在沉默中，她的手鬆開了一直攥著的刀柄。有時候，沉默比說話更有用。',
+      textEn: 'Iron Frost says no more. But in the silence, her hand finally releases the grip on her blade. Sometimes silence speaks louder than words.',
+      delay: 3500, effect: function() { changeHp(5); changePetri(-2); } },
+    { tag: '效果', tagColor: 'tag-system',
+      text: L('HP+5，石化-2%。無言的信任。', 'HP+5, Petri-2%. Unspoken trust.'),
+      delay: 1500 },
+  ], [
+    { text: '回去睡覺', textEn: 'Go back to sleep', action: () => loadNode('r2_camp') },
+  ], { label: L('鐵霜守夜', 'Frost\'s Vigil') });
+});
+
+// ═══════════════════════════════════════
+//  NG+ Romance: 螢的手冊最後一頁 (Ying's Last Page)
+// ═══════════════════════════════════════
+registerNode('r2_ying_ng_notebook', () => {
+  state.flags.r2YingNgNotebook = true;
+  addNpcAffinity('ying', 10);
+  var isMale = state.sex === 'male';
+  var yP = isMale ? L('她', 'she') : L('他', 'he');
+  var yPC = isMale ? 'She' : 'He';
+  autoExplore([
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('螢愣了一下：「最後一頁？那裡什麼都沒有啊。」',
+             'Ying pauses: "The last page? There\'s nothing there."'),
+      delay: 2200 },
+    { tag: '行動', tagColor: 'tag-move',
+      text: L('「讓我看看。」你伸出手。螢猶豫了一下，把手冊遞給你。',
+             '"Let me see." You hold out your hand. Ying hesitates, then hands it over.'),
+      delay: 2500 },
+    { tag: '感知', tagColor: 'tag-sense',
+      text: L('你翻到最後一頁。空白的——表面上是。但你把紙頁傾斜到微光石的角度下——',
+             'You turn to the last page. Blank — on the surface. But when you tilt the paper under the glowstone\'s angle —'),
+      delay: 2800 },
+    { tag: '記憶', tagColor: 'tag-petri',
+      text: L('墨跡。很淡，像是很久以前用乾掉的筆寫的。字跡不是螢的——是你的。',
+             'Ink marks. Faint, as if written long ago with a dry pen. The handwriting isn\'t Ying\'s — it\'s yours.'),
+      delay: 3000 },
+    { tag: '感知', tagColor: 'tag-sense',
+      text: L('兩個字。「全文完」。',
+             'Two words. "The End."'),
+      delay: 2500 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('螢湊過來看。' + yP + '的眼睛慢慢睜大了。',
+             'Ying leans in to look. ' + yPC + '\'s eyes slowly widen.'),
+      delay: 2500 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「這……這是你寫的？」' + yP + '的聲音在發抖。「什麼時候——我從來沒讓你碰過我的手冊——」',
+             '"This... you wrote this?" ' + yPC + '\'s voice trembles. "When — I\'ve never let you touch my notebook —"'),
+      delay: 3200 },
+    { tag: '記憶', tagColor: 'tag-petri',
+      text: L('你想說：「上輩子。你寫完了那本書。我在最後一頁寫了這兩個字。」但你知道說了也沒人會信。',
+             'You want to say: "In my past life. You finished that book. I wrote these two words on the last page." But you know no one would believe it.'),
+      delay: 3200 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('螢盯著那兩個字看了很久。然後' + yP + '慢慢抬起頭，眼眶泛紅。',
+             'Ying stares at those two words for a long time. Then ' + yPC + ' slowly looks up, eyes reddening.'),
+      delay: 2800 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「我不懂。但我——」' + yP + '的聲音很輕。「我做的那個夢。寫書的夢。坐在旁邊的人——」',
+             '"I don\'t understand. But I —" ' + yPC + '\'s voice is very quiet. "That dream I had. Writing a book. The person sitting beside me —"'),
+      delay: 3200 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「——是你。對不對。」',
+             '"— was you. Wasn\'t it."'),
+      delay: 2500 },
+    { tag: '效果', tagColor: 'tag-system',
+      text: L('螢好感 ↑↑↑ | 經驗 +10', 'Ying bond ↑↑↑ | XP +10'),
+      delay: 1500, effect: () => { gainXp(10); } },
+  ], [
+    { text: '返回', textEn: 'Back', action: () => loadNode('r2_ying_talk') },
+  ], { label: L('最後一頁', 'The last page') });
+});
+
+// ═══════════════════════════════════════
+//  Romance: 螢的嫉妒 (Ying's Jealousy)
+// ═══════════════════════════════════════
+registerNode('r2_ying_jealousy', () => {
+  state.flags.r2YingJealousy = true;
+  var isMale = state.sex === 'male';
+  var yingPronoun = isMale ? L('她', 'she') : L('他', 'he');
+  autoExplore([
+    { tag: '感知', tagColor: 'tag-sense',
+      text: '你注意到螢在寫東西，但筆尖一直懸在紙面上沒有落下。' + yingPronoun + '的目光飄向你剛才和灰鶴待過的方向。',
+      textEn: 'You notice Ying holding her pen above the page without writing. ' + (isMale ? 'Her' : 'His') + ' eyes drift toward where you were just sitting with Grey Crane.',
+      delay: 2800 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: '「灰鶴很有趣吧。」螢的語氣很平淡——太平淡了。',
+      textEn: '"Grey Crane is fun, isn\'t she." Ying\'s tone is flat — too flat.',
+      delay: 2200 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: '「' + (isMale ? '她' : '他') + '會骰子、會交易、走過那麼多地方……」螢低頭翻了一頁筆記本。「我只會寫東西。」',
+      textEn: '"' + (isMale ? 'She' : 'He') + ' knows dice, trading, traveled so many places..." Ying turns a notebook page. "All I can do is write."',
+      delay: 3000 },
+  ], [
+    { text: '你寫的東西比骰子重要多了', textEn: 'What you write matters far more than dice',
+      action: () => {
+        addNpcAffinity('ying', 5);
+        autoExplore([
+          { tag: '對話', tagColor: 'tag-npc', text: '螢抬起頭。' + yingPronoun + '的眼睛裡有一瞬間的驚訝，然後慢慢染上了別的東西。', textEn: 'Ying looks up. A flash of surprise in ' + (isMale ? 'her' : 'his') + ' eyes, then something warmer takes its place.', delay: 2500 },
+          { tag: '對話', tagColor: 'tag-npc', text: '「……你真的這麼想？」' + yingPronoun + '的筆終於落回了紙面。你注意到' + yingPronoun + '在笑——很淺很淺的，但是真的。', textEn: '"...You really think so?" ' + (isMale ? 'Her' : 'His') + ' pen finally touches the page again. You notice a smile — faint, but real.', delay: 3000 },
+        ], [{ text: '繼續', textEn: 'Continue', action: () => loadNode('r2_ying_talk') }]);
+      }},
+    { text: '我跟灰鶴只是做生意而已', textEn: 'Crane and I were just doing business',
+      action: () => {
+        addNpcAffinity('ying', 3);
+        autoExplore([
+          { tag: '對話', tagColor: 'tag-npc', text: '「我知道。」螢說得很快。太快了。然後' + yingPronoun + '低下頭繼續寫字，但你發現' + yingPronoun + '的耳朵尖微微泛紅。', textEn: '"I know." Ying says it quickly. Too quickly. Then ' + (isMale ? 'she' : 'he') + ' bends over the notebook again, but you notice ' + (isMale ? 'her' : 'his') + ' ear tips are slightly red.', delay: 3000 },
+        ], [{ text: '繼續', textEn: 'Continue', action: () => loadNode('r2_ying_talk') }]);
+      }},
+    { text: '（不回應）', textEn: '(Say nothing)',
+      action: () => {
+        addNpcAffinity('ying', -5);
+        autoExplore([
+          { tag: '感知', tagColor: 'tag-sense', text: '螢等了一會。然後' + yingPronoun + '點了點頭，像是做出了某個結論。「……嗯。也是。」' + yingPronoun + '的字跡在那之後潦草了很多。', textEn: 'Ying waits. Then nods, as if reaching a conclusion. "...Right. Of course." ' + (isMale ? 'Her' : 'His') + ' handwriting is much rougher after that.', delay: 3000 },
+        ], [{ text: '繼續', textEn: 'Continue', action: () => loadNode('r2_ying_talk') }]);
+      }},
+  ], { label: L('螢的心事', 'Ying\'s Feelings') });
+});
+
+// ═══════════════════════════════════════
+//  Romance: 灰鶴受傷 (Treating Crane's Wound)
+// ═══════════════════════════════════════
+registerNode('r2_crane_wound', () => {
+  state.flags.r2CraneWound = true;
+  addNpcAffinity('crane', 10);
+  var isMale = state.sex === 'male';
+  autoExplore([
+    { tag: '場景', tagColor: 'tag-sense',
+      text: '灰鶴坐在角落裡，用牙齒咬著一條布帶，笨拙地試圖纏住前臂的一道傷口。血滲透了第一層繃帶。',
+      textEn: 'Grey Crane sits in a corner, biting a strip of cloth, clumsily trying to bandage a gash on her forearm. Blood has soaked through the first layer.',
+      delay: 2800 },
+    { tag: '行動', tagColor: 'tag-explore',
+      text: '你走過去蹲下。「讓我來。」',
+      textEn: 'You walk over and crouch. "Let me."',
+      delay: 1800 },
+    { tag: '感知', tagColor: 'tag-sense',
+      text: '灰鶴本能地縮了一下——像是一隻被碰到傷口的貓。她的眼神戒備了一瞬，然後才慢慢鬆開手臂。',
+      textEn: 'Crane flinches instinctively — like a cat whose wound has been touched. Wariness flashes in her eyes before she slowly unclenches her arm.',
+      delay: 3000 },
+    { tag: '感知', tagColor: 'tag-sense',
+      text: '你拿過布帶，小心地清理傷口邊緣。她的手臂上佈滿了大大小小的舊疤——有些是整齊的、有規律的。那些不是戰鬥留下的。',
+      textEn: 'You take the cloth and carefully clean around the wound. Her arm is covered in old scars — some neat and regular. Those aren\'t from fights.',
+      delay: 3500 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: '「別看。」灰鶴的聲音很輕。不是命令，是請求。',
+      textEn: '"Don\'t look." Crane\'s voice is quiet. Not a command — a plea.',
+      delay: 2200 },
+    { tag: '行動', tagColor: 'tag-explore',
+      text: '你沒有看。你只是繼續纏繃帶，一圈一圈，把那些舊疤和新傷一起蓋住。',
+      textEn: 'You don\'t look. You just keep wrapping, turn by turn, covering old scars and new wounds alike.',
+      delay: 3000 },
+    { tag: '感知', tagColor: 'tag-sense',
+      text: '纏到最後，你打了個結。手指碰到她的手腕內側時，感覺到她的脈搏跳得很快。',
+      textEn: 'You tie the last knot. When your fingers brush the inside of her wrist, you feel her pulse racing.',
+      delay: 2800 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: '灰鶴把手收回去，檢查了一下繃帶。很久之後，她說了一句你差點沒聽見的話：「……你是第一個不問我為什麼的人。」',
+      textEn: 'Crane pulls her hand back and checks the bandage. After a long silence, she says something you almost miss: "...You\'re the first person who didn\'t ask why."',
+      delay: 3500 },
+  ], [
+    { text: '因為你會在想說的時候告訴我', textEn: 'Because you\'ll tell me when you\'re ready',
+      action: () => {
+        addNpcAffinity('crane', 5);
+        autoExplore([
+          { tag: '感知', tagColor: 'tag-sense', text: '灰鶴看著你。很長時間裡，她的表情褪去了所有偽裝——不是笑嘻嘻的行商人，不是冷靜的交易者，只是一個疲憊的、傷痕累累的人。', textEn: 'Crane looks at you. For a long moment, every mask falls away — not the grinning merchant, not the cool trader, just a tired, scarred person.', delay: 3500 },
+          { tag: '對話', tagColor: 'tag-npc', text: '「……也許吧。」她站起來，用好的那隻手拍了一下你的肩膀。力道比她平常輕很多。', textEn: '"...Maybe." She stands and pats your shoulder with her good hand. The touch is much gentler than usual.', delay: 2800 },
+        ], [{ text: '繼續', textEn: 'Continue', action: () => loadNode('r2_camp') }]);
+      }},
+    { text: '（默默站起來）', textEn: '(Stand up silently)',
+      action: () => {
+        autoExplore([
+          { tag: '感知', tagColor: 'tag-sense', text: '你站起來，沒有說話。灰鶴也沒有。有時候不說話就是最好的回答。', textEn: 'You stand without a word. Neither does Crane. Sometimes silence is the best answer.', delay: 2500 },
+        ], [{ text: '繼續', textEn: 'Continue', action: () => loadNode('r2_camp') }]);
+      }},
+  ], { label: L('包紮傷口', 'Treating the Wound') });
 });
 

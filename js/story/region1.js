@@ -126,7 +126,106 @@ registerNode('r1_look', () => {
     mapArt,
   ];
 
+  // First-visit passive patrol: danger descriptions before mandatory patrol
+  if (!state.flags.r1PatrolCleared) {
+    steps.push({ tag: '警告', tagColor: 'tag-warn', text: '迴廊深處傳來沉重的拖曳聲——石化生物的領地。', textEn: 'Deep in the corridor, heavy dragging sounds echo — petrified creature territory.', delay: 2500 });
+    steps.push({ tag: '感知', tagColor: 'tag-sense', text: '牆壁上的礦脈突然明暗閃爍，像是在警告什麼。空氣中的石化氣息比任何地方都濃。', textEn: 'Ore veins on the walls flicker light and dark, as if warning you. The petri-concentration here is the thickest yet.', delay: 3000 });
+    steps.push({ tag: '判斷', tagColor: 'tag-move', text: '前方一片未知——你必須先清除威脅，才能安全探索這片迴廊。', textEn: 'The unknown stretches ahead — you must clear threats before safely exploring this corridor.', delay: 2500 });
+  }
+
   autoExplore(steps, (function() {
+    // First visit: mandatory patrol (passive event)
+    if (!state.flags.r1PatrolCleared) {
+      return [{ text: L('深入這片未知的迴廊……', 'Venture into the unknown corridor...'), textEn: 'Venture into the unknown corridor...', action: () => {
+        startPatrol({ firstVisit: true, onDiscovery: function() { stopPatrol(); },
+          firstVisitEvents: [
+            // Cycle 2: Encounter Grey Crane being cornered by a stone creature
+            { cycle: 2, buildQueue: function(queue) {
+              queue.push({ tag: L('感知','Sense'), color: 'tag-sense',
+                text: L('前方傳來一聲尖叫——不是石化生物的吼聲，而是人類的呼喊。', 'A scream ahead — not a monster\'s roar, but a human cry.'),
+                delay: 2500, pending: true });
+              queue.push({ tag: L('遭遇','Encounter'), color: 'tag-combat',
+                text: L('你加快腳步——轉過拐角，一個穿著補丁斗篷的女人被兩隻石化蜥蜴逼到了死角！', 'You quicken your pace — rounding a corner, a woman in a patched cloak is cornered by two stone lizards!'),
+                delay: 3000, pending: true, sfx: 'click' });
+              queue.push({
+                text: L('你要怎麼做？', 'What do you do?'),
+                choices: [
+                  { text: L('衝上去幫忙！', 'Rush in to help!'), textEn: 'Rush in to help!', action: function() {
+                    var result = statCheck('str', 6);
+                    sfx.hit();
+                    if (result !== 'fail') {
+                      patrolAppend(L('戰鬥','Battle'), 'tag-combat',
+                        L('你從側面猛撲過去，一刀劈向最近的蜥蜴——它痛苦地嘶叫著向後退去！另一隻見狀也轉身逃竄。',
+                          'You lunge from the side, slashing the nearest lizard — it shrieks and retreats! The other flees at the sight.'), false);
+                    } else {
+                      patrolAppend(L('戰鬥','Battle'), 'tag-combat',
+                        L('你衝上去揮出一擊——沒打中！但你的出現嚇退了蜥蜴，它們嘶叫著退入黑暗。你被蜥蜴尾巴掃了一下。',
+                          'You charge and swing — miss! But your presence scares them off. A tail swipe catches you.'), false);
+                      changeHp(-5); renderStatus();
+                    }
+                    state.flags.r1WandererMet = true;
+                    state.flags.r1CranePatrolRescue = true;
+                    setTimeout(function() {
+                      patrolAppend(L('遭遇','Encounter'), 'tag-explore',
+                        L('女人直起身，拍了拍斗篷上的灰塵。她看起來出奇地冷靜。',
+                          'The woman straightens up and dusts off her cloak. She looks remarkably calm.'), false);
+                      setTimeout(function() {
+                        patrolAppend(L('對話','Dialogue'), 'tag-info',
+                          L('「……謝了。我叫灰鶴，在這些礦道裡討生活的。」她瞥了你一眼，「你不像是礦工。」',
+                            '"...Thanks. I\'m Grey Crane. I make my living in these mines." She eyes you. "You don\'t look like a miner."'), false);
+                        setTimeout(function() {
+                          patrolAppend(L('對話','Dialogue'), 'tag-info',
+                            L('「走吧，這裡不安全。如果你往深處走，鐵軌旁能找到我——我有東西可以跟你交易。」',
+                              '"Let\'s go, it\'s not safe here. If you head deeper, find me by the rails — I\'ve got things to trade."'), false);
+                          sfx.item();
+                          addItem(L('黑麵包', 'Black Bread'));
+                          notify(L('灰鶴給了你一塊黑麵包', 'Grey Crane gave you Black Bread'));
+                          renderStatus();
+                          patrolTimers.push(setTimeout(runPatrolCycle, 2500));
+                        }, 2500);
+                      }, 2800);
+                    }, 2000);
+                  }},
+                  { text: L('在暗處觀察', 'Watch from the shadows'), textEn: 'Watch from the shadows', action: function() {
+                    patrolAppend(L('感知','Sense'), 'tag-sense',
+                      L('你躲在柱子後面觀望——女人突然從斗篷下抽出一把短刀，精準地刺中蜥蜴的腹部。另一隻嘶叫著逃走了。',
+                        'You hide behind a pillar — the woman suddenly draws a short blade from her cloak, stabbing the lizard\'s belly with precision. The other flees shrieking.'), false);
+                    state.flags.r1WandererMet = true;
+                    setTimeout(function() {
+                      patrolAppend(L('感知','Sense'), 'tag-sense',
+                        L('她收刀入鞘，朝你藏身的方向看了一眼：「出來吧。我知道你在那裡。」',
+                          'She sheathes her blade and glances your way: "Come out. I know you\'re there."'), false);
+                      setTimeout(function() {
+                        patrolAppend(L('對話','Dialogue'), 'tag-info',
+                          L('「叫我灰鶴。」她沒有敵意，「你要是往深處走，鐵軌旁能找到我。」',
+                            '"Call me Grey Crane." No hostility. "Head deeper and find me by the rails."'), false);
+                        renderStatus();
+                        patrolTimers.push(setTimeout(runPatrolCycle, 2500));
+                      }, 2500);
+                    }, 2800);
+                  }}
+                ]
+              });
+            }},
+            // Cycle 4: Find traces of someone else (Ying foreshadowing)
+            { cycle: 4, buildQueue: function(queue) {
+              queue.push({ tag: L('感知','Sense'), color: 'tag-sense',
+                text: L('地上有一張被撕下的紙頁，邊緣沾著新鮮的墨漬。上面畫著精確的礦脈分佈圖。',
+                  'A torn page on the ground, edges stained with fresh ink. It bears a precise ore vein map.'),
+                delay: 2800, pending: true });
+              queue.push({ tag: L('感知','Sense'), color: 'tag-sense',
+                text: L('紙頁還是溫的——有人剛剛從這裡經過。一個纖細的身影？',
+                  'The page is still warm — someone passed through here moments ago. A slender figure?'),
+                delay: 2500 });
+              queue.push({ tag: L('情報','Intel'), color: 'tag-info',
+                text: L('你將紙頁折好收起。也許之後能找到這個人。',
+                  'You fold the page and pocket it. Perhaps you\'ll find this person later.'),
+                delay: 2000, effect: function() { state.flags.r1YingHintSeen = true; gainXp(3); } });
+            }}
+          ]
+        });
+      }}];
+    }
     var c = [];
     c.push({ text: '探索北面鍛造間', textEn: 'Explore the forge room to the north', action: () => loadNode('r1_forge') });
     c.push({ text: '查看東面的守衛殘骸', textEn: 'Examine the guardian remains to the east', action: () => loadNode('r1_guard_check') });
@@ -526,6 +625,7 @@ registerNode('r1_guard_fight', () => {
 </pre>`, delay: 800 },
         { tag: '勝利', tagColor: 'tag-explore', text: '守衛轟然倒地，石化碎片四散飛濺。', textEn: 'The guardian crashes to the ground, petrified fragments scattering.', delay: 2000 },
         { tag: '發現', tagColor: 'tag-item', html: '它胸口的核心碎裂了，露出裡面一塊<b>守衛核心石</b>。', htmlEn: 'Its chest core cracks open, revealing a <b>Guardian Core Stone</b>.', delay: 2200, effect: () => addItem(L('守衛核心石', 'Guardian Core Stone')) },
+        { tag: '感知', tagColor: 'tag-sense', text: '你蹲下檢查殘骸。它的石化紋路不像其他怪物那樣混亂——而是完美對稱的，像工業模具壓出來的。這東西不是自然產物。它是被製造出來的。', textEn: 'You crouch to examine the wreckage. Its petrification patterns aren\'t chaotic like other creatures — they\'re perfectly symmetrical, like an industrial mold pressed them. This thing wasn\'t natural. It was manufactured.', delay: 3200, effect: function() { state.flags.r1GuardClue = true; } },
         { tag: '情報', tagColor: 'tag-info', text: '通往迴廊深處的道路打開了。', textEn: 'The path deeper into the corridor is now open.', delay: 1800 },
       ], [{ text: '繼續前進', textEn: 'Continue forward', action: () => loadNode('r1_look') }]);
     },
@@ -778,6 +878,9 @@ registerNode('r1_quarters', () => {
     } else {
       c.push({ text: '找老周說話', textEn: 'Talk to Old Zhou', action: () => loadNode('r1_survivor_talk') });
     }
+    if (state.flags.r1SurvivorMet && !state.flags.r1ZhouFire) {
+      c.push({ text: '角落裡老周在生火……', textEn: 'Old Zhou is making a fire in the corner...', action: () => loadNode('r1_zhou_fire') });
+    }
     c.push({ text: '在床上休息', textEn: 'Rest on a bunk', action: () => loadNode('r1_rest') });
     c.push({ text: '返回', textEn: 'Return', action: () => loadNode('r1_deep') });
     return c;
@@ -857,6 +960,7 @@ registerNode('r1_rest', () => {
 // ── NPC: Old Zhou — Surviving Miner ──
 registerNode('r1_survivor', () => {
   state.flags.r1SurvivorMet = true;
+  addNpcAffinity('zhou', 10);
   autoExplore([
     { art: npcPortrait.art('zhou', { subtitle: '倖存者' }) || `<pre class="ascii-art">
        ╭──╮
@@ -911,6 +1015,7 @@ registerNode('r1_survivor', () => {
 
 registerNode('r1_survivor_bread', () => {
   state.flags.r1SurvivorFed = true;
+  addNpcAffinity('zhou', 8);
   removeItem(L('黑麵包', 'Black Bread'));
   autoExplore([
     { art: npcPortrait.art('zhou', { subtitle: '倖存者' }) || `<pre class="ascii-art">
@@ -983,6 +1088,7 @@ registerNode('r1_survivor_reward', () => {
       changeStat('wil', 1);
       notify(L('意志 +1', 'WIL +1'));
       state.flags.r1SurvivorFullTrust = true;
+      addNpcAffinity('zhou', 10);
       loadNode('r1_quarters');
     }},
   ], { label: L('老周的回報', 'Zhou\'s reward') });
@@ -1179,6 +1285,10 @@ registerNode('r1_zhou_memory', () => {
              '"He said behind the seal lay massive petrification crystals — highest purity. Worth a fortune." Old Zhou clenches his fists.'),
       delay: 3000 },
     { tag: '對話', tagColor: 'tag-npc',
+      text: L('「但奇怪的是——K 怎麼知道封印後面有什麼？」老周皺眉。「他來之前帶了一份密封圖紙。黑色封蠟，上面有個我沒見過的徽章。他看完就燒掉了。」',
+             '"But the strange thing is — how did K know what was behind the seal?" Old Zhou frowns. "He brought sealed blueprints with him. Black wax seal, with an emblem I\'d never seen. He burned them after reading."'),
+      delay: 3500, effect: function() { state.flags.r1ZhouBlueprintClue = true; } },
+    { tag: '對話', tagColor: 'tag-npc',
       text: L('「我們第三班被派去炸開封印。十七個人。」他的聲音開始發抖。',
              '"Our Crew 3 was ordered to blast the seal open. Seventeen men." His voice starts shaking.'),
       delay: 2800 },
@@ -1253,6 +1363,7 @@ registerNode('r1_zhou_memory', () => {
 // ── NPC: The Wanderer — 灰鶴 (Grey Crane) ──
 registerNode('r1_wanderer', () => {
   state.flags.r1WandererMet = true;
+  addNpcAffinity('crane', 8);
   autoExplore([
     { tag: '感知', tagColor: 'tag-sense', text: '鐵軌旁傳來輕微的腳步聲——不是石化生物那種僵硬的步伐。', textEn: 'Light footsteps by the rails — not the rigid gait of a petrified creature.', delay: 2000 },
     { tag: '遭遇', tagColor: 'tag-combat', text: '你立刻壓低身體，握緊武器——', textEn: 'You crouch immediately, weapon ready —', delay: 1500 },
@@ -1355,6 +1466,7 @@ registerNode('r1_wanderer_lore', () => {
       ], [
         { text: '謝謝你告訴我這些', textEn: 'Thank you for telling me this', action: () => {
           state.flags.r1WandererLore = true;
+          addNpcAffinity('crane', 10);
           changeStat('wil', 1);
           notify(L('意志 +1', 'WIL +1'));
           loadNode('r1_wanderer_trade');
@@ -1441,6 +1553,12 @@ registerNode('r1_wanderer_trade', () => {
         ], [{ text: '返回', textEn: 'Return', action: () => loadNode('r1_deep') }]);
       }});
     }
+    if (state.flags.r1WandererMet && !state.flags.r1CraneDrink) {
+      c.push({ text: '喝一杯再走？', textEn: 'A drink before you go?', action: () => loadNode('r1_crane_drink') });
+    }
+    if (state.flags.ngPlus && state.flags.r1CraneDrink && !state.flags.r1CraneNgDeja) {
+      c.push({ text: '灰鶴——你的出千手法，我好像在哪裡見過', textEn: 'Grey Crane — your card tricks... I feel like I\'ve seen them before', action: () => loadNode('r1_crane_ng_deja') });
+    }
     c.push({ text: '結束交易', textEn: 'End trading', action: () => {
       autoExplore([
         { tag: '情報', tagColor: 'tag-info', text: '灰鶴繫好行囊：「小心前面的路。大門後面……不止有石頭。」', textEn: 'Grey Crane ties her pack: "Watch out ahead. Beyond the gate... there\'s more than stone."', delay: 2500 },
@@ -1458,6 +1576,7 @@ registerNode('r1_wanderer_trade', () => {
 // ── First encounter: chasing the figure ──
 registerNode('r1_ying_encounter', () => {
   state.flags.r1YingMet = true;
+  addNpcAffinity('ying', 10);
   var isMale = state.sex === 'male';
   var yingGender = isMale ? L('女孩', 'girl') : L('少年', 'young man');
   var yingPronoun = isMale ? L('她', 'she') : L('他', 'he');
@@ -1540,6 +1659,7 @@ registerNode('r1_ying_truth', () => {
   var yingPronoun = isMale ? L('她', 'she') : L('他', 'he');
   var yingPronounCap = isMale ? 'She' : 'He';
   state.flags.r1YingTrustUp = true;
+  addNpcAffinity('ying', 8);
   autoExplore([
     { art: npcPortrait.art('ying', { subtitle: '記錄員' }) || `<pre class="ascii-art cyan">
          ·  ✦  ·
@@ -1707,6 +1827,7 @@ registerNode('r1_ying_share', () => {
   ], [
     { text: '那就一起走吧', textEn: 'Then let\'s go together', action: () => {
       state.flags.r1YingCompanion = true;
+      addNpcAffinity('ying', 12);
       addItem(L('螢的筆記抄本', 'Ying\'s Note Copy'));
       autoExplore([
         { tag: '行動', tagColor: 'tag-move', text: '你伸出手。螢看著你的手——那隻左手指尖泛灰，石化紋路蜿蜒。', textEn: 'You extend your hand. Ying looks at it — your left hand, grey at the fingertips, petrification patterns winding up.', delay: 2500 },
@@ -1783,6 +1904,12 @@ registerNode('r1_ying_talk', () => {
     steps.push({ tag: '情報', tagColor: 'tag-info', html: '「第十七任爐灶' + (isMale ? '少年' : '少女') + '，從祭獻坑生還，正在向大採石場前進。<b>這是三百年來第一個活著回來的。</b>」', htmlEn: '"The 17th ' + (isMale ? 'Hearth-Youth' : 'Hearth-Maiden') + ', survived the Sacrificial Pit, advancing toward the Great Quarry. <b>The first to return alive in three hundred years.</b>"', delay: 3500 });
     steps.push({ tag: '感知', tagColor: 'tag-sense', text: yingPronoun + '抬起頭看著你，眼神裡有一種你說不清楚的溫度。', textEn: yingPronounCap + ' looks up at you, eyes carrying a warmth you can\'t quite name.', delay: 2500 });
     steps.push({ tag: '情報', tagColor: 'tag-info', text: '「……要是以後有人讀到這段記錄，他們會知道你的名字。」', textEn: '"...If anyone reads these records someday, they\'ll know your name."', delay: 2800 });
+  } else if (companion && state.flags.r1YingLore2 && !state.flags.r1YingLore3) {
+    state.flags.r1YingLore3 = true;
+    steps.push({ tag: '感知', tagColor: 'tag-sense', text: '你注意到螢翻筆記本的時候愣了一下。' + yingPronoun + '反覆翻了好幾次同一個位置。', textEn: 'You notice Ying pause while flipping through ' + (isMale ? 'her' : 'his') + ' notebook. ' + yingPronounCap + ' flips back and forth over the same spot.', delay: 2500 });
+    steps.push({ tag: '對話', tagColor: 'tag-npc', text: '「……這裡少了一頁。」螢皺起眉頭。「被撕掉的。但我不記得自己撕過。」', textEn: '"...There\'s a page missing here." Ying frowns. "Torn out. But I don\'t remember tearing it."', delay: 3000 });
+    steps.push({ tag: '對話', tagColor: 'tag-npc', text: '螢把殘留的紙邊湊到微光石下看了半天。「只能看到幾個字……『受控轉化』、『成功率』……還有一個被墨水蓋住的印章。」', textEn: 'Ying holds the torn edge under the glowstone. "I can only make out a few words... \'controlled conversion\', \'success rate\'... and a stamp covered by ink."', delay: 3500 });
+    steps.push({ tag: '感知', tagColor: 'tag-sense', text: yingPronoun + '沉默了很久，然後慢慢合上筆記本。「……這本手冊是我從上面帶下來的官方記錄。誰會撕掉官方記錄的一頁？」', textEn: yingPronounCap + ' goes silent for a long time, then slowly closes the notebook. "...This handbook is an official record I brought from above. Who would tear a page from an official record?"', delay: 3500, effect: function() { state.flags.r1YingTornPage = true; } });
   }
 
   autoExplore(steps, (function() {
@@ -1807,6 +1934,10 @@ registerNode('r1_ying_talk', () => {
     if (companion && !state.flags.r1YingWarmth) {
       c.push({ text: '這裡好冷……要不要靠近一點？', textEn: 'It\'s so cold... want to huddle closer?', action: () => loadNode('r1_ying_warmth') });
     }
+    // NG+ exclusive: Ying's dream (requires NG+ + companion + warmth done)
+    if (state.flags.ngPlus && companion && state.flags.r1YingWarmth && !state.flags.r1YingNgDream) {
+      c.push({ text: '螢，你昨晚做了什麼夢？', textEn: 'Ying, what did you dream last night?', action: () => loadNode('r1_ying_ng_dream') });
+    }
     if (companion) {
       c.push({ text: '聊聊天', textEn: 'Chat a while', action: () => loadNode('r1_ying_chat') });
     }
@@ -1821,6 +1952,7 @@ registerNode('r1_ying_herb', () => {
   var yingPronoun = isMale ? L('她', 'she') : L('他', 'he');
   var yingPronounCap = isMale ? 'She' : 'He';
   state.flags.r1YingHerb = true;
+  addNpcAffinity('ying', 8);
   removeItem(L('乾燥草藥', 'Dried Herbs'));
   autoExplore([
     { art: npcPortrait.art('ying', { subtitle: '記錄員' }) || `<pre class="ascii-art cyan">
@@ -1978,6 +2110,7 @@ registerNode('r1_ying_warmth', () => {
   var yingPronounCap = isMale ? 'She' : 'He';
   var yPo = isMale ? 'her' : 'his';
   state.flags.r1YingWarmth = true;
+  addNpcAffinity('ying', 15);
 
   autoExplore([
     { art: npcPortrait.art('ying', { subtitle: '記錄員' }), artEn: npcPortrait.art('ying', { subtitle: 'Chronicler' }), delay: 800 },
@@ -2010,6 +2143,84 @@ registerNode('r1_ying_warmth', () => {
       loadNode('r1_deep');
     }},
   ], { label: L('寒夜共眠', 'Warmth in the Cold') });
+});
+
+// ── NG+ Exclusive: Ying's Dream (past-life memory seeping through) ──
+registerNode('r1_ying_ng_dream', () => {
+  state.flags.r1YingNgDream = true;
+  addNpcAffinity('ying', 8);
+  var isMale = state.sex === 'male';
+  var yP = isMale ? L('她', 'she') : L('他', 'he');
+  var yPC = isMale ? 'She' : 'He';
+  autoExplore([
+    { art: npcPortrait.art('ying', { subtitle: L('……夢', '...dream') }) || '<pre class="ascii-art cyan">\n    ·˚· 螢 — 夢境 ·˚·\n      ╱═══╲\n     │ ─  ─ │ ← 出神\n     │  ──  │\n      ╲═══╱\n    ╱──┤    ├──╲\n        ˚ ✦ ˚\n</pre>', artEn: npcPortrait.art('ying', { subtitle: '...dream' }) || '<pre class="ascii-art cyan">\n    ·˚· Ying — Dream ·˚·\n      ╱═══╲\n     │ ─  ─ │ ← lost in thought\n     │  ──  │\n      ╲═══╱\n    ╱──┤    ├──╲\n        ˚ ✦ ˚\n</pre>', delay: 800 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('螢的筆停了。' + yP + '看著你，表情有些恍惚。',
+             'Ying\'s pen stops. ' + yPC + ' looks at you, expression dazed.'),
+      delay: 2200 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「……夢？」' + yP + '重複了一遍你的問題。「你怎麼知道我做夢了？」',
+             '"...Dream?" ' + yPC + ' repeats your question. "How did you know I dreamed?"'),
+      delay: 2500 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「我夢見自己在寫一本書。不是筆記——是一本完整的書。有開頭、有結尾。」',
+             '"I dreamed I was writing a book. Not notes — a complete book. With a beginning and an ending."'),
+      delay: 3000 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「旁邊坐著一個人。」' + yP + '的聲音變輕了。「我看不清臉——但' + yP + '一直在幫我校對。每寫完一頁，' + yP + '就拿過去讀。」',
+             '"Someone sat beside me." ' + yPC + '\'s voice softens. "I couldn\'t see the face — but they kept proofreading. Every page I finished, they\'d take and read."'),
+      delay: 3500 },
+    { tag: '記憶', tagColor: 'tag-petri',
+      text: L('你的心跳漏了一拍。校對——你答應過' + yP + '的。在另一段記憶裡。',
+             'Your heart skips. Proofreading — you promised ' + (isMale ? 'her' : 'him') + ' that. In another memory.'),
+      delay: 2800 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「最奇怪的是最後一頁。」螢皺起眉。「我寫完了，但那個人把筆拿過去，在最後加了兩個字——」',
+             '"The strangest part was the last page." Ying frowns. "I finished writing, but that person took the pen and added two words at the end —"'),
+      delay: 3200 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「『全文完』。」',
+             '"\'The End.\'"'),
+      delay: 2500 },
+    { tag: '感知', tagColor: 'tag-sense',
+      text: L('螢笑了一下——一種困惑的、有些甜的笑。「我醒來之後心裡暖暖的。但我不知道為什麼。」',
+             'Ying smiles — a confused, slightly sweet smile. "When I woke up, I felt warm inside. But I don\'t know why."'),
+      delay: 3000 },
+  ], [
+    { text: L('也許有一天你會知道', 'Maybe someday you\'ll know'), textEn: 'Maybe someday you\'ll know',
+      action: () => {
+        addNpcAffinity('ying', 5);
+        autoExplore([
+          { tag: '對話', tagColor: 'tag-npc',
+            text: L('螢歪著頭看你：「你說話的語氣……好像已經知道答案了。」',
+                   'Ying tilts ' + (isMale ? 'her' : 'his') + ' head: "The way you say that... as if you already know the answer."'),
+            delay: 2500 },
+          { tag: '感知', tagColor: 'tag-sense',
+            text: L('你沒有回答。但你在心裡默默想：是的。那本書的最後兩個字，是我寫的。',
+                   'You don\'t answer. But silently you think: Yes. Those last two words were mine.'),
+            delay: 3000 },
+          { tag: '效果', tagColor: 'tag-system',
+            text: L('螢好感 ↑↑ | 經驗 +8', 'Ying bond ↑↑ | XP +8'),
+            delay: 1500, effect: () => { gainXp(8); } },
+        ], [
+          { text: '返回', textEn: 'Back', action: () => loadNode('r1_ying_talk') },
+        ], { label: L('螢的夢', 'Ying\'s dream') });
+      }},
+    { text: L('那本書叫什麼名字？', 'What was the book called?'), textEn: 'What was the book called?',
+      action: () => {
+        autoExplore([
+          { tag: '對話', tagColor: 'tag-npc',
+            text: L('螢想了想：「……『石化深淵紀事』。」' + yP + '笑著搖搖頭。「多俗的名字。但夢裡的我——好像非常驕傲。」',
+                   'Ying thinks: "...\'Chronicles of the Petrified Abyss.\'" ' + yPC + ' laughs, shaking ' + (isMale ? 'her' : 'his') + ' head. "What a plain title. But in the dream, I was — so proud of it."'),
+            delay: 3500 },
+          { tag: '效果', tagColor: 'tag-system',
+            text: L('螢好感 ↑ | 經驗 +5', 'Ying bond ↑ | XP +5'),
+            delay: 1500, effect: () => { gainXp(5); } },
+        ], [
+          { text: '返回', textEn: 'Back', action: () => loadNode('r1_ying_talk') },
+        ], { label: L('螢的夢', 'Ying\'s dream') });
+      }},
+  ], { label: L('螢的夢', 'Ying\'s dream') });
 });
 
 // ── Gate to Region 2 ──
@@ -2509,5 +2720,236 @@ registerNode('r1_ghost', function() {
   ], [
     { text: '返回迴廊', textEn: 'Return to corridor', action: function() { loadNode('r1_look'); }},
   ], { label: L('石化幽靈', 'Petrified Ghost') });
+});
+
+// ═══════════════════════════════════════
+//  Brotherhood: 老周生火 (Zhou's Campfire)
+// ═══════════════════════════════════════
+registerNode('r1_zhou_fire', () => {
+  state.flags.r1ZhouFire = true;
+  addNpcAffinity('zhou', 8);
+  autoExplore([
+    { tag: '場景', tagColor: 'tag-sense',
+      art: `<pre class="ascii-art gold">
+       ·  ˚  ✦  ˚  ·
+      ╱╲  火苗  ╱╲
+     ╱◇◇╲ ↑↑↑ ╱◇◇╲
+    ╱ ◇◇◇ ╲↑╱ ◇◇◇ ╲
+   ═══╧═══════╧══════
+    ░ 老周 ░░░░ 你 ░░
+   ══════════════════
+</pre>`, artEn: `<pre class="ascii-art gold">
+       ·  ˚  ✦  ˚  ·
+      ╱╲ Flames ╱╲
+     ╱◇◇╲ ↑↑↑ ╱◇◇╲
+    ╱ ◇◇◇ ╲↑╱ ◇◇◇ ╲
+   ═══╧═══════╧══════
+    ░ Zhou ░░░░ You ░░
+   ══════════════════
+</pre>`,
+      text: '老周蹲在宿舍角落，用兩塊石脈礦石互相敲擊。火星飛濺，照亮了他那張佈滿皺紋的臉。',
+      textEn: 'Old Zhou crouches in the corner, striking two vein-stones together. Sparks fly, lighting up his weathered face.',
+      delay: 2800 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: '「坐。」他頭也不抬。「這種石頭含硫量高，敲對地方就能生火。這是我在礦坑裡學的第一件事。」',
+      textEn: '"Sit." He doesn\'t look up. "These stones are high in sulfur. Hit the right spot, you get fire. First thing I learned in the mines."',
+      delay: 3200 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: '他把一塊遞給你。「來，你試試。往斜上方敲——對，就是那個角度。」',
+      textEn: 'He hands you a piece. "Here, try. Strike upward at an angle — right, just like that."',
+      delay: 2500 },
+    { tag: '行動', tagColor: 'tag-explore',
+      text: '你學著他的手勢敲了幾次。第三次，一簇小小的火苗跳了起來。老周點了點頭。',
+      textEn: 'You mimic his motion and strike a few times. On the third try, a small flame leaps up. Old Zhou nods.',
+      delay: 2500 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: '火堆慢慢旺了起來。老周從口袋裡掏出一個壓扁的鐵壺，往裡倒了點水，架在火上。',
+      textEn: 'The fire grows. Old Zhou pulls out a dented iron kettle, pours in some water, and sets it over the flames.',
+      delay: 2800 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: '「你知道在礦坑裡怎麼判斷水能不能喝嗎？」他問。你搖頭。',
+      textEn: '"Know how to tell if water\'s drinkable in the mines?" he asks. You shake your head.',
+      delay: 2500 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: '「先嚐一口。沒死的話，就能喝。」他一本正經地說。然後嘴角微微彎了一下。',
+      textEn: '"Take a sip. If you don\'t die, it\'s drinkable." He says it deadpan. Then the corner of his mouth twitches.',
+      delay: 3000 },
+    { tag: '感知', tagColor: 'tag-sense',
+      text: '你不由自主地笑了。這是你來到地底以後第一次笑。老周也笑了——一種很輕的、沙啞的笑聲，像是鏽蝕的齒輪重新轉動。',
+      textEn: 'You can\'t help but laugh. It\'s the first time you\'ve laughed since coming underground. Old Zhou laughs too — a faint, rusty sound, like corroded gears turning again.',
+      delay: 3500 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: '他遞給你一杯滾燙的水。「這個真的能喝。別擔心。」',
+      textEn: 'He passes you a cup of scalding water. "This one\'s actually safe. Don\'t worry."',
+      delay: 2200 },
+    { tag: '感知', tagColor: 'tag-sense',
+      text: '你們就這樣坐在火邊，喝著沒有味道的熱水，什麼也沒說。但這個地底洞穴忽然覺得沒那麼冷了。',
+      textEn: 'You sit by the fire together, drinking tasteless hot water in silence. But somehow the underground doesn\'t feel as cold anymore.',
+      delay: 3500, effect: function() { changeHp(8); changePetri(-2); } },
+    { tag: '效果', tagColor: 'tag-system',
+      text: L('HP+8，石化-2%。你學會了一種新的生火方法。', 'HP+8, Petri-2%. You learned a new way to make fire.'),
+      delay: 1500 },
+  ], [
+    { text: '返回', textEn: 'Return', action: () => loadNode('r1_quarters') },
+  ], { label: L('老周的火', 'Zhou\'s Fire') });
+});
+
+// ═══════════════════════════════════════
+//  Romance: 灰鶴喝酒 (Crane's Drink)
+// ═══════════════════════════════════════
+registerNode('r1_crane_drink', () => {
+  state.flags.r1CraneDrink = true;
+  addNpcAffinity('crane', 8);
+  autoExplore([
+    { tag: '場景', tagColor: 'tag-sense',
+      art: npcPortrait.art('crane', { subtitle: '行商人' }) || `<pre class="ascii-art gold">
+       ╱▔▔▔▔╲
+      │ ─  ─ │
+      │ ╰─╯  │～
+    ──┤  🍶 ├──
+      │      │
+      ╱╲  ╱╲
+   灰鶴 · 行商人
+</pre>`, artEn: npcPortrait.art('crane', { subtitle: 'Merchant' }) || `<pre class="ascii-art gold">
+       ╱▔▔▔▔╲
+      │ ─  ─ │
+      │ ╰─╯  │～
+    ──┤  🍶 ├──
+      │      │
+      ╱╲  ╱╲
+  Crane · Merchant
+</pre>`,
+      text: '灰鶴從行囊深處摸出一個扁平的金屬酒壺。「自釀的。原料你別問。」',
+      textEn: 'Grey Crane fishes a flat metal flask from deep in her pack. "Homemade. Don\'t ask about the ingredients."',
+      delay: 2500 },
+    { tag: '行動', tagColor: 'tag-explore',
+      text: '你接過來喝了一口。出乎意料地順滑——帶著一點苦杏仁的味道。',
+      textEn: 'You take a sip. Surprisingly smooth — with a hint of bitter almond.',
+      delay: 2200 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: '灰鶴盤腿坐在地上，把酒壺拿回去灌了一大口。微醺的燈光下，她的表情比平常柔和了很多。',
+      textEn: 'Crane sits cross-legged and takes a long pull. In the dim light, her expression softens noticeably.',
+      delay: 2800 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: '「你知道嗎，」她忽然說，「地底的好處就是——沒人會來找你。」',
+      textEn: '"You know what," she says suddenly, "the good thing about underground — nobody comes looking for you."',
+      delay: 2500 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: '「地表上……有些人欠了不該欠的債。不是錢的問題。」她的手指無意識地摩挲著前臂。你瞥到袖口下隱約的刀疤。',
+      textEn: '"Up on the surface... some people owe debts they shouldn\'t. Not about money." Her fingers absently rub her forearm. You glimpse faint scars beneath her sleeve.',
+      delay: 3200 },
+    { tag: '感知', tagColor: 'tag-sense',
+      text: '她注意到你的目光，迅速放下了手。笑容重新掛上嘴角——但這次你看出那笑容是裝的。',
+      textEn: 'She catches your gaze and drops her hand quickly. The grin returns — but this time you can see it\'s a mask.',
+      delay: 2800 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: '「地表上有個人在等我。」灰鶴仰頭看著洞頂。「但我不確定她還在不在等。」',
+      textEn: '"There\'s someone waiting for me on the surface." Crane looks up at the cavern ceiling. "But I\'m not sure she\'s still waiting."',
+      delay: 3000 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: '她又喝了一口。「算了，不說這些。」她把酒壺遞回給你。「你呢？上面有人在等你嗎？」',
+      textEn: 'Another sip. "Forget it." She passes the flask back. "What about you? Anyone waiting for you up there?"',
+      delay: 2800 },
+  ], [
+    { text: '沒有。所以我更想活著上去。', textEn: 'No. That\'s why I want to make it out even more.',
+      action: () => {
+        addNpcAffinity('crane', 3);
+        autoExplore([
+          { tag: '對話', tagColor: 'tag-npc', text: '灰鶴看了你一會。「……也是。沒有牽掛的人反而活得更久。」她的語氣聽不出是羨慕還是感慨。', textEn: 'Crane studies you. "...True. People with nothing to lose tend to survive longer." You can\'t tell if it\'s envy or wistfulness.', delay: 3000 },
+        ], [{ text: '繼續', textEn: 'Continue', action: () => loadNode('r1_deep') }]);
+      }},
+    { text: '也許有。但那是另一個故事了。', textEn: 'Maybe. But that\'s another story.',
+      action: () => {
+        autoExplore([
+          { tag: '對話', tagColor: 'tag-npc', text: '灰鶴笑了——這次的笑是真的。「神秘男人——不，神秘' + L('少年', 'youth') + '。我喜歡。」她站起來拍掉身上的灰。「有緣再見。」', textEn: 'Crane laughs — a genuine one this time. "Mysterious one. I like that." She stands and dusts herself off. "Till we meet again."', delay: 3000 },
+        ], [{ text: '繼續', textEn: 'Continue', action: () => loadNode('r1_deep') }]);
+      }},
+  ], { label: L('喝一杯', 'A Drink') });
+});
+
+// ═══════════════════════════════════════
+//  NG+ Romance: 灰鶴似曾相識 (Crane Déjà Vu)
+// ═══════════════════════════════════════
+registerNode('r1_crane_ng_deja', () => {
+  state.flags.r1CraneNgDeja = true;
+  addNpcAffinity('crane', 10);
+  autoExplore([
+    { tag: '場景', tagColor: 'tag-sense',
+      art: npcPortrait.art('crane', { subtitle: '行商人' }) || `<pre class="ascii-art gold">
+       ╱▔▔▔▔╲
+      │ ─  ─ │
+      │ ╰─╯  │ ?
+    ──┤      ├──
+      │  ??  │
+      ╱╲  ╱╲
+   灰鶴 · 似曾相識
+</pre>`, artEn: npcPortrait.art('crane', { subtitle: 'Merchant' }) || `<pre class="ascii-art gold">
+       ╱▔▔▔▔╲
+      │ ─  ─ │
+      │ ╰─╯  │ ?
+    ──┤      ├──
+      │  ??  │
+      ╱╲  ╱╲
+  Crane · Déjà Vu
+</pre>`,
+      text: '灰鶴正在洗牌。你隨口提了一句——關於她藏牌的手法。',
+      textEn: 'Grey Crane is shuffling. You casually mention — something about the way she hides cards.',
+      delay: 2500 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: '她的手停了。',
+      textEn: 'Her hands stop.',
+      delay: 1500 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: '「你剛才說什麼？」灰鶴抬起頭。眼神不再是玩世不恭——而是一種你從未見過的銳利。',
+      textEn: '"What did you just say?" Crane looks up. Her gaze is no longer playful — it\'s sharp in a way you\'ve never seen.',
+      delay: 3000 },
+    { tag: '感知', tagColor: 'tag-sense',
+      text: '「第三張牌藏在袖口內側。對吧？」你說得很平靜。因為你記得——上一世，你看了她耍這手法不知道多少次。',
+      textEn: '"Third card, hidden inside the cuff. Right?" You say it calmly. Because you remember — in the last life, you watched her pull this trick countless times.',
+      delay: 3500 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: '灰鶴的臉上閃過一連串表情——驚訝、戒備、困惑。然後是一種更深的東西。',
+      textEn: 'A cascade of expressions flickers across Crane\'s face — surprise, wariness, confusion. Then something deeper.',
+      delay: 3000 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: '「這手法是我自己發明的。」她慢慢地說。「沒有第二個人知道。」',
+      textEn: '"I invented this trick myself." She says slowly. "No one else knows it."',
+      delay: 2800 },
+    { tag: '感知', tagColor: 'tag-sense',
+      text: '她把牌放下。雙手交叉在胸前——防禦姿態。但你注意到她的手指在微微發抖。',
+      textEn: 'She puts the cards down. Arms crossed — defensive posture. But you notice her fingers trembling slightly.',
+      delay: 2800 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: '「你是誰？」灰鶴的聲音壓得很低。「真的——你到底是誰？」',
+      textEn: '"Who are you?" Crane\'s voice drops low. "Really — who the hell are you?"',
+      delay: 2800 },
+  ], [
+    { text: '「一個見過你太多次的人。」', textEn: '"Someone who\'s seen you too many times."',
+      action: () => {
+        autoExplore([
+          { tag: '感知', tagColor: 'tag-sense', text: '灰鶴盯著你看了很久。你不閃避，不解釋——因為真話本身就夠瘋狂了。', textEn: 'Crane stares at you for a long time. You don\'t look away, don\'t explain — because the truth itself is crazy enough.', delay: 3000 },
+          { tag: '對話', tagColor: 'tag-npc', text: '「……你的眼神。」她終於開口。「像是看著一個老朋友。不——比老朋友更深。」', textEn: '"...Your eyes." She finally speaks. "Like looking at an old friend. No — deeper than that."', delay: 3000 },
+          { tag: '感知', tagColor: 'tag-sense', text: '她的防備鬆了一點。不是被說服——是被你眼中某種東西打動了。一種只有真正認識她的人才會有的、溫柔的熟悉。', textEn: 'Her guard drops slightly. Not from persuasion — from something in your eyes. A gentle familiarity that only someone who truly knows her would have.', delay: 3500 },
+          { tag: '對話', tagColor: 'tag-npc', text: '「我不知道你在說什麼。」灰鶴撿起牌，但沒有繼續洗。「但我決定——暫時不追問。」', textEn: '"I don\'t know what you\'re talking about." Crane picks up the cards but doesn\'t shuffle. "But I\'ve decided — not to press for now."', delay: 3200 },
+          { tag: '對話', tagColor: 'tag-npc', text: '她頓了頓。「不過——如果你真的『見過我太多次』——」她露出一個複雜的笑。「那你應該知道，我不喜歡被人看透。」', textEn: 'A pause. "But — if you really \'have seen me too many times\' —" A complicated smile. "Then you should know, I don\'t like being seen through."', delay: 3500 },
+          { tag: '感知', tagColor: 'tag-sense', text: '她站起來，行囊甩上肩。經過你身邊時——她的腳步頓了一瞬。', textEn: 'She stands, swinging her pack over her shoulder. Passing by you — her steps falter for an instant.', delay: 2500 },
+          { tag: '對話', tagColor: 'tag-npc', text: '「但也不討厭。」聲音很輕。像是說給自己聽的。', textEn: '"But I don\'t hate it either." Barely a whisper. As if meant for herself.', delay: 2500, effect: function() { addNpcAffinity('crane', 5); } },
+        ], [{ text: '繼續', textEn: 'Continue', action: () => {
+          notify(L('灰鶴好感 +15（似曾相識的動搖）', 'Crane affinity +15 (Déjà vu tremor)'));
+          loadNode('r1_deep');
+        }}]);
+      }},
+    { text: '「直覺而已。也許我猜的。」', textEn: '"Just intuition. Maybe I guessed."',
+      action: () => {
+        autoExplore([
+          { tag: '對話', tagColor: 'tag-npc', text: '灰鶴嗤笑一聲。「猜？你連位置都猜對了。」', textEn: 'Crane scoffs. "Guessed? You even got the position right."', delay: 2500 },
+          { tag: '對話', tagColor: 'tag-npc', text: '她搖搖頭，重新洗牌。但你注意到——她換了一種完全不同的藏牌手法。', textEn: 'She shakes her head and reshuffles. But you notice — she switches to a completely different hiding technique.', delay: 2800 },
+          { tag: '對話', tagColor: 'tag-npc', text: '「有意思。」灰鶴看你的眼神變了——帶著一種獵人打量對手的審視。和一點點……好奇。', textEn: '"Interesting." The way Crane looks at you changes — a hunter appraising an opponent. And a hint of... curiosity.', delay: 3000 },
+        ], [{ text: '繼續', textEn: 'Continue', action: () => {
+          notify(L('灰鶴好感 +10（引起了她的興趣）', 'Crane affinity +10 (Piqued her interest)'));
+          loadNode('r1_deep');
+        }}]);
+      }},
+  ], { label: L('似曾相識', 'Déjà Vu') });
 });
 

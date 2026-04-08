@@ -239,11 +239,38 @@ registerNode('r0_look', () => {
     mapArt,
   ];
 
+  // First-visit passive patrol: after getting weapon, add danger text before mandatory patrol
+  if (state.flags.corpseSearched && !state.flags.r0PatrolCleared) {
+    steps.push({ tag: '警告', tagColor: 'tag-warn', text: '黑暗中傳來細微的聲響——碎石被什麼東西踩碎的聲音。', textEn: 'Faint sounds in the darkness — something crushing gravel underfoot.', delay: 2500 });
+    steps.push({ tag: '感知', tagColor: 'tag-sense', text: '你的石化紋路隱隱作痛，空氣中的石化粒子突然變得濃厚。這裡……有石化生物在活動。', textEn: 'Your petrification marks throb. Airborne petri-particles suddenly thicken. Petrified creatures... are moving nearby.', delay: 3000 });
+    steps.push({ tag: '判斷', tagColor: 'tag-move', text: '你握緊武器——在探索更多區域之前，必須先確認這片區域的安全。', textEn: 'You grip your weapon — before exploring further, you must secure this area first.', delay: 2500 });
+  }
+
   autoExplore(steps, (function() {
+    // If weapon obtained but patrol not cleared → mandatory patrol (passive event)
+    if (state.flags.corpseSearched && !state.flags.r0PatrolCleared) {
+      return [{ text: L('在黑暗中小心前進……', 'Advance cautiously through the darkness...'), textEn: 'Advance cautiously through the darkness...', action: () => {
+        startPatrol({ firstVisit: true, onDiscovery: function() { stopPatrol(); },
+          firstVisitEvents: [
+            // Cycle 2: Find a hidden survivor's cache in the rubble
+            { cycle: 2, buildQueue: function(queue) {
+              queue.push({ tag: L('感知','Sense'), color: 'tag-sense',
+                text: L('你踢到了什麼硬物——碎石堆下藏著一個已經半碎的木箱。', 'You kick something hard — a half-broken crate hidden under rubble.'),
+                delay: 2500, pending: true });
+              queue.push({ tag: L('發現','Find'), color: 'tag-item',
+                text: L('箱子裡有一些前人留下的物資——看來之前有人在這裡試圖生存過。', 'Inside: supplies left by someone who tried to survive here.'),
+                delay: 2200 });
+              queue.push({ tag: L('物品','Item'), color: 'tag-item',
+                text: L('獲得黑麵包 × 1，HP +10', 'Obtained Black Bread × 1, HP +10'),
+                delay: 1500, sfx: 'item',
+                effect: function() { addItem(L('黑麵包', 'Black Bread')); changeHp(10); renderStatus(); } });
+            }}
+          ]
+        });
+      }}];
+    }
     var c = [];
-    if (state.flags.corpseSearched) {
-      c.push({ text: '在坑底四處警戒', textEn: 'Stay alert and patrol the pit', action: () => loadNode('r0_patrol') });
-    } else {
+    if (!state.flags.corpseSearched) {
       c.push({ text: '查看西側的屍體和石化人形', textEn: 'Examine the corpse and petrified figures', action: () => loadNode('r0_corpse') });
     }
     c.push({ text: '查看北面攀爬痕跡', textEn: 'Check the climbing marks to the north', action: () => loadNode('r0_climb_check') });
@@ -263,6 +290,10 @@ registerNode('r0_look', () => {
     }
     if (!state.flags.r0MuralSeen) {
       c.push({ text: '岩壁上似乎刻著什麼圖案', textEn: 'Patterns carved into the rock wall', action: () => loadNode('r0_mural') });
+    }
+    // Patrol option only available after first patrol cleared
+    if (state.flags.r0PatrolCleared) {
+      c.push({ text: '在坑底四處警戒', textEn: 'Stay alert and patrol the pit', action: () => loadNode('r0_patrol') });
     }
     // Ferryman route — always visible, but blocked if no ending achieved
     c.push({ text: '◇ 走向深處傳來的低語……', textEn: '◇ Follow the whispers from below...', action: () => loadNode('r0_ferryman_gate') });
@@ -1908,6 +1939,14 @@ registerNode('r0_bones', function() {
       text: '日記的主人是第一批感染者之一。字跡歪斜地記載了早期症狀：指尖發灰、關節僵硬、皮膚出現結晶紋路……',
       textEn: 'The diary belonged to one of the first infected. Shaky handwriting records early symptoms: greying fingertips, stiff joints, crystalline patterns on the skin...',
       delay: 3200 },
+    { tag: '發現', tagColor: 'tag-info',
+      text: '中間幾頁的語氣突然變了——不再是恐懼，而是實驗記錄般的冷靜：「第七次校準。能量輸出穩定。受試者四肢石化率83%，核心器官完好。」',
+      textEn: 'The tone shifts abruptly in the middle pages — no longer fear, but clinical calm: "Seventh calibration. Energy output stable. Subject limb petrification 83%, core organs intact."',
+      delay: 3500 },
+    { tag: '疑問', tagColor: 'tag-sense',
+      text: '校準？受試者？這不像是感染者的日記——更像是……研究人員的筆記。但為什麼它會出現在骨堆裡？',
+      textEn: 'Calibration? Subject? This doesn\'t read like a victim\'s diary — more like... a researcher\'s notes. But why would it be in a bone pile?',
+      delay: 3000, effect: function() { state.flags.r0DiaryClue = true; } },
     { tag: '線索', tagColor: 'tag-sense',
       text: '最後幾頁反覆出現一個名字——「守護者K」。日記寫道：「K說封印會保護我們，但他在說謊。」',
       textEn: 'The last few pages repeat a name — "Guardian K". The diary reads: "K said the seal would protect us, but he was lying."',
@@ -1958,6 +1997,10 @@ registerNode('r0_altar', function() {
       text: '一座古老的祭壇半埋在碎石中，上方嵌著一顆裂開的石化結晶，仍散發著微弱的能量脈動。',
       textEn: 'An ancient altar lies half-buried in rubble. A cracked petrification crystal sits atop it, still pulsing with faint energy.',
       delay: 3000 },
+    { tag: '感知', tagColor: 'tag-sense',
+      text: '你蹲下仔細端詳祭壇表面的刻痕。那不是祈禱文——是一串串你看不懂的符號和圖表。像是某種公式，或者……操作手冊。',
+      textEn: 'You crouch to examine the carvings on the altar\'s surface. They\'re not prayers — they\'re strings of unfamiliar symbols and diagrams. Like formulas, or... an operating manual.',
+      delay: 3000, effect: function() { state.flags.r0AltarClue = true; } },
     { tag: '判斷', tagColor: 'tag-info',
       text: '你可以嘗試砸碎結晶釋放殘餘能量，或者靜心冥想試圖引導它。',
       textEn: 'You could try smashing the crystal to release its residual energy, or meditate to channel it.',
@@ -2070,13 +2113,21 @@ registerNode('r0_mural', function() {
       text: '第二幅：實驗——穿長袍的學者圍繞著巨大的結晶裝置。他們在嘗試用石化能量改造人體。',
       textEn: 'Panel two: Experiments — robed scholars surround an enormous crystal apparatus. They attempt to reshape the human body with petrification energy.',
       delay: 3500 },
+    { tag: '感知', tagColor: 'tag-sense',
+      text: '……等一下。你再看了一次第二幅。那些學者的姿勢不像是在恐懼——他們在操控裝置。手勢精確而從容，像是經過無數次練習。',
+      textEn: '...Wait. You look at panel two again. The scholars don\'t look afraid — they\'re operating the apparatus. Their gestures are precise and calm, as if rehearsed countless times.',
+      delay: 3200 },
     { tag: '壁畫', tagColor: 'tag-warn',
       text: '第三幅：瘟疫——結晶失控，石化從裝置中心爆發。人們一個接一個變成石像，城市化為廢墟。',
       textEn: 'Panel three: Plague — the crystals spiral out of control, petrification erupts from the apparatus. People turn to stone one by one, the city crumbles to ruins.',
       delay: 3500 },
+    { tag: '感知', tagColor: 'tag-sense',
+      text: '但第三幅有些地方被刻意損毀了——像是有人用鑿子磨掉了部分畫面。在殘留的線條中，你隱約看到：有些石化的人臉上不是痛苦，而是……平靜？',
+      textEn: 'But parts of panel three have been deliberately defaced — someone chiseled away sections. In the remaining lines, you glimpse: some petrified faces don\'t show agony, but... serenity?',
+      delay: 3500, effect: function() { state.flags.r0MuralClue = true; } },
     { tag: '領悟', tagColor: 'tag-info',
-      text: '石化瘟疫不是天災——而是古代文明的傲慢所釀成的災難。這段歷史不該被遺忘。（XP+8）',
-      textEn: 'The petrification plague was no natural disaster — it was born of an ancient civilization\'s hubris. This history must not be forgotten. (XP+8)',
+      text: '石化瘟疫不是天災——而是古代文明的傲慢所釀成的災難。但那些被損毀的部分……有人不想讓你看到完整的真相。（XP+8）',
+      textEn: 'The petrification plague was no natural disaster — it was born of an ancient civilization\'s hubris. But those defaced sections... someone didn\'t want you to see the full truth. (XP+8)',
       delay: 3000, effect: function() { gainXp(8); } },
   ], [
     { text: '返回', textEn: 'Return', action: function() { loadNode('r0_look'); } },

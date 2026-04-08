@@ -278,9 +278,137 @@ function getNpcAffinityNum(id) {
 }
 
 // Add micro-affinity points to an NPC (from conversations, gifts, etc.)
+// Respects romance cap: non-romance NPCs capped at 79 if someone is romanced.
 function addNpcAffinity(id, amount) {
   var key = 'npcAff_' + id;
-  state.flags[key] = Math.min(100, (state.flags[key] || 0) + amount);
+  var cap = 100;
+  if (state.romance && state.romance !== id && ROMANCEABLE_IDS.indexOf(id) !== -1) {
+    cap = 79; // exclusive romance cap
+  }
+  state.flags[key] = Math.min(cap, (state.flags[key] || 0) + amount);
+}
+
+// ── Romance System ──
+// Romanceable NPCs and their multi-playthrough requirements
+var ROMANCEABLE_IDS = ['ying', 'crane', 'bell', 'cheng'];
+
+var ROMANCE_REQUIRED_RUNS = {
+  ying:  1,  // 2nd playthrough (totalRuns >= 1) for full romance
+  crane: 1,  // 2nd playthrough
+  bell:  2,  // 3rd playthrough (totalRuns >= 2)
+  cheng: 3,  // 4th playthrough (totalRuns >= 3)
+};
+
+// Get affinity level (0-5) from numerical value
+// 0=Stranger(0-19), 1=Acquaintance(20-39), 2=Trusted(40-59),
+// 3=Intimate(60-79), 4=Ambiguous(80-89), 5=Lover(90-100)
+function getAffinityLevel(id) {
+  var num = getNpcAffinityNum(id);
+  if (num >= 90) return 5;
+  if (num >= 80) return 4;
+  if (num >= 60) return 3;
+  if (num >= 40) return 2;
+  if (num >= 20) return 1;
+  return 0;
+}
+
+// Get localized affinity level name
+function getAffinityLevelName(level) {
+  var names = [
+    { zh: '陌生', en: 'Stranger' },
+    { zh: '認識', en: 'Acquaintance' },
+    { zh: '信任', en: 'Trusted' },
+    { zh: '親密', en: 'Intimate' },
+    { zh: '曖昧', en: 'Ambiguous' },
+    { zh: '戀人', en: 'Lover' },
+  ];
+  var n = names[level] || names[0];
+  return L(n.zh, n.en);
+}
+
+// Check if a romance NPC can reach full romance this playthrough
+function canFullRomance(id) {
+  if (ROMANCEABLE_IDS.indexOf(id) === -1) return false;
+  var reqRuns = ROMANCE_REQUIRED_RUNS[id] || 0;
+  var totalRuns = (typeof globalStats !== 'undefined') ? (globalStats.totalRuns || 0) : 0;
+  return totalRuns >= reqRuns;
+}
+
+// Get the affinity cap for this NPC this playthrough
+function getAffinityCap(id) {
+  if (ROMANCEABLE_IDS.indexOf(id) === -1) return 100;
+  if (state.romance && state.romance !== id) return 79; // exclusive cap
+  var reqRuns = ROMANCE_REQUIRED_RUNS[id] || 0;
+  var totalRuns = (typeof globalStats !== 'undefined') ? (globalStats.totalRuns || 0) : 0;
+  // Progressive cap based on playthrough count
+  if (totalRuns >= reqRuns) return 100;
+  // Below required runs: cap increases per playthrough
+  var caps = { ying: [90], crane: [80], bell: [60, 85], cheng: [40, 65, 85] };
+  var npcCaps = caps[id];
+  if (!npcCaps) return 100;
+  return (totalRuns < npcCaps.length) ? npcCaps[totalRuns] : 100;
+}
+
+// Commit to romance with this NPC (called when affinity >= 90 and player accepts)
+function setRomance(id) {
+  if (ROMANCEABLE_IDS.indexOf(id) === -1) return;
+  state.romance = id;
+  // Cap other romanceable NPCs at 79
+  for (var i = 0; i < ROMANCEABLE_IDS.length; i++) {
+    var rid = ROMANCEABLE_IDS[i];
+    if (rid === id) continue;
+    var key = 'npcAff_' + rid;
+    if ((state.flags[key] || 0) > 79) state.flags[key] = 79;
+  }
+  var def = NPC_DEFS[id];
+  if (def) {
+    notify(L('♥ 與' + def.name + '確認了關係', '♥ Romance confirmed with ' + def.nameEn));
+  }
+}
+
+// Break romance (reject confession or story event)
+function breakRomance(id) {
+  if (state.romance === id) state.romance = null;
+  // Reduce affinity to 75 on rejection
+  var key = 'npcAff_' + id;
+  if ((state.flags[key] || 0) > 75) state.flags[key] = 75;
+}
+
+// Apply NG+ romance carry-over at start of new game
+function applyRomanceCarryOver() {
+  if (typeof globalStats === 'undefined') return;
+  var lastRomance = globalStats.romanceCarryOver;
+  for (var i = 0; i < NPC_IDS.length; i++) {
+    var id = NPC_IDS[i];
+    var history = globalStats.romanceHistory[id];
+    if (!history) continue;
+    var carry = 0;
+    if (id === lastRomance) {
+      carry = Math.floor(history.maxAffinity * 0.30); // 30% for last lover
+    } else {
+      carry = Math.floor(history.maxAffinity * 0.10); // 10% for others
+    }
+    if (carry > 0) {
+      state.flags['npcAff_' + id] = carry;
+    }
+  }
+}
+
+// Record romance data to globalStats at end of run
+function recordRomanceStats() {
+  if (typeof globalStats === 'undefined') return;
+  globalStats.romanceCarryOver = state.romance;
+  for (var i = 0; i < ROMANCEABLE_IDS.length; i++) {
+    var id = ROMANCEABLE_IDS[i];
+    var num = getNpcAffinityNum(id);
+    if (num <= 0) continue;
+    if (!globalStats.romanceHistory[id]) {
+      globalStats.romanceHistory[id] = { maxAffinity: 0, timesRomanced: 0 };
+    }
+    var h = globalStats.romanceHistory[id];
+    if (num > h.maxAffinity) h.maxAffinity = num;
+    if (state.romance === id) h.timesRomanced++;
+  }
 }
 
 // Legacy heart-based count (still used for gift/max checks)

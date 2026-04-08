@@ -125,10 +125,20 @@ function renderStatus() {
           giftHtml = '<span class="npc-gift-claimed">✓</span>';
         }
         var numLabel = npc.num != null ? '<span class="npc-num">' + npc.num + '%</span>' : '';
+        var romanceTag = '';
+        if (state.romance === npc.id) {
+          romanceTag = '<span class="npc-romance-tag">' + L('♥戀人', '♥Lover') + '</span>';
+        } else if (typeof getAffinityLevel === 'function') {
+          var lvl = getAffinityLevel(npc.id);
+          if (lvl >= 3) {
+            romanceTag = '<span class="npc-level-tag">' + getAffinityLevelName(lvl) + '</span>';
+          }
+        }
         html += '<div class="npc-row">'
           + '<span class="npc-name">' + (state.lang === 'en' ? npc.nameEn : npc.name) + '</span>'
           + '<span class="npc-hearts">' + hearts + '</span>'
           + numLabel
+          + romanceTag
           + giftHtml
           + '</div>';
       }
