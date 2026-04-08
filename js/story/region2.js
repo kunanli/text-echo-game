@@ -1839,6 +1839,9 @@ registerNode('r2_ying_talk', () => {
     if (state.flags.r2YingLore3 && state.flags.r2YingSketch && !state.flags.r2YingSecret) {
       c.push({ text: '螢……你的手冊裡還藏了什麼？', textEn: 'Ying... what else are you hiding in that notebook?', action: () => loadNode('r2_ying_secret') });
     }
+    if (state.flags.r2CraneMet && !state.flags.r2YingJealousy) {
+      c.push({ text: '（螢看起來有些心不在焉……）', textEn: '(Ying seems distracted...)', action: () => loadNode('r2_ying_jealousy') });
+    }
     if (state.flags.r2CampVisited && !state.flags.r2YingNight) {
       c.push({ text: '要不要一起去營地休息？', textEn: 'Want to rest at the camp together?', action: () => loadNode('r2_ying_night') });
     }
@@ -2624,6 +2627,10 @@ registerNode('r2_crane', () => {
       ], { label: L('吹牛骰', 'Liar\'s Dice') });
     }});
 
+    // Romance: Crane wound treatment (requires scar revealed + not done)
+    if (state.flags.r2CraneScar && !state.flags.r2CraneWound) {
+      c.push({ text: '灰鶴的手臂在流血……', textEn: 'Crane\'s arm is bleeding...', action: () => loadNode('r2_crane_wound') });
+    }
     // Sidequest: Crane's scars (requires met + lore done)
     if (state.flags.r2CraneLore && !state.flags.r2CraneScar) {
       c.push({ text: '她手臂上的刀疤……', textEn: 'Those scars on her arms...', action: () => loadNode('r2_crane_scar') });
@@ -4256,5 +4263,109 @@ registerNode('r2_frost_vigil', () => {
   ], [
     { text: '回去睡覺', textEn: 'Go back to sleep', action: () => loadNode('r2_camp') },
   ], { label: L('鐵霜守夜', 'Frost\'s Vigil') });
+});
+
+// ═══════════════════════════════════════
+//  Romance: 螢的嫉妒 (Ying's Jealousy)
+// ═══════════════════════════════════════
+registerNode('r2_ying_jealousy', () => {
+  state.flags.r2YingJealousy = true;
+  var isMale = state.sex === 'male';
+  var yingPronoun = isMale ? L('她', 'she') : L('他', 'he');
+  autoExplore([
+    { tag: '感知', tagColor: 'tag-sense',
+      text: '你注意到螢在寫東西，但筆尖一直懸在紙面上沒有落下。' + yingPronoun + '的目光飄向你剛才和灰鶴待過的方向。',
+      textEn: 'You notice Ying holding her pen above the page without writing. ' + (isMale ? 'Her' : 'His') + ' eyes drift toward where you were just sitting with Grey Crane.',
+      delay: 2800 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: '「灰鶴很有趣吧。」螢的語氣很平淡——太平淡了。',
+      textEn: '"Grey Crane is fun, isn\'t she." Ying\'s tone is flat — too flat.',
+      delay: 2200 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: '「' + (isMale ? '她' : '他') + '會骰子、會交易、走過那麼多地方……」螢低頭翻了一頁筆記本。「我只會寫東西。」',
+      textEn: '"' + (isMale ? 'She' : 'He') + ' knows dice, trading, traveled so many places..." Ying turns a notebook page. "All I can do is write."',
+      delay: 3000 },
+  ], [
+    { text: '你寫的東西比骰子重要多了', textEn: 'What you write matters far more than dice',
+      action: () => {
+        addNpcAffinity('ying', 5);
+        autoExplore([
+          { tag: '對話', tagColor: 'tag-npc', text: '螢抬起頭。' + yingPronoun + '的眼睛裡有一瞬間的驚訝，然後慢慢染上了別的東西。', textEn: 'Ying looks up. A flash of surprise in ' + (isMale ? 'her' : 'his') + ' eyes, then something warmer takes its place.', delay: 2500 },
+          { tag: '對話', tagColor: 'tag-npc', text: '「……你真的這麼想？」' + yingPronoun + '的筆終於落回了紙面。你注意到' + yingPronoun + '在笑——很淺很淺的，但是真的。', textEn: '"...You really think so?" ' + (isMale ? 'Her' : 'His') + ' pen finally touches the page again. You notice a smile — faint, but real.', delay: 3000 },
+        ], [{ text: '繼續', textEn: 'Continue', action: () => loadNode('r2_ying_talk') }]);
+      }},
+    { text: '我跟灰鶴只是做生意而已', textEn: 'Crane and I were just doing business',
+      action: () => {
+        addNpcAffinity('ying', 3);
+        autoExplore([
+          { tag: '對話', tagColor: 'tag-npc', text: '「我知道。」螢說得很快。太快了。然後' + yingPronoun + '低下頭繼續寫字，但你發現' + yingPronoun + '的耳朵尖微微泛紅。', textEn: '"I know." Ying says it quickly. Too quickly. Then ' + (isMale ? 'she' : 'he') + ' bends over the notebook again, but you notice ' + (isMale ? 'her' : 'his') + ' ear tips are slightly red.', delay: 3000 },
+        ], [{ text: '繼續', textEn: 'Continue', action: () => loadNode('r2_ying_talk') }]);
+      }},
+    { text: '（不回應）', textEn: '(Say nothing)',
+      action: () => {
+        addNpcAffinity('ying', -5);
+        autoExplore([
+          { tag: '感知', tagColor: 'tag-sense', text: '螢等了一會。然後' + yingPronoun + '點了點頭，像是做出了某個結論。「……嗯。也是。」' + yingPronoun + '的字跡在那之後潦草了很多。', textEn: 'Ying waits. Then nods, as if reaching a conclusion. "...Right. Of course." ' + (isMale ? 'Her' : 'His') + ' handwriting is much rougher after that.', delay: 3000 },
+        ], [{ text: '繼續', textEn: 'Continue', action: () => loadNode('r2_ying_talk') }]);
+      }},
+  ], { label: L('螢的心事', 'Ying\'s Feelings') });
+});
+
+// ═══════════════════════════════════════
+//  Romance: 灰鶴受傷 (Treating Crane's Wound)
+// ═══════════════════════════════════════
+registerNode('r2_crane_wound', () => {
+  state.flags.r2CraneWound = true;
+  addNpcAffinity('crane', 10);
+  var isMale = state.sex === 'male';
+  autoExplore([
+    { tag: '場景', tagColor: 'tag-sense',
+      text: '灰鶴坐在角落裡，用牙齒咬著一條布帶，笨拙地試圖纏住前臂的一道傷口。血滲透了第一層繃帶。',
+      textEn: 'Grey Crane sits in a corner, biting a strip of cloth, clumsily trying to bandage a gash on her forearm. Blood has soaked through the first layer.',
+      delay: 2800 },
+    { tag: '行動', tagColor: 'tag-explore',
+      text: '你走過去蹲下。「讓我來。」',
+      textEn: 'You walk over and crouch. "Let me."',
+      delay: 1800 },
+    { tag: '感知', tagColor: 'tag-sense',
+      text: '灰鶴本能地縮了一下——像是一隻被碰到傷口的貓。她的眼神戒備了一瞬，然後才慢慢鬆開手臂。',
+      textEn: 'Crane flinches instinctively — like a cat whose wound has been touched. Wariness flashes in her eyes before she slowly unclenches her arm.',
+      delay: 3000 },
+    { tag: '感知', tagColor: 'tag-sense',
+      text: '你拿過布帶，小心地清理傷口邊緣。她的手臂上佈滿了大大小小的舊疤——有些是整齊的、有規律的。那些不是戰鬥留下的。',
+      textEn: 'You take the cloth and carefully clean around the wound. Her arm is covered in old scars — some neat and regular. Those aren\'t from fights.',
+      delay: 3500 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: '「別看。」灰鶴的聲音很輕。不是命令，是請求。',
+      textEn: '"Don\'t look." Crane\'s voice is quiet. Not a command — a plea.',
+      delay: 2200 },
+    { tag: '行動', tagColor: 'tag-explore',
+      text: '你沒有看。你只是繼續纏繃帶，一圈一圈，把那些舊疤和新傷一起蓋住。',
+      textEn: 'You don\'t look. You just keep wrapping, turn by turn, covering old scars and new wounds alike.',
+      delay: 3000 },
+    { tag: '感知', tagColor: 'tag-sense',
+      text: '纏到最後，你打了個結。手指碰到她的手腕內側時，感覺到她的脈搏跳得很快。',
+      textEn: 'You tie the last knot. When your fingers brush the inside of her wrist, you feel her pulse racing.',
+      delay: 2800 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: '灰鶴把手收回去，檢查了一下繃帶。很久之後，她說了一句你差點沒聽見的話：「……你是第一個不問我為什麼的人。」',
+      textEn: 'Crane pulls her hand back and checks the bandage. After a long silence, she says something you almost miss: "...You\'re the first person who didn\'t ask why."',
+      delay: 3500 },
+  ], [
+    { text: '因為你會在想說的時候告訴我', textEn: 'Because you\'ll tell me when you\'re ready',
+      action: () => {
+        addNpcAffinity('crane', 5);
+        autoExplore([
+          { tag: '感知', tagColor: 'tag-sense', text: '灰鶴看著你。很長時間裡，她的表情褪去了所有偽裝——不是笑嘻嘻的行商人，不是冷靜的交易者，只是一個疲憊的、傷痕累累的人。', textEn: 'Crane looks at you. For a long moment, every mask falls away — not the grinning merchant, not the cool trader, just a tired, scarred person.', delay: 3500 },
+          { tag: '對話', tagColor: 'tag-npc', text: '「……也許吧。」她站起來，用好的那隻手拍了一下你的肩膀。力道比她平常輕很多。', textEn: '"...Maybe." She stands and pats your shoulder with her good hand. The touch is much gentler than usual.', delay: 2800 },
+        ], [{ text: '繼續', textEn: 'Continue', action: () => loadNode('r2_camp') }]);
+      }},
+    { text: '（默默站起來）', textEn: '(Stand up silently)',
+      action: () => {
+        autoExplore([
+          { tag: '感知', tagColor: 'tag-sense', text: '你站起來，沒有說話。灰鶴也沒有。有時候不說話就是最好的回答。', textEn: 'You stand without a word. Neither does Crane. Sometimes silence is the best answer.', delay: 2500 },
+        ], [{ text: '繼續', textEn: 'Continue', action: () => loadNode('r2_camp') }]);
+      }},
+  ], { label: L('包紮傷口', 'Treating the Wound') });
 });
 

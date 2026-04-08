@@ -1553,6 +1553,9 @@ registerNode('r1_wanderer_trade', () => {
         ], [{ text: '返回', textEn: 'Return', action: () => loadNode('r1_deep') }]);
       }});
     }
+    if (state.flags.r1WandererMet && !state.flags.r1CraneDrink) {
+      c.push({ text: '喝一杯再走？', textEn: 'A drink before you go?', action: () => loadNode('r1_crane_drink') });
+    }
     c.push({ text: '結束交易', textEn: 'End trading', action: () => {
       autoExplore([
         { tag: '情報', tagColor: 'tag-info', text: '灰鶴繫好行囊：「小心前面的路。大門後面……不止有石頭。」', textEn: 'Grey Crane ties her pack: "Watch out ahead. Beyond the gate... there\'s more than stone."', delay: 2500 },
@@ -2704,5 +2707,78 @@ registerNode('r1_zhou_fire', () => {
   ], [
     { text: '返回', textEn: 'Return', action: () => loadNode('r1_quarters') },
   ], { label: L('老周的火', 'Zhou\'s Fire') });
+});
+
+// ═══════════════════════════════════════
+//  Romance: 灰鶴喝酒 (Crane's Drink)
+// ═══════════════════════════════════════
+registerNode('r1_crane_drink', () => {
+  state.flags.r1CraneDrink = true;
+  addNpcAffinity('crane', 8);
+  autoExplore([
+    { tag: '場景', tagColor: 'tag-sense',
+      art: npcPortrait.art('crane', { subtitle: '行商人' }) || `<pre class="ascii-art gold">
+       ╱▔▔▔▔╲
+      │ ─  ─ │
+      │ ╰─╯  │～
+    ──┤  🍶 ├──
+      │      │
+      ╱╲  ╱╲
+   灰鶴 · 行商人
+</pre>`, artEn: npcPortrait.art('crane', { subtitle: 'Merchant' }) || `<pre class="ascii-art gold">
+       ╱▔▔▔▔╲
+      │ ─  ─ │
+      │ ╰─╯  │～
+    ──┤  🍶 ├──
+      │      │
+      ╱╲  ╱╲
+  Crane · Merchant
+</pre>`,
+      text: '灰鶴從行囊深處摸出一個扁平的金屬酒壺。「自釀的。原料你別問。」',
+      textEn: 'Grey Crane fishes a flat metal flask from deep in her pack. "Homemade. Don\'t ask about the ingredients."',
+      delay: 2500 },
+    { tag: '行動', tagColor: 'tag-explore',
+      text: '你接過來喝了一口。出乎意料地順滑——帶著一點苦杏仁的味道。',
+      textEn: 'You take a sip. Surprisingly smooth — with a hint of bitter almond.',
+      delay: 2200 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: '灰鶴盤腿坐在地上，把酒壺拿回去灌了一大口。微醺的燈光下，她的表情比平常柔和了很多。',
+      textEn: 'Crane sits cross-legged and takes a long pull. In the dim light, her expression softens noticeably.',
+      delay: 2800 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: '「你知道嗎，」她忽然說，「地底的好處就是——沒人會來找你。」',
+      textEn: '"You know what," she says suddenly, "the good thing about underground — nobody comes looking for you."',
+      delay: 2500 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: '「地表上……有些人欠了不該欠的債。不是錢的問題。」她的手指無意識地摩挲著前臂。你瞥到袖口下隱約的刀疤。',
+      textEn: '"Up on the surface... some people owe debts they shouldn\'t. Not about money." Her fingers absently rub her forearm. You glimpse faint scars beneath her sleeve.',
+      delay: 3200 },
+    { tag: '感知', tagColor: 'tag-sense',
+      text: '她注意到你的目光，迅速放下了手。笑容重新掛上嘴角——但這次你看出那笑容是裝的。',
+      textEn: 'She catches your gaze and drops her hand quickly. The grin returns — but this time you can see it\'s a mask.',
+      delay: 2800 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: '「地表上有個人在等我。」灰鶴仰頭看著洞頂。「但我不確定她還在不在等。」',
+      textEn: '"There\'s someone waiting for me on the surface." Crane looks up at the cavern ceiling. "But I\'m not sure she\'s still waiting."',
+      delay: 3000 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: '她又喝了一口。「算了，不說這些。」她把酒壺遞回給你。「你呢？上面有人在等你嗎？」',
+      textEn: 'Another sip. "Forget it." She passes the flask back. "What about you? Anyone waiting for you up there?"',
+      delay: 2800 },
+  ], [
+    { text: '沒有。所以我更想活著上去。', textEn: 'No. That\'s why I want to make it out even more.',
+      action: () => {
+        addNpcAffinity('crane', 3);
+        autoExplore([
+          { tag: '對話', tagColor: 'tag-npc', text: '灰鶴看了你一會。「……也是。沒有牽掛的人反而活得更久。」她的語氣聽不出是羨慕還是感慨。', textEn: 'Crane studies you. "...True. People with nothing to lose tend to survive longer." You can\'t tell if it\'s envy or wistfulness.', delay: 3000 },
+        ], [{ text: '繼續', textEn: 'Continue', action: () => loadNode('r1_deep') }]);
+      }},
+    { text: '也許有。但那是另一個故事了。', textEn: 'Maybe. But that\'s another story.',
+      action: () => {
+        autoExplore([
+          { tag: '對話', tagColor: 'tag-npc', text: '灰鶴笑了——這次的笑是真的。「神秘男人——不，神秘' + L('少年', 'youth') + '。我喜歡。」她站起來拍掉身上的灰。「有緣再見。」', textEn: 'Crane laughs — a genuine one this time. "Mysterious one. I like that." She stands and dusts herself off. "Till we meet again."', delay: 3000 },
+        ], [{ text: '繼續', textEn: 'Continue', action: () => loadNode('r1_deep') }]);
+      }},
+  ], { label: L('喝一杯', 'A Drink') });
 });
 

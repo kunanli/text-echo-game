@@ -200,6 +200,9 @@ registerNode('r3_look', () => {
     if (state.flags.r1YingCompanion) {
       c.push({ text: '找螢', textEn: 'Find Ying', action: () => loadNode('r3_ying_talk') });
     }
+    if (state.flags.r3YingRiver && !state.flags.r3YingConfessionFull && typeof getNpcAffinityNum === 'function' && getNpcAffinityNum('ying') >= 85) {
+      c.push({ text: '螢說想在河邊跟你說一件事……', textEn: 'Ying said she wants to tell you something by the river...', action: () => loadNode('r3_ying_confession_full') });
+    }
     if (state.flags.r3MarketVisited && !state.flags.r3ZhouMet) {
       c.push({ text: '市場角落的老人', textEn: 'Old man in the market corner', action: () => loadNode('r3_zhou') });
     }
@@ -1799,6 +1802,14 @@ registerNode('r3_crane', () => {
     if (state.flags.r3CranePast && state.flags.r3BellAlliance && !state.flags.r3CraneDeal) {
       c.push({ text: '灰鶴，你考慮好了嗎？', textEn: 'Crane, have you decided?', action: () => loadNode('r3_crane_deal') });
     }
+    // Romance: Rooftop scene (requires past + high affinity)
+    if (state.flags.r3CranePast && !state.flags.r3CraneRooftop && typeof getNpcAffinityNum === 'function' && getNpcAffinityNum('crane') >= 70) {
+      c.push({ text: '灰鶴說想帶你去一個地方……', textEn: 'Crane says she wants to show you a place...', action: () => loadNode('r3_crane_rooftop') });
+    }
+    // Romance: Confession (requires rooftop + very high affinity)
+    if (state.flags.r3CraneRooftop && !state.flags.r3CraneConfession && typeof getNpcAffinityNum === 'function' && getNpcAffinityNum('crane') >= 85) {
+      c.push({ text: '灰鶴在碼頭等你', textEn: 'Crane is waiting at the dock', action: () => loadNode('r3_crane_confession') });
+    }
     c.push({ text: '離開', textEn: 'Leave', action: () => loadNode('r3_market') });
     return c;
   })(), { label: L('灰鶴', 'Grey Crane') });
@@ -2795,10 +2806,14 @@ registerNode('r3_boss_prep', () => {
     state.flags.r3PlagueProof = true;
   }
 
-  autoExplore(steps, [
-    { text: '走向議會大廳', textEn: 'Head to the Council chamber', action: () => loadNode('r3_boss') },
-    { text: '先去準備一下', textEn: 'Prepare first', action: () => loadNode('r3_look') },
-  ], { label: L('決戰前夕', 'Eve of the showdown') });
+  var bossChoices = [];
+  if (state.flags.r1YingCompanion && !state.flags.r3YingFarewell) {
+    bossChoices.push({ text: '螢站在走廊盡頭看著你……', textEn: 'Ying stands at the corridor\'s end, watching you...', action: () => loadNode('r3_ying_farewell') });
+  }
+  bossChoices.push({ text: '走向議會大廳', textEn: 'Head to the Council chamber', action: () => loadNode('r3_boss') });
+  bossChoices.push({ text: '先去準備一下', textEn: 'Prepare first', action: () => loadNode('r3_look') });
+
+  autoExplore(steps, bossChoices, { label: L('決戰前夕', 'Eve of the showdown') });
 });
 
 // ═══════════════════════════════════════════════════
@@ -3675,4 +3690,208 @@ registerNode('r3_crane_zhou', () => {
   ], [
     { text: '返回碼頭', textEn: 'Return to the dock', action: () => loadNode('r3_dock') },
   ], { label: L('碼頭棋局', 'Dock Chess Game') });
+});
+
+// ═══════════════════════════════════════
+//  Romance: 螢的告白 (Ying's Full Confession)
+// ═══════════════════════════════════════
+registerNode('r3_ying_confession_full', () => {
+  state.flags.r3YingConfessionFull = true;
+  addNpcAffinity('ying', 10);
+  var isMale = state.sex === 'male';
+  var yingPronoun = isMale ? L('她', 'she') : L('他', 'he');
+  autoExplore([
+    { tag: '場景', tagColor: 'tag-sense',
+      art: npcPortrait.art('ying', { subtitle: L('記錄員', 'Chronicler') }) || '',
+      text: '螢站在河邊，手裡拿著那本你已經看過無數次的筆記本。但今天' + yingPronoun + '沒有在寫字。',
+      textEn: 'Ying stands by the river, holding the notebook you\'ve seen countless times. But today ' + (isMale ? 'she' : 'he') + ' isn\'t writing.',
+      delay: 2800 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: '「上次在河邊——我沒把話說完。」螢看著水面。月光在波紋上碎成無數銀色的碎片。',
+      textEn: '"Last time by the river — I didn\'t finish." Ying watches the water. Moonlight shatters into silver fragments on the ripples.',
+      delay: 3000 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: '「我一直在記錄你的故事。從祭獻坑到河城——每一步、每一個選擇、每一次你差點死掉。」' + yingPronoun + '把筆記本翻到最後一頁。',
+      textEn: '"I\'ve been recording your story. From the Sacrificial Pit to River City — every step, every choice, every time you nearly died." ' + (isMale ? 'She' : 'He') + ' turns to the last page.',
+      delay: 3500 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: '「但我沒有記錄一件事。」螢的聲音開始發抖。「因為它不屬於紀錄——它只屬於我。」',
+      textEn: '"But there\'s one thing I didn\'t record." Ying\'s voice starts trembling. "Because it doesn\'t belong in the records — it belongs only to me."',
+      delay: 3000 },
+    { tag: '感知', tagColor: 'tag-sense',
+      text: yingPronoun + '抬起頭看著你。月光落在' + yingPronoun + '的眼睛裡，像是兩顆溺在水裡的星星。',
+      textEn: (isMale ? 'She' : 'He') + ' looks up at you. Moonlight pools in ' + (isMale ? 'her' : 'his') + ' eyes like two stars drowning in water.',
+      delay: 2800 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: '「從什麼時候開始的，我也不知道。也許是你分給我那塊黑麵包的時候。也許是你幫我敷草藥的時候。也許更早——你第一次在黑暗中叫我名字的時候。」',
+      textEn: '"When it started, I don\'t know. Maybe when you shared that black bread. Maybe when you dressed my petrification with herbs. Maybe earlier — the first time you called my name in the dark."',
+      delay: 4000 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: '「我喜歡你。」' + yingPronoun + '說得很輕。像是怕聲音太大就會碎掉。「不是記錄員對記錄對象的好感。是……我，喜歡你。」',
+      textEn: '"I like you." ' + (isMale ? 'She' : 'He') + ' says it quietly. As if afraid the words might shatter if spoken too loud. "Not a chronicler\'s fondness for the subject. It\'s... me. I like you."',
+      delay: 3500 },
+  ], [
+    { text: '我也是。從很久以前就是了。', textEn: 'Me too. For a long time now.',
+      action: () => {
+        addNpcAffinity('ying', 10);
+        if (typeof setRomance === 'function') setRomance('ying');
+        autoExplore([
+          { tag: '感知', tagColor: 'tag-sense', text: '螢的眼淚流了下來——但' + yingPronoun + '在笑。' + yingPronoun + '用袖子擦了一下臉，然後向前走了一步。', textEn: 'Tears fall from Ying\'s eyes — but ' + (isMale ? 'she\'s' : 'he\'s') + ' smiling. ' + (isMale ? 'She' : 'He') + ' wipes ' + (isMale ? 'her' : 'his') + ' face with a sleeve, then takes a step forward.', delay: 3000 },
+          { tag: '感知', tagColor: 'tag-sense', text: yingPronoun + '把頭靠在你的肩上。你感覺到' + yingPronoun + '的體溫透過衣服傳來——比石化的身體溫暖太多了。', textEn: (isMale ? 'She' : 'He') + ' rests ' + (isMale ? 'her' : 'his') + ' head on your shoulder. You feel the warmth through your clothes — so much warmer than your petrifying body.', delay: 3500 },
+          { tag: '對話', tagColor: 'tag-npc', text: '「……這一頁。我會寫上去的。」' + yingPronoun + '的聲音悶悶的。「用最漂亮的字。」', textEn: '"...This page. I\'ll write it down." ' + (isMale ? 'Her' : 'His') + ' voice is muffled. "In the most beautiful handwriting."', delay: 3000, effect: function() { changeHp(20); changePetri(-8); sfx.levelUp(); } },
+          { tag: '效果', tagColor: 'tag-system', text: L('HP+20，石化-8%。你不再是一個人了。', 'HP+20, Petri-8%. You\'re no longer alone.'), delay: 1500 },
+        ], [{ text: '（握住' + yingPronoun + '的手）', textEn: '(Hold ' + (isMale ? 'her' : 'his') + ' hand)', action: () => loadNode('r3_look') }]);
+      }},
+    { text: '對不起。我不能回應你。', textEn: 'I\'m sorry. I can\'t return your feelings.',
+      action: () => {
+        if (typeof breakRomance === 'function') breakRomance('ying');
+        autoExplore([
+          { tag: '感知', tagColor: 'tag-sense', text: '螢沉默了很久。然後' + yingPronoun + '點了點頭。「嗯。我知道了。」' + yingPronoun + '把筆記本合上，抱在胸前。', textEn: 'Ying is silent for a long time. Then nods. "Mm. I understand." ' + (isMale ? 'She' : 'He') + ' closes the notebook and hugs it to ' + (isMale ? 'her' : 'his') + ' chest.', delay: 3000 },
+          { tag: '對話', tagColor: 'tag-npc', text: '「但我還是會記錄你的故事。」' + yingPronoun + '轉過身去。「因為那是好的故事。不管結局怎樣。」', textEn: '"But I\'ll still record your story." ' + (isMale ? 'She' : 'He') + ' turns away. "Because it\'s a good story. No matter the ending."', delay: 3000 },
+        ], [{ text: '（目送' + yingPronoun + '離開）', textEn: '(Watch ' + (isMale ? 'her' : 'him') + ' leave)', action: () => loadNode('r3_look') }]);
+      }},
+  ], { label: L('月光告白', 'Moonlight Confession') });
+});
+
+// ═══════════════════════════════════════
+//  Romance: 螢的離別 (Ying's Farewell)
+// ═══════════════════════════════════════
+registerNode('r3_ying_farewell', () => {
+  state.flags.r3YingFarewell = true;
+  addNpcAffinity('ying', 5);
+  var isMale = state.sex === 'male';
+  var yingPronoun = isMale ? L('她', 'she') : L('他', 'he');
+  autoExplore([
+    { tag: '場景', tagColor: 'tag-sense',
+      art: npcPortrait.art('ying', { subtitle: L('記錄員', 'Chronicler') }) || '',
+      text: '螢站在通往議會大廳的走廊盡頭。' + yingPronoun + '手裡攥著筆記本——攥得太緊了，指節都發白了。',
+      textEn: 'Ying stands at the end of the corridor leading to the council hall. ' + (isMale ? 'She' : 'He') + ' grips the notebook so tight ' + (isMale ? 'her' : 'his') + ' knuckles are white.',
+      delay: 2800 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: '「你答應過我的。」' + yingPronoun + '沒有看你，眼睛盯著走廊盡頭的門。',
+      textEn: '"You promised me." ' + (isMale ? 'She' : 'He') + ' doesn\'t look at you, eyes fixed on the door at the corridor\'s end.',
+      delay: 2500 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: '「你說過——等一切結束了，你會幫我校對這本書。」' + yingPronoun + '的聲音在發抖。「所以你必須回來。」',
+      textEn: '"You said — when this is all over, you\'d help proofread this book." ' + (isMale ? 'Her' : 'His') + ' voice shakes. "So you have to come back."',
+      delay: 3200 },
+    { tag: '感知', tagColor: 'tag-sense',
+      text: yingPronoun + '終於轉過頭來。' + yingPronoun + '的眼眶是紅的，但沒有哭。',
+      textEn: (isMale ? 'She' : 'He') + ' finally turns to face you. ' + (isMale ? 'Her' : 'His') + ' eyes are red, but no tears fall.',
+      delay: 2500 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: '「去吧。」' + yingPronoun + '退了一步，讓出了路。「我在這裡等你。」',
+      textEn: '"Go." ' + (isMale ? 'She' : 'He') + ' steps aside, clearing the way. "I\'ll wait here."',
+      delay: 2500, effect: function() { changeHp(10); changePetri(-3); } },
+    { tag: '效果', tagColor: 'tag-system',
+      text: L('HP+10，石化-3%。有人在等你回來。', 'HP+10, Petri-3%. Someone is waiting for you to return.'),
+      delay: 1500 },
+  ], [
+    { text: '我會回來的', textEn: 'I\'ll come back', action: () => loadNode('r3_boss') },
+  ], { label: L('離別', 'Farewell') });
+});
+
+// ═══════════════════════════════════════
+//  Romance: 灰鶴的屋頂 (Crane's Rooftop)
+// ═══════════════════════════════════════
+registerNode('r3_crane_rooftop', () => {
+  state.flags.r3CraneRooftop = true;
+  addNpcAffinity('crane', 12);
+  autoExplore([
+    { tag: '場景', tagColor: 'tag-sense',
+      text: '灰鶴帶你爬上河城一棟老舊倉庫的屋頂。頭頂是巨大的岩洞穹頂，鑲嵌著密密麻麻的石化結晶——在遠處看起來竟然有點像星空。',
+      textEn: 'Crane leads you up to the roof of an old warehouse. Overhead stretches the vast cavern dome, studded with petrification crystals — from this distance, they almost look like stars.',
+      delay: 3200 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: '「這是我在河城最喜歡的地方。」她坐在屋頂邊緣，雙腿懸空。「假裝自己在地表看星星。」',
+      textEn: '"This is my favorite place in River City." She sits at the roof\'s edge, legs dangling. "Pretending I\'m on the surface watching stars."',
+      delay: 2800 },
+    { tag: '感知', tagColor: 'tag-sense',
+      text: '你坐在她旁邊。從這個高度看下去，河城的燈火像是一條發光的蛇，沿著地下河蜿蜒。',
+      textEn: 'You sit beside her. From this height, River City\'s lights look like a glowing serpent winding along the underground river.',
+      delay: 2800 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: '「我在地表的名字叫秋蘅。」她忽然說。你已經知道了——但她不知道你知道。「灰鶴是我到地底以後給自己取的。因為灰鶴不需要家。」',
+      textEn: '"My surface name is Qiu Heng." She says it abruptly. You already know — but she doesn\'t know you know. "Grey Crane is the name I gave myself underground. Because cranes don\'t need homes."',
+      delay: 3500 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: '她把膝蓋抱起來。你第一次看到灰鶴不笑的臉——不是冷，是疲憊。像是背了太久太重的行囊終於放下來的那一刻。',
+      textEn: 'She hugs her knees. For the first time you see Crane\'s face without a smile — not cold, just tired. Like finally setting down a pack carried too long.',
+      delay: 3200 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: '「等這些事結束了——如果我們都還活著的話。」她看著頭頂的假星空。「你要不要一起……回地表？」',
+      textEn: '"When this is over — if we\'re both still alive." She looks at the fake stars above. "Do you want to... go back to the surface? Together?"',
+      delay: 3500 },
+  ], [
+    { text: '我想。跟你一起。', textEn: 'I\'d like that. With you.',
+      action: () => {
+        addNpcAffinity('crane', 5);
+        autoExplore([
+          { tag: '感知', tagColor: 'tag-sense', text: '灰鶴愣了一下。然後她笑了——但這次的笑完全不同。不是行商人的假笑，不是骰桌上的得意，而是一個叫秋蘅的女人的、很輕很真的微笑。', textEn: 'Crane freezes. Then she smiles — but this time it\'s completely different. Not the merchant\'s grin, not the dice table smirk, but a gentle, genuine smile from a woman named Qiu Heng.', delay: 3500 },
+          { tag: '對話', tagColor: 'tag-npc', text: '「那說好了。」她伸出小指。「地底的人用這個——勾一下就算立誓了。別反悔。」', textEn: '"Then it\'s a deal." She extends her pinky. "Underground people use this — one hook and it\'s an oath. No take-backs."', delay: 3000 },
+          { tag: '感知', tagColor: 'tag-sense', text: '你勾住了她的小指。她的手指佈滿了繭和疤痕——但很溫暖。', textEn: 'You hook her pinky. Her fingers are calloused and scarred — but warm.', delay: 2800, effect: function() { changeHp(15); changePetri(-5); } },
+        ], [{ text: '繼續', textEn: 'Continue', action: () => loadNode('r3_look') }]);
+      }},
+    { text: '我還不確定', textEn: 'I\'m not sure yet',
+      action: () => {
+        autoExplore([
+          { tag: '對話', tagColor: 'tag-npc', text: '灰鶴點了點頭。「嗯。也不急。」她站起來拍掉身上的灰。但你注意到她的手指收進了袖子裡。', textEn: 'Crane nods. "Mm. No rush." She stands and dusts herself off. But you notice her fingers disappear into her sleeves.', delay: 2800 },
+        ], [{ text: '繼續', textEn: 'Continue', action: () => loadNode('r3_look') }]);
+      }},
+  ], { label: L('屋頂的星空', 'Rooftop Stars') });
+});
+
+// ═══════════════════════════════════════
+//  Romance: 灰鶴的告白 (Crane's Confession)
+// ═══════════════════════════════════════
+registerNode('r3_crane_confession', () => {
+  state.flags.r3CraneConfession = true;
+  addNpcAffinity('crane', 10);
+  autoExplore([
+    { tag: '場景', tagColor: 'tag-sense',
+      art: npcPortrait.art('crane', { subtitle: L('秋蘅', 'Qiu Heng') }) || '',
+      text: '灰鶴站在碼頭最遠的角落，背對著河城的燈火。她聽到你的腳步聲，沒有回頭。',
+      textEn: 'Grey Crane stands at the farthest corner of the dock, back to River City\'s lights. She hears your footsteps but doesn\'t turn around.',
+      delay: 2800 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: '「我一直在逃。」她的聲音很平靜。「從地表逃到地底，從東區逃到西區，從一個身分逃到另一個身分。」',
+      textEn: '"I\'ve been running." Her voice is calm. "From the surface to underground, from east to west, from one identity to the next."',
+      delay: 3200 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: '她轉過身。你看到她把長袖捲了上去——那些刀疤全部暴露在碼頭的燈光下。她沒有遮掩。',
+      textEn: 'She turns around. You see she\'s rolled up her sleeves — every scar exposed under the dock light. No hiding.',
+      delay: 3000 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: '「但是你讓我想停下來。」她走近一步。「我不知道這叫什麼——感恩、依賴、還是別的什麼。」',
+      textEn: '"But you make me want to stop." She steps closer. "I don\'t know what this is called — gratitude, dependence, or something else."',
+      delay: 3000 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: '又走近一步。你能看清她嘴唇微微顫抖。',
+      textEn: 'Another step. You can see her lips tremble slightly.',
+      delay: 2000 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: '「……但我覺得那叫喜歡。」灰鶴——不，秋蘅——第一次用這麼脆弱的語氣說話。「我一直在逃。但是你讓我想停下來。」',
+      textEn: '"...But I think it\'s called \'like\'." Grey Crane — no, Qiu Heng — speaks in a vulnerability you\'ve never heard. "I\'ve been running all my life. But you make me want to stop."',
+      delay: 3500 },
+  ], [
+    { text: '那就停下來。我接住你。', textEn: 'Then stop. I\'ll catch you.',
+      action: () => {
+        addNpcAffinity('crane', 10);
+        if (typeof setRomance === 'function') setRomance('crane');
+        autoExplore([
+          { tag: '感知', tagColor: 'tag-sense', text: '秋蘅抓住了你的手——用力到你能感覺到她每一道疤痕的紋路壓在你的掌心裡。', textEn: 'Qiu Heng grabs your hand — so hard you feel every scar ridge pressed into your palm.', delay: 2800 },
+          { tag: '感知', tagColor: 'tag-sense', text: '她沒有哭。灰鶴不會哭。但她的手在發抖——像一隻終於肯停下來的鳥，不知道怎麼收翅膀。', textEn: 'She doesn\'t cry. Grey Crane doesn\'t cry. But her hand shakes — like a bird that finally wants to land, but has forgotten how to fold its wings.', delay: 3500 },
+          { tag: '對話', tagColor: 'tag-npc', text: '「……謝謝。」她靠在你的肩上。她的體重意外地輕——走了太多路的人都是這樣。', textEn: '"...Thank you." She leans against your shoulder. She\'s lighter than expected — people who\'ve traveled too far always are.', delay: 3000, effect: function() { changeHp(20); changePetri(-8); sfx.levelUp(); } },
+          { tag: '效果', tagColor: 'tag-system', text: L('HP+20，石化-8%。她不再逃了。', 'HP+20, Petri-8%. She\'s done running.'), delay: 1500 },
+        ], [{ text: '（握緊她的手）', textEn: '(Hold her hand tight)', action: () => loadNode('r3_look') }]);
+      }},
+    { text: '秋蘅……我不能回應你。', textEn: 'Qiu Heng... I can\'t return your feelings.',
+      action: () => {
+        if (typeof breakRomance === 'function') breakRomance('crane');
+        autoExplore([
+          { tag: '感知', tagColor: 'tag-sense', text: '秋蘅愣了一秒。然後她的笑容又回來了——但你已經能分辨那個笑是真的還是假的了。這次是假的。', textEn: 'Qiu Heng freezes for a second. Then the grin returns — but you can tell real from fake now. This one is fake.', delay: 3000 },
+          { tag: '對話', tagColor: 'tag-npc', text: '「嘿——灰鶴可不是會在一棵樹上吊死的鳥。」她聳聳肩。轉身時，你看到她把袖子拉了回去。', textEn: '"Hey — Grey Crane\'s not the type to hang from one tree." She shrugs. As she turns, you see her pull her sleeves back down.', delay: 3000 },
+        ], [{ text: '（目送她離開）', textEn: '(Watch her leave)', action: () => loadNode('r3_look') }]);
+      }},
+  ], { label: L('灰鶴的告白', 'Crane\'s Confession') });
 });
