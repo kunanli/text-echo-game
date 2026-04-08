@@ -36,13 +36,9 @@ js/
   nodes.js          # 節點系統 + 死亡/復活
   patrol.js         # 隨機巡邏遭遇
   title.js          # 標題畫面 + 角色創建（最後載入，綁定事件）
-  story/
-    region0.js      # 祭獻坑（教學區）
-    region1.js      # 石脈迴廊
-    region2.js      # 大採石場
-    region3.js      # 河城渡口（含 4 結局）
   portrait.js       # NPC 像素肖像系統（預載入、fallback、HTML 生成）
   npc.js            # NPC 好感度系統（數值 0-100 + 攻略獨佔機制）
+  leaderboard.js    # 玩家排行榜（Firebase Realtime DB）
   story/
     region0.js      # 祭獻坑（教學區）
     region1.js      # 石脈迴廊
@@ -69,7 +65,7 @@ assets/
 - **HTML 內容**：部分步驟用 `html`/`htmlEn` 取代 `text`/`textEn`，支援粗體等標記
 - **CSS 命名**：用 `.tag-xxx` 管理標籤顏色（tag-combat, tag-info, tag-sense, tag-system, tag-warn, tag-petri 等）
 - **雙語必備**：所有面向玩家的文字都必須同時提供 `zh` 和 `en` 版本
-- **版本號**：每次 push 前必須更新 `index.html` 中的版本號（`<div id="title-version">v2.x</div>`，約第 68 行）。版本遞增規則：新功能或劇情 → minor 版本 +0.1，bug fix / 文字修正 → patch 加後綴（如 v2.0.1）
+- **版本號**：每次 push 前必須更新 `index.html` 中的版本號（`<div id="title-version">v2.3.1</div>`，約第 68 行）。版本遞增規則：新功能或劇情 → minor 版本 +0.1，bug fix / 文字修正 → patch 加後綴（如 v2.3.1）
 
 ## 目前狀態
 
@@ -482,7 +478,7 @@ effectiveStat(stat)      // → Math.max(1, state[stat] + penalty)
 
 ## 劇情節點索引（Story Node Index）
 
-全遊戲共約 90+ 個劇情節點，分佈在 4 個區域 + 1 條隱藏路線。
+全遊戲共約 140+ 個劇情節點，分佈在 4 個區域 + 1 條隱藏路線。
 修改劇情時請參照此索引定位節點，並維持節點 ID 命名慣例 `r{region}_{描述}`。
 
 ### 整體流程
@@ -561,6 +557,10 @@ R0 祭獻坑 → R1 石脈迴廊 → R2 大採石場 → R3 河城渡口 → 4 �
 | `r1_ying_herb` | 浪漫 | 一起採集草藥 | 螢 |
 | `r1_ying_chat` | 關係 | 輕鬆聊天加深羈絆 | 螢 |
 | `r1_ying_warmth` | 浪漫 | 共眠取暖——螢靠在肩上入睡（HP+20, 石化-8%, WIL+1） | 螢 |
+| `r1_ying_ng_dream` | NG+浪漫 | 螢夢見寫書的模糊人影——「全文完」 | 螢 |
+| `r1_zhou_fire` | 兄弟 | 老周教生火 + 礦工黑色幽默 | 老周 |
+| `r1_crane_drink` | 浪漫 | 骰局後喝酒，灰鶴微醺吐露過去 | 灰鶴 |
+| `r1_crane_ng_deja` | NG+浪漫 | 看穿灰鶴藏牌手法——似曾相識 | 灰鶴 |
 | `r1_gate` | 門檻 | 通往 R2 的大門（需守衛核心石） | — |
 | `r1_gate_open` | 過渡 | 開門進入 R2 | — |
 | `r1_patrol` | 戰鬥 | 迴廊巡邏練等 | R1 怪物池 |
@@ -593,6 +593,15 @@ R0 祭獻坑 → R1 石脈迴廊 → R2 大採石場 → R3 河城渡口 → 4 �
 | `r2_ying_night` | 浪漫 | 營火邊的夜間場景 | 螢 |
 | `r2_ying_promise` | 浪漫 | Boss 前的承諾 | 螢 |
 | `r2_ying_nightmare` | 浪漫 | 螢的噩夢——安撫（抱緊/低語兩條分支，HP+25, 石化-10%, WIL+1） | 螢 |
+| `r2_ying_jealousy` | 浪漫 | 螢看到你跟灰鶴骰子時吃醋 | 螢 |
+| `r2_ying_ng_notebook` | NG+浪漫 | 筆記本最後一頁的前世字跡 | 螢 |
+| `r2_camp_dinner` | 兄弟 | 營地晚餐——老鑄煮湯、清露抱怨、鐵霜偷笑 | 多NPC |
+| `r2_frost_spar` | 兄弟 | 與鐵霜切磋 5 回合 | 鐵霜 |
+| `r2_frost_vigil` | 兄弟 | Boss 前夜守夜——沉默的信任 | 鐵霜 |
+| `r2_cheng_question` | 浪漫 | 承鋼問「什麼是想念一個人」 | 承鋼 |
+| `r2_cheng_frost_talk` | 浪漫 | 鐵霜看出你們的關係——「我把他交給你」 | 鐵霜+承鋼 |
+| `r2_cheng_ng2_touch` | NG+浪漫 | 承鋼第一次觸碰——「36.5°C 很溫暖」 | 承鋼 |
+| `r2_cheng_ng3_frost` | NG+浪漫 | 鐵霜正式放手——「教他跳舞」 | 鐵霜+承鋼 |
 | `r2_crane` | NPC | 灰鶴再登場——交易 + 吹牛骰 | 灰鶴 |
 | `r2_zhou_trace` | 線索 | 發現老周蹤跡 | — |
 | `r2_ancient_tunnel` | **隱藏** | 古代科學密道（需饒恕 Boss + 承鋼通行碼），獲得瘟疫起源報告 | 承鋼 |
@@ -612,6 +621,17 @@ R0 祭獻坑 → R1 石脈迴廊 → R2 大採石場 → R3 河城渡口 → 4 �
 | `r3_ying_talk` | 對話 | 螢的 R3 對話分支 | 螢 |
 | `r3_ying_inn` | 浪漫 | 客棧晚宴——重要情節節點 | 螢 |
 | `r3_ying_river` | 浪漫 | 河邊月光近告白——牽手/筆記本兩條分支（HP+30, 石化-12%, WIL+2） | 螢 |
+| `r3_ying_ng_kiss` | NG+浪漫 | 河邊跨世之吻——「待續」/「跨越兩世」（好感≥95） | 螢 |
+| `r3_bell_tea` | 浪漫 | 銅鐘請你喝茶「只是因為你有用」 | 銅鐘 |
+| `r3_bell_hand` | 浪漫 | 幫銅鐘按摩石化右手（好感≥50） | 銅鐘 |
+| `r3_bell_wall` | 浪漫 | 表決前夜靠在你肩上「我好累」（好感≥70） | 銅鐘 |
+| `r3_bell_ng_memory` | NG+浪漫 | 說出右手午夜疼痛——前世記憶震撼 | 銅鐘 |
+| `r3_bell_ng_garden` | NG+浪漫 | 花園月光——銅鐘告訴你本名「銅韻」 | 銅鐘 |
+| `r3_crane_rooftop` | 浪漫 | 屋頂假看星真聊天（好感≥70） | 灰鶴 |
+| `r3_crane_confession` | 浪漫 | 碼頭告白（好感≥85）→ setRomance | 灰鶴 |
+| `r3_crane_ng_name` | NG+浪漫 | 叫出真名「秋蘅」——跨世的淚（好感≥80） | 灰鶴 |
+| `r3_npc_argument` | 兄弟 | 螢 vs 銅鐘——真相 vs 穩定 | 螢+銅鐘 |
+| `r3_crane_zhou` | 兄弟 | 灰鶴老周下棋，灰鶴作弊被抓 | 灰鶴+老周 |
 | `r3_zhou` | NPC | 老周再會 | 老周 |
 | `r3_crane` | NPC | 灰鶴的 R3 登場——取得證詞 + 吹牛骰 | 灰鶴 |
 | `r3_quest_check` | 任務 | 回報銅鐘——檢查 3 個任務完成度 | 銅鐘 |
@@ -634,7 +654,7 @@ R0 祭獻坑 → R1 石脈迴廊 → R2 大採石場 → R3 河城渡口 → 4 �
 | 老周 Old Zhou | 男 | R1 `r1_survivor` | R1→R3 | 3 | `r1SurvivorMet`, `r3ZhouMet` |
 | 灰鶴 Grey Crane | **女** | R1 `r1_wanderer` | R1→R2→R3 | 5 | `r1WandererMet`, `r2CraneMet`, `r3CraneTestimony` |
 | 鐵霜 Iron Frost | 女 | R2 `r2_camp_chief` | R2 | 3 | `r2CampVisited`, `r2BossSpared`, `r2ReunionSeen` |
-| 承鋼 Cheng Gang | 男 | R2 `r2_camp_chief`(饒恕Boss後) | R2 | — | `r2BossSpared`, `r2ChengAwake` |
+| 承鋼 Cheng Gang | 男 | R2 `r2_camp_chief`(饒恕Boss後) | R2 | 5 | `r2BossSpared`, `r2ChengAwake`, `r2ChengNg2Touch` |
 | 老鑄 Old Cast | 男 | R2 `r2_camp_smith` | R2 | 3 | `r2SmithVisited` |
 | 清露 Dew | 女 | R2 `r2_camp_medic` | R2 | 3 | `r2MedicHealed`, `r2MedicElixir` |
 | 銅鐘 Bronze Bell | 女 | R3 `r3_bell` | R3 | 3 | `r3BellMet`, `r3BellReport`, `r3BellQuest`, `r3BellAlliance`（任務完成後才給） |
@@ -721,6 +741,9 @@ if (state.flags.r3PlagueProof)    score += 3;  // 瘟疫起源證據（關鍵）
 - [ ] **冥河深淵（R4+ 新區域）** — 渡江人路線目前只有「敬請期待」，可開發全新區域：古代封印層、石化瘟疫真正起源、最終 Boss。NG+ 高周目玩家的終極挑戰
 - [x] **NG+ 專屬劇情分歧** — 4 個關鍵節點的二周目新選項（螢「我認識你」、承鋼跳過 Boss 戰、銅鐘前世記憶、鏽刃證據說服）
 - [x] **NPC 好感度系統** — `npc.js` 數值型 0-100，攻略獨佔、跨周目繼承，4 條浪漫路線（螢/灰鶴/銅鐘/承鋼）
+- [x] **四條攻略路線 + NG+ 深化** — 螢/灰鶴/銅鐘/承鋼各有 1 周目場景鏈 + NG+ 專屬場景（共 18 個浪漫節點）
+- [x] **兄弟情誼 + 驚喜反轉** — 7 個 NPC 互動場景、背叛事件、NPC 死亡分支、隱藏 Boss
+- [x] **敘事沉浸強化** — 石化感官描寫、環境微敘事（16 條）、神秘線索金字塔（6 處）
 - [ ] **NPC 好感度影響擴展** — 好感度影響 NPC 商店價格、戰鬥支援、專屬結局變體
 - [ ] **裝備系統** — 目前只有 `weaponDmg` flag，可擴展為完整裝備槽（武器/護甲/飾品），各區域 Boss 掉落稀有裝備，NG+ 可繼承
 - [ ] **動態難度調整** — 追蹤玩家的連續死亡/連續勝利，自動微調怪物強度，讓不同技術水準的玩家都有好體驗
