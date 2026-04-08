@@ -983,6 +983,8 @@
   .lang-select {
     display: flex;
     gap: 24px;
+    justify-content: center;
+    margin-top: 12px;
   }
   .lang-btn {
     background: #12121e;

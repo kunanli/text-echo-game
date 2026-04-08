@@ -65,17 +65,12 @@
                                / ░░ 深  淵 ░░ \
                               /░░░░░░░░░░░░░░░░\
     </pre>
-    <div class="title-version" id="title-version">v2.3.1</div>
+    <div class="title-version" id="title-version">v2.3.2</div>
     <button class="start-btn" id="continue-btn" style="display:none; margin-bottom:12px;" aria-label="Continue adventure">繼 續 冒 險</button>
     <button class="start-btn chapter-select-title-btn" id="chapter-btn" style="display:none; margin-bottom:12px;" aria-label="Chapter select">章 節 選 擇</button>
     <button class="start-btn ngplus-btn" id="ngplus-btn" style="display:none; margin-bottom:12px;" aria-label="New Game+">NEW GAME+</button>
     <button class="start-btn title-lb-btn" id="title-leaderboard-btn" style="margin-bottom:12px;" aria-label="Leaderboard">高 分 榜</button>
-    <div class="click-prompt">— 點擊開始 · Click to Start —</div>
-  </div>
-
-  <!-- Phase 2: Language Selection -->
-  <div class="title-phase" id="phase-lang">
-    <div class="lang-select">
+    <div class="lang-select" id="splash-lang-select">
       <button class="lang-btn" data-lang="zh">
         <span class="lang-label">中文</span>
         <span class="lang-desc">繁體中文介面</span>
@@ -87,7 +82,7 @@
     </div>
   </div>
 
-  <!-- Phase 3.5: Chapter Select -->
+  <!-- Phase 2: Chapter Select -->
   <div class="title-phase" id="phase-chapter">
     <div class="chapter-select-container">
       <h2 class="chapter-title" id="chapter-title">章 節 選 擇</h2>
@@ -99,7 +94,7 @@
     </div>
   </div>
 
-  <!-- Phase 3: Character Creation -->
+  <!-- Phase 3: Character Creation (language already chosen on splash) -->
   <div class="title-phase" id="phase-create">
     <div class="title-form">
       <div class="title-section">

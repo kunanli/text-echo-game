@@ -45,15 +45,8 @@ document.getElementById('phase-splash').addEventListener('click', function(e) {
   // Warm up AudioContext on first touch — mobile browsers require this
   // to happen inside a user gesture, so the splash tap is the earliest moment.
   splashWarmup();
-
-  // If clicked the continue/chapter button, let their own listeners handle it
-  if (e.target.id === 'continue-btn' || e.target.closest('#continue-btn') ||
-      e.target.id === 'chapter-btn' || e.target.closest('#chapter-btn') ||
-      e.target.id === 'ngplus-btn' || e.target.closest('#ngplus-btn') ||
-      e.target.id === 'title-leaderboard-btn' || e.target.closest('#title-leaderboard-btn')) {
-    return;
-  }
-  showPhase('phase-lang');
+  // All interactions on splash are button-driven (lang-btn, continue, chapter, ng+, leaderboard).
+  // No generic click-to-proceed — language must be chosen first.
 });
 
 // Continue button handler
@@ -87,8 +80,8 @@ var _ngPlusMode = false;
     if (localStorage.getItem('petriabyss_ngplus_pending') === '1') {
       localStorage.removeItem('petriabyss_ngplus_pending');
       _ngPlusMode = true;
-      // Skip splash, go straight to language select after a brief delay
-      setTimeout(function() { showPhase('phase-lang'); }, 400);
+      // NG+ auto-redirect: player still needs to pick language on splash,
+      // then lang-btn handler will route to character creation.
     }
   } catch (e) {}
 })();
@@ -120,37 +113,45 @@ var _ngPlusMode = false;
     e.stopPropagation();
     splashWarmup();
     _ngPlusMode = true;
-    showPhase('phase-lang');
+    // Highlight the NG+ button to indicate it's selected, then player picks language
+    ngBtn.classList.add('selected');
+    notify(L('已選擇 NG+，請選擇語言開始', 'NG+ selected — choose a language to start'));
   });
 })();
 
-// ── Phase 2: Language selection ──
+// ── Language selection (buttons live on splash screen) ──
+// Shared helper: apply NG+ stat label and show character creation
+function _applyLangAndShowCreate() {
+  applyLang();
+  if (_ngPlusMode) {
+    ngPlusAllocBonus = (typeof globalStats !== 'undefined' && globalStats.bankedPoints > 0)
+      ? globalStats.bankedPoints : 3;
+    var ngRun = (typeof globalStats !== 'undefined') ? globalStats.totalRuns : 1;
+    var cycleNames = { 1: '二周目', 2: '三周目', 3: '四周目' };
+    var cycleNamesEn = { 1: 'Cycle 2', 2: 'Cycle 3', 3: 'Cycle 4' };
+    var cycleName = cycleNames[ngRun] || (ngRun + 1) + '周目';
+    var cycleNameEn = cycleNamesEn[ngRun] || 'Cycle ' + (ngRun + 1);
+    var scale = Math.pow(2, ngRun);
+    var label = document.getElementById('label-stat-alloc');
+    if (label) label.textContent = state.lang === 'en'
+      ? 'STATS  [' + cycleNameEn + ' +' + ngPlusAllocBonus + 'pts | Enemies ' + scale + 'x]'
+      : '能 力 分 配  [' + cycleName + ' +' + ngPlusAllocBonus + '點｜怪物' + scale + '倍]';
+  } else {
+    ngPlusAllocBonus = 0;
+  }
+  allocStats.str = ALLOC_BASE;
+  allocStats.agi = ALLOC_BASE;
+  allocStats.wil = ALLOC_BASE;
+  updateAllocUI();
+  showPhase('phase-create');
+}
+
 document.querySelectorAll('.lang-btn').forEach(function(btn) {
-  btn.addEventListener('click', function() {
+  btn.addEventListener('click', function(e) {
+    e.stopPropagation();
+    splashWarmup();
     state.lang = btn.dataset.lang;
-    applyLang();
-    // NG+ bonus stat points from banked conversion
-    if (_ngPlusMode) {
-      ngPlusAllocBonus = (typeof globalStats !== 'undefined' && globalStats.bankedPoints > 0)
-        ? globalStats.bankedPoints : 3;
-      var ngRun = (typeof globalStats !== 'undefined') ? globalStats.totalRuns : 1;
-      var cycleNames = { 1: '二周目', 2: '三周目', 3: '四周目' };
-      var cycleNamesEn = { 1: 'Cycle 2', 2: 'Cycle 3', 3: 'Cycle 4' };
-      var cycleName = cycleNames[ngRun] || (ngRun + 1) + '周目';
-      var cycleNameEn = cycleNamesEn[ngRun] || 'Cycle ' + (ngRun + 1);
-      var scale = Math.pow(2, ngRun);
-      var label = document.getElementById('label-stat-alloc');
-      if (label) label.textContent = state.lang === 'en'
-        ? 'STATS  [' + cycleNameEn + ' +' + ngPlusAllocBonus + 'pts | Enemies ' + scale + 'x]'
-        : '能 力 分 配  [' + cycleName + ' +' + ngPlusAllocBonus + '點｜怪物' + scale + '倍]';
-    } else {
-      ngPlusAllocBonus = 0;
-    }
-    allocStats.str = ALLOC_BASE;
-    allocStats.agi = ALLOC_BASE;
-    allocStats.wil = ALLOC_BASE;
-    updateAllocUI();
-    showPhase('phase-create');
+    _applyLangAndShowCreate();
   });
 });
 
@@ -211,6 +212,14 @@ document.querySelectorAll('.sex-btn').forEach(function(btn) {
 });
 
 function startGame() {
+  // Require all stat points to be allocated before starting
+  var remaining = getTotalAllocPoints() - getAllocUsed();
+  if (remaining > 0) {
+    notify(L('請先分配完所有能力點數（剩餘 ' + remaining + ' 點）',
+             'Please allocate all stat points first (' + remaining + ' remaining)'));
+    return;
+  }
+
   var nameInput = document.getElementById('name-input');
   var name = nameInput.value.trim() || L('無名旅者', 'Nameless Wanderer');
 
