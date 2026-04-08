@@ -734,6 +734,14 @@ registerNode('r3_bell', () => {
     if (state.flags.r3BellHand && !state.flags.r3BellWall && typeof getNpcAffinityNum === 'function' && getNpcAffinityNum('bell') >= 70) {
       c.push({ text: '表決前夜，去找銅鐘', textEn: 'Visit Bell the night before the vote', action: () => loadNode('r3_bell_wall') });
     }
+    // NG+ Romance: Mentioning her hand pain from a past life (requires NG+ + wall scene done)
+    if (state.flags.ngPlus && state.flags.r3BellWall && !state.flags.r3BellNgMemory && typeof getNpcAffinityNum === 'function' && getNpcAffinityNum('bell') >= 75) {
+      c.push({ text: '「你的右手——半夜最痛，對嗎？」', textEn: '"Your right hand — it hurts most at midnight, doesn\'t it?"', action: () => loadNode('r3_bell_ng_memory') });
+    }
+    // NG+ Romance: Garden walk (requires ng_memory + high affinity)
+    if (state.flags.ngPlus && state.flags.r3BellNgMemory && !state.flags.r3BellNgGarden && typeof getNpcAffinityNum === 'function' && getNpcAffinityNum('bell') >= 85) {
+      c.push({ text: '銅鐘邀你去議會花園走走', textEn: 'Bell invites you to walk in the Council garden', action: () => loadNode('r3_bell_ng_garden') });
+    }
     c.push({ text: '離開', textEn: 'Leave', action: () => loadNode(state.flags.r3BellQuest ? 'r3_look' : 'r3_council') });
     return c;
   })(), { label: L('銅鐘', 'Bronze Bell') });
@@ -1199,6 +1207,166 @@ registerNode('r3_bell_wall', () => {
   ], { label: L('走廊盡頭', 'End of corridor') });
 });
 
+// ═══════════════════════════════════════
+//  NG+ Romance: 銅鐘前世記憶 (Bell Past-Life Memory)
+// ═══════════════════════════════════════
+registerNode('r3_bell_ng_memory', () => {
+  state.flags.r3BellNgMemory = true;
+  addNpcAffinity('bell', 12);
+  autoExplore([
+    { tag: '場景', tagColor: 'tag-sense',
+      art: npcPortrait.art('bell', { subtitle: L('議會代表', 'Council Rep') }) || '',
+      text: '銅鐘正在批閱文件。你走進辦公室——然後說了一句不該知道的話。',
+      textEn: 'Bronze Bell is reviewing documents. You walk into her office — then say something you shouldn\'t know.',
+      delay: 2500 },
+    { tag: '行動', tagColor: 'tag-move',
+      text: '「你的右手——半夜最痛。尤其是右手無名指到小指之間的那條石化紋路。對吧？」',
+      textEn: '"Your right hand — it hurts most at midnight. Especially the petrification line between your ring finger and pinky. Right?"',
+      delay: 3200 },
+    { tag: '感知', tagColor: 'tag-sense',
+      text: '銅鐘的筆停了。墨水在紙上洇開一個黑點。',
+      textEn: 'Bell\'s pen stops. Ink bleeds into a black dot on the paper.',
+      delay: 2200 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: '她抬頭。眼神像審訊犯人——但瞳孔在微微顫動。',
+      textEn: 'She looks up. Eyes like an interrogator\'s — but her pupils are trembling.',
+      delay: 2500 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: '「這件事。」她的聲音壓得很低。「我從沒告訴過任何人。甚至——」她頓了一下。「甚至清露都不知道具體位置。」',
+      textEn: '"This." Her voice drops low. "I\'ve never told anyone. Not even—" She pauses. "Not even Dew knows the exact location."',
+      delay: 3500 },
+    { tag: '感知', tagColor: 'tag-sense',
+      text: '她站起來。繞過桌子。走到你面前——近到你能看到她鬢角邊隱藏的幾根灰白頭髮。',
+      textEn: 'She stands. Circles the desk. Walks up to you — close enough to see the hidden grey at her temples.',
+      delay: 2800 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: '「你到底是什麼人？」每個字都像在用手術刀剖開你。「不要跟我說直覺。不要跟我說巧合。」',
+      textEn: '"What exactly are you?" Every word is a scalpel. "Don\'t say intuition. Don\'t say coincidence."',
+      delay: 3200 },
+  ], [
+    { text: '「上一世的走廊盡頭。你靠在我肩上，說了三個字——我好累。」', textEn: '"At the end of a corridor, in the last life. You leaned on my shoulder and said three words — I\'m so tired."',
+      action: () => {
+        addNpcAffinity('bell', 5);
+        autoExplore([
+          { tag: '感知', tagColor: 'tag-sense', text: '銅鐘的表情裂了。', textEn: 'Bell\'s composure cracks.', delay: 1500 },
+          { tag: '感知', tagColor: 'tag-sense', text: '不是憤怒。不是懷疑。是一種你從未在這張臉上看到的東西——被理解的恐懼。', textEn: 'Not anger. Not suspicion. Something you\'ve never seen on this face — the fear of being understood.', delay: 3000 },
+          { tag: '對話', tagColor: 'tag-npc', text: '「……我好累。」她重複了一遍。像是在確認這三個字是不是真的從自己嘴裡說出去過。', textEn: '"...I\'m so tired." She repeats it. As if confirming whether those words really left her lips.', delay: 3000 },
+          { tag: '對話', tagColor: 'tag-npc', text: '她退了半步。但沒有轉身。', textEn: 'She steps half a step back. But doesn\'t turn away.', delay: 2000 },
+          { tag: '對話', tagColor: 'tag-npc', text: '「我不知道什麼前世。我不信那些。」她的聲音在強撐。「但——你的眼神。你看我的方式——不像第一次見面的人。」', textEn: '"I don\'t know about past lives. I don\'t believe in those." Her voice struggles. "But — your eyes. The way you look at me — not like someone meeting me for the first time."', delay: 3500 },
+          { tag: '感知', tagColor: 'tag-sense', text: '她低頭看了看自己石化的右手。然後——非常非常慢地——她把那隻手伸向你。', textEn: 'She looks down at her petrified right hand. Then — very, very slowly — she extends it toward you.', delay: 3000 },
+          { tag: '對話', tagColor: 'tag-npc', text: '「你說——你按過這隻手？」聲音碎得幾乎聽不見。「那你知道——它有多疼嗎？」', textEn: '"You said — you\'ve massaged this hand before?" Voice shattered to near silence. "Then do you know — how much it hurts?"', delay: 3200, effect: function() { sfx.levelUp(); } },
+        ], [{ text: '（接住她的手。像上一世那樣。）', textEn: '(Take her hand. Like you did in the last life.)', action: () => {
+          changeHp(15);
+          changePetri(-5);
+          changeStat('wil', 1);
+          notify(L('HP +15，石化度 -5%，意志 +1（跨世的信任）', 'HP +15, Petri -5%, WIL +1 (Trust across lifetimes)'));
+          loadNode('r3_bell');
+        }}]);
+      }},
+    { text: '「我知道的比你想像的更多。但我不會傷害你。」', textEn: '"I know more than you think. But I won\'t hurt you."',
+      action: () => {
+        autoExplore([
+          { tag: '感知', tagColor: 'tag-sense', text: '銅鐘盯著你。十幾秒。像在用整個議會生涯積累的閱人經驗來審視你這句話的每一個字。', textEn: 'Bell stares at you. Ten, fifteen seconds. As if using every ounce of her political career\'s experience to dissect every word.', delay: 3500 },
+          { tag: '對話', tagColor: 'tag-npc', text: '「……我暫時相信你。」她回到桌後坐下。但她的語氣不再像審訊犯人了。', textEn: '"...I\'ll believe you. For now." She sits back behind the desk. But her tone is no longer an interrogator\'s.', delay: 3000 },
+          { tag: '對話', tagColor: 'tag-npc', text: '「但如果你騙我——」她看了一眼石化的右手。「我會讓你知道這隻手的疼痛是什麼感覺。」', textEn: '"But if you\'re lying—" She glances at her petrified hand. "I\'ll let you know what this pain feels like."', delay: 3000 },
+        ], [{ text: '繼續', textEn: 'Continue', action: () => {
+          changeHp(10);
+          notify(L('HP +10（銅鐘暫時信任了你）', 'HP +10 (Bell temporarily trusts you)'));
+          loadNode('r3_bell');
+        }}]);
+      }},
+  ], { label: L('前世的痛', 'Pain from a Past Life') });
+});
+
+// ═══════════════════════════════════════
+//  NG+ Romance: 議會花園月下散步 (Bell's Garden Walk)
+// ═══════════════════════════════════════
+registerNode('r3_bell_ng_garden', () => {
+  state.flags.r3BellNgGarden = true;
+  addNpcAffinity('bell', 15);
+  autoExplore([
+    { tag: '場景', tagColor: 'tag-sense',
+      art: `<pre class="ascii-art">
+    ·˚·  議會花園  ·˚·
+
+  🌿   ·  🌿  ·   🌿
+    ╱╲      ╱╲      ╱╲
+   ╱  ╲  · ╱  ╲ ·  ╱  ╲
+  ────────────────────────
+     ○ ○          ╱═══╲
+     ╰╯          │ ─  ─│
+    ╱╲            ╲═══╱
+   ╱  ╲          ╱│  │╲
+</pre>`, artEn: `<pre class="ascii-art">
+    ·˚·  Council Garden  ·˚·
+
+  🌿   ·  🌿  ·   🌿
+    ╱╲      ╱╲      ╱╲
+   ╱  ╲  · ╱  ╲ ·  ╱  ╲
+  ────────────────────────
+     ○ ○          ╱═══╲
+     ╰╯          │ ─  ─│
+    ╱╲            ╲═══╱
+   ╱  ╲          ╱│  │╲
+</pre>`,
+      text: '銅鐘把你帶到議會花園。不是公事。不是任務。她只是說：「走走。」',
+      textEn: 'Bronze Bell takes you to the Council garden. Not business. Not a mission. She just says: "Walk."',
+      delay: 2500 },
+    { tag: '環境', tagColor: 'tag-system',
+      text: '花園在地底——但不知道用了什麼技術，穹頂上嵌著會發光的石英，模仿月光。光線落在石化的花叢上，像一層銀霜。',
+      textEn: 'The garden is underground — but somehow the domed ceiling is set with luminescent quartz, mimicking moonlight. It falls on petrified flowers like silver frost.',
+      delay: 3200 },
+    { tag: '感知', tagColor: 'tag-sense',
+      text: '銅鐘走在你旁邊。沒有穿議會的正裝——只是一件簡單的灰色長衫。你第一次注意到，她其實比你矮半個頭。',
+      textEn: 'Bell walks beside you. Not in Council formal wear — just a simple grey robe. For the first time you notice she\'s actually half a head shorter than you.',
+      delay: 3000 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: '「你知道嗎——」她的聲音沒有平時的鋒利。「我在議會十一年。從來沒有人帶我來這裡散步。」',
+      textEn: '"You know—" Her voice lacks its usual edge. "Eleven years on the Council. No one has ever walked with me here."',
+      delay: 3000 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: '「也從來沒有人——」她停下腳步，看著一朵石化的白花。「叫過我的名字。不是銅鐘。不是代表。不是女士。」',
+      textEn: '"And no one has ever—" She stops, looking at a petrified white flower. "Called me by my name. Not Bronze Bell. Not Representative. Not Madam."',
+      delay: 3500 },
+    { tag: '感知', tagColor: 'tag-sense',
+      text: '她轉向你。石英月光把她的臉照得很柔——那些疲倦和皺紋都被銀色模糊了。她看起來年輕了十歲。',
+      textEn: 'She turns to you. Quartz moonlight softens her face — fatigue and lines blurred by silver. She looks ten years younger.',
+      delay: 3000 },
+  ], [
+    { text: '那我叫你什麼？', textEn: 'Then what should I call you?',
+      action: () => {
+        autoExplore([
+          { tag: '對話', tagColor: 'tag-npc', text: '銅鐘猶豫了。這可能是她人生中最長的一次猶豫。', textEn: 'Bell hesitates. Perhaps the longest hesitation of her life.', delay: 2500 },
+          { tag: '對話', tagColor: 'tag-npc', text: '「……銅韻。」她說了一個你從未聽過的名字。「我的本名。議會裡沒人知道。」', textEn: '"...Tong Yun." She says a name you\'ve never heard. "My real name. No one on the Council knows."', delay: 3200 },
+          { tag: '感知', tagColor: 'tag-sense', text: '她把石化的右手放在那朵白花上。花瓣和她的手一樣灰白——但在石英月光下，都泛著微微的銀。', textEn: 'She places her petrified right hand on the white flower. Petals as grey-white as her hand — but under quartz moonlight, both glow faintly silver.', delay: 3200 },
+          { tag: '對話', tagColor: 'tag-npc', text: '「銅韻——銅的聲音。我父親說，銅不如金銀貴重，但敲起來最響。」', textEn: '"Tong Yun — the sound of copper. My father said copper isn\'t as precious as gold or silver, but it rings the loudest."', delay: 3200 },
+          { tag: '對話', tagColor: 'tag-npc', text: '她看著你。眼裡有一種你只在走廊盡頭見過一次的脆弱。但這次不是疲倦——是信任。', textEn: 'She looks at you. A vulnerability you\'ve only seen once, at the corridor\'s end. But this time it\'s not exhaustion — it\'s trust.', delay: 3000 },
+          { tag: '對話', tagColor: 'tag-npc', text: '「上一世——我也告訴過你嗎？」她的聲音很輕。', textEn: '"In the last life — did I tell you too?" Her voice is light.', delay: 2500 },
+          { tag: '行動', tagColor: 'tag-move', text: '你搖頭。「沒有。這是第一次。」', textEn: 'You shake your head. "No. This is the first time."', delay: 2200 },
+          { tag: '感知', tagColor: 'tag-sense', text: '銅鐘——不，銅韻——笑了。這是你見過的她最真的笑容。連石化的右手都好像不那麼痛了。', textEn: 'Bronze Bell — no, Tong Yun — smiles. The most genuine smile you\'ve ever seen from her. Even the petrified hand seems to hurt less.', delay: 3200, effect: function() { sfx.levelUp(); } },
+        ], [{ text: '「銅韻。」（第一次叫她的名字。）', textEn: '"Tong Yun." (Calling her name for the first time.)', action: () => {
+          changeHp(20);
+          changePetri(-8);
+          changeStat('wil', 1);
+          notify(L('HP +20，石化度 -8%，意志 +1（銅的聲音）', 'HP +20, Petri -8%, WIL +1 (The sound of copper)'));
+          loadNode('r3_bell');
+        }}]);
+      }},
+    { text: '（和她一起看石化的花。不需要名字也可以。）', textEn: '(Watch the petrified flowers with her. No names needed.)',
+      action: () => {
+        autoExplore([
+          { tag: '感知', tagColor: 'tag-sense', text: '你們在石化的花叢間走了很久。她的石化右手偶爾碰到你的手背——可能是不小心，也可能不是。', textEn: 'You walk among the petrified flowers for a long time. Her petrified right hand occasionally brushes your hand — maybe by accident, maybe not.', delay: 3200 },
+          { tag: '對話', tagColor: 'tag-npc', text: '「謝謝你陪我來。」她在花園門口停下。聲音又恢復了議會代表的穩重——但眼角多了一點以前沒有的柔軟。', textEn: '"Thank you for coming." She stops at the garden gate. Her voice regains its political steadiness — but there\'s a new softness at the corners of her eyes.', delay: 3200 },
+        ], [{ text: '繼續', textEn: 'Continue', action: () => {
+          changeHp(15);
+          changePetri(-5);
+          notify(L('HP +15，石化度 -5%（花園月光）', 'HP +15, Petri -5% (Garden moonlight)'));
+          loadNode('r3_bell');
+        }}]);
+      }},
+  ], { label: L('花園月光', 'Garden Moonlight') });
+});
+
 // ═══════════════════════════════════════════════════
 //  NPC — 螢 (Ying) in Region 3
 // ═══════════════════════════════════════════════════
@@ -1301,6 +1469,9 @@ registerNode('r3_ying_talk', () => {
     }
     if (state.flags.r3YingRiver && state.flags.r2YingPast && !state.flags.r3YingConfession) {
       c.push({ text: '螢，有些話我想跟你說', textEn: 'Ying, there\'s something I want to say', action: () => loadNode('r3_ying_confession') });
+    }
+    if (state.flags.ngPlus && state.flags.r3YingRiver && state.flags.r2YingNgNotebook && !state.flags.r3YingNgKiss && getNpcAffinityNum('ying') >= 95) {
+      c.push({ text: '螢……我想帶你回河邊。有些事，這一世我不想再錯過', textEn: 'Ying... I want to take you back to the river. There are things I don\'t want to miss this time', action: () => loadNode('r3_ying_ng_kiss') });
     }
     c.push({ text: '離開', textEn: 'Leave', action: () => loadNode('r3_look') });
     return c;
@@ -1461,6 +1632,102 @@ registerNode('r3_ying_river', () => {
       ], { label: L('私密的一頁', 'A Private Page') });
     }},
   ], { label: L('河邊的月光', 'Moonlight by the River') });
+});
+
+// ── Ying: NG+ Kiss — upgraded moonlight scene (2nd cycle, affinity >= 95) ──
+registerNode('r3_ying_ng_kiss', () => {
+  var isMale = state.sex === 'male';
+  var yP = isMale ? L('她', 'she') : L('他', 'he');
+  var yPC = isMale ? 'She' : 'He';
+  var yPo = isMale ? 'her' : 'his';
+  state.flags.r3YingNgKiss = true;
+  addNpcAffinity('ying', 10);
+
+  autoExplore([
+    { art: `<pre class="ascii-art cyan">
+      · ˚ ·  ✦  · ˚ ·  ✦  · ˚ ·
+    ˚     ·  ˚     ·  ˚     ·  ˚
+  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ╱╲          ○ ○         · ✦ ·
+     ╱  ╲         ╰▽╯         ˚   ˚
+    ╱ ╱╲ ╲        ╱╲
+   ╱ ╱  ╲ ╲      ╱  ╲    前 世 的 河
+  ╱ ╱    ╲ ╲    ╱    ╲
+</pre>`, artEn: `<pre class="ascii-art cyan">
+      · ˚ ·  ✦  · ˚ ·  ✦  · ˚ ·
+    ˚     ·  ˚     ·  ˚     ·  ˚
+  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ╱╲          ○ ○         · ✦ ·
+     ╱  ╲         ╰▽╯         ˚   ˚
+    ╱ ╱╲ ╲        ╱╲
+   ╱ ╱  ╲ ╲      ╱  ╲    River of Past Lives
+  ╱ ╱    ╲ ╲    ╱    ╲
+</pre>`, delay: 800 },
+    { tag: '環境', tagColor: 'tag-system', text: '你帶著螢回到那個碼頭邊。同一片河水。同一座石岸。同一輪倒映在水面的微光——但一切都不一樣了。', textEn: 'You lead Ying back to the same dock. Same river. Same stone shore. Same faint light reflected on the water — but everything is different now.', delay: 3200 },
+    { tag: '感知', tagColor: 'tag-sense', text: '因為你記得上一世。你記得' + yP + '靠在你肩上的重量。你記得十指相扣的溫度。你記得那句沒來得及說出口的話。', textEn: 'Because you remember the last life. You remember the weight of ' + yPo + ' head on your shoulder. The warmth of intertwined fingers. The words you never got to say.', delay: 3500 },
+    { tag: '情報', tagColor: 'tag-info', text: '螢在你身邊坐下，打開手冊——然後愣住了。', textEn: 'Ying sits beside you, opens the notebook — and freezes.', delay: 2500 },
+    { tag: '情報', tagColor: 'tag-info', text: '「最後一頁。」' + yP + '喃喃。「那兩個字——『全文完』。我到現在還是不知道是誰寫的。」', textEn: '"The last page." ' + yPC + ' murmurs. "Those two words — \'The End.\' I still don\'t know who wrote them."', delay: 3200 },
+    { tag: '感知', tagColor: 'tag-sense', text: '你看著' + yP + '側臉上被河光照亮的輪廓。和上一世一模一樣——又完全不同。因為這一次，你知道自己不能再錯過了。', textEn: 'You watch the river light trace ' + yPo + ' profile. Exactly the same as the last life — and completely different. Because this time, you know you can\'t miss it again.', delay: 3500 },
+    { tag: '行動', tagColor: 'tag-move', text: '「螢。」你叫' + yP + '的名字。不是記錄員，不是調查員。只是螢。', textEn: '"Ying." You call ' + yPo + ' name. Not the chronicler, not the investigator. Just Ying.', delay: 2800 },
+    { tag: '情報', tagColor: 'tag-info', text: yP + '轉過頭。琥珀色的眼睛映著碎光——和上一世的河邊一模一樣。但這次你看清了那雙眼睛裡的東西。', textEn: yPC + ' turns. Amber eyes reflecting shattered light — identical to the riverside in the past life. But this time you see clearly what\'s in those eyes.', delay: 3200 },
+    { tag: '感知', tagColor: 'tag-sense', text: '不是好奇。不是信任。不是依賴。', textEn: 'Not curiosity. Not trust. Not dependence.', delay: 2000 },
+    { tag: '感知', tagColor: 'tag-sense', text: '是愛。', textEn: 'It\'s love.', delay: 2000 },
+  ], [
+    { text: '「是我寫的。上一世的我。」', textEn: '"I wrote it. The me from the past life."', action: () => {
+      autoExplore([
+        { tag: '情報', tagColor: 'tag-info', text: '螢的呼吸停了一拍。' + yP + '沒有問「什麼意思」。' + yP + '只是看著你——像是一直在等這句話。', textEn: 'Ying\'s breath stops for a beat. ' + yPC + ' doesn\'t ask "what do you mean." ' + yPC + ' just looks at you — as if waiting for those words all along.', delay: 3200 },
+        { tag: '情報', tagColor: 'tag-info', text: '「……我知道。」' + yP + '的聲音幾乎聽不見。「從你叫出我名字的那一刻——我就知道了。」', textEn: '"...I know." ' + yPo + ' voice is barely audible. "From the moment you called my name — I knew."', delay: 3200 },
+        { tag: '感知', tagColor: 'tag-sense', text: '螢的手冊從膝蓋上滑落。' + yP + '沒有去撿。', textEn: 'Ying\'s notebook slides off ' + yPo + ' knees. ' + yPC + ' doesn\'t pick it up.', delay: 2500 },
+        { tag: '感知', tagColor: 'tag-sense', text: yP + '伸出手——指尖觸上你的臉頰。帶著墨漬的指腹輕輕描過石化的灰色紋路。', textEn: yPC + ' reaches out — fingertips touch your cheek. Ink-stained fingers trace the grey lines of petrification.', delay: 3000 },
+        { tag: '情報', tagColor: 'tag-info', text: '「上一世你握著我的手，什麼都沒說。」螢低聲說。「這一世——你能不能別再忍了？」', textEn: '"In the last life, you held my hand and said nothing." Ying whispers. "This time — can you stop holding back?"', delay: 3500 },
+        { tag: '感知', tagColor: 'tag-sense', text: '你把' + yP + '的手從你臉上拉下來——十指交握。和上一世一樣。一隻帶著墨漬，一隻帶著石紋。', textEn: 'You pull ' + yPo + ' hand from your cheek — fingers interlocking. Just like the past life. One stained with ink, one marked with stone.', delay: 3200 },
+        { tag: '行動', tagColor: 'tag-move', text: '然後你做了上一世沒做的事。', textEn: 'Then you do what you didn\'t do in the last life.', delay: 2500 },
+        { tag: '感知', tagColor: 'tag-sense', text: '你吻了' + yP + '。', textEn: 'You kiss ' + (isMale ? 'her' : 'him') + '.', delay: 2500 },
+        { tag: '環境', tagColor: 'tag-system', text: '河水依然在流。碎光依然搖曳。世界沒有改變——但你們之間的一切都變了。', textEn: 'The river still flows. Light still sways. The world hasn\'t changed — but everything between you has.', delay: 3200 },
+        { tag: '感知', tagColor: 'tag-sense', text: '螢的嘴唇嚐起來像墨水和草藥——帶著一點河水的鹹。' + yP + '的手收緊了。比上一世用力得多。', textEn: 'Ying\'s lips taste of ink and herbs — with a hint of river salt. ' + yPC + ' squeezes your hand. Much harder than in the last life.', delay: 3500 },
+        { tag: '感知', tagColor: 'tag-sense', text: '像是怕你再一次消失。', textEn: 'As if afraid you\'ll disappear again.', delay: 2500 },
+        { tag: '情報', tagColor: 'tag-info', text: '分開的時候，螢的眼眶是紅的。但' + yP + '在笑。', textEn: 'When you part, Ying\'s eyes are red. But ' + yPC + '\'s smiling.', delay: 2500 },
+        { tag: '情報', tagColor: 'tag-info', text: '「我要改最後一頁。」' + yP + '把手冊從地上撿起來。', textEn: '"I need to change the last page." ' + yPC + ' picks the notebook up from the ground.', delay: 2800 },
+        { tag: '情報', tagColor: 'tag-info', text: '「『全文完』太早了。」螢一邊擦眼淚一邊寫。筆跡歪歪扭扭，但每一個字都很用力。', textEn: '"\'The End\' was too soon." Ying writes while wiping away tears. The handwriting is shaky, but every word is deliberate.', delay: 3200 },
+        { tag: '感知', tagColor: 'tag-sense', text: '你瞥見新的最後一行——', textEn: 'You catch the new last line —', delay: 2000 },
+        { tag: '感知', tagColor: 'tag-sense', html: '<b>「待續。」</b>', htmlEn: '<b>"To be continued."</b>', delay: 2500, effect: function() { sfx.levelUp(); } },
+      ], [
+        { text: '（這一次，故事不會結束。）', textEn: '(This time, the story won\'t end.)', action: () => {
+          if (typeof setRomance === 'function') setRomance('ying');
+          changeHp(35);
+          changePetri(-15);
+          changeStat('wil', 2);
+          notify(L('HP +35，石化度 -15%，意志 +2（待續）', 'HP +35, Petri -15%, WIL +2 (To be continued)'));
+          loadNode('r3_look');
+        }},
+      ], { label: L('待續', 'To Be Continued') });
+    }},
+    { text: '（不說話。只是把額頭靠上' + yP + '的額頭。）', textEn: '(Say nothing. Just rest your forehead against ' + (isMale ? 'hers' : 'his') + '.)', action: () => {
+      autoExplore([
+        { tag: '感知', tagColor: 'tag-sense', text: '你們的額頭貼在一起。呼吸交錯。近到能看見彼此眼睛裡自己的倒影。', textEn: 'Your foreheads touch. Breaths mingling. Close enough to see your own reflection in each other\'s eyes.', delay: 3000 },
+        { tag: '感知', tagColor: 'tag-sense', text: '螢閉上眼睛。一滴淚從' + yP + '的睫毛上滑落——掉在你石化的手背上。你感覺到了。這次你真的感覺到了。', textEn: 'Ying closes ' + yPo + ' eyes. A tear slips from ' + yPo + ' lashes — falls on your petrified hand. You feel it. This time you truly feel it.', delay: 3500 },
+        { tag: '感知', tagColor: 'tag-sense', text: '「不用說。」螢的聲音像河面上的霧。「我都知道。」', textEn: '"You don\'t have to say it." Ying\'s voice is like mist on the river. "I know."', delay: 2800 },
+        { tag: '行動', tagColor: 'tag-move', text: '你微微仰頭——吻落在' + yP + '的額頭上。輕得像石化紋路蔓延的速度。', textEn: 'You tilt your head slightly — a kiss lands on ' + yPo + ' forehead. Light as the slow spread of petrification.', delay: 3000 },
+        { tag: '感知', tagColor: 'tag-sense', text: '螢的手攥住了你的衣領。然後——', textEn: 'Ying\'s hand grips your collar. Then —', delay: 2200 },
+        { tag: '感知', tagColor: 'tag-sense', text: yP + '踮起腳尖，吻住了你。', textEn: yPC + ' rises on tiptoes and kisses you.', delay: 2500 },
+        { tag: '環境', tagColor: 'tag-system', text: '手冊掉在地上。河水聲變得很遠。世界只剩下嘴唇相觸的溫度和心跳交疊的節奏。', textEn: 'The notebook falls. The river fades. The world shrinks to the warmth of lips touching and the rhythm of overlapping heartbeats.', delay: 3500 },
+        { tag: '感知', tagColor: 'tag-sense', text: '這一吻很長。跨越了兩世。', textEn: 'The kiss is long. It spans two lifetimes.', delay: 2500, effect: function() { sfx.levelUp(); } },
+      ], [
+        { text: '（兩世的等待，值得。）', textEn: '(Two lifetimes of waiting. Worth it.)', action: () => {
+          if (typeof setRomance === 'function') setRomance('ying');
+          changeHp(35);
+          changePetri(-15);
+          changeStat('wil', 2);
+          notify(L('HP +35，石化度 -15%，意志 +2（跨越兩世的吻）', 'HP +35, Petri -15%, WIL +2 (A kiss across two lifetimes)'));
+          loadNode('r3_look');
+        }},
+      ], { label: L('跨越兩世', 'Across Two Lifetimes') });
+    }},
+  ], { label: L('前世的河', 'River of Past Lives') });
 });
 
 // ── Ying: Conflict — her standing vs her report ──
@@ -2019,6 +2286,10 @@ registerNode('r3_crane', () => {
     // Romance: Confession (requires rooftop + very high affinity)
     if (state.flags.r3CraneRooftop && !state.flags.r3CraneConfession && typeof getNpcAffinityNum === 'function' && getNpcAffinityNum('crane') >= 85) {
       c.push({ text: '灰鶴在碼頭等你', textEn: 'Crane is waiting at the dock', action: () => loadNode('r3_crane_confession') });
+    }
+    // NG+ Romance: Call her real name (requires past + NG+ + déjà vu)
+    if (state.flags.ngPlus && state.flags.r3CranePast && state.flags.r1CraneNgDeja && !state.flags.r3CraneNgName && typeof getNpcAffinityNum === 'function' && getNpcAffinityNum('crane') >= 80) {
+      c.push({ text: '「秋蘅。」——你叫出了她從未告訴過你的名字', textEn: '"Qiu Heng." — You call the name she never told you', action: () => loadNode('r3_crane_ng_name') });
     }
     c.push({ text: '離開', textEn: 'Leave', action: () => loadNode('r3_market') });
     return c;
@@ -4197,4 +4468,87 @@ registerNode('r3_crane_confession', () => {
         ], [{ text: '（目送她離開）', textEn: '(Watch her leave)', action: () => loadNode('r3_look') }]);
       }},
   ], { label: L('灰鶴的告白', 'Crane\'s Confession') });
+});
+
+// ═══════════════════════════════════════
+//  NG+ Romance: 叫出灰鶴的真名 (Calling Crane's Real Name)
+// ═══════════════════════════════════════
+registerNode('r3_crane_ng_name', () => {
+  state.flags.r3CraneNgName = true;
+  addNpcAffinity('crane', 12);
+  autoExplore([
+    { tag: '場景', tagColor: 'tag-sense',
+      art: npcPortrait.art('crane', { subtitle: L('秋蘅', 'Qiu Heng') }) || '',
+      text: '灰鶴正在整理貨物。你走到她身邊——然後你叫了一個她還沒有告訴過你的名字。',
+      textEn: 'Grey Crane is sorting goods. You walk up beside her — then call a name she hasn\'t told you yet.',
+      delay: 2800 },
+    { tag: '行動', tagColor: 'tag-move',
+      text: '「秋蘅。」',
+      textEn: '"Qiu Heng."',
+      delay: 2000 },
+    { tag: '感知', tagColor: 'tag-sense',
+      text: '她的動作凍結了。',
+      textEn: 'She freezes.',
+      delay: 1500 },
+    { tag: '感知', tagColor: 'tag-sense',
+      text: '不是驚訝。不是戒備。是一種比那更深的恐懼——被看穿最後一層偽裝的恐懼。',
+      textEn: 'Not surprise. Not wariness. A deeper fear — the fear of being stripped of the very last disguise.',
+      delay: 3000 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: '「你——」她的聲音啞了。一隻手下意識地攥住前臂——那些刀疤的位置。「你怎麼——我從來沒——」',
+      textEn: '"You—" Her voice cracks. One hand instinctively grips her forearm — where the scars are. "How did you — I never—"',
+      delay: 3200 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: '她退了一步。像一隻被逼到角落的鳥。',
+      textEn: 'She backs up a step. Like a bird cornered.',
+      delay: 2000 },
+    { tag: '感知', tagColor: 'tag-sense',
+      text: '你沒有追上去。你站在原地，看著她。眼神裡沒有任何威脅——只有某種跨越了很長時間的溫柔。',
+      textEn: 'You don\'t follow. You stand still, watching her. No threat in your eyes — only a tenderness that has crossed a very long time.',
+      delay: 3200 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: '「……迴廊裡的那次。你看穿我的藏牌手法。我以為那已經夠離譜了。」灰鶴的聲音在發抖。「現在你連我的名字都知道。」',
+      textEn: '"...Back in the corridor. You saw through my card trick. I thought that was insane enough." Crane\'s voice trembles. "Now you even know my name."',
+      delay: 3500 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: '她直直地看著你。眼眶微紅——但灰鶴不哭。灰鶴從來不哭。',
+      textEn: 'She stares straight at you. Eyes reddening — but Crane doesn\'t cry. Crane never cries.',
+      delay: 2500 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: '「你到底是什麼人？」這次的問法和迴廊裡不一樣。不是質問。是懇求。',
+      textEn: '"What are you?" This time it\'s different from the corridor. Not a demand. A plea.',
+      delay: 2800 },
+  ], [
+    { text: '「上一世，是你自己告訴我的。在這同一片碼頭上。」', textEn: '"In the last life, you told me yourself. On this very dock."',
+      action: () => {
+        autoExplore([
+          { tag: '感知', tagColor: 'tag-sense', text: '灰鶴沉默了很久。碼頭的燈火在她臉上投下搖曳的光——你看到她的表情一點一點從防備變成了別的什麼。', textEn: 'Crane is silent for a long time. Dock lights cast flickering shadows on her face — you watch her expression shift, slowly, from guard to something else.', delay: 3500 },
+          { tag: '對話', tagColor: 'tag-npc', text: '「上一世。」她重複了一遍。像是在品嚐這兩個字的重量。', textEn: '"The last life." She repeats it. As if tasting the weight of those words.', delay: 2500 },
+          { tag: '對話', tagColor: 'tag-npc', text: '「所以——在那個『上一世』裡——你知道我全部的事。刀疤。債務。秋蕓。我逃了多遠、躲了多久。」', textEn: '"So — in that \'last life\' — you knew everything about me. The scars. The debts. Qiu Yun. How far I ran, how long I hid."', delay: 3500 },
+          { tag: '感知', tagColor: 'tag-sense', text: '她走近了一步。這次不是後退——是主動靠近。', textEn: 'She steps closer. Not retreating this time — approaching.', delay: 2200 },
+          { tag: '對話', tagColor: 'tag-npc', text: '「然後你還是站在這裡。」她的聲音碎了一個角。「看完了全部的我——還是站在這裡。」', textEn: '"And you\'re still standing here." Her voice cracks at the edge. "Saw all of me — and still standing here."', delay: 3200 },
+          { tag: '感知', tagColor: 'tag-sense', text: '她伸出手——這次不是攥住你的手腕，是輕輕地，掌心朝上。', textEn: 'She extends her hand — this time not grabbing your wrist, but gently, palm up.', delay: 2500 },
+          { tag: '對話', tagColor: 'tag-npc', text: '「那這一世——你還願意接住我嗎？」灰鶴的眼淚終於掉了下來。一滴。只有一滴。「灰鶴不哭的。但秋蘅可以。」', textEn: '"Then this life — will you catch me again?" Crane\'s tear finally falls. One drop. Just one. "Grey Crane doesn\'t cry. But Qiu Heng can."', delay: 3500, effect: function() { sfx.levelUp(); } },
+        ], [{ text: '（握住她的手。握得比上一世更緊。）', textEn: '(Take her hand. Hold it tighter than last time.)', action: () => {
+          changeHp(25);
+          changePetri(-10);
+          changeStat('wil', 1);
+          notify(L('HP +25，石化度 -10%，意志 +1（秋蘅可以哭）', 'HP +25, Petri -10%, WIL +1 (Qiu Heng can cry)'));
+          loadNode('r3_crane');
+        }}]);
+      }},
+    { text: '「你不需要知道原因。你只需要知道——我不會離開。」', textEn: '"You don\'t need to know why. You just need to know — I\'m not leaving."',
+      action: () => {
+        autoExplore([
+          { tag: '感知', tagColor: 'tag-sense', text: '灰鶴盯著你。像是在找一絲說謊的痕跡——但她找不到。', textEn: 'Crane stares at you. Searching for a trace of deception — and finding none.', delay: 2800 },
+          { tag: '對話', tagColor: 'tag-npc', text: '「……你真的很奇怪。」她的嘴角抽動了一下——不是假笑，是一種忍住眼淚的笑。', textEn: '"...You\'re really strange." Her lips twitch — not a false grin, but the kind of smile that holds back tears.', delay: 3000 },
+          { tag: '對話', tagColor: 'tag-npc', text: '「但我不討厭。」她用力擦了一下眼角。「秋蘅不討厭奇怪的人。」', textEn: '"But I don\'t hate it." She rubs her eyes hard. "Qiu Heng doesn\'t hate strange people."', delay: 2800 },
+        ], [{ text: '（陪她站在碼頭，直到燈火熄滅。）', textEn: '(Stand with her at the dock until the lights go out.)', action: () => {
+          changeHp(20);
+          changePetri(-8);
+          notify(L('HP +20，石化度 -8%（秋蘅不討厭奇怪的人）', 'HP +20, Petri -8% (Qiu Heng doesn\'t hate strange people)'));
+          loadNode('r3_crane');
+        }}]);
+      }},
+  ], { label: L('叫出真名', 'Calling Her Name') });
 });

@@ -1556,6 +1556,9 @@ registerNode('r1_wanderer_trade', () => {
     if (state.flags.r1WandererMet && !state.flags.r1CraneDrink) {
       c.push({ text: '喝一杯再走？', textEn: 'A drink before you go?', action: () => loadNode('r1_crane_drink') });
     }
+    if (state.flags.ngPlus && state.flags.r1CraneDrink && !state.flags.r1CraneNgDeja) {
+      c.push({ text: '灰鶴——你的出千手法，我好像在哪裡見過', textEn: 'Grey Crane — your card tricks... I feel like I\'ve seen them before', action: () => loadNode('r1_crane_ng_deja') });
+    }
     c.push({ text: '結束交易', textEn: 'End trading', action: () => {
       autoExplore([
         { tag: '情報', tagColor: 'tag-info', text: '灰鶴繫好行囊：「小心前面的路。大門後面……不止有石頭。」', textEn: 'Grey Crane ties her pack: "Watch out ahead. Beyond the gate... there\'s more than stone."', delay: 2500 },
@@ -1931,6 +1934,10 @@ registerNode('r1_ying_talk', () => {
     if (companion && !state.flags.r1YingWarmth) {
       c.push({ text: '這裡好冷……要不要靠近一點？', textEn: 'It\'s so cold... want to huddle closer?', action: () => loadNode('r1_ying_warmth') });
     }
+    // NG+ exclusive: Ying's dream (requires NG+ + companion + warmth done)
+    if (state.flags.ngPlus && companion && state.flags.r1YingWarmth && !state.flags.r1YingNgDream) {
+      c.push({ text: '螢，你昨晚做了什麼夢？', textEn: 'Ying, what did you dream last night?', action: () => loadNode('r1_ying_ng_dream') });
+    }
     if (companion) {
       c.push({ text: '聊聊天', textEn: 'Chat a while', action: () => loadNode('r1_ying_chat') });
     }
@@ -2136,6 +2143,84 @@ registerNode('r1_ying_warmth', () => {
       loadNode('r1_deep');
     }},
   ], { label: L('寒夜共眠', 'Warmth in the Cold') });
+});
+
+// ── NG+ Exclusive: Ying's Dream (past-life memory seeping through) ──
+registerNode('r1_ying_ng_dream', () => {
+  state.flags.r1YingNgDream = true;
+  addNpcAffinity('ying', 8);
+  var isMale = state.sex === 'male';
+  var yP = isMale ? L('她', 'she') : L('他', 'he');
+  var yPC = isMale ? 'She' : 'He';
+  autoExplore([
+    { art: npcPortrait.art('ying', { subtitle: L('……夢', '...dream') }) || '<pre class="ascii-art cyan">\n    ·˚· 螢 — 夢境 ·˚·\n      ╱═══╲\n     │ ─  ─ │ ← 出神\n     │  ──  │\n      ╲═══╱\n    ╱──┤    ├──╲\n        ˚ ✦ ˚\n</pre>', artEn: npcPortrait.art('ying', { subtitle: '...dream' }) || '<pre class="ascii-art cyan">\n    ·˚· Ying — Dream ·˚·\n      ╱═══╲\n     │ ─  ─ │ ← lost in thought\n     │  ──  │\n      ╲═══╱\n    ╱──┤    ├──╲\n        ˚ ✦ ˚\n</pre>', delay: 800 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('螢的筆停了。' + yP + '看著你，表情有些恍惚。',
+             'Ying\'s pen stops. ' + yPC + ' looks at you, expression dazed.'),
+      delay: 2200 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「……夢？」' + yP + '重複了一遍你的問題。「你怎麼知道我做夢了？」',
+             '"...Dream?" ' + yPC + ' repeats your question. "How did you know I dreamed?"'),
+      delay: 2500 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「我夢見自己在寫一本書。不是筆記——是一本完整的書。有開頭、有結尾。」',
+             '"I dreamed I was writing a book. Not notes — a complete book. With a beginning and an ending."'),
+      delay: 3000 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「旁邊坐著一個人。」' + yP + '的聲音變輕了。「我看不清臉——但' + yP + '一直在幫我校對。每寫完一頁，' + yP + '就拿過去讀。」',
+             '"Someone sat beside me." ' + yPC + '\'s voice softens. "I couldn\'t see the face — but they kept proofreading. Every page I finished, they\'d take and read."'),
+      delay: 3500 },
+    { tag: '記憶', tagColor: 'tag-petri',
+      text: L('你的心跳漏了一拍。校對——你答應過' + yP + '的。在另一段記憶裡。',
+             'Your heart skips. Proofreading — you promised ' + (isMale ? 'her' : 'him') + ' that. In another memory.'),
+      delay: 2800 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「最奇怪的是最後一頁。」螢皺起眉。「我寫完了，但那個人把筆拿過去，在最後加了兩個字——」',
+             '"The strangest part was the last page." Ying frowns. "I finished writing, but that person took the pen and added two words at the end —"'),
+      delay: 3200 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「『全文完』。」',
+             '"\'The End.\'"'),
+      delay: 2500 },
+    { tag: '感知', tagColor: 'tag-sense',
+      text: L('螢笑了一下——一種困惑的、有些甜的笑。「我醒來之後心裡暖暖的。但我不知道為什麼。」',
+             'Ying smiles — a confused, slightly sweet smile. "When I woke up, I felt warm inside. But I don\'t know why."'),
+      delay: 3000 },
+  ], [
+    { text: L('也許有一天你會知道', 'Maybe someday you\'ll know'), textEn: 'Maybe someday you\'ll know',
+      action: () => {
+        addNpcAffinity('ying', 5);
+        autoExplore([
+          { tag: '對話', tagColor: 'tag-npc',
+            text: L('螢歪著頭看你：「你說話的語氣……好像已經知道答案了。」',
+                   'Ying tilts ' + (isMale ? 'her' : 'his') + ' head: "The way you say that... as if you already know the answer."'),
+            delay: 2500 },
+          { tag: '感知', tagColor: 'tag-sense',
+            text: L('你沒有回答。但你在心裡默默想：是的。那本書的最後兩個字，是我寫的。',
+                   'You don\'t answer. But silently you think: Yes. Those last two words were mine.'),
+            delay: 3000 },
+          { tag: '效果', tagColor: 'tag-system',
+            text: L('螢好感 ↑↑ | 經驗 +8', 'Ying bond ↑↑ | XP +8'),
+            delay: 1500, effect: () => { gainXp(8); } },
+        ], [
+          { text: '返回', textEn: 'Back', action: () => loadNode('r1_ying_talk') },
+        ], { label: L('螢的夢', 'Ying\'s dream') });
+      }},
+    { text: L('那本書叫什麼名字？', 'What was the book called?'), textEn: 'What was the book called?',
+      action: () => {
+        autoExplore([
+          { tag: '對話', tagColor: 'tag-npc',
+            text: L('螢想了想：「……『石化深淵紀事』。」' + yP + '笑著搖搖頭。「多俗的名字。但夢裡的我——好像非常驕傲。」',
+                   'Ying thinks: "...\'Chronicles of the Petrified Abyss.\'" ' + yPC + ' laughs, shaking ' + (isMale ? 'her' : 'his') + ' head. "What a plain title. But in the dream, I was — so proud of it."'),
+            delay: 3500 },
+          { tag: '效果', tagColor: 'tag-system',
+            text: L('螢好感 ↑ | 經驗 +5', 'Ying bond ↑ | XP +5'),
+            delay: 1500, effect: () => { gainXp(5); } },
+        ], [
+          { text: '返回', textEn: 'Back', action: () => loadNode('r1_ying_talk') },
+        ], { label: L('螢的夢', 'Ying\'s dream') });
+      }},
+  ], { label: L('螢的夢', 'Ying\'s dream') });
 });
 
 // ── Gate to Region 2 ──
@@ -2780,5 +2865,91 @@ registerNode('r1_crane_drink', () => {
         ], [{ text: '繼續', textEn: 'Continue', action: () => loadNode('r1_deep') }]);
       }},
   ], { label: L('喝一杯', 'A Drink') });
+});
+
+// ═══════════════════════════════════════
+//  NG+ Romance: 灰鶴似曾相識 (Crane Déjà Vu)
+// ═══════════════════════════════════════
+registerNode('r1_crane_ng_deja', () => {
+  state.flags.r1CraneNgDeja = true;
+  addNpcAffinity('crane', 10);
+  autoExplore([
+    { tag: '場景', tagColor: 'tag-sense',
+      art: npcPortrait.art('crane', { subtitle: '行商人' }) || `<pre class="ascii-art gold">
+       ╱▔▔▔▔╲
+      │ ─  ─ │
+      │ ╰─╯  │ ?
+    ──┤      ├──
+      │  ??  │
+      ╱╲  ╱╲
+   灰鶴 · 似曾相識
+</pre>`, artEn: npcPortrait.art('crane', { subtitle: 'Merchant' }) || `<pre class="ascii-art gold">
+       ╱▔▔▔▔╲
+      │ ─  ─ │
+      │ ╰─╯  │ ?
+    ──┤      ├──
+      │  ??  │
+      ╱╲  ╱╲
+  Crane · Déjà Vu
+</pre>`,
+      text: '灰鶴正在洗牌。你隨口提了一句——關於她藏牌的手法。',
+      textEn: 'Grey Crane is shuffling. You casually mention — something about the way she hides cards.',
+      delay: 2500 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: '她的手停了。',
+      textEn: 'Her hands stop.',
+      delay: 1500 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: '「你剛才說什麼？」灰鶴抬起頭。眼神不再是玩世不恭——而是一種你從未見過的銳利。',
+      textEn: '"What did you just say?" Crane looks up. Her gaze is no longer playful — it\'s sharp in a way you\'ve never seen.',
+      delay: 3000 },
+    { tag: '感知', tagColor: 'tag-sense',
+      text: '「第三張牌藏在袖口內側。對吧？」你說得很平靜。因為你記得——上一世，你看了她耍這手法不知道多少次。',
+      textEn: '"Third card, hidden inside the cuff. Right?" You say it calmly. Because you remember — in the last life, you watched her pull this trick countless times.',
+      delay: 3500 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: '灰鶴的臉上閃過一連串表情——驚訝、戒備、困惑。然後是一種更深的東西。',
+      textEn: 'A cascade of expressions flickers across Crane\'s face — surprise, wariness, confusion. Then something deeper.',
+      delay: 3000 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: '「這手法是我自己發明的。」她慢慢地說。「沒有第二個人知道。」',
+      textEn: '"I invented this trick myself." She says slowly. "No one else knows it."',
+      delay: 2800 },
+    { tag: '感知', tagColor: 'tag-sense',
+      text: '她把牌放下。雙手交叉在胸前——防禦姿態。但你注意到她的手指在微微發抖。',
+      textEn: 'She puts the cards down. Arms crossed — defensive posture. But you notice her fingers trembling slightly.',
+      delay: 2800 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: '「你是誰？」灰鶴的聲音壓得很低。「真的——你到底是誰？」',
+      textEn: '"Who are you?" Crane\'s voice drops low. "Really — who the hell are you?"',
+      delay: 2800 },
+  ], [
+    { text: '「一個見過你太多次的人。」', textEn: '"Someone who\'s seen you too many times."',
+      action: () => {
+        autoExplore([
+          { tag: '感知', tagColor: 'tag-sense', text: '灰鶴盯著你看了很久。你不閃避，不解釋——因為真話本身就夠瘋狂了。', textEn: 'Crane stares at you for a long time. You don\'t look away, don\'t explain — because the truth itself is crazy enough.', delay: 3000 },
+          { tag: '對話', tagColor: 'tag-npc', text: '「……你的眼神。」她終於開口。「像是看著一個老朋友。不——比老朋友更深。」', textEn: '"...Your eyes." She finally speaks. "Like looking at an old friend. No — deeper than that."', delay: 3000 },
+          { tag: '感知', tagColor: 'tag-sense', text: '她的防備鬆了一點。不是被說服——是被你眼中某種東西打動了。一種只有真正認識她的人才會有的、溫柔的熟悉。', textEn: 'Her guard drops slightly. Not from persuasion — from something in your eyes. A gentle familiarity that only someone who truly knows her would have.', delay: 3500 },
+          { tag: '對話', tagColor: 'tag-npc', text: '「我不知道你在說什麼。」灰鶴撿起牌，但沒有繼續洗。「但我決定——暫時不追問。」', textEn: '"I don\'t know what you\'re talking about." Crane picks up the cards but doesn\'t shuffle. "But I\'ve decided — not to press for now."', delay: 3200 },
+          { tag: '對話', tagColor: 'tag-npc', text: '她頓了頓。「不過——如果你真的『見過我太多次』——」她露出一個複雜的笑。「那你應該知道，我不喜歡被人看透。」', textEn: 'A pause. "But — if you really \'have seen me too many times\' —" A complicated smile. "Then you should know, I don\'t like being seen through."', delay: 3500 },
+          { tag: '感知', tagColor: 'tag-sense', text: '她站起來，行囊甩上肩。經過你身邊時——她的腳步頓了一瞬。', textEn: 'She stands, swinging her pack over her shoulder. Passing by you — her steps falter for an instant.', delay: 2500 },
+          { tag: '對話', tagColor: 'tag-npc', text: '「但也不討厭。」聲音很輕。像是說給自己聽的。', textEn: '"But I don\'t hate it either." Barely a whisper. As if meant for herself.', delay: 2500, effect: function() { addNpcAffinity('crane', 5); } },
+        ], [{ text: '繼續', textEn: 'Continue', action: () => {
+          notify(L('灰鶴好感 +15（似曾相識的動搖）', 'Crane affinity +15 (Déjà vu tremor)'));
+          loadNode('r1_deep');
+        }}]);
+      }},
+    { text: '「直覺而已。也許我猜的。」', textEn: '"Just intuition. Maybe I guessed."',
+      action: () => {
+        autoExplore([
+          { tag: '對話', tagColor: 'tag-npc', text: '灰鶴嗤笑一聲。「猜？你連位置都猜對了。」', textEn: 'Crane scoffs. "Guessed? You even got the position right."', delay: 2500 },
+          { tag: '對話', tagColor: 'tag-npc', text: '她搖搖頭，重新洗牌。但你注意到——她換了一種完全不同的藏牌手法。', textEn: 'She shakes her head and reshuffles. But you notice — she switches to a completely different hiding technique.', delay: 2800 },
+          { tag: '對話', tagColor: 'tag-npc', text: '「有意思。」灰鶴看你的眼神變了——帶著一種獵人打量對手的審視。和一點點……好奇。', textEn: '"Interesting." The way Crane looks at you changes — a hunter appraising an opponent. And a hint of... curiosity.', delay: 3000 },
+        ], [{ text: '繼續', textEn: 'Continue', action: () => {
+          notify(L('灰鶴好感 +10（引起了她的興趣）', 'Crane affinity +10 (Piqued her interest)'));
+          loadNode('r1_deep');
+        }}]);
+      }},
+  ], { label: L('似曾相識', 'Déjà Vu') });
 });
 

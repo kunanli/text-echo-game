@@ -972,6 +972,14 @@ registerNode('r2_camp_chief', () => {
     if (state.flags.r2ChengQuestion && state.flags.r2FrostPast && !state.flags.r2ChengFrostTalk) {
       c.push({ text: '鐵霜似乎想跟你說什麼……', textEn: 'Iron Frost seems to want to tell you something...', action: () => loadNode('r2_cheng_frost_talk') });
     }
+    // NG+ Romance: Cheng's first touch (requires NG+ 2nd cycle + question done)
+    if (state.flags.ngPlus && state.flags.r2ChengQuestion && !state.flags.r2ChengNg2Touch && typeof getNpcAffinityNum === 'function' && getNpcAffinityNum('cheng') >= 50) {
+      c.push({ text: '承鋼的手碰了你一下——好像是故意的……', textEn: 'Cheng\'s hand brushed yours — it seemed deliberate...', action: () => loadNode('r2_cheng_ng2_touch') });
+    }
+    // NG+ Romance: Frost lets go (requires 3+ cycles + touch + frost talk done)
+    if (state.flags.ngPlus && state.flags.r2ChengNg2Touch && state.flags.r2ChengFrostTalk && !state.flags.r2ChengNg3Frost && (state.flags.ngPlusRun || 0) >= 2 && typeof getNpcAffinityNum === 'function' && getNpcAffinityNum('cheng') >= 70) {
+      c.push({ text: '鐵霜和承鋼在營火旁低聲交談……', textEn: 'Frost and Cheng are whispering by the campfire...', action: () => loadNode('r2_cheng_ng3_frost') });
+    }
     // Sidequest: Frost's past (requires first meeting done)
     if (state.flags.r2CampVisited && !state.flags.r2FrostPast) {
       c.push({ text: '鐵霜，你是怎麼到這裡的？', textEn: 'Frost, how did you end up here?', action: () => loadNode('r2_frost_past') });
@@ -1886,6 +1894,10 @@ registerNode('r2_ying_talk', () => {
     }
     if (state.flags.r2YingLore3 && state.flags.r2YingSketch && !state.flags.r2YingSecret) {
       c.push({ text: '螢……你的手冊裡還藏了什麼？', textEn: 'Ying... what else are you hiding in that notebook?', action: () => loadNode('r2_ying_secret') });
+    }
+    // NG+ exclusive: Ying's notebook last page has past-life writing
+    if (state.flags.ngPlus && state.flags.r1YingNgDream && !state.flags.r2YingNgNotebook) {
+      c.push({ text: '螢，你的手冊最後一頁……', textEn: 'Ying, the last page of your notebook...', action: () => loadNode('r2_ying_ng_notebook') });
     }
     if (state.flags.r2CraneMet && !state.flags.r2YingJealousy) {
       c.push({ text: '（螢看起來有些心不在焉……）', textEn: '(Ying seems distracted...)', action: () => loadNode('r2_ying_jealousy') });
@@ -3943,6 +3955,159 @@ registerNode('r2_cheng_frost_talk', () => {
   ], { label: L('鐵霜的話', 'Iron Frost\'s words') });
 });
 
+// ═══════════════════════════════════════
+//  NG+ Romance: 承鋼的第一次觸碰 (Cheng's First Touch)
+// ═══════════════════════════════════════
+registerNode('r2_cheng_ng2_touch', () => {
+  state.flags.r2ChengNg2Touch = true;
+  addNpcAffinity('cheng', 13);
+  autoExplore([
+    { tag: '場景', tagColor: 'tag-sense',
+      art: npcPortrait.art('cheng', { subtitle: L('研究員', 'Researcher') }) || '',
+      text: '你在實驗室陪承鋼整理數據。他翻閱筆記的動作還是很僵硬——石化後的手指恢復得比腿慢。',
+      textEn: 'You\'re helping Cheng sort data in the lab. His hands are still stiff when flipping notes — fingers recovered slower than legs after petrification.',
+      delay: 2800 },
+    { tag: '感知', tagColor: 'tag-sense',
+      text: '然後他的手碰了你的。',
+      textEn: 'Then his hand touches yours.',
+      delay: 1800 },
+    { tag: '感知', tagColor: 'tag-sense',
+      text: '不是拿遞東西時的偶然接觸。是他放下筆記之後，手指留在你手背上——停了三秒。',
+      textEn: 'Not the accidental brush of passing something. He puts the notebook down and his fingers rest on the back of your hand — for three seconds.',
+      delay: 3000 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: '「你的體表溫度是 36.5°C。」承鋼說。語氣像在記錄實驗數據。「石化區域的平均溫度是 22°C。差值 14.5°C。」',
+      textEn: '"Your surface temperature is 36.5°C." Cheng says. Tone like recording experiment data. "The average temperature in petrified zones is 22°C. Differential of 14.5°C."',
+      delay: 3500 },
+    { tag: '感知', tagColor: 'tag-sense',
+      text: '他的指尖還在你手背上。你注意到他的手在微微發抖——不是石化後遺症，而是另一種原因。',
+      textEn: 'His fingertips are still on your hand. You notice them trembling slightly — not a petrification aftereffect, but for another reason.',
+      delay: 2800 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: '「很溫暖。」他安靜了一會。然後補充了一句不像科學家會說的話。',
+      textEn: '"Very warm." He\'s quiet for a moment. Then adds something a scientist wouldn\'t normally say.',
+      delay: 2500 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: '「溫暖——是不是就是那種。想念一個人的時候想要碰到的感覺？」',
+      textEn: '"Warm — is this what it feels like? What you want to touch when you miss someone?"',
+      delay: 3200 },
+  ], [
+    { text: '「是的。就是這種感覺。」', textEn: '"Yes. That\'s exactly it."',
+      action: () => {
+        autoExplore([
+          { tag: '感知', tagColor: 'tag-sense', text: '承鋼點了點頭。像是又記下了一筆數據。但他沒有收回手。', textEn: 'Cheng nods. As if noting another data point. But he doesn\'t pull his hand back.', delay: 2500 },
+          { tag: '對話', tagColor: 'tag-npc', text: '「那我再多記錄一會。」他的聲音很輕。「這個……數據很重要。」', textEn: '"Then let me record a bit longer." His voice is soft. "This... data is important."', delay: 2800 },
+          { tag: '感知', tagColor: 'tag-sense', text: '你沒有動。他的手一點一點從你的手背滑到了你的手心——然後停在那裡。不是十指相扣——他還不會那個。只是掌心貼著掌心。', textEn: 'You don\'t move. His hand slides slowly from the back of your hand to your palm — and stays. Not interlocking fingers — he doesn\'t know how yet. Just palm against palm.', delay: 3500 },
+          { tag: '感知', tagColor: 'tag-sense', text: '他的掌心有石化後留下的粗糙紋路。像砂紙，又像年輪。那些紋路裡藏著他被凍結的三年。', textEn: 'His palm has rough textures from petrification. Like sandpaper, or tree rings. Those lines hold three frozen years.', delay: 3200, effect: function() { sfx.levelUp(); } },
+        ], [{ text: '（讓手停在那裡。溫度就是最好的語言。）', textEn: '(Let your hand stay. Temperature is the best language.)', action: () => {
+          changeHp(15);
+          changePetri(-5);
+          notify(L('HP +15，石化度 -5%，承鋼好感 ↑↑（36.5°C）', 'HP +15, Petri -5%, Cheng bond ↑↑ (36.5°C)'));
+          loadNode('r2_camp_chief');
+        }}]);
+      }},
+    { text: '（把手翻過來，讓他握住。）', textEn: '(Turn your hand over, letting him hold it.)',
+      action: () => {
+        autoExplore([
+          { tag: '感知', tagColor: 'tag-sense', text: '承鋼看著你翻過來的手掌。像看一個從未見過的實驗結果。', textEn: 'Cheng stares at your upturned palm. Like seeing an experiment result he\'s never encountered.', delay: 2500 },
+          { tag: '對話', tagColor: 'tag-npc', text: '他猶豫了一下——然後把手放了上去。五根手指笨拙地對齊你的五根手指。', textEn: 'He hesitates — then places his hand on yours. Five fingers clumsily aligning with your five.', delay: 2800 },
+          { tag: '對話', tagColor: 'tag-npc', text: '「不太對。」他微微皺眉。「指頭應該——怎麼放？」', textEn: '"Not quite right." He frowns slightly. "How should the fingers — go?"', delay: 2500 },
+          { tag: '感知', tagColor: 'tag-sense', text: '你忍不住笑了。然後你幫他把手指調整成交握的姿勢。他認真地看著——像在學一種新的實驗技術。', textEn: 'You can\'t help but smile. Then you adjust his fingers into a proper clasp. He watches seriously — like learning a new lab technique.', delay: 3200 },
+          { tag: '對話', tagColor: 'tag-npc', text: '「原來是這樣。」他看著交握的手。「這個動作——讓心率加快了 12%。」', textEn: '"So that\'s how it works." He looks at the clasped hands. "This action — heart rate increased by 12%."', delay: 3000, effect: function() { sfx.levelUp(); } },
+        ], [{ text: '（讓他慢慢學。他有一輩子的時間。）', textEn: '(Let him learn slowly. He has a lifetime.)', action: () => {
+          changeHp(15);
+          changePetri(-5);
+          notify(L('HP +15，石化度 -5%，承鋼好感 ↑↑（心率 +12%）', 'HP +15, Petri -5%, Cheng bond ↑↑ (Heart rate +12%)'));
+          loadNode('r2_camp_chief');
+        }}]);
+      }},
+  ], { label: L('36.5°C', '36.5°C') });
+});
+
+// ═══════════════════════════════════════
+//  NG+ Romance: 鐵霜放手 (Frost Lets Go — Deep)
+// ═══════════════════════════════════════
+registerNode('r2_cheng_ng3_frost', () => {
+  state.flags.r2ChengNg3Frost = true;
+  addNpcAffinity('cheng', 10);
+  addNpcAffinity('frost', 8);
+  autoExplore([
+    { tag: '場景', tagColor: 'tag-sense',
+      text: '營火旁。鐵霜和承鋼坐在一起——你已經很久沒看到他們這樣了。她的手擱在他肩上。他沒有躲開。',
+      textEn: 'By the campfire. Frost and Cheng sit together — you haven\'t seen them like this in a long time. Her hand rests on his shoulder. He doesn\'t flinch.',
+      delay: 3000 },
+    { art: npcPortrait.art('frost', { subtitle: L('鐵霜', 'Iron Frost') }) || '', delay: 800 },
+    { tag: '感知', tagColor: 'tag-sense',
+      text: '你本來想走開。但鐵霜看到了你——她朝你招了招手。不是驅趕，是邀請。',
+      textEn: 'You almost turn away. But Frost spots you — she waves you over. Not dismissal, but invitation.',
+      delay: 2500 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: '「過來。」鐵霜的聲音很平靜。「有些話——要你在場才說得清楚。」',
+      textEn: '"Come here." Frost\'s voice is calm. "Some things — need you present to be said clearly."',
+      delay: 2800 },
+    { tag: '感知', tagColor: 'tag-sense',
+      text: '你在他們對面坐下。營火的光在三個人的臉上跳動。承鋼看看鐵霜，又看看你——他的眼神裡有困惑，也有一種笨拙的急切。',
+      textEn: 'You sit across from them. Firelight dances on three faces. Cheng looks at Frost, then at you — confusion in his eyes, and a clumsy urgency.',
+      delay: 3200 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: '鐵霜深吸了一口氣。然後她做了一件你在任何一世都沒見過的事——她笑了。不是營地首領的笑，是一個女人放下重擔的笑。',
+      textEn: 'Frost takes a deep breath. Then she does something you\'ve never seen in any lifetime — she smiles. Not the camp leader\'s smile, but a woman setting down a burden.',
+      delay: 3500 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: '「承鋼。」她看著他。「你還記得石化之前——我跟你說過的最後一句話嗎？」',
+      textEn: '"Cheng Gang." She looks at him. "Do you remember — the last thing I said to you before petrification?"',
+      delay: 3000 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: '承鋼搖頭。石化偷走了那段記憶。',
+      textEn: 'Cheng shakes his head. Petrification stole that memory.',
+      delay: 2000 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: '「我說——『等你醒來，我教你跳舞。』」鐵霜的聲音碎了一下。「三年了。你醒了。但你忘了跳舞。也忘了我。」',
+      textEn: '"I said — \'When you wake up, I\'ll teach you to dance.\'" Frost\'s voice cracks. "Three years. You woke up. But you forgot how to dance. And forgot me."',
+      delay: 3800 },
+    { tag: '感知', tagColor: 'tag-sense',
+      text: '承鋼的嘴唇動了動。他想說什麼——但石化凍結了太多東西，包括道歉的能力。',
+      textEn: 'Cheng\'s lips move. He wants to say something — but petrification froze too many things, including the ability to apologize.',
+      delay: 3000 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: '「但——」鐵霜把手從他肩上拿開，輕輕地放在自己膝蓋上。「他讓你快樂。那就夠了。」',
+      textEn: '"But—" Frost lifts her hand from his shoulder, placing it gently on her own knee. "' + L('他', 'They') + ' makes you happy. That\'s enough."',
+      delay: 3200 },
+  ], [
+    { text: '「鐵霜——你不必……」', textEn: '"Frost — you don\'t have to..."',
+      action: () => {
+        autoExplore([
+          { tag: '對話', tagColor: 'tag-npc', text: '「我必須。」她打斷你。眼神堅定得像鍛過的鐵。「不是因為放棄。是因為——」', textEn: '"I must." She cuts you off. Eyes steely as tempered iron. "Not because I\'m giving up. Because—"', delay: 2800 },
+          { tag: '對話', tagColor: 'tag-npc', text: '「因為我愛他。」鐵霜的聲音沒有抖。「所以我知道——他需要什麼。不是我。」', textEn: '"Because I love him." Frost\'s voice doesn\'t waver. "So I know — what he needs. It\'s not me."', delay: 3200 },
+          { tag: '感知', tagColor: 'tag-sense', text: '承鋼看著鐵霜。他的眼裡終於有了一種你認得的東西——不是實驗數據，不是體溫計算。是痛。', textEn: 'Cheng looks at Frost. Finally something recognizable in his eyes — not data, not temperature calculations. Pain.', delay: 3000 },
+          { tag: '對話', tagColor: 'tag-npc', text: '「對不起。」承鋼說了他石化醒來之後的第一句道歉。聲音生硬得像斷裂的石頭——但那是真的。', textEn: '"I\'m sorry." Cheng says his first apology since waking from petrification. Rough as cracking stone — but genuine.', delay: 3200 },
+          { tag: '對話', tagColor: 'tag-npc', text: '鐵霜站起來。走到你面前——然後做了一件所有人都沒想到的事。她抱了你一下。很快，很用力。', textEn: 'Frost stands. Walks to you — then does something no one expected. She hugs you. Brief, and fierce.', delay: 3000 },
+          { tag: '對話', tagColor: 'tag-npc', text: '「照顧好他。」她在你耳邊說。「教他跳舞。我沒來得及教的——你來教。」', textEn: '"Take care of him." She whispers. "Teach him to dance. What I never got to teach — you do it."', delay: 3200, effect: function() { sfx.levelUp(); } },
+          { tag: '感知', tagColor: 'tag-sense', text: '她放開你，轉身離開。背影筆直，沒有回頭。營火把她的影子拉得很長——像一面永遠不會倒下的牆。', textEn: 'She lets go, turns, and walks away. Back straight, no looking back. The campfire stretches her shadow long — like a wall that will never fall.', delay: 3500 },
+        ], [{ text: '（看著鐵霜離去的背影。然後看向承鋼。）', textEn: '(Watch Frost\'s retreating figure. Then look at Cheng.)', action: () => {
+          changeHp(20);
+          changePetri(-8);
+          changeStat('wil', 1);
+          notify(L('HP +20，石化度 -8%，意志 +1（教他跳舞）', 'HP +20, Petri -8%, WIL +1 (Teach him to dance)'));
+          loadNode('r2_camp_chief');
+        }}]);
+      }},
+    { text: '（沉默。有些事不需要回應——只需要見證。）', textEn: '(Silence. Some things don\'t need a response — only a witness.)',
+      action: () => {
+        autoExplore([
+          { tag: '感知', tagColor: 'tag-sense', text: '三個人在營火旁坐了很久。鐵霜最先站起來——「我去巡邏。」她的聲音恢復了營地首領的穩重。', textEn: 'Three people sit by the fire for a long time. Frost stands first — "I\'ll go patrol." Her voice regains its commander\'s steadiness.', delay: 3000 },
+          { tag: '感知', tagColor: 'tag-sense', text: '等鐵霜走遠之後，承鋼的手碰了碰你的。不是實驗——這次是主動的，笨拙的，帶著一種剛學會的溫柔。', textEn: 'After Frost is gone, Cheng\'s hand touches yours. Not an experiment — this time it\'s deliberate, clumsy, carrying a just-learned tenderness.', delay: 3200 },
+          { tag: '對話', tagColor: 'tag-npc', text: '「她說的……跳舞。」承鋼的聲音很小。「你能教我嗎？」', textEn: '"What she said... dancing." Cheng\'s voice is small. "Can you teach me?"', delay: 2800, effect: function() { sfx.levelUp(); } },
+        ], [{ text: '（站起來，伸出手。）', textEn: '(Stand up and extend your hand.)', action: () => {
+          changeHp(15);
+          changePetri(-5);
+          notify(L('HP +15，石化度 -5%（教他跳舞）', 'HP +15, Petri -5% (Teach him to dance)'));
+          loadNode('r2_camp_chief');
+        }}]);
+      }},
+  ], { label: L('教他跳舞', 'Teach Him to Dance') });
+});
+
 // ============================================================
 // R2 Exploration Nodes (v2.1) — 6 new optional locations
 // ============================================================
@@ -4520,6 +4685,68 @@ registerNode('r2_frost_vigil', () => {
   ], [
     { text: '回去睡覺', textEn: 'Go back to sleep', action: () => loadNode('r2_camp') },
   ], { label: L('鐵霜守夜', 'Frost\'s Vigil') });
+});
+
+// ═══════════════════════════════════════
+//  NG+ Romance: 螢的手冊最後一頁 (Ying's Last Page)
+// ═══════════════════════════════════════
+registerNode('r2_ying_ng_notebook', () => {
+  state.flags.r2YingNgNotebook = true;
+  addNpcAffinity('ying', 10);
+  var isMale = state.sex === 'male';
+  var yP = isMale ? L('她', 'she') : L('他', 'he');
+  var yPC = isMale ? 'She' : 'He';
+  autoExplore([
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('螢愣了一下：「最後一頁？那裡什麼都沒有啊。」',
+             'Ying pauses: "The last page? There\'s nothing there."'),
+      delay: 2200 },
+    { tag: '行動', tagColor: 'tag-move',
+      text: L('「讓我看看。」你伸出手。螢猶豫了一下，把手冊遞給你。',
+             '"Let me see." You hold out your hand. Ying hesitates, then hands it over.'),
+      delay: 2500 },
+    { tag: '感知', tagColor: 'tag-sense',
+      text: L('你翻到最後一頁。空白的——表面上是。但你把紙頁傾斜到微光石的角度下——',
+             'You turn to the last page. Blank — on the surface. But when you tilt the paper under the glowstone\'s angle —'),
+      delay: 2800 },
+    { tag: '記憶', tagColor: 'tag-petri',
+      text: L('墨跡。很淡，像是很久以前用乾掉的筆寫的。字跡不是螢的——是你的。',
+             'Ink marks. Faint, as if written long ago with a dry pen. The handwriting isn\'t Ying\'s — it\'s yours.'),
+      delay: 3000 },
+    { tag: '感知', tagColor: 'tag-sense',
+      text: L('兩個字。「全文完」。',
+             'Two words. "The End."'),
+      delay: 2500 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('螢湊過來看。' + yP + '的眼睛慢慢睜大了。',
+             'Ying leans in to look. ' + yPC + '\'s eyes slowly widen.'),
+      delay: 2500 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「這……這是你寫的？」' + yP + '的聲音在發抖。「什麼時候——我從來沒讓你碰過我的手冊——」',
+             '"This... you wrote this?" ' + yPC + '\'s voice trembles. "When — I\'ve never let you touch my notebook —"'),
+      delay: 3200 },
+    { tag: '記憶', tagColor: 'tag-petri',
+      text: L('你想說：「上輩子。你寫完了那本書。我在最後一頁寫了這兩個字。」但你知道說了也沒人會信。',
+             'You want to say: "In my past life. You finished that book. I wrote these two words on the last page." But you know no one would believe it.'),
+      delay: 3200 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('螢盯著那兩個字看了很久。然後' + yP + '慢慢抬起頭，眼眶泛紅。',
+             'Ying stares at those two words for a long time. Then ' + yPC + ' slowly looks up, eyes reddening.'),
+      delay: 2800 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「我不懂。但我——」' + yP + '的聲音很輕。「我做的那個夢。寫書的夢。坐在旁邊的人——」',
+             '"I don\'t understand. But I —" ' + yPC + '\'s voice is very quiet. "That dream I had. Writing a book. The person sitting beside me —"'),
+      delay: 3200 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「——是你。對不對。」',
+             '"— was you. Wasn\'t it."'),
+      delay: 2500 },
+    { tag: '效果', tagColor: 'tag-system',
+      text: L('螢好感 ↑↑↑ | 經驗 +10', 'Ying bond ↑↑↑ | XP +10'),
+      delay: 1500, effect: () => { gainXp(10); } },
+  ], [
+    { text: '返回', textEn: 'Back', action: () => loadNode('r2_ying_talk') },
+  ], { label: L('最後一頁', 'The last page') });
 });
 
 // ═══════════════════════════════════════
