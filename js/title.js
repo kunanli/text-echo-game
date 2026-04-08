@@ -212,12 +212,14 @@ document.querySelectorAll('.sex-btn').forEach(function(btn) {
 });
 
 function startGame() {
-  // Require all stat points to be allocated before starting
+  // Warn if stat points not fully allocated
   var remaining = getTotalAllocPoints() - getAllocUsed();
   if (remaining > 0) {
-    notify(L('請先分配完所有能力點數（剩餘 ' + remaining + ' 點）',
-             'Please allocate all stat points first (' + remaining + ' remaining)'));
-    return;
+    var ok = confirm(L(
+      '你還有 ' + remaining + ' 點能力點數未分配。\n確定要直接開始嗎？',
+      'You have ' + remaining + ' unallocated stat point(s).\nAre you sure you want to start?'
+    ));
+    if (!ok) return;
   }
 
   var nameInput = document.getElementById('name-input');
