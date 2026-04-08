@@ -722,6 +722,18 @@ registerNode('r3_bell', () => {
     if (state.flags.r3BellSecret && !state.flags.r3BellAllianceDeep) {
       c.push({ text: '銅鐘，我們需要一起面對這件事', textEn: 'Bell, we need to face this together', action: () => loadNode('r3_bell_alliance_deep') });
     }
+    // Romance: Tea after quest report (requires alliance, one-time)
+    if (state.flags.r3BellAlliance && !state.flags.r3BellTea) {
+      c.push({ text: '留下來喝杯茶', textEn: 'Stay for tea', action: () => loadNode('r3_bell_tea') });
+    }
+    // Romance: Massage her petrified hand (requires tea + affinity >= 50)
+    if (state.flags.r3BellTea && !state.flags.r3BellHand && typeof getNpcAffinityNum === 'function' && getNpcAffinityNum('bell') >= 50) {
+      c.push({ text: '你的手……還疼嗎？', textEn: 'Does your hand... still hurt?', action: () => loadNode('r3_bell_hand') });
+    }
+    // Romance: Pre-vote night, leaning on shoulder (requires hand + affinity >= 70)
+    if (state.flags.r3BellHand && !state.flags.r3BellWall && typeof getNpcAffinityNum === 'function' && getNpcAffinityNum('bell') >= 70) {
+      c.push({ text: '表決前夜，去找銅鐘', textEn: 'Visit Bell the night before the vote', action: () => loadNode('r3_bell_wall') });
+    }
     c.push({ text: '離開', textEn: 'Leave', action: () => loadNode(state.flags.r3BellQuest ? 'r3_look' : 'r3_council') });
     return c;
   })(), { label: L('銅鐘', 'Bronze Bell') });
@@ -987,6 +999,204 @@ registerNode('r3_bell_alliance_deep', () => {
         ], { label: L('深度同盟', 'Deep alliance') });
       }},
   ], { label: L('銅鐘的底牌', 'Bronze Bell\'s cards') });
+});
+
+// ═══════════════════════════════════════════════════
+//  Romance — 銅鐘 (Bronze Bell) C3 Route
+// ═══════════════════════════════════════════════════
+
+// --- r3_bell_tea: After alliance, Bell invites you for tea (rare gesture) ---
+registerNode('r3_bell_tea', () => {
+  state.flags.r3BellTea = true;
+  addNpcAffinity('bell', 5);
+  autoExplore([
+    { tag: '感知', tagColor: 'tag-sense',
+      text: L('你準備離開的時候，銅鐘忽然說了一句：「等等。」',
+             'As you turn to leave, Bronze Bell suddenly says: "Wait."'),
+      delay: 2200 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('她打開桌角一個小木盒，裡面是茶葉——在地底，這比金幣還稀罕。',
+             'She opens a small wooden box at the corner of her desk. Inside is tea — underground, rarer than gold coins.'),
+      delay: 2800 },
+    { art: npcPortrait.art('bell', { subtitle: L('……坐', '...Sit') }) || '<pre class="ascii-art">\n    ·˚· 銅鐘 — 茶 ·˚·\n        ╱═══╲\n       │ ─  ─ │\n       │  ─   │\n        ╲═══╱\n      ┌─┤    ├─┐\n      │ │ ☕ │ │\n      └─┤    ├─┘\n</pre>', artEn: npcPortrait.art('bell', { subtitle: '...Sit' }) || '<pre class="ascii-art">\n    ·˚· Bell — Tea ·˚·\n        ╱═══╲\n       │ ─  ─ │\n       │  ─   │\n        ╲═══╱\n      ┌─┤    ├─┐\n      │ │ ☕ │ │\n      └─┤    ├─┘\n</pre>', delay: 800 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「只是因為你有用。」她倒茶的時候說，沒有看你。但她倒了兩杯——大小一模一樣。',
+             '"Just because you\'re useful." She says while pouring, not looking at you. But she pours two cups — exactly the same size.'),
+      delay: 3000 },
+    { tag: '感知', tagColor: 'tag-sense',
+      text: L('茶的溫度透過陶杯傳到掌心。你想起來了——在深淵裡，「有用」就是銅鐘最高的肯定。',
+             'The warmth seeps through the clay cup into your palm. You realize — underground, "useful" is Bronze Bell\'s highest praise.'),
+      delay: 3000 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「你是第一個在這間辦公室喝茶的外人。」她啜了一口。「……也許是最後一個。表決之後，這張桌子也許就不是我的了。」',
+             '"You\'re the first outsider to drink tea in this office." She takes a sip. "...Perhaps the last. After the vote, this desk may no longer be mine."'),
+      delay: 3500 },
+    { tag: '感知', tagColor: 'tag-sense',
+      text: L('你們沉默地喝完了一杯茶。辦公室裡只有茶水和燭火的聲音。這也許是你在深淵裡最安靜的時刻。',
+             'You finish the tea in silence. Only the sounds of liquid and candlelight in the office. Perhaps the quietest moment you\'ve had in the abyss.'),
+      delay: 3000 },
+    { tag: '效果', tagColor: 'tag-system',
+      text: L('銅鐘好感 ↑ | HP +8', 'Bronze Bell bond ↑ | HP +8'),
+      delay: 1500, effect: () => { changeHp(8); } },
+  ], [
+    { text: '返回', textEn: 'Back', action: () => loadNode('r3_council') },
+  ], { label: L('一杯茶', 'A cup of tea') });
+});
+
+// --- r3_bell_hand: Massaging Bell's petrified hand (affinity >= 50) ---
+registerNode('r3_bell_hand', () => {
+  state.flags.r3BellHand = true;
+  addNpcAffinity('bell', 10);
+  autoExplore([
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('銅鐘的動作頓了一下。她下意識把右手藏到桌子底下。',
+             'Bronze Bell\'s movements falter. She instinctively hides her right hand under the desk.'),
+      delay: 2500 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「不關你的事。」她說。但她的聲音沒有平時那麼硬。',
+             '"None of your concern." she says. But her voice lacks its usual edge.'),
+      delay: 2500 },
+  ], [
+    { text: '讓我看看', textEn: 'Let me see',
+      action: () => {
+        addNpcAffinity('bell', 5);
+        autoExplore([
+          { tag: '行動', tagColor: 'tag-move',
+            text: L('你伸出手，等著。沒有去拉她。只是等。',
+                   'You hold out your hand. Not pulling. Just waiting.'),
+            delay: 2500 },
+          { tag: '感知', tagColor: 'tag-sense',
+            text: L('十秒。二十秒。銅鐘咬了一下嘴唇。然後，慢慢地，把石化的右手放到了你的掌心上。',
+                   'Ten seconds. Twenty. Bronze Bell bites her lip. Then, slowly, places her petrified right hand in your palm.'),
+            delay: 3200 },
+          { art: npcPortrait.art('bell', { subtitle: L('……痛', '...hurts') }) || '<pre class="ascii-art">\n     你的手     銅鐘的手\n     ╱───╲      ╱▓▓▓╲\n    │·····│────│░▓▓▓░│\n    │·····│    │▓████▓│\n     ╲───╱      ╲▓▓▓╱\n      溫暖        冰冷\n      柔軟        堅硬\n</pre>', artEn: npcPortrait.art('bell', { subtitle: '...hurts' }) || '<pre class="ascii-art">\n     Your hand   Bell\'s hand\n     ╱───╲       ╱▓▓▓╲\n    │·····│─────│░▓▓▓░│\n    │·····│     │▓████▓│\n     ╲───╱       ╲▓▓▓╱\n      Warm        Cold\n      Soft        Hard\n</pre>', delay: 800 },
+          { tag: '感知', tagColor: 'tag-sense',
+            text: L('她的手指冰涼而堅硬——石化的部分像大理石一樣光滑。但在石紋的裂縫裡，你能感覺到微弱的脈搏。她的手還沒有完全死去。',
+                   'Her fingers are cold and rigid — the petrified parts smooth as marble. But in the cracks between stone veins, you feel a faint pulse. Her hand isn\'t completely dead.'),
+            delay: 3500 },
+          { tag: '行動', tagColor: 'tag-move',
+            text: L('你用拇指沿著石紋的邊緣輕輕按壓。銅鐘倒吸了一口氣——不是疼痛，是太久沒有人碰過那隻手。',
+                   'You press your thumb gently along the edges of the stone veins. Bronze Bell draws a sharp breath — not pain. It\'s been too long since anyone touched that hand.'),
+            delay: 3200 },
+          { tag: '對話', tagColor: 'tag-npc',
+            text: L('「……你不覺得噁心嗎？」她問。聲音很輕，像是怕你聽到。「石化的手。半人半石。議會裡有人叫我石手鬼。」',
+                   '"...You\'re not disgusted?" she asks. Voice so quiet, as if afraid you\'d hear. "A petrified hand. Half-human, half-stone. Some on the Council call me the Stone-Hand Ghost."'),
+            delay: 3500 },
+          { tag: '行動', tagColor: 'tag-move',
+            text: L('你沒有回答。只是把她的石化手指一根根掰開，輕輕揉捏指節之間殘存的肌腱。',
+                   'You don\'t answer. You just gently pry open her stone fingers one by one, kneading the tendons that remain between the joints.'),
+            delay: 3000 },
+          { tag: '感知', tagColor: 'tag-sense',
+            text: L('銅鐘的呼吸慢慢變深了。她的肩膀放鬆下來。你注意到她的眼角有一點光——是燭火的反射。也許不只是燭火。',
+                   'Bronze Bell\'s breathing slowly deepens. Her shoulders relax. You notice a glimmer at the corner of her eye — candlelight reflected. Perhaps not only candlelight.'),
+            delay: 3200 },
+          { tag: '對話', tagColor: 'tag-npc',
+            text: L('「夠了。」她抽回手。但速度很慢。「……明天如果我的手好一點，那不是因為你。」',
+                   '"Enough." She pulls her hand back. But slowly. "...If my hand feels better tomorrow, it\'s not because of you."'),
+            delay: 3000 },
+          { tag: '效果', tagColor: 'tag-system',
+            text: L('銅鐘好感 ↑↑ | HP +10 | 石化 -3', 'Bronze Bell bond ↑↑ | HP +10 | Petri -3'),
+            delay: 1500, effect: () => { changeHp(10); changePetri(-3); } },
+        ], [
+          { text: '返回', textEn: 'Back', action: () => loadNode('r3_council') },
+        ], { label: L('石化的手', 'The petrified hand') });
+      }},
+    { text: '好吧，不問了', textEn: 'Alright, I won\'t ask',
+      action: () => {
+        autoExplore([
+          { tag: '感知', tagColor: 'tag-sense',
+            text: L('銅鐘看了你一眼。她的表情裡有鬆了一口氣，也有一絲……失望？你不確定。',
+                   'Bronze Bell glances at you. Relief in her expression, but also a trace of... disappointment? You\'re not sure.'),
+            delay: 2500 },
+        ], [
+          { text: '返回', textEn: 'Back', action: () => loadNode('r3_council') },
+        ], { label: L('銅鐘', 'Bronze Bell') });
+      }},
+  ], { label: L('石化的手', 'The petrified hand') });
+});
+
+// --- r3_bell_wall: Night before the vote, Bell breaks down (affinity >= 70) ---
+registerNode('r3_bell_wall', () => {
+  state.flags.r3BellWall = true;
+  addNpcAffinity('bell', 8);
+  autoExplore([
+    { tag: '移動', tagColor: 'tag-move',
+      text: L('表決前夜。議會廳的走廊冷得像一條石棺。你找到銅鐘的時候，她站在走廊盡頭的窗口，看著河城的夜景。',
+             'The night before the vote. The Council hall corridor is cold as a stone coffin. You find Bronze Bell at the end of the corridor, standing by the window, watching the river city\'s night.'),
+      delay: 3200 },
+    { art: npcPortrait.art('bell', { subtitle: L('……', '...') }) || '<pre class="ascii-art">\n     ·˚· 走廊盡頭 ·˚·\n\n  ╔══════╗     ╱═══╲\n  ║ 河城 ║    │ ─  ─ │\n  ║ 夜景 ║    │  ─   │\n  ║ ···· ║     ╲═══╱\n  ║ ☆  ˚ ║   ╱│     │╲\n  ║  · ☆ ║  ╱ │     │ ╲\n  ╚══════╝    │     │\n     窗        銅鐘\n</pre>', artEn: npcPortrait.art('bell', { subtitle: '...' }) || '<pre class="ascii-art">\n     ·˚· End of corridor ·˚·\n\n  ╔══════╗     ╱═══╲\n  ║ River║    │ ─  ─ │\n  ║ City ║    │  ─   │\n  ║ Night║     ╲═══╱\n  ║ ☆  ˚ ║   ╱│     │╲\n  ║  · ☆ ║  ╱ │     │ ╲\n  ╚══════╝    │     │\n   Window     Bell\n</pre>', delay: 800 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「睡不著？」她沒回頭。語氣像在說公事。但她的石化右手垂在身側，微微發抖。',
+             '"Can\'t sleep?" She doesn\'t turn. Her tone is businesslike. But her petrified right hand hangs at her side, trembling slightly.'),
+      delay: 2800 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「明天要是輸了——」她停了一下。「不。我不會輸。我贏過更難的仗。」',
+             '"If we lose tomorrow —" She pauses. "No. I won\'t lose. I\'ve won harder battles."'),
+      delay: 2800 },
+    { tag: '感知', tagColor: 'tag-sense',
+      text: L('但她的聲音在最後一個字的時候碎了一下。很輕，輕到如果不是站在她身邊，你根本聽不到。',
+             'But her voice cracks on the last word. So faintly that if you weren\'t standing beside her, you\'d never hear it.'),
+      delay: 2800 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「……我好累。」',
+             '"...I\'m so tired."'),
+      delay: 2500 },
+    { tag: '感知', tagColor: 'tag-sense',
+      text: L('三個字。銅鐘在議會裡對抗鏽刃半年，在石化的疼痛裡咬牙半輩子，在黑暗中獨自撐起一個腐朽的制度——所有的重量，壓縮成三個字。',
+             'Three words. Half a year fighting Rust Blade in the Council, a lifetime gritting her teeth through petrification pain, holding up a rotting system alone in the dark — all that weight, compressed into three words.'),
+      delay: 3500 },
+  ], [
+    { text: '伸出手臂', textEn: 'Extend your arm',
+      action: () => {
+        addNpcAffinity('bell', 10);
+        autoExplore([
+          { tag: '行動', tagColor: 'tag-move',
+            text: L('你沒有說「辛苦了」或者「會沒事的」——這些話對銅鐘沒有用。你只是把手臂張開。',
+                   'You don\'t say "you\'ve worked hard" or "it\'ll be okay" — those words don\'t work on Bronze Bell. You simply open your arms.'),
+            delay: 2800 },
+          { tag: '感知', tagColor: 'tag-sense',
+            text: L('銅鐘看了你三秒。然後——她的頭靠上了你的肩膀。沒有擁抱。只是靠著。像一面牆終於承認自己需要另一面牆來支撐。',
+                   'Bronze Bell looks at you for three seconds. Then — her head leans onto your shoulder. No embrace. Just leaning. Like a wall finally admitting it needs another wall for support.'),
+            delay: 3500 },
+          { tag: '感知', tagColor: 'tag-sense',
+            text: L('她的頭髮蹭到你的脖子。有石化粉塵的冰涼，也有活人的體溫。你感覺她的呼吸在放慢——不是睡著，是終於不再逞強了。',
+                   'Her hair brushes your neck. The chill of petri-dust, and also the warmth of a living person. You feel her breathing slow — not sleeping, just finally letting go.'),
+            delay: 3200 },
+          { tag: '對話', tagColor: 'tag-npc',
+            text: L('「……只有今晚。」她小聲說。「明天我就要重新當銅鐘。」',
+                   '"...Only tonight." She whispers. "Tomorrow I have to be Bronze Bell again."'),
+            delay: 3000 },
+          { tag: '感知', tagColor: 'tag-sense',
+            text: L('你們就這樣站在走廊盡頭。窗外河城的燈火一盞盞熄滅。她沒有動。你也沒有動。有些東西不需要說出口——它已經在那裡了。',
+                   'You stand like that at the corridor\'s end. River city\'s lights go out one by one beyond the window. She doesn\'t move. Neither do you. Some things don\'t need to be spoken — they\'re already there.'),
+            delay: 3500 },
+          { tag: '效果', tagColor: 'tag-system',
+            text: L('銅鐘好感 ↑↑↑ | HP +15 | 石化 -5 | 意志 +1', 'Bronze Bell bond ↑↑↑ | HP +15 | Petri -5 | WIL +1'),
+            delay: 2000, effect: () => { changeHp(15); changePetri(-5); changeStat('wil', 1); } },
+        ], [
+          { text: '返回', textEn: 'Back', action: () => loadNode('r3_look') },
+        ], { label: L('走廊盡頭', 'End of corridor') });
+      }},
+    { text: '站在旁邊，不說話', textEn: 'Stand beside her, say nothing',
+      action: () => {
+        addNpcAffinity('bell', 5);
+        autoExplore([
+          { tag: '感知', tagColor: 'tag-sense',
+            text: L('你們並肩站在窗口。沒有對話，沒有接觸。只有兩個人共享同一段沉默。',
+                   'You stand side by side at the window. No words, no touch. Just two people sharing the same silence.'),
+            delay: 3000 },
+          { tag: '對話', tagColor: 'tag-npc',
+            text: L('過了很久，銅鐘深吸一口氣，像是把所有脆弱重新吞回去。「走吧。明天見。」',
+                   'After a long while, Bronze Bell draws a deep breath, swallowing all vulnerability back down. "Let\'s go. See you tomorrow."'),
+            delay: 2800 },
+          { tag: '效果', tagColor: 'tag-system',
+            text: L('銅鐘好感 ↑ | HP +8', 'Bronze Bell bond ↑ | HP +8'),
+            delay: 1500, effect: () => { changeHp(8); } },
+        ], [
+          { text: '返回', textEn: 'Back', action: () => loadNode('r3_look') },
+        ], { label: L('走廊盡頭', 'End of corridor') });
+      }},
+  ], { label: L('走廊盡頭', 'End of corridor') });
 });
 
 // ═══════════════════════════════════════════════════
@@ -2909,7 +3119,53 @@ registerNode('r3_boss', () => {
         state.flags.r3BossMethod = 'fight';
         loadNode('r3_vote');
       }, function() {
-        loadNode('r3_council');
+        // ── D4 YING SACRIFICE: If Ying is present, she shields your retreat ──
+        if (state.flags.r1YingCompanion && !state.flags.r3YingSacrifice) {
+          state.flags.r3YingSacrifice = true;
+          autoExplore([
+            { tag: '逃跑', tagColor: 'tag-warn',
+              text: L('你轉身逃跑——但鏽刃的劍已經劈了下來。你閉上眼睛，等著痛楚。',
+                     'You turn to flee — but Rust Blade\'s sword is already falling. You close your eyes, bracing for pain.'),
+              delay: 2500 },
+            { tag: '異變', tagColor: 'tag-petri',
+              text: L('痛楚沒有來。取而代之的是一個熟悉的聲音：「——不准碰他！」',
+                     'The pain doesn\'t come. Instead, a familiar voice: "— Don\'t touch ' + (state.sex === 'male' ? L('他', 'him') : L('她', 'her')) + '!"'),
+              delay: 2800 },
+            { art: npcPortrait.art('ying', { subtitle: L('護盾', 'Shield') }) || '<pre class="ascii-art cyan">\n    ·˚· 螢 ·˚·\n      ╱═══╲\n     │ ◦  ◦ │ ← 決絕\n     │  ──  │\n      ╲═══╱\n   ╱──┤█████├──╲\n       石化盾\n</pre>', artEn: npcPortrait.art('ying', { subtitle: 'Shield' }) || '<pre class="ascii-art cyan">\n    ·˚· Ying ·˚·\n      ╱═══╲\n     │ ◦  ◦ │ ← resolve\n     │  ──  │\n      ╲═══╱\n   ╱──┤█████├──╲\n     Petri-Shield\n</pre>', delay: 800 },
+            { tag: '感知', tagColor: 'tag-sense',
+              text: L('螢擋在了你面前。鏽刃的劍砍在了她舉起的手臂上——石化紋路從傷口像閃電一樣蔓延。',
+                     'Ying throws herself in front of you. Rust Blade\'s sword strikes her raised arm — petrification spreads from the wound like lightning.'),
+              delay: 3200 },
+            { tag: '石化', tagColor: 'tag-petri',
+              text: L('「走——快走！」螢的右臂已經完全石化了。她用左手把你推向走廊。她的臉上沒有恐懼——只有絕不讓你死在這裡的決心。',
+                     '"Go — now!" Ying\'s right arm is completely petrified. She pushes you toward the corridor with her left. No fear on her face — only the resolve that you will not die here.'),
+              delay: 3500 },
+            { tag: '感知', tagColor: 'tag-sense',
+              text: L('鏽刃收回了劍。他看著螢石化的手臂，嘴裡嘟囔了一句「不值得」，轉身走回了大門。',
+                     'Rust Blade withdraws his sword. He glances at Ying\'s petrified arm, mutters "not worth it," and turns back to the doors.'),
+              delay: 3000 },
+            { tag: '感知', tagColor: 'tag-sense',
+              text: L('你扶著螢退進走廊。她的右臂像一截灰色的木頭一樣垂著。石化紋路已經蔓延到了肩膀。',
+                     'You support Ying into the corridor. Her right arm hangs like a grey log. Petrification has spread to her shoulder.'),
+              delay: 3000 },
+            { tag: '對話', tagColor: 'tag-npc',
+              text: L('「……答應過我的。」她咬著牙笑了。「校對。你還欠我的。」',
+                     '"...You promised." She smiles through gritted teeth. "Proofreading. You still owe me."'),
+              delay: 3000,
+              effect: function() {
+                sfx.hurt();
+                state.mood = 'hurt';
+                renderStatus();
+              }},
+            { tag: '效果', tagColor: 'tag-system',
+              text: L('螢受了重傷。她的右臂永久石化了。但她活著。', 'Ying is gravely wounded. Her right arm is permanently petrified. But she\'s alive.'),
+              delay: 2500 },
+          ], [
+            { text: '回到安全的地方', textEn: 'Get to safety', action: () => loadNode('r3_council') },
+          ], { label: L('螢的犧牲', 'Ying\'s sacrifice') });
+        } else {
+          loadNode('r3_council');
+        }
       });
     }});
     if (state.agi >= 10) {
@@ -2977,6 +3233,19 @@ registerNode('r3_vote', () => {
   if (state.flags.r3YingRealReport) score += 3; // Ying's true report — powerful evidence
   if (state.flags.r3CraneDealDone) score += 2; // Grey Crane's supply donation proves trade value
   if (state.flags.ngPlus) score += 2; // NG+ past-life testimony bonus
+
+  // ── D4 Betrayal: Bell sells you out under pressure ──
+  // Triggers when: Bell allied but NOT deeply allied, AND score is weak (< 8)
+  // She fears losing her seat more than she values the alliance
+  var bellBetrayed = false;
+  if (state.flags.r3BellAlliance && !state.flags.r3BellAllianceDeep && score < 8) {
+    bellBetrayed = true;
+    state.flags.r3BellBetrayed = true;
+    // Bell hands your evidence to Rust Blade before the vote
+    score -= 3; // Lose the alliance bonus she brought
+    if (score < 0) score = 0;
+  }
+
   // Store score for ending determination
   state.flags.r3VoteScore = score;
 
@@ -3016,7 +3285,41 @@ registerNode('r3_vote', () => {
     { tag: '情報', tagColor: 'tag-info', text: '鉛錘敲了敲桌子：「快點說完。我還有一百把刀要打。」', textEn: 'Lead Hammer taps the table: "Make it quick. I have a hundred blades to forge."', delay: 2500 },
     { tag: '情報', tagColor: 'tag-info', text: '黑鰭瞇著眼看你：「一個石化了一半的外來者……有什麼資格在這裡說話？」', textEn: 'Black Fin narrows his eyes: "A half-petrified outsider... what right have you to speak here?"', delay: 2800 },
     { tag: '情報', tagColor: 'tag-info', text: '玉秤微微一笑，什麼也沒說。她在等你表現。', textEn: 'Jade Scale smiles faintly, saying nothing. She\'s waiting to see your performance.', delay: 2200 },
-  ], [
+  ].concat(bellBetrayed ? [
+    // ── D4 BETRAYAL SCENE ──
+    { tag: '異變', tagColor: 'tag-warn',
+      text: L('但在你開口之前——銅鐘站了起來。她沒有看你。',
+             'But before you can speak — Bronze Bell stands. She doesn\'t look at you.'),
+      delay: 2800 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「各位同僚——在這位外來者作證之前，我有一件事要先交代。」銅鐘的聲音很穩。太穩了。',
+             '"Colleagues — before this outsider testifies, I have something to disclose." Bronze Bell\'s voice is steady. Too steady.'),
+      delay: 3200 },
+    { tag: '感知', tagColor: 'tag-sense',
+      text: L('她從懷中取出一疊文件——你認出了那些。那是你交給她的瘟疫證據。',
+             'She produces a stack of documents — you recognize them. They\'re the plague evidence you gave her.'),
+      delay: 2800 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('「這份所謂的『瘟疫起源證據』——」銅鐘把文件遞給鏽刃。「來源不可靠。我建議議會不予採信。」',
+             '"This so-called \'plague origin evidence\' —" Bronze Bell hands the documents to Rust Blade. "The source is unreliable. I recommend the Council disregard it."'),
+      delay: 3500 },
+    { tag: '震驚', tagColor: 'tag-petri',
+      text: L('你的血液凝固了。銅鐘——你最信任的盟友——正在把你賣給鏽刃。',
+             'Your blood freezes. Bronze Bell — your most trusted ally — is selling you out to Rust Blade.'),
+      delay: 3000 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('銅鐘終於看了你一眼。她的琥珀色眼睛裡——有歉疚，有計算，有一種你從未見過的冰冷決斷。',
+             'Bronze Bell finally glances at you. In those amber eyes — guilt, calculation, and a cold resolve you\'ve never seen.'),
+      delay: 3200 },
+    { tag: '對話', tagColor: 'tag-npc',
+      text: L('她只對你說了一句，聲音輕到只有你聽得到：「對不起。但我不能讓議會倒台。」',
+             'She whispers one sentence, so quiet only you can hear: "I\'m sorry. But I can\'t let the Council fall."'),
+      delay: 3000 },
+    { tag: '感知', tagColor: 'tag-sense',
+      text: L('鏽刃接過文件，嘴角微微上揚。黑鰭哼了一聲。你手中的牌——少了最重要的一張。',
+             'Rust Blade takes the documents, lips curving slightly. Black Fin snorts. Your hand just lost its most important card.'),
+      delay: 3000 },
+  ] : []), [
     { text: '開始作證', textEn: 'Begin testimony', action: () => loadNode('r3_testimony') },
   ], { label: L('議會大廳', 'Council chamber') });
 });
