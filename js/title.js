@@ -211,17 +211,47 @@ document.querySelectorAll('.sex-btn').forEach(function(btn) {
   });
 });
 
+function _showAllocConfirm(remaining, onConfirm) {
+  var overlay = document.createElement('div');
+  overlay.className = 'save-overlay active';
+  overlay.style.zIndex = '600';
+  var dialog = document.createElement('div');
+  dialog.className = 'save-dialog';
+  dialog.innerHTML =
+    '<h3>' + L('未完成配點', 'Unallocated Points') + '</h3>' +
+    '<p style="color:#c8c8d0;font-size:.95rem;margin:12px 0 18px;line-height:1.6;">' +
+    L('你還有 <b style="color:#d4a843;">' + remaining + '</b> 點能力點數未分配。<br>確定要直接開始嗎？',
+      'You have <b style="color:#d4a843;">' + remaining + '</b> unallocated stat point(s).<br>Start anyway?') +
+    '</p>' +
+    '<div style="display:flex;gap:12px;justify-content:center;">' +
+    '<button class="save-action-btn" id="alloc-confirm-back" style="flex:1;">' + L('返回配點', 'Go Back') + '</button>' +
+    '<button class="save-action-btn save-close-btn" id="alloc-confirm-start" style="flex:1;">' + L('直接開始', 'Start') + '</button>' +
+    '</div>';
+  overlay.appendChild(dialog);
+  document.body.appendChild(overlay);
+  document.getElementById('alloc-confirm-back').addEventListener('click', function() {
+    document.body.removeChild(overlay);
+  });
+  document.getElementById('alloc-confirm-start').addEventListener('click', function() {
+    document.body.removeChild(overlay);
+    onConfirm();
+  });
+  overlay.addEventListener('click', function(e) {
+    if (e.target === overlay) document.body.removeChild(overlay);
+  });
+}
+
 function startGame() {
   // Warn if stat points not fully allocated
   var remaining = getTotalAllocPoints() - getAllocUsed();
   if (remaining > 0) {
-    var ok = confirm(L(
-      '你還有 ' + remaining + ' 點能力點數未分配。\n確定要直接開始嗎？',
-      'You have ' + remaining + ' unallocated stat point(s).\nAre you sure you want to start?'
-    ));
-    if (!ok) return;
+    _showAllocConfirm(remaining, _doStartGame);
+    return;
   }
+  _doStartGame();
+}
 
+function _doStartGame() {
   var nameInput = document.getElementById('name-input');
   var name = nameInput.value.trim() || L('無名旅者', 'Nameless Wanderer');
 
