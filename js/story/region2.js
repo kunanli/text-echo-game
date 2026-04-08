@@ -1136,6 +1136,8 @@ registerNode('r2_frost_soldier', () => {
     ╚═══════════════════════════════╝
 </pre>`, delay: 800 },
     { tag: '遭遇', tagColor: 'tag-explore',
+      art: npcPortrait.art('frost', { subtitle: L('營地首領', 'Camp Leader') }),
+      artEn: npcPortrait.art('frost', { subtitle: 'Camp Leader' }),
       text: L('他看到鐵霜從帳篷裡走出來，整個人僵住了。然後他的嘴唇開始顫抖。',
              'He sees Iron Frost emerge from her tent and freezes. Then his lips begin to tremble.'),
       delay: 2800 },
@@ -1180,6 +1182,8 @@ registerNode('r2_frost_letter', () => {
   state.flags.r2FrostLetter = true;
   autoExplore([
     { tag: '感知', tagColor: 'tag-sense',
+      art: npcPortrait.art('frost', { subtitle: L('營地首領', 'Camp Leader') }),
+      artEn: npcPortrait.art('frost', { subtitle: 'Camp Leader' }),
       text: L('你注意到鐵霜坐在帳篷角落，借著燭光在寫什麼。她石化的左手壓著紙角，右手握筆的姿勢異常認真。',
              'You notice Iron Frost sitting in a tent corner, writing by candlelight. Her petrified left hand holds the paper\'s edge, her right grips the pen with unusual care.'),
       delay: 3000 },

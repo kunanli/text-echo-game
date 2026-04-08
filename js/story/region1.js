@@ -1225,6 +1225,8 @@ registerNode('r1_zhou_memory', () => {
   state.flags.r1ZhouMemory = true;
   autoExplore([
     { tag: '對話', tagColor: 'tag-npc',
+      art: npcPortrait.art('zhou', { subtitle: L('倖存礦工', 'Survivor') }),
+      artEn: npcPortrait.art('zhou', { subtitle: 'Survivor' }),
       text: L('老周聽到你的問題，整個人僵住了。好一會兒，他才開口。',
              'Old Zhou stiffens at your question. A long silence before he speaks.'),
       delay: 2500 },
