@@ -36,11 +36,11 @@ var ENDING_FLAVOR = {
 
 // ── Rarity ──
 var RARITY_TIERS = [
-  { min: 85, zh: '傳說', en: 'LEGENDARY', color: '#d4a843', stars: 5 },
-  { min: 70, zh: '史詩', en: 'EPIC',      color: '#9a5ac8', stars: 4 },
-  { min: 55, zh: '稀有', en: 'RARE',      color: '#4a8ac8', stars: 3 },
-  { min: 40, zh: '精良', en: 'UNCOMMON',   color: '#4a9e4a', stars: 2 },
-  { min: 0,  zh: '普通', en: 'COMMON',     color: '#6a6a7a', stars: 1 },
+  { min: 120, zh: '傳說', en: 'LEGENDARY', color: '#d4a843', stars: 5 },
+  { min: 100, zh: '史詩', en: 'EPIC',      color: '#9a5ac8', stars: 4 },
+  { min: 80,  zh: '稀有', en: 'RARE',      color: '#4a8ac8', stars: 3 },
+  { min: 60,  zh: '精良', en: 'UNCOMMON',   color: '#4a9e4a', stars: 2 },
+  { min: 0,   zh: '普通', en: 'COMMON',     color: '#6a6a7a', stars: 1 },
 ];
 
 function getRarity(score) {
