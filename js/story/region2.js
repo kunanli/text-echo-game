@@ -219,7 +219,7 @@ registerNode('r2_look', () => {
     if (hasR2Explore) {
       c.push({ text: '探索採石場其他角落', textEn: 'Explore other corners of the quarry', action: () => loadNode('r2_explore') });
     }
-    c.push({ text: '巡邏採石場', textEn: 'Patrol the quarry', action: () => loadNode('r2_patrol') });
+    c.push({ text: '警戒搜索採石場', textEn: 'Search the quarry on alert', action: () => loadNode('r2_patrol') });
     c.push({ text: '返回石脈迴廊', textEn: 'Return to Vein Corridor', action: () => loadNode('r1_deep') });
     return c;
   })(), { label: L('觀察採石場', 'Surveying quarry') });
@@ -2936,9 +2936,9 @@ registerNode('r2_patrol', () => {
     { tag: '判斷', tagColor: 'tag-move', text: '採石場的怪物比迴廊更加兇猛。但你需要更多的戰鬥經驗來面對前方的挑戰。', textEn: 'Quarry monsters are fiercer than those in the corridor. But you need combat experience for the challenges ahead.', delay: 2200 },
     { tag: '感知', tagColor: 'tag-sense', text: '你握緊武器，踏入了採石台之間的暗影。', textEn: 'You grip your weapon and step into the shadows between quarry platforms.', delay: 2000 },
   ], [
-    { text: '開始巡邏', textEn: 'Begin patrol', action: () => startPatrol() },
+    { text: '開始探索', textEn: 'Begin exploring', action: () => startPatrol() },
     { text: '返回', textEn: 'Return', action: () => loadNode('r2_look') },
-  ], { label: L('準備巡邏', 'Preparing patrol') });
+  ], { label: L('準備探索', 'Preparing exploration') });
 });
 
 // ═══════════════════════════════════════════════════

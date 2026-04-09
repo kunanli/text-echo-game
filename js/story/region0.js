@@ -360,7 +360,7 @@ registerNode('r0_patrol', () => {
   ], [
     { text: '深入警戒搜索', textEn: 'Begin patrol sweep', action: () => startPatrol() },
     { text: '返回', textEn: 'Return', action: () => loadNode('r0_look') },
-  ], { label: L('準備巡邏', 'Preparing patrol') });
+  ], { label: L('準備探索', 'Preparing exploration') });
 });
 
 registerNode('r0_corpse', () => {
@@ -1133,14 +1133,28 @@ registerNode('r0_tunnel', () => {
       if (r === 'crit') {
         autoExplore([
           { tag: '大成功', tagColor: 'tag-move', text: '你如同幽靈般無聲移動——石蜥蜴毫無察覺！', textEn: 'You move like a ghost — the lizard notices nothing!', delay: 2000 },
-          { tag: '探索', tagColor: 'tag-explore', text: '你甚至在它身旁摸到了一件有用的東西。', textEn: 'You even find something useful beside it.', delay: 2000 },
-        ], [{ text: '繼續前進', textEn: 'Continue forward', action: () => { addItem(L('蜥蜴鱗片', 'Lizard Scale')); loadNode('r0_after_lizard'); } }]);
+          { tag: '探索', tagColor: 'tag-explore', text: '你甚至在它身旁摸到了一件有用的東西，但腳下的碎石終究引起了牠的警戒。', textEn: 'You even find something useful beside it — but loose gravel underfoot finally alerts it.', delay: 2200 },
+          { tag: '遭遇', tagColor: 'tag-combat', text: '石蜥蜴猛地轉過頭，紫色雙眼鎖定了你！', textEn: 'The lizard whips its head around — purple eyes lock onto you!', delay: 1800 },
+        ], [{ text: L('面對警覺的石蜥蜴', 'Face the alerted Stone Lizard'), textEn: 'Face the alerted Stone Lizard', action: () => {
+          addItem(L('蜥蜴鱗片', 'Lizard Scale'));
+          startCombat(
+            { name: lizardName, hp: 30, atkMin: 8, atkMax: 18, petriDmg: 6, xp: 15, desc: lizardDescShort },
+            () => { changeStat('str', 1); notify(L('力量 +1', 'STR +1')); loadNode('r0_after_lizard'); },
+            () => { changePetri(5); loadNode('r0_climb_check'); }
+          );
+        }}]);
       } else if (r === 'pass') {
         autoExplore([
           { tag: '潛行', tagColor: 'tag-move', text: '你壓低身體，沿著洞穴邊緣慢慢移動……', textEn: 'You crouch low, inching along the cave wall...', delay: 2000 },
-          { tag: '感知', tagColor: 'tag-sense', text: '石蜥蜴抬起頭嗅了嗅空氣……隨後又趴了下去。', textEn: 'The lizard lifts its head to sniff the air... then settles back down.', delay: 2500 },
-          { tag: '成功', tagColor: 'tag-explore', text: '你屏住呼吸，從它身後悄悄溜了過去！', textEn: 'Holding your breath, you slip past it silently!', delay: 1800 },
-        ], [{ text: '繼續前進', textEn: 'Continue forward', action: () => loadNode('r0_after_lizard') }]);
+          { tag: '感知', tagColor: 'tag-sense', text: '石蜥蜴抬起頭嗅了嗅空氣——然後慢慢轉向了你的方向。', textEn: 'The lizard lifts its head to sniff the air — then slowly turns toward you.', delay: 2500 },
+          { tag: '遭遇', tagColor: 'tag-combat', text: '潛行失敗！紫色的凝視穿透陰影，石蜥蜴發出低吼。', textEn: 'Stealth failed! The purple gaze pierces the shadows — the lizard lets out a low growl.', delay: 2000 },
+        ], [{ text: L('準備應戰', 'Ready for combat'), textEn: 'Ready for combat', action: () => {
+          startCombat(
+            { name: lizardName, hp: 30, atkMin: 8, atkMax: 18, petriDmg: 6, xp: 15, desc: lizardDescShort },
+            () => { changeStat('str', 1); notify(L('力量 +1', 'STR +1')); loadNode('r0_after_lizard'); },
+            () => { changePetri(5); loadNode('r0_climb_check'); }
+          );
+        }}]);
       } else {
         var dead = changePetri(4);
         if (!dead) dead = changeHp(-5);

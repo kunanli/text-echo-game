@@ -136,7 +136,7 @@ registerNode('r3_look', () => {
   autoExplore(steps, (function() {
     // First visit: mandatory patrol (passive event)
     if (!state.flags.r3PatrolCleared) {
-      return [{ text: L('進入河岸隧道巡邏……', 'Enter the river tunnels on patrol...'), textEn: 'Enter the river tunnels on patrol...', action: () => {
+      return [{ text: L('進入河岸隧道探索……', 'Explore the river tunnels...'), textEn: 'Explore the river tunnels...', action: () => {
         startPatrol({ firstVisit: true, onDiscovery: function() { stopPatrol(); },
           firstVisitEvents: [
             // Cycle 2: A dock guard is overwhelmed by mutants
@@ -232,7 +232,7 @@ registerNode('r3_look', () => {
           npcEvents.concat([{ text: '返回', textEn: 'Return', action: () => loadNode('r3_look') }]));
       }});
     }
-    c.push({ text: '巡邏（練級）', textEn: 'Patrol (grind)', action: () => loadNode('r3_patrol') });
+    c.push({ text: '深入河岸隧道探索', textEn: 'Venture into the riverbank tunnels', action: () => loadNode('r3_patrol') });
     c.push({ text: '返回上升通道', textEn: 'Return to ascent shaft', action: () => loadNode('r2_gate') });
     return c;
   })(), { label: L('河城渡口', 'River City Ferry') });
@@ -3041,9 +3041,9 @@ registerNode('r3_patrol', () => {
     { tag: '判斷', tagColor: 'tag-move', text: '渡口外圍的河岸隧道裡棲息著各種變異生物。城市的守衛不會巡邏到那裡。', textEn: 'Mutated creatures nest in the river tunnels beyond the docks. City guards don\'t patrol there.', delay: 2200 },
     { tag: '感知', tagColor: 'tag-sense', text: '你握緊武器，踏入了河岸隧道的陰暗深處。', textEn: 'You grip your weapon and step into the dark river tunnels.', delay: 2000 },
   ], [
-    { text: '開始巡邏', textEn: 'Begin patrol', action: () => startPatrol() },
+    { text: '開始探索', textEn: 'Begin exploring', action: () => startPatrol() },
     { text: '返回', textEn: 'Return', action: () => loadNode('r3_look') },
-  ], { label: L('準備巡邏', 'Preparing patrol') });
+  ], { label: L('準備探索', 'Preparing exploration') });
 });
 
 // ═══════════════════════════════════════════════════

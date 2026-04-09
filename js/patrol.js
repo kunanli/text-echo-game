@@ -566,7 +566,7 @@ var R0_EVENTS = [
           },
           { text: L('走開', 'Walk away'), textEn: 'Walk away',
             action: function() {
-              patrolAppend(L('巡邏','Patrol'), 'tag-move',
+              patrolAppend(L('探索','Explore'), 'tag-move',
                 L('你移開目光，繼續前進。身後傳來一聲極輕的嘆息——或者只是風聲。', 'You look away and move on. A faint sigh drifts from behind — or perhaps it\'s just the wind.'), false);
             }
           }
@@ -623,7 +623,7 @@ var R0_EVENTS = [
           },
           { text: L('不值得冒險', 'Not worth the risk'), textEn: 'Not worth the risk',
             action: function() {
-              patrolAppend(L('巡邏','Patrol'), 'tag-move',
+              patrolAppend(L('探索','Explore'), 'tag-move',
                 L('你記下了裂縫的位置，繼續前進。也許以後會回來。', 'You note the crack\'s location and move on. Perhaps you\'ll return.'), false);
             }
           }
@@ -703,7 +703,7 @@ var R0_EVENTS = [
                         var sb = document.createElement('button');
                         sb.className = 'choice-btn'; sb.textContent = L('停下腳步','Stop and rest');
                         sb.addEventListener('click', stopPatrol); $choices.appendChild(sb);
-                        patrolAppend(L('巡邏','Patrol'), 'tag-move',
+                        patrolAppend(L('探索','Explore'), 'tag-move',
                           L('你把吊墜放回她腳邊。轉身時，彷彿又聽見了極輕的哼唱。', 'You place the locket back. As you turn, you think you hear a faint hum once more.'), false);
                         patrolTimers.push(setTimeout(runPatrolCycle, 2000));
                       });
@@ -720,7 +720,7 @@ var R0_EVENTS = [
           { text: L('忽略它', 'Ignore it'), textEn: 'Ignore it',
             pauseQueue: true,
             action: function() {
-              patrolAppend(L('巡邏','Patrol'), 'tag-move',
+              patrolAppend(L('探索','Explore'), 'tag-move',
                 L('你捂住耳朵，加快腳步離開。有些聲音不該去追。', 'You cover your ears and quicken your pace. Some sounds are best left unfollowed.'), false);
               patrolTimers.push(setTimeout(runPatrolCycle, 2000));
             }
@@ -795,7 +795,7 @@ var R1_EVENTS = [
           },
           { text: L('不理牠', 'Ignore it'), textEn: 'Ignore it',
             action: function() {
-              patrolAppend(L('巡邏','Patrol'), 'tag-move',
+              patrolAppend(L('探索','Explore'), 'tag-move',
                 L('你沒有停下腳步。小貓在你身後叫了兩聲，然後消失在陰影裡。', 'You don\'t stop. The cat calls twice behind you, then vanishes into shadow.'), false);
             }
           }
@@ -946,7 +946,7 @@ var R1_EVENTS = [
           },
           { text: L('離開，不看', 'Walk away — don\'t look'), textEn: 'Walk away — don\'t look',
             action: function() {
-              patrolAppend(L('巡邏','Patrol'), 'tag-move',
+              patrolAppend(L('探索','Explore'), 'tag-move',
                 L('你沒有看鏡子。有些真相，知道得太早並不是好事。', 'You leave the mirror alone. Some truths are best left unknown.'), false);
             }
           }
@@ -1026,7 +1026,7 @@ var R2_EVENTS = [
           },
           { text: L('不碰它', 'Leave it alone'), textEn: 'Leave it alone',
             action: function() {
-              patrolAppend(L('巡邏','Patrol'), 'tag-move',
+              patrolAppend(L('探索','Explore'), 'tag-move',
                 L('你離開了販賣機。幾百年前的東西，誰知道裡面還裝著什麼。', 'You leave the machine. Who knows what\'s been sitting inside for centuries.'), false);
             }
           }
@@ -1108,7 +1108,7 @@ var R2_EVENTS = [
           },
           { text: L('不信任他，離開', 'Don\'t trust him — leave'), textEn: 'Don\'t trust him — leave',
             action: function() {
-              patrolAppend(L('巡邏','Patrol'), 'tag-move',
+              patrolAppend(L('探索','Explore'), 'tag-move',
                 L('你遠遠繞開了營火。在深淵裡，陌生人的善意可能是最危險的東西。', 'You give the fire a wide berth. In the abyss, a stranger\'s kindness may be the most dangerous thing of all.'), false);
             }
           }
@@ -1265,7 +1265,7 @@ var R3_EVENTS = [
           },
           { text: L('搖頭離開', 'Shake your head and leave'), textEn: 'Shake your head and leave',
             action: function() {
-              patrolAppend(L('巡邏','Patrol'), 'tag-move',
+              patrolAppend(L('探索','Explore'), 'tag-move',
                 L('你擺了擺手，繼續巡邏。身後傳來嘲弄的口哨聲。', 'You wave them off and move on. A mocking whistle trails behind you.'), false);
             }
           }
@@ -1330,7 +1330,7 @@ var R3_EVENTS = [
           },
           { text: L('假裝沒看到', 'Pretend you didn\'t see'), textEn: 'Pretend you didn\'t see',
             action: function() {
-              patrolAppend(L('巡邏','Patrol'), 'tag-move',
+              patrolAppend(L('探索','Explore'), 'tag-move',
                 L('你移開視線，繼續走你的路。河城的規矩不關你的事。', 'You look away and continue on your path. River Port\'s rules aren\'t your concern.'), false);
             }
           }
@@ -1418,7 +1418,7 @@ var R3_EVENTS = [
           },
           { text: L('丟掉它', 'Discard it'), textEn: 'Discard it',
             action: function() {
-              patrolAppend(L('巡邏','Patrol'), 'tag-move',
+              patrolAppend(L('探索','Explore'), 'tag-move',
                 L('你把信扔進了路邊的火盆。匿名信從來不是好東西。', 'You toss the letter into a roadside brazier. Anonymous letters are never good news.'), false);
             }
           }
@@ -1511,7 +1511,7 @@ function startPatrol(opts) {
   ambientAudio.setCombat(true);
   renderStatus();
   appendDivider();
-  showExploreBar(L('警戒巡邏中', 'Patrolling'));
+  showExploreBar(L('警戒探索中', 'Exploring'));
   autoClockTimer = setInterval(function() {
     autoElapsed += 200;
     updateExploreTimer();
@@ -1590,7 +1590,7 @@ function runNarrativeEvent(evt) {
   // 1-2 patrol flavor lines (same as combat preamble)
   var patrolPool = getPatrolTexts();
   var p = patrolPool[rng(0, patrolPool.length - 1)];
-  queue.push({ tag: L('巡邏','Patrol'), color: 'tag-move',
+  queue.push({ tag: L('探索','Explore'), color: 'tag-move',
     text: L(p.text, p.textEn), delay: rng(1500, 2300) });
 
   // Event builds its own steps into the queue
@@ -1725,7 +1725,7 @@ function showPatrolDiscovery() {
 
   var btnContinue = document.createElement('button');
   btnContinue.className = 'choice-btn';
-  btnContinue.textContent = L('繼續巡邏', 'Continue patrolling');
+  btnContinue.textContent = L('繼續探索', 'Continue exploring');
   btnContinue.addEventListener('click', function() {
     sfx.click();
     // Mark cleared but continue patrolling — now show stop button
@@ -1804,7 +1804,7 @@ function runPatrolCycleManual(monster) {
     var idx; do { idx = rng(0, patrolPool.length - 1); } while (used.indexOf(idx) !== -1);
     used.push(idx);
     var p = patrolPool[idx];
-    queue.push({ tag: L('巡邏','Patrol'), color: 'tag-move', text: L(p.text, p.textEn), delay: rng(1500, 2300) });
+    queue.push({ tag: L('探索','Explore'), color: 'tag-move', text: L(p.text, p.textEn), delay: rng(1500, 2300) });
   }
 
   // Suspense line — tension build-up before encounter
@@ -1891,7 +1891,7 @@ function runPatrolCycleManual(monster) {
         state.mood = 'combat';
         ambientAudio.setCombat(true);
         appendDivider();
-        showExploreBar(L('警戒巡邏中', 'Patrolling'));
+        showExploreBar(L('警戒探索中', 'Exploring'));
         if (!autoClockTimer) {
           autoClockTimer = setInterval(function() {
             autoElapsed += 200;
@@ -1981,7 +1981,7 @@ function runPatrolCycleAuto(monster) {
     var idx; do { idx = rng(0, patrolPool.length - 1); } while (used.indexOf(idx) !== -1);
     used.push(idx);
     var p = patrolPool[idx];
-    queue.push({ tag: L('巡邏','Patrol'), color: 'tag-move', text: L(p.text, p.textEn), delay: rng(1500, 2300) });
+    queue.push({ tag: L('探索','Explore'), color: 'tag-move', text: L(p.text, p.textEn), delay: rng(1500, 2300) });
   }
 
   // Suspense line
@@ -2053,8 +2053,8 @@ function runPatrolCycleAuto(monster) {
   });
 
   // Continue text
-  queue.push({ tag: L('巡邏','Patrol'), color: 'tag-move',
-    text: L('繼續巡邏……', 'Continuing patrol...'), delay: 2200 });
+  queue.push({ tag: L('探索','Explore'), color: 'tag-move',
+    text: L('繼續探索……', 'Continuing exploration...'), delay: 2200 });
 
   // Process queue sequentially with pending indicators
   var qi = 0;

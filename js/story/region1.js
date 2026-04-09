@@ -257,7 +257,7 @@ registerNode('r1_look', () => {
     if (hasR1Explore) {
       c.push({ text: '探索迴廊周邊的側道', textEn: 'Explore side passages around the corridor', action: () => loadNode('r1_explore') });
     }
-    c.push({ text: '在迴廊中巡邏練級', textEn: 'Patrol the corridor for experience', action: () => loadNode('r1_patrol') });
+    c.push({ text: '在迴廊中警戒探索', textEn: 'Explore the corridor on alert', action: () => loadNode('r1_patrol') });
     return c;
   })(), { label: L('觀察迴廊', 'Surveying corridor') });
 });
@@ -2400,9 +2400,9 @@ registerNode('r1_patrol', () => {
     { tag: '判斷', tagColor: 'tag-move', text: '迴廊中的怪物比坑底更強，但也能提供更好的戰鬥經驗。', textEn: 'Corridor monsters are tougher, but offer better combat experience.', delay: 2000 },
     { tag: '感知', tagColor: 'tag-sense', text: '你握緊武器，沿著礦脈的冷光前進。', textEn: 'You grip your weapon and advance by the cold glow of ore veins.', delay: 2000 },
   ], [
-    { text: '開始巡邏', textEn: 'Begin patrol', action: () => startPatrol() },
+    { text: '開始探索', textEn: 'Begin exploring', action: () => startPatrol() },
     { text: '返回', textEn: 'Return', action: () => loadNode('r1_look') },
-  ], { label: L('準備巡邏', 'Preparing patrol') });
+  ], { label: L('準備探索', 'Preparing exploration') });
 });
 
 // ── Minecart Track ──
