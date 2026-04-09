@@ -467,6 +467,21 @@
     outline: 2px solid #d4a843;
     outline-offset: 2px;
   }
+  /* Visited choices: dim + grayscale to show "you've been there before" */
+  .choice-btn.visited {
+    opacity: 0.55;
+    filter: grayscale(0.7);
+    color: #7a7a85;
+  }
+  .choice-btn.visited .key-hint {
+    color: #7a6a3a;
+    border-color: #2a2a3a;
+  }
+  .choice-btn.visited:hover, .choice-btn.visited:focus {
+    opacity: 0.95;
+    filter: grayscale(0.2);
+    color: #d8d8e0;
+  }
   .choice-btn .key-hint {
     display: inline-block;
     width: 26px; height: 26px;

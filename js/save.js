@@ -23,6 +23,7 @@ function saveGame() {
       maxRegion: state.maxRegion || state.region,
       node: state.node,
       flags: JSON.parse(JSON.stringify(state.flags)),
+      visitedNodes: state.visitedNodes ? JSON.parse(JSON.stringify(state.visitedNodes)) : {},
       deathCount: state.deathCount,
       lang: state.lang,
       mood: state.mood,
@@ -59,6 +60,7 @@ function loadSave() {
     state.maxRegion = data.maxRegion || data.region || 0;
     state.node = data.node || 'r0_start';
     state.flags = data.flags || {};
+    state.visitedNodes = data.visitedNodes || {};
     state.deathCount = data.deathCount || 0;
     state.lang = data.lang || 'zh';
     state.mood = data.mood || 'normal';

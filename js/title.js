@@ -268,6 +268,7 @@ function _doStartGame() {
   state.region = 0;
   state.node = 'start';
   state.flags = {};
+  state.visitedNodes = {};
   state.deathCount = 0;
   state.mood = 'normal';
 

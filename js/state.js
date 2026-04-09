@@ -14,6 +14,7 @@ const state = {
   maxRegion: 0,      // 到達過的最高區域（章節跳轉不會降低此值）
   node: 'start',
   flags: {},
+  visitedNodes: {},      // node IDs the player has loaded — used to grey out repeat choices
   skills: [],            // unlocked combat skill IDs (NG+ only)
   romance: null,         // current romance NPC id ('ying'|'crane'|'bell'|'cheng'|null)
   deathCount: 0,

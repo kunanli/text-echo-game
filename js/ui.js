@@ -202,12 +202,27 @@ function renderScene(text, choices) {
   }, 500);
 }
 
+// Extract loadNode('xxx') target from a choice action for visited-state highlighting.
+function _extractLoadNodeTarget(fn) {
+  if (typeof fn !== 'function') return null;
+  try {
+    var src = fn.toString();
+    var m = src.match(/loadNode\(\s*['"]([^'"]+)['"]\s*\)/);
+    return m ? m[1] : null;
+  } catch (e) { return null; }
+}
+
 function showChoices(choices) {
   $choices.innerHTML = '';
   var keys = ['A','B','C','D','E','F','G','H','I','J'];
   choices.forEach(function(c, i) {
     var btn = document.createElement('button');
     btn.className = 'choice-btn';
+    // Greyscale visited choices: if action navigates to a node we've already loaded, dim it
+    var target = _extractLoadNodeTarget(c.action);
+    if (target && state.visitedNodes && state.visitedNodes[target]) {
+      btn.classList.add('visited');
+    }
     var choiceLabel = c.label ? c.label : ((state.lang === 'en' && c.textEn) ? c.textEn : c.text);
     btn.innerHTML = '<span class="key-hint">' + keys[i] + '</span><span>' + choiceLabel + '</span>';
     btn.addEventListener('click', function() { selectChoice(i); });
