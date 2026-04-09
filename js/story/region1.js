@@ -233,6 +233,22 @@ registerNode('r1_look', () => {
     if (state.flags.r1ForgeVisited && state.flags.r1GuardDefeated) {
       c.push({ text: '沿鐵軌深入迴廊', textEn: 'Follow the rails deeper', action: () => loadNode('r1_deep') });
     }
+    // Sub-hub: optional exploration nodes
+    var hasR1Explore = !state.flags.r1MinecartDone || !state.flags.r1RiverDone
+      || !state.flags.r1CollapseDone || !state.flags.r1ShrineDone
+      || !state.flags.r1VeinDeepDone || !state.flags.r1GhostDone;
+    if (hasR1Explore) {
+      c.push({ text: '探索迴廊周邊的側道', textEn: 'Explore side passages around the corridor', action: () => loadNode('r1_explore') });
+    }
+    c.push({ text: '在迴廊中巡邏練級', textEn: 'Patrol the corridor for experience', action: () => loadNode('r1_patrol') });
+    return c;
+  })(), { label: L('觀察迴廊', 'Surveying corridor') });
+});
+
+// ── R1 Sub-hub: optional exploration ──
+registerNode('r1_explore', () => {
+  renderScene(L('你環顧迴廊四周，那些被忽略的側道似乎還藏著什麼。', 'You look around the corridor — overlooked side passages seem to hide more.'), (function() {
+    var c = [];
     if (!state.flags.r1MinecartDone) {
       c.push({ text: '查看廢棄礦車軌道', textEn: 'Check the abandoned mine cart track', action: () => loadNode('r1_minecart') });
     }
@@ -251,9 +267,9 @@ registerNode('r1_look', () => {
     if (!state.flags.r1GhostDone) {
       c.push({ text: '靠近那個半透明的身影', textEn: 'Approach the translucent figure', action: () => loadNode('r1_ghost') });
     }
-    c.push({ text: '在迴廊中巡邏練級', textEn: 'Patrol the corridor for experience', action: () => loadNode('r1_patrol') });
+    c.push({ text: '返回', textEn: 'Return', action: () => loadNode('r1_look') });
     return c;
-  })(), { label: L('觀察迴廊', 'Surveying corridor') });
+  })());
 });
 
 // ── Forge Room ──

@@ -65,7 +65,7 @@ assets/
 - **HTML 內容**：部分步驟用 `html`/`htmlEn` 取代 `text`/`textEn`，支援粗體等標記
 - **CSS 命名**：用 `.tag-xxx` 管理標籤顏色（tag-combat, tag-info, tag-sense, tag-system, tag-warn, tag-petri 等）
 - **雙語必備**：所有面向玩家的文字都必須同時提供 `zh` 和 `en` 版本
-- **版本號**：每次 push 前必須更新 `index.html` 中的版本號（`<div id="title-version">v2.3.2</div>`，約第 68 行）。版本遞增規則：新功能或劇情 → minor 版本 +0.1，bug fix / 文字修正 → patch 加後綴（如 v2.3.2）
+- **版本號**：每次 push 前必須更新 `index.html` 中的版本號（`<div id="title-version">v2.3.3</div>`，約第 68 行）。版本遞增規則：新功能或劇情 → minor 版本 +0.1，bug fix / 文字修正 → patch 加後綴（如 v2.3.3）
 
 ## 目前狀態
 
@@ -113,6 +113,10 @@ assets/
 - 標題畫面 UI 重構（v2.3.2）：語言選擇移至 splash 首頁（附呼吸動畫提示文字），功能按鈕（繼續/章節/NG+/排行榜）改為緊湊橫排放在分隔線下方；NG+ 按鈕點擊後 selected 狀態提示選語言
 - 角色創建強制配點（v2.3.2）：`startGame()` 驗證剩餘點數 > 0 時阻止開始，顯示 toast 通知
 - 結局卡評分系統大改（v2.3.2）：`calculateEndScore()` 新增裝備/NPC支線/戀人/好感度/技能/NG+周目/探索深度計分；稀有度門檻大幅提升（傳說 180+、史詩 140+、稀有 105+、精良 75+），詳見下方「結局卡片重製」
+- 巡邏改為手動戰鬥（v2.3.3）：`patrol.js` 的 auto-combat 改用 `startCombat()`，玩家可手動選擇攻擊/觀察/交流/逃跑，大幅降低初期死亡率
+- 早期補給擴充（v2.3.3）：R0 `r0_corpse` 新增「急救草藥」道具（HP +15），緩解初期難度
+- 中樞節點選項精簡（v2.3.3）：R0-R3 的 `rN_look` 主中樞節點引入 sub-hub 模式，將 5-6 個可選探索分流到 `rN_explore` 子中樞，主中樞選項數從 10-20 降至 6-10（符合 A-J 鍵盤快捷鍵上限）
+- R3 NPC 事件合併（v2.3.3）：短暫 NPC 事件提示（老周喝酒、螢/銅鐘爭吵）合併為單一「朋友們有事找你 (N)」入口，避免中樞選項爆炸
 
 ## ✅ 已完成：NPC 好感度系統（v2.2，npc.js）
 

@@ -1780,53 +1780,8 @@ function runPatrolCycle() {
 
   var monsters = getPatrolMonsters();
   var monster = monsters[rng(0, monsters.length - 1)];
-  var mName = L(monster.name, monster.nameEn);
 
-  // NG+ scaling
-  var scaled = scaleEnemyNgPlus(monster);
-  var mHpMax = scaled.hp;
-  var mAtkMin = scaled.atkMin;
-  var mAtkMax = scaled.atkMax;
-  var mPetriDmg = scaled.petriDmg;
-  var mXpBase = scaled.xp;
-
-  // Pre-simulate combat
-  var mHp = mHpMax;
-  var totalDmg = 0, totalPetri = 0, rounds = 0;
-  var combatLog = [];
-  var effStr = effectiveStat('str');
-  var mercy = (typeof getMercyReduction === 'function') ? getMercyReduction() : 0;
-  while (mHp > 0 && rounds < 12) {
-    rounds++;
-    var pAtk = rng(Math.max(1, effStr), effStr + 4);
-    var mAtk = rng(mAtkMin, mAtkMax);
-    if (mercy > 0) mAtk = Math.max(1, Math.floor(mAtk * (1 - mercy)));
-    mHp -= pAtk;
-    totalDmg += mAtk;
-    totalPetri += mPetriDmg;
-
-    var av = ATK_VERBS[rng(0, ATK_VERBS.length - 1)];
-    var cv = COUNTER_VERBS[rng(0, COUNTER_VERBS.length - 1)];
-
-    if (mHp <= 0) {
-      var dv = DEFEAT_VERBS[rng(0, DEFEAT_VERBS.length - 1)];
-      combatLog.push({ who: 'player', text: L(
-        av.zh + '造成 ' + pAtk + ' 傷害' + dv.zh + monster.name + '！',
-        av.en + pAtk + ' dmg' + dv.en + monster.nameEn + ' defeated!'
-      )});
-    } else {
-      combatLog.push({ who: 'player', text: L(
-        av.zh + '造成 ' + pAtk + ' 傷害。',
-        av.en + pAtk + ' dmg.'
-      )});
-      combatLog.push({ who: 'enemy', text: L(
-        monster.name + cv.zh + ' 受到 ' + mAtk + ' 傷害。',
-        monster.nameEn + ' ' + cv.en + ' Take ' + mAtk + ' dmg.'
-      )});
-    }
-  }
-
-  // Build timed queue
+  // Build timed queue (narrative preamble only — combat itself is now manual)
   var queue = [];
 
   // 2-3 patrol exploration lines
@@ -1849,78 +1804,38 @@ function runPatrolCycle() {
 
   // Encounter announcement
   queue.push({ tag: L('遭遇','Encounter'), color: 'tag-combat',
-    html: L('一隻<b>' + monster.name + '</b>出現了！進入戰鬥！',
-            'A <b>' + monster.nameEn + '</b> appears! Entering combat!'),
-    delay: 1800, sfx: 'click' });
+    html: L('一隻<b>' + monster.name + '</b>出現了！',
+            'A <b>' + monster.nameEn + '</b> appears!'),
+    delay: 1600, sfx: 'click' });
 
-  // Combat rounds (with dramatic pacing — player and enemy on separate lines)
-  for (var i = 0; i < combatLog.length; i++) {
-    var entry = combatLog[i];
-    var isLast = (i === combatLog.length - 1);
-    var tag = entry.who === 'enemy' ? L('反擊','Counter') : L('戰鬥','Battle');
-    var color = entry.who === 'enemy' ? 'tag-warn' : 'tag-combat';
-    var d = entry.who === 'enemy' ? rng(1200, 1800) : (isLast ? rng(2000, 2800) : rng(1500, 2200));
-    var entrySfx = entry.who === 'player' ? 'hit' : 'hurt';
-    queue.push({ tag: tag, color: color, text: entry.text,
-      delay: d, pending: entry.who === 'player', sfx: entrySfx });
-  }
-
-  // NPC Patrol Aid — roll for ally assistance
+  // NPC Patrol Aid — roll for ally assistance (now a pre-combat heal buff only)
   var npcAid = (typeof rollPatrolAid === 'function') ? rollPatrolAid() : null;
   if (npcAid) {
-    // Build modified result
     var aidResult = { dmgMult: 1, petriMult: 1, bonusDmg: 0, healHp: 0 };
     npcAid.apply(aidResult);
-    totalDmg = Math.max(0, Math.floor(totalDmg * aidResult.dmgMult));
-    totalPetri = Math.max(0, Math.floor(totalPetri * aidResult.petriMult));
-    if (aidResult.bonusDmg > 0) {
-      // Extra damage shortens fight — just narrate it
-    }
     var aidName = L(npcAid.name, npcAid.nameEn);
     queue.push({ tag: L('援助','ALLY'), color: 'tag-info',
       text: npcAid.text,
-      delay: 2200, pending: true });
-    // Heal effect if present
+      delay: 2000, pending: true });
     if (aidResult.healHp > 0) {
       var healAmt = aidResult.healHp;
       queue.push({ tag: L('恢復','Heal'), color: 'tag-item',
         text: L(aidName + ' 為你治療了 ' + healAmt + ' HP。',
                 aidName + ' heals you for ' + healAmt + ' HP.'),
-        delay: 1400,
+        delay: 1200,
         sfx: 'item',
-        effect: function() { changeHp(healAmt); renderStatus(); }
+        effect: (function(amt) { return function() { changeHp(amt); renderStatus(); }; })(healAmt)
       });
     }
   }
 
-  // Result + apply effects
-  var mXp = mXpBase + rng(0, 2);
-  queue.push({ tag: L('結果','Result'), color: 'tag-item',
-    text: L('勝利！ HP -' + totalDmg + '  石化 +' + totalPetri + '%  經驗 +' + mXp
-            + (npcAid ? '  (' + L(npcAid.name, npcAid.nameEn) + L('的援助！', '\'s aid!') + ')' : ''),
-            'Victory! HP -' + totalDmg + '  Petri +' + totalPetri + '%  XP +' + mXp
-            + (npcAid ? '  (' + L(npcAid.name, npcAid.nameEn) + L('的援助！', '\'s aid!') + ')' : '')),
-    delay: 2000,
-    pending: true,
-    sfx: 'pass',
-    effect: function() {
-      changeHp(-totalDmg);
-      if (totalPetri > 0) { changePetri(totalPetri); sfx.petri(); }
-      gainXp(mXp);
-      renderStatus();
-    }
-  });
-
-  // Continue text
-  queue.push({ tag: L('巡邏','Patrol'), color: 'tag-move',
-    text: L('繼續巡邏……', 'Continuing patrol...'), delay: 2200 });
-
-  // Process queue sequentially with pending indicators for tension
+  // Process queue sequentially, then hand control to manual combat
   var qi = 0;
   function processNext() {
     if (!patrolActive) return;
     if (qi >= queue.length) {
-      patrolTimers.push(setTimeout(runPatrolCycle, 500));
+      // Preamble done — engage manual combat
+      beginManualCombat();
       return;
     }
     var step = queue[qi++];
@@ -1957,5 +1872,53 @@ function runPatrolCycle() {
       renderAndContinue();
     }
   }
+
+  // ── Hand over to manual combat, then resume patrol on win ──
+  function beginManualCombat() {
+    if (!patrolActive) return;
+    // Stop the patrol clock/explore bar while combat UI takes over
+    if (autoClockTimer) { clearInterval(autoClockTimer); autoClockTimer = null; }
+    hideExploreBar();
+
+    startCombat(
+      monster,
+      function onPatrolWin() {
+        // Player may have ended patrol by some means — don't resume if so
+        if (state.hp <= 0 || state.petri >= 100) return;
+        // Resume patrol UI
+        state.mood = 'combat';
+        ambientAudio.setCombat(true);
+        appendDivider();
+        showExploreBar(L('警戒巡邏中', 'Patrolling'));
+        if (!autoClockTimer) {
+          autoClockTimer = setInterval(function() {
+            autoElapsed += 200;
+            updateExploreTimer();
+          }, 200);
+        }
+        // Restore patrol stop button (unless still in first-visit discovery mode)
+        $choices.innerHTML = '';
+        currentChoices = [];
+        if (!_patrolFirstVisit) {
+          var btn = document.createElement('button');
+          btn.className = 'choice-btn';
+          btn.textContent = L('停下腳步', 'Stop and rest');
+          btn.addEventListener('click', stopPatrol);
+          $choices.appendChild(btn);
+        }
+        patrolActive = true;
+        patrolTimers.push(setTimeout(runPatrolCycle, 1200));
+      },
+      function onPatrolFlee() {
+        // Fleeing ends the patrol and returns to hub
+        patrolActive = false;
+        clearPatrolTimers();
+        state.mood = 'normal';
+        ambientAudio.setCombat(false);
+        loadNode(getPatrolReturnNode());
+      }
+    );
+  }
+
   processNext();
 }

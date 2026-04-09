@@ -203,9 +203,6 @@ registerNode('r2_look', () => {
     } else {
       c.push({ text: '過橋前往營地', textEn: 'Cross bridge to the camp', action: () => loadNode('r2_camp') });
     }
-    if (state.flags.r2CampVisited) {
-      c.push({ text: '去找營地的人', textEn: 'Visit the camp', action: () => loadNode('r2_camp') });
-    }
     if (state.flags.r2MachineCore) {
       c.push({ text: '前往上升通道', textEn: 'Go to the ascent shaft', action: () => loadNode('r2_gate') });
     }
@@ -215,6 +212,23 @@ registerNode('r2_look', () => {
     if (state.flags.r2YingArrived) {
       c.push({ text: '找螢', textEn: 'Find Ying', action: () => loadNode('r2_ying_talk') });
     }
+    // Sub-hub: optional exploration nodes
+    var hasR2Explore = !state.flags.r2ElevatorDone || !state.flags.r2LabDone
+      || !state.flags.r2GardenDone || !state.flags.r2ArenaDone
+      || !state.flags.r2WaterfallDone || !state.flags.r2MuralWarDone;
+    if (hasR2Explore) {
+      c.push({ text: '探索採石場其他角落', textEn: 'Explore other corners of the quarry', action: () => loadNode('r2_explore') });
+    }
+    c.push({ text: '巡邏採石場', textEn: 'Patrol the quarry', action: () => loadNode('r2_patrol') });
+    c.push({ text: '返回石脈迴廊', textEn: 'Return to Vein Corridor', action: () => loadNode('r1_deep') });
+    return c;
+  })(), { label: L('觀察採石場', 'Surveying quarry') });
+});
+
+// ── R2 Sub-hub: optional exploration ──
+registerNode('r2_explore', () => {
+  renderScene(L('採石場太大了——還有一些角落值得去看看。', 'The quarry is vast — several corners are worth a closer look.'), (function() {
+    var c = [];
     if (!state.flags.r2ElevatorDone) {
       c.push({ text: '調查廢棄升降機', textEn: 'Investigate the abandoned elevator', action: () => loadNode('r2_elevator') });
     }
@@ -233,10 +247,9 @@ registerNode('r2_look', () => {
     if (!state.flags.r2MuralWarDone) {
       c.push({ text: '查看戰爭壁畫', textEn: 'Examine the war mural', action: () => loadNode('r2_mural_war') });
     }
-    c.push({ text: '巡邏採石場', textEn: 'Patrol the quarry', action: () => loadNode('r2_patrol') });
-    c.push({ text: '返回石脈迴廊', textEn: 'Return to Vein Corridor', action: () => loadNode('r1_deep') });
+    c.push({ text: '返回', textEn: 'Return', action: () => loadNode('r2_look') });
     return c;
-  })(), { label: L('觀察採石場', 'Surveying quarry') });
+  })());
 });
 
 // ── Quarry Floor — 採石台 ──

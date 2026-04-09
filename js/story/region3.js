@@ -197,11 +197,11 @@ registerNode('r3_look', () => {
     if (state.flags.r3InnUnlocked) {
       c.push({ text: '河畔客棧', textEn: 'Riverside Inn', action: () => loadNode('r3_inn') });
     }
-    if (state.flags.r1YingCompanion) {
-      c.push({ text: '找螢', textEn: 'Find Ying', action: () => loadNode('r3_ying_talk') });
-    }
+    // Ying — event prompt takes priority over regular "find Ying"
     if (state.flags.r3YingRiver && !state.flags.r3YingConfessionFull && typeof getNpcAffinityNum === 'function' && getNpcAffinityNum('ying') >= 85) {
-      c.push({ text: '螢說想在河邊跟你說一件事……', textEn: 'Ying said she wants to tell you something by the river...', action: () => loadNode('r3_ying_confession_full') });
+      c.push({ text: '♥ 螢說想在河邊跟你說一件事……', textEn: '♥ Ying said she wants to tell you something by the river...', action: () => loadNode('r3_ying_confession_full') });
+    } else if (state.flags.r1YingCompanion) {
+      c.push({ text: '找螢', textEn: 'Find Ying', action: () => loadNode('r3_ying_talk') });
     }
     if (state.flags.r3MarketVisited && !state.flags.r3ZhouMet) {
       c.push({ text: '市場角落的老人', textEn: 'Old man in the market corner', action: () => loadNode('r3_zhou') });
@@ -209,6 +209,39 @@ registerNode('r3_look', () => {
     if (state.flags.r3BellQuest && !state.flags.r3Ending) {
       c.push({ text: '回報銅鐘（任務進度）', textEn: 'Report to Bronze Bell (quest progress)', action: () => loadNode('r3_quest_check') });
     }
+    // Sub-hub: optional exploration nodes
+    var hasR3Explore = !state.flags.r3UndergroundDone || !state.flags.r3TempleDone
+      || !state.flags.r3LibraryDone || !state.flags.r3SlumDone
+      || !state.flags.r3GardenDone || !state.flags.r3PrisonDone;
+    if (hasR3Explore) {
+      c.push({ text: '探索河城其他角落', textEn: 'Explore other corners of River City', action: () => loadNode('r3_explore') });
+    }
+    // Special NPC event prompts — bundle into one entry when multiple are active
+    var npcEvents = [];
+    if (state.flags.r3ZhouMet && !state.flags.r3ZhouDrink) {
+      npcEvents.push({ text: '♦ 老周說今晚請你喝酒', textEn: '♦ Old Zhou invited you for a drink tonight', action: () => loadNode('r3_zhou_drink') });
+    }
+    if (state.flags.r1YingCompanion && state.flags.r3BellAlliance && !state.flags.r3NpcArgument) {
+      npcEvents.push({ text: '♦ 議會廳外傳來爭吵聲……', textEn: '♦ Arguing voices outside the council hall...', action: () => loadNode('r3_npc_argument') });
+    }
+    if (npcEvents.length === 1) {
+      c.push(npcEvents[0]);
+    } else if (npcEvents.length > 1) {
+      c.push({ text: '♦ 朋友們有事找你（' + npcEvents.length + '）', textEn: '♦ Friends need you (' + npcEvents.length + ')', action: function() {
+        renderScene(L('誰先找你？', 'Who first?'),
+          npcEvents.concat([{ text: '返回', textEn: 'Return', action: () => loadNode('r3_look') }]));
+      }});
+    }
+    c.push({ text: '巡邏（練級）', textEn: 'Patrol (grind)', action: () => loadNode('r3_patrol') });
+    c.push({ text: '返回上升通道', textEn: 'Return to ascent shaft', action: () => loadNode('r2_gate') });
+    return c;
+  })(), { label: L('河城渡口', 'River City Ferry') });
+});
+
+// ── R3 Sub-hub: optional exploration ──
+registerNode('r3_explore', () => {
+  renderScene(L('河城的角落還有許多值得探訪的地方。', 'River City has many corners still worth exploring.'), (function() {
+    var c = [];
     if (!state.flags.r3UndergroundDone) {
       c.push({ text: '地下通道', textEn: 'Underground Tunnels', action: () => loadNode('r3_underground') });
     }
@@ -227,16 +260,9 @@ registerNode('r3_look', () => {
     if (!state.flags.r3PrisonDone) {
       c.push({ text: '河城監獄', textEn: 'City Prison', action: () => loadNode('r3_prison') });
     }
-    if (state.flags.r3ZhouMet && !state.flags.r3ZhouDrink) {
-      c.push({ text: '老周說今晚請你喝酒', textEn: 'Old Zhou invited you for a drink tonight', action: () => loadNode('r3_zhou_drink') });
-    }
-    if (state.flags.r1YingCompanion && state.flags.r3BellAlliance && !state.flags.r3NpcArgument) {
-      c.push({ text: '議會廳外傳來爭吵聲……', textEn: 'Arguing voices outside the council hall...', action: () => loadNode('r3_npc_argument') });
-    }
-    c.push({ text: '巡邏（練級）', textEn: 'Patrol (grind)', action: () => loadNode('r3_patrol') });
-    c.push({ text: '返回上升通道', textEn: 'Return to ascent shaft', action: () => loadNode('r2_gate') });
+    c.push({ text: '返回', textEn: 'Return', action: () => loadNode('r3_look') });
     return c;
-  })(), { label: L('河城渡口', 'River City Ferry') });
+  })());
 });
 
 // ═══════════════════════════════════════════════════

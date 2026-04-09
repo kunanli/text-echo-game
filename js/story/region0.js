@@ -275,7 +275,26 @@ registerNode('r0_look', () => {
     }
     c.push({ text: '查看北面攀爬痕跡', textEn: 'Check the climbing marks to the north', action: () => loadNode('r0_climb_check') });
     c.push({ text: '探索南面裂縫', textEn: 'Explore the southern crack', action: () => loadNode('r0_crack') });
-    // Extra exploration nodes
+    // Sub-hub: optional exploration nodes
+    var hasR0Explore = !state.flags.r0PoolExplored || !state.flags.r0EchoDone
+      || !state.flags.r0BonesSearched || !state.flags.r0AltarUsed || !state.flags.r0MuralSeen;
+    if (hasR0Explore) {
+      c.push({ text: '仔細搜索坑底周圍', textEn: 'Search the pit floor thoroughly', action: () => loadNode('r0_explore') });
+    }
+    // Patrol option only available after first patrol cleared
+    if (state.flags.r0PatrolCleared) {
+      c.push({ text: '在坑底四處警戒', textEn: 'Stay alert and patrol the pit', action: () => loadNode('r0_patrol') });
+    }
+    // Ferryman route — always visible, but blocked if no ending achieved
+    c.push({ text: '◇ 走向深處傳來的低語……', textEn: '◇ Follow the whispers from below...', action: () => loadNode('r0_ferryman_gate') });
+    return c;
+  })(), { label: L('觀察環境', 'Observing area') });
+});
+
+// ── R0 Sub-hub: optional exploration ──
+registerNode('r0_explore', () => {
+  renderScene(L('你環顧坑底，仔細搜尋每一個可能被忽略的角落。', 'You scan the pit floor, searching every corner that might have been missed.'), (function() {
+    var c = [];
     if (!state.flags.r0PoolExplored) {
       c.push({ text: '坑底積水處閃爍著微光……', textEn: 'Something glimmers in the pool at the pit\'s bottom...', action: () => loadNode('r0_pool') });
     }
@@ -291,14 +310,9 @@ registerNode('r0_look', () => {
     if (!state.flags.r0MuralSeen) {
       c.push({ text: '岩壁上似乎刻著什麼圖案', textEn: 'Patterns carved into the rock wall', action: () => loadNode('r0_mural') });
     }
-    // Patrol option only available after first patrol cleared
-    if (state.flags.r0PatrolCleared) {
-      c.push({ text: '在坑底四處警戒', textEn: 'Stay alert and patrol the pit', action: () => loadNode('r0_patrol') });
-    }
-    // Ferryman route — always visible, but blocked if no ending achieved
-    c.push({ text: '◇ 走向深處傳來的低語……', textEn: '◇ Follow the whispers from below...', action: () => loadNode('r0_ferryman_gate') });
+    c.push({ text: '返回', textEn: 'Return', action: () => loadNode('r0_look') });
     return c;
-  })(), { label: L('觀察環境', 'Observing area') });
+  })());
 });
 
 registerNode('r0_patrol', () => {
@@ -398,6 +412,7 @@ registerNode('r0_corpse', () => {
     { tag: '探索', tagColor: 'tag-explore', text: '這個人已經死了很久。右半身完全石化，左半部已腐朽。', textEn: 'This person has been dead for a long time. Right side fully petrified, left side decayed.', delay: 2200 },
     { tag: '探索', tagColor: 'tag-explore', text: '他的石化手中緊握著一把碎石磨成的粗糙匕首。', textEn: 'In their petrified hand, a crude dagger ground from broken stone.', delay: 2000 },
     { tag: '物品', tagColor: 'tag-item', html: '你費了些力氣，把匕首撬了出來。<b>獲得：碎石匕首</b>', htmlEn: 'With some effort, you pry the dagger free. <b>Acquired: Stone Dagger</b>', delay: 2000, effect: () => addItem(L('碎石匕首', 'Stone Dagger')) },
+    { tag: '發現', tagColor: 'tag-item', html: '屍體的內袋裡還塞著一小包乾燥草藥——你認得這味道，能止血。<b>獲得：急救草藥</b>（HP +15）', htmlEn: 'Inside the corpse\'s inner pocket — a small bundle of dried herbs. You recognize the scent: a wound-stauncher. <b>Acquired: First Aid Herbs</b> (HP +15)', delay: 2200, sfx: 'item', effect: () => { addItem(L('急救草藥', 'First Aid Herbs')); changeHp(15); renderStatus(); } },
     { tag: '警告', tagColor: 'tag-warn', html: '屍體胸口刻著歪歪斜斜的字：<b>「別走南邊」</b>', htmlEn: 'Carved crookedly on the corpse\'s chest: <b>"DON\'T GO SOUTH"</b>', delay: 2000 },
   ], [
     { text: '記住警告，去查看攀爬痕跡', textEn: 'Heed the warning, check climbing marks', action: () => { state.flags.corpseWarning = true; loadNode('r0_climb_check'); } },
