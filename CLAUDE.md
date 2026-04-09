@@ -1146,7 +1146,7 @@ if (hasSkill('undying') && !cooldowns.undying && state.hp + delta <= 0) {
 
 #### 系統設計
 
-- 整合進現有 `runPatrolCycle()`，每次巡邏循環有 **25% 機率**觸發敘事事件取代戰鬥
+- 整合進現有 `runPatrolCycle()`，每次巡邏循環有 **35% 機率**觸發敘事事件取代戰鬥（v2.3.4c 從 25% 調高）
 - 每個事件有唯一 flag（如 `state.flags._evt_r0_statue`），**每周目只觸發一次**
 - 當該區域所有事件都已觸發時，回退為正常戰鬥
 - 事件使用巡邏系統的 `queue` + `processNext()` 機制渲染（與戰鬥同樣的打字機/pending 效果）
@@ -1183,7 +1183,7 @@ function getPatrolEvents() {
 function runPatrolCycle() {
   if (!patrolActive) return;
 
-  // 25% 機率觸發敘事事件（取代戰鬥）
+  // 35% 機率觸發敘事事件（取代戰鬥）
   var events = getPatrolEvents();
   var available = events.filter(function(e) { return !state.flags[e.flag]; });
   if (available.length > 0 && Math.random() < 0.25) {

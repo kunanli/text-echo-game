@@ -1769,9 +1769,9 @@ function runPatrolCycle() {
     }
   }
 
-  // ── 25% chance to trigger a narrative event instead of combat ──
+  // ── 35% chance to trigger a narrative event instead of combat ──
   var available = getAvailablePatrolEvents();
-  if (available.length > 0 && Math.random() < 0.25) {
+  if (available.length > 0 && Math.random() < 0.35) {
     var evt = available[rng(0, available.length - 1)];
     state.flags[evt.flag] = true; // mark as triggered (once per playthrough)
     runNarrativeEvent(evt);
