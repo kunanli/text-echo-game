@@ -783,6 +783,9 @@ registerNode('r2_camp', () => {
       c.push({ text: '夜深了，鐵霜還坐在營火邊', textEn: 'Late night — Iron Frost still sits by the fire', action: () => loadNode('r2_frost_vigil') });
     }
     c.push({ text: '在營地休息', textEn: 'Rest at the camp', action: () => loadNode('r2_rest') });
+    if (state.flags.r2MachineCore && !state.flags.r2BossDefeated && state.flags.r2ChiefTalked) {
+      c.push({ text: '★ 前往上升通道——挑戰石化巨獸', textEn: '★ Head to the ascent shaft — challenge the Colossus', action: () => loadNode('r2_boss_prep') });
+    }
     c.push({ text: '過橋返回', textEn: 'Cross back', action: () => loadNode('r2_look') });
     return c;
   })(), { label: L('倖存者營地', 'Survivor camp') });
@@ -959,9 +962,6 @@ registerNode('r2_camp_chief', () => {
   }
   autoExplore(steps, (function() {
     var c = [];
-    if (state.flags.r2MachineCore && !state.flags.r2BossDefeated) {
-      c.push({ text: '「我準備好了，一起去挑戰巨獸。」', textEn: '"I\'m ready. Let\'s challenge the colossus."', action: () => loadNode('r2_boss_prep') });
-    }
     if (state.flags.r2ChengAwake && (state.flags.r2ChengTrainCount || 0) < 3) {
       c.push({ text: '◆ 和承鋼一起訓練', textEn: '◆ Train with Cheng Gang', action: () => loadNode('r2_cheng_train') });
     }

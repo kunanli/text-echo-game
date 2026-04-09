@@ -206,9 +206,9 @@ registerNode('r3_look', () => {
     if (state.flags.r3MarketVisited && !state.flags.r3ZhouMet) {
       c.push({ text: '市場角落的老人', textEn: 'Old man in the market corner', action: () => loadNode('r3_zhou') });
     }
-    if (state.flags.r3BellQuest && !state.flags.r3Ending) {
-      c.push({ text: '回報銅鐘（任務進度）', textEn: 'Report to Bronze Bell (quest progress)', action: () => loadNode('r3_quest_check') });
-    }
+    // Note: "回報銅鐘（任務進度）" moved into r3_council submenu to avoid accidental
+    // spam-clicks from shifting hub positions. Player must deliberately enter Council Hall
+    // to report progress. See r3_council for the quest-check entry point.
     // Sub-hub: optional exploration nodes
     var hasR3Explore = !state.flags.r3UndergroundDone || !state.flags.r3TempleDone
       || !state.flags.r3LibraryDone || !state.flags.r3SlumDone
@@ -233,7 +233,8 @@ registerNode('r3_look', () => {
       }});
     }
     c.push({ text: '深入河岸隧道探索', textEn: 'Venture into the riverbank tunnels', action: () => loadNode('r3_patrol') });
-    c.push({ text: '返回上升通道', textEn: 'Return to ascent shaft', action: () => loadNode('r2_gate') });
+    // Removed "返回上升通道 → r2_gate" — R3 is the final region. Players clicking this
+    // accidentally jumped back to R2 mecha area. No legitimate reason to backtrack.
     return c;
   })(), { label: L('河城渡口', 'River City Ferry') });
 });
@@ -729,7 +730,7 @@ registerNode('r3_bell', () => {
             state.flags.r3BellQuest = true;
             loadNode('r3_look');
           }},
-          { text: '離開', textEn: 'Leave', action: () => loadNode('r3_council') },
+          { text: '離開', textEn: 'Leave', action: () => loadNode('r3_look') },
         ], { label: L('銅鐘的考驗', 'Bronze Bell\'s test') });
       }});
     }
@@ -768,7 +769,10 @@ registerNode('r3_bell', () => {
     if (state.flags.ngPlus && state.flags.r3BellNgMemory && !state.flags.r3BellNgGarden && typeof getNpcAffinityNum === 'function' && getNpcAffinityNum('bell') >= 85) {
       c.push({ text: '銅鐘邀你去議會花園走走', textEn: 'Bell invites you to walk in the Council garden', action: () => loadNode('r3_bell_ng_garden') });
     }
-    c.push({ text: '離開', textEn: 'Leave', action: () => loadNode(state.flags.r3BellQuest ? 'r3_look' : 'r3_council') });
+    // Leave always returns to the hub — prevents accidental re-entry into council
+    // chain after Bell dialog. Previously went to r3_council post-quest which added
+    // confusion since r3_council auto-shows the quest-check button.
+    c.push({ text: '離開', textEn: 'Leave', action: () => loadNode('r3_look') });
     return c;
   })(), { label: L('銅鐘', 'Bronze Bell') });
 });
@@ -3190,11 +3194,13 @@ registerNode('r3_boss_prep', () => {
   }
 
   var bossChoices = [];
+  // Safe options first — prevent spam-click chain from r3_quest_check → r3_boss_prep → r3_boss
+  bossChoices.push({ text: '先去準備一下（補給、道別、支線）', textEn: 'Prepare first (supplies, farewells, sidequests)', action: () => loadNode('r3_look') });
   if (state.flags.r1YingCompanion && !state.flags.r3YingFarewell) {
     bossChoices.push({ text: '螢站在走廊盡頭看著你……', textEn: 'Ying stands at the corridor\'s end, watching you...', action: () => loadNode('r3_ying_farewell') });
   }
-  bossChoices.push({ text: '走向議會大廳', textEn: 'Head to the Council chamber', action: () => loadNode('r3_boss') });
-  bossChoices.push({ text: '先去準備一下', textEn: 'Prepare first', action: () => loadNode('r3_look') });
+  // Deliberate boss entry — ★ mark + warning label
+  bossChoices.push({ text: '★ 決意走向議會大廳（將直接面對鏽刃）', textEn: '★ Commit: walk to the Council chamber (will face Rust Blade)', action: () => loadNode('r3_boss') });
 
   autoExplore(steps, bossChoices, { label: L('決戰前夕', 'Eve of the showdown') });
 });
