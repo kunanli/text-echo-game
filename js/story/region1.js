@@ -147,6 +147,23 @@ registerNode('r1_look', () => {
               queue.push({ tag: L('遭遇','Encounter'), color: 'tag-combat',
                 text: L('你加快腳步——轉過拐角，一個穿著補丁斗篷的女人被兩隻石化蜥蜴逼到了死角！', 'You quicken your pace — rounding a corner, a woman in a patched cloak is cornered by two stone lizards!'),
                 delay: 3000, pending: true, sfx: 'click' });
+              queue.push({ art: npcPortrait.art('crane', { subtitle: L('流浪者', 'Wanderer') }) || `<pre class="ascii-art gold">
+      ·  .  ·  .  ·  .  ·  .  ·
+          ╭━━━━━━━━━╮
+         ╱           ╲
+        ╱  ╭━━━━━━━╮  ╲
+       │   │ ─   ─ │   │
+       │   │  ╰△╯  │   │
+        ╲  ╰━━━┯━━━╯  ╱
+    ╭╮   ╲╲    │    ╱╱   ╭────╮
+    ││  ╱╱ ╲───┤───╱ ╲╲  │行囊│
+    ╰┤ ╱╱   ╲  │  ╱   ╲╲ ├────┤
+     │╱╱     ╲ │ ╱     ╲╰┤ ◆◇ │
+     ╱╱       ╲│╱       ╲╰┬───╯
+    ╱╱        ╱ ╲        │╯
+             ╱   ╲
+      灰 鶴  ——  流 浪 者
+</pre>`, delay: 1500, pending: true });
               queue.push({
                 text: L('你要怎麼做？', 'What do you do?'),
                 choices: [
