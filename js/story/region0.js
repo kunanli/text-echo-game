@@ -239,17 +239,20 @@ registerNode('r0_look', () => {
     mapArt,
   ];
 
-  // First-visit passive patrol: after getting weapon, add danger text before mandatory patrol
+  // After getting weapon, warn about hostile presence — but don't force patrol
   if (state.flags.corpseSearched && !state.flags.r0PatrolCleared) {
     steps.push({ tag: '警告', tagColor: 'tag-warn', text: '黑暗中傳來細微的聲響——碎石被什麼東西踩碎的聲音。', textEn: 'Faint sounds in the darkness — something crushing gravel underfoot.', delay: 2500 });
-    steps.push({ tag: '感知', tagColor: 'tag-sense', text: '你的石化紋路隱隱作痛，空氣中的石化粒子突然變得濃厚。這裡……有石化生物在活動。', textEn: 'Your petrification marks throb. Airborne petri-particles suddenly thicken. Petrified creatures... are moving nearby.', delay: 3000 });
-    steps.push({ tag: '判斷', tagColor: 'tag-move', text: '你握緊武器——在探索更多區域之前，必須先確認這片區域的安全。', textEn: 'You grip your weapon — before exploring further, you must secure this area first.', delay: 2500 });
+    steps.push({ tag: '感知', tagColor: 'tag-sense', text: '你的石化紋路隱隱作痛——這片區域有石化生物在活動。', textEn: 'Your petrification marks throb — petrified creatures are moving in this area.', delay: 2800 });
   }
 
   autoExplore(steps, (function() {
-    // If weapon obtained but patrol not cleared → mandatory patrol (passive event)
+    var c = [];
+    if (!state.flags.corpseSearched) {
+      c.push({ text: '查看西側的屍體和石化人形', textEn: 'Examine the corpse and petrified figures', action: () => loadNode('r0_corpse') });
+    }
+    // Patrol option — first time is a tutorial forced-manual combat sequence
     if (state.flags.corpseSearched && !state.flags.r0PatrolCleared) {
-      return [{ text: L('在黑暗中小心前進……', 'Advance cautiously through the darkness...'), textEn: 'Advance cautiously through the darkness...', action: () => {
+      c.push({ text: '⚠ 小心前進，清除周圍的威脅', textEn: '⚠ Advance cautiously, clear nearby threats', action: () => {
         startPatrol({ firstVisit: true, onDiscovery: function() { stopPatrol(); },
           firstVisitEvents: [
             // Cycle 2: Find a hidden survivor's cache in the rubble
@@ -267,17 +270,16 @@ registerNode('r0_look', () => {
             }}
           ]
         });
-      }}];
-    }
-    var c = [];
-    if (!state.flags.corpseSearched) {
-      c.push({ text: '查看西側的屍體和石化人形', textEn: 'Examine the corpse and petrified figures', action: () => loadNode('r0_corpse') });
+      }});
     }
     c.push({ text: '查看北面攀爬痕跡', textEn: 'Check the climbing marks to the north', action: () => loadNode('r0_climb_check') });
-    c.push({ text: '探索南面裂縫', textEn: 'Explore the southern crack', action: () => loadNode('r0_crack') });
+    if (!state.flags.r0CrackDone) {
+      c.push({ text: '探索南面裂縫', textEn: 'Explore the southern crack', action: () => loadNode('r0_crack') });
+    }
     // Sub-hub: optional exploration nodes
     var hasR0Explore = !state.flags.r0PoolExplored || !state.flags.r0EchoDone
-      || !state.flags.r0BonesSearched || !state.flags.r0AltarUsed || !state.flags.r0MuralSeen;
+      || !state.flags.r0BonesSearched || !state.flags.r0AltarUsed || !state.flags.r0MuralSeen
+      || !state.flags.r0StatuesVisited || !state.flags.hiddenFound || !state.flags.r0Rested;
     if (hasR0Explore) {
       c.push({ text: '仔細搜索坑底周圍', textEn: 'Search the pit floor thoroughly', action: () => loadNode('r0_explore') });
     }
@@ -309,6 +311,15 @@ registerNode('r0_explore', () => {
     }
     if (!state.flags.r0MuralSeen) {
       c.push({ text: '岩壁上似乎刻著什麼圖案', textEn: 'Patterns carved into the rock wall', action: () => loadNode('r0_mural') });
+    }
+    if (!state.flags.r0StatuesVisited) {
+      c.push({ text: '走向那些石化人形', textEn: 'Approach the petrified figures', action: () => loadNode('r0_statues') });
+    }
+    if (!state.flags.hiddenFound) {
+      c.push({ text: '東側岩壁角落的石塊堆疊', textEn: 'The rock pile in the eastern wall corner', action: () => loadNode('r0_hidden') });
+    }
+    if (!state.flags.r0Rested) {
+      c.push({ text: '靠著岩壁休息片刻', textEn: 'Lean against the wall and rest a moment', action: () => loadNode('r0_rest') });
     }
     c.push({ text: '返回', textEn: 'Return', action: () => loadNode('r0_look') });
     return c;
@@ -357,8 +368,6 @@ registerNode('r0_corpse', () => {
     renderScene(L('你已經搜過這具屍體了。石化的手指保持著握緊的姿態，再也無法鬆開。',
       'You\'ve already searched this corpse. The petrified fingers remain clenched, never to open again.'),
       [
-        { text: '搜索東側岩壁的角落', textEn: 'Search the eastern wall corner', action: () => loadNode('r0_hidden') },
-        { text: '靠著岩壁休息一下', textEn: 'Lean against the wall and rest', action: () => loadNode('r0_rest') },
         { text: '返回', textEn: 'Return', action: () => loadNode('r0_look') },
       ]);
     return;
@@ -416,13 +425,13 @@ registerNode('r0_corpse', () => {
     { tag: '警告', tagColor: 'tag-warn', html: '屍體胸口刻著歪歪斜斜的字：<b>「別走南邊」</b>', htmlEn: 'Carved crookedly on the corpse\'s chest: <b>"DON\'T GO SOUTH"</b>', delay: 2000 },
   ], [
     { text: '記住警告，去查看攀爬痕跡', textEn: 'Heed the warning, check climbing marks', action: () => { state.flags.corpseWarning = true; loadNode('r0_climb_check'); } },
-    { text: '走向旁邊的石化人形', textEn: 'Approach the petrified figures nearby', action: () => loadNode('r0_statues') },
-    { text: '返回', textEn: 'Return', action: () => loadNode('r0_look') },
+    { text: '返回坑底中央', textEn: 'Return to the pit center', action: () => loadNode('r0_look') },
   ], { label: L('調查屍體', 'Examining corpse') });
 });
 
 // ── Petrified figures (new exploration) ──
 registerNode('r0_statues', () => {
+  state.flags.r0StatuesVisited = true;
   var steps = [
     { art: `<pre class="ascii-art purple">
       .    .         .         .    .
@@ -695,6 +704,7 @@ registerNode('r0_hidden', () => {
 
 // ── Rest and memory flashback ──
 registerNode('r0_rest', () => {
+  state.flags.r0Rested = true;
   autoExplore([
     { tag: '行動', tagColor: 'tag-move', text: '你靠著岩壁坐了下來，讓自己喘口氣。', textEn: 'You lean against the wall and sit down, catching your breath.', delay: 2000,
       art: `<pre class="ascii-art">
@@ -761,6 +771,7 @@ registerNode('r0_rest', () => {
 });
 
 registerNode('r0_crack', () => {
+  state.flags.r0CrackDone = true;
   var warnStep = state.flags.corpseWarning
     ? { tag: '記憶', tagColor: 'tag-warn', text: '你想起屍體上的警告，心中一緊——', textEn: 'You recall the warning on the corpse — your heart tightens.', delay: 1500 }
     : { tag: '感知', tagColor: 'tag-sense', text: '腳下的石地越來越濕滑。', textEn: 'The stone beneath your feet grows increasingly slippery.', delay: 1200 };
@@ -1152,9 +1163,15 @@ registerNode('r0_tunnel', () => {
         removeItem(daggerName);
         autoExplore([
           { tag: '行動', tagColor: 'tag-combat', text: '你抽出碎石匕首，瞄準石蜥蜴的眼睛擲出！', textEn: 'You draw the Stone Dagger and hurl it at the lizard\'s eye!', delay: 1500 },
-          { tag: '戰鬥', tagColor: 'tag-combat', text: '匕首準確擊中目標——石蜥蜴發出刺耳慘叫！', textEn: 'A perfect hit — the lizard lets out a piercing shriek!', delay: 2000 },
-          { tag: '勝利', tagColor: 'tag-explore', text: '紫色的眼睛暗淡下來，它變回了一塊普通灰石。', textEn: 'The purple eyes dim, and it crumbles into ordinary grey stone.', delay: 2000 },
-        ], [{ text: '繼續前進', textEn: 'Continue forward', action: () => { changeStat('str', 1); gainXp(15); notify(L('經驗 +15', 'XP +15')); loadNode('r0_after_lizard'); } }]);
+          { tag: '戰鬥', tagColor: 'tag-combat', text: '匕首擦過牠的側頭，劃出一道深深的傷口——石蜥蜴發出刺耳慘叫！', textEn: 'The dagger grazes its head, carving a deep wound — the lizard lets out a piercing shriek!', delay: 2000 },
+          { tag: '警告', tagColor: 'tag-warn', text: '但牠並沒有倒下——受傷的紫色眼睛鎖定了你。牠被激怒了。', textEn: 'But it doesn\'t fall — the wounded purple eyes lock onto you. It\'s enraged.', delay: 2200 },
+        ], [{ text: L('面對受傷的石蜥蜴', 'Face the wounded Stone Lizard'), action: () => {
+          startCombat(
+            { name: lizardName + L('（負傷）', ' (Wounded)'), nameEn: 'Stone Lizard (Wounded)', hp: 18, atkMin: 7, atkMax: 14, petriDmg: 5, xp: 15, desc: lizardDescShort },
+            () => { changeStat('str', 1); notify(L('力量 +1', 'STR +1')); loadNode('r0_after_lizard'); },
+            () => { changePetri(5); loadNode('r0_climb_check'); }
+          );
+        }}]);
       } else {
         autoExplore([
           { tag: '行動', tagColor: 'tag-move', text: '你大喊一聲，試圖嚇退石蜥蜴。', textEn: 'You shout, trying to scare the lizard off.', delay: 1500 },
