@@ -257,7 +257,7 @@ registerNode('r1_look', () => {
     if (hasR1Explore) {
       c.push({ text: '探索迴廊周邊的側道', textEn: 'Explore side passages around the corridor', action: () => loadNode('r1_explore') });
     }
-    c.push({ text: '在迴廊中警戒探索', textEn: 'Explore the corridor on alert', action: () => loadNode('r1_patrol') });
+    c.push({ text: '潛行於石脈之間，搜尋生機', textEn: 'Stalk deeper into the veins, hunting for signs of life', action: () => loadNode('r1_patrol') });
     return c;
   })(), { label: L('觀察迴廊', 'Surveying corridor') });
 });
@@ -2390,7 +2390,7 @@ registerNode('r1_patrol', () => {
   ░░░║      ╱   ╲    ╱??╲    ║░░░
   ░░░║  ══════════════════    ║░░░
   ═══╩════════════════════════╩═══
-         迴 廊 巡 邏
+         潛 行 於 石 脈
 </pre>`, artEn: `<pre class="ascii-art blue">
   ═══╦════════════════════════╦═══
   ░░░║  .:*~*:.    .:*~*:.   ║░░░
@@ -2401,9 +2401,9 @@ registerNode('r1_patrol', () => {
   ░░░║      ╱   ╲    ╱??╲    ║░░░
   ░░░║  ══════════════════    ║░░░
   ═══╩════════════════════════╩═══
-       Corridor Patrol
+      Stalking the Veins
 </pre>`, delay: 800 },
-    { tag: '判斷', tagColor: 'tag-move', text: '迴廊中的怪物比坑底更強，但也能提供更好的戰鬥經驗。', textEn: 'Corridor monsters are tougher, but offer better combat experience.', delay: 2000 },
+    { tag: '判斷', tagColor: 'tag-move', text: '石脈深處藏著更兇惡的生物——但狩獵它們或許能讓你活得更久。', textEn: 'The deep veins harbour fouler things — but hunting them may keep you alive longer.', delay: 2000 },
     { tag: '感知', tagColor: 'tag-sense', text: '你握緊武器，沿著礦脈的冷光前進。', textEn: 'You grip your weapon and advance by the cold glow of ore veins.', delay: 2000 },
   ], [
     { text: '開始探索', textEn: 'Begin exploring', action: () => startPatrol() },

@@ -285,7 +285,7 @@ registerNode('r0_look', () => {
     }
     // Patrol option only available after first patrol cleared
     if (state.flags.r0PatrolCleared) {
-      c.push({ text: '在坑底四處警戒', textEn: 'Stay alert and patrol the pit', action: () => loadNode('r0_patrol') });
+      c.push({ text: '在坑底的陰影裡尋找威脅', textEn: 'Stalk the pit\'s shadows for threats', action: () => loadNode('r0_patrol') });
     }
     // Ferryman route — always visible, but blocked if no ending achieved
     c.push({ text: '◇ 走向深處傳來的低語……', textEn: '◇ Follow the whispers from below...', action: () => loadNode('r0_ferryman_gate') });
@@ -358,7 +358,7 @@ registerNode('r0_patrol', () => {
 </pre>` },
     { tag: '感知', tagColor: 'tag-sense', text: '你握緊武器，壓低身體，沿著洞穴邊緣摸索前進。', textEn: 'You grip your weapon, crouch low, and creep along the cave walls.', delay: 2000 },
   ], [
-    { text: '深入警戒搜索', textEn: 'Begin patrol sweep', action: () => startPatrol() },
+    { text: '深入陰影狩獵', textEn: 'Hunt deeper into the shadows', action: () => startPatrol() },
     { text: '返回', textEn: 'Return', action: () => loadNode('r0_look') },
   ], { label: L('準備探索', 'Preparing exploration') });
 });

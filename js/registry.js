@@ -154,7 +154,13 @@ function registerPatrolEvents(regionId, events) {
 function getAvailablePatrolEvents(regionId) {
   var id = regionId != null ? regionId : state.region;
   var pool = _narrativeEventPools[id] || [];
-  return pool.filter(function(e) { return !state.flags[e.flag]; });
+  var isNgPlus = !!state.flags.ngPlus;
+  return pool.filter(function(e) {
+    if (state.flags[e.flag]) return false;
+    // Gold-centric events only surface on NG+ (gold is an NG+ reward)
+    if (e.ngPlusOnly && !isNgPlus) return false;
+    return true;
+  });
 }
 
 // ─── NPC Registry (for future expansion) ───

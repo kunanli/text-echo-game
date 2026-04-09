@@ -120,6 +120,36 @@ registerNode('r2_look', () => {
       var yP = isMale ? L('她', 'she') : L('他', 'he');
       steps.push({ tag: '遭遇', tagColor: 'tag-explore', text: '「——等等我！」', textEn: '"— Wait for me!"', delay: 2200 });
       steps.push({ tag: '感知', tagColor: 'tag-sense', text: '身後傳來急促的腳步聲和喘息。你轉過身——', textEn: 'Hurried footsteps and panting from behind. You turn —', delay: 2000 });
+      steps.push({
+        art: npcPortrait.art('ying', { subtitle: L('追上你了', 'Caught up') }) || `<pre class="ascii-art cyan">
+           ·˚·  螢  ·˚·
+              ╱▔▔╲
+             │ o o│   ← 氣喘
+             │ ~~ │
+              ╲──╱
+           ╱──┤  ├──╲
+             ╱    ╲
+            ╱  📖  ╲        ← 緊抱手冊
+            ════════
+           石階    ↗↗
+           ═══════════
+              ↑   ↑
+           跑上來
+</pre>`, artEn: npcPortrait.art('ying', { subtitle: L('追上你了', 'Caught up') }) || `<pre class="ascii-art cyan">
+           ·˚·  Ying  ·˚·
+              ╱▔▔╲
+             │ o o│   ← panting
+             │ ~~ │
+              ╲──╱
+           ╱──┤  ├──╲
+             ╱    ╲
+            ╱  📖  ╲        ← notebook
+            ════════
+           stairs   ↗↗
+           ═══════════
+              ↑   ↑
+           running up
+</pre>`, delay: 700 });
       steps.push({ tag: '遭遇', tagColor: 'tag-explore', html: '<b>螢</b>從入口的階梯上跑來，滿臉灰塵，衣角還沾著礦石碎屑。' + yP + '手裡緊抱著那本手冊。', htmlEn: '<b>Ying</b> rushes up the entrance stairs, face dusty, clothes flecked with mineral debris. ' + (isMale ? 'She' : 'He') + ' clutches that notebook tight.', delay: 2800 });
       steps.push({ tag: '感知', tagColor: 'tag-sense', text: '「哈……哈……我從側隧道繞上來的。差點被一隻石化蟒吃了。」螢彎著腰喘氣，但眼睛裡帶著笑意。', textEn: '"Ha... ha... I came up through a side tunnel. Nearly got eaten by a petrified python." Ying doubles over panting, but ' + (isMale ? 'her' : 'his') + ' eyes are smiling.', delay: 3200 });
       steps.push({ tag: '感知', tagColor: 'tag-sense', text: yP + '直起身，四下張望，然後深吸一口氣——', textEn: (isMale ? 'She' : 'He') + ' straightens up, looks around, takes a deep breath —', delay: 2200 });
@@ -219,7 +249,7 @@ registerNode('r2_look', () => {
     if (hasR2Explore) {
       c.push({ text: '探索採石場其他角落', textEn: 'Explore other corners of the quarry', action: () => loadNode('r2_explore') });
     }
-    c.push({ text: '警戒搜索採石場', textEn: 'Search the quarry on alert', action: () => loadNode('r2_patrol') });
+    c.push({ text: '深入採石場的廢墟尋獵', textEn: 'Hunt through the quarry\'s ruined depths', action: () => loadNode('r2_patrol') });
     c.push({ text: '返回石脈迴廊', textEn: 'Return to Vein Corridor', action: () => loadNode('r1_deep') });
     return c;
   })(), { label: L('觀察採石場', 'Surveying quarry') });
@@ -2659,19 +2689,24 @@ registerNode('r2_crane', () => {
         ], { label: L('灰鶴的貨物', 'Grey Crane\'s wares') });
       }});
     }
-    // Gambling — always available after first meeting
-    c.push({ text: L('來一把吹牛骰？', 'Fancy a game of Liar\'s Dice?'), action: () => {
+    // Gambling — NG+ only (gold is an NG+ reward)
+    if (state.flags.ngPlus) c.push({ text: L('來一把吹牛骰？', 'Fancy a game of Liar\'s Dice?'), action: () => {
+      // Flat bet keeps the loop stable regardless of win/loss streaks
+      var bet = 5;
       var gold = state.flags.gold || 0;
-      var bet = Math.max(5, Math.min(20, Math.floor(gold / 3) + 5));
       if (gold < bet) {
-        // Give starting gold if broke
-        if (gold < 5) {
-          state.flags.gold = 10;
-          gold = 10;
-          notify(L('灰鶴借了你 10 金幣：「沒錢怎麼賭？先借你。」', 'Grey Crane lends you 10 gold: "Can\'t gamble with nothing. I\'ll spot you."'));
-          renderStatus();
-        }
-        bet = 5;
+        state.flags.gold = bet;
+        gold = bet;
+        // Rotating flavor loan lines — Crane never runs out of cash
+        var loanLines = [
+          { zh: '灰鶴從腰間又摸出幾枚金幣：「沒錢怎麼賭？先借你 ' + bet + '——算我投資。」', en: 'Grey Crane pulls more coins from her belt: "Can\'t gamble broke. ' + bet + ' on me — call it an investment."' },
+          { zh: '灰鶴嘆了口氣，把 ' + bet + ' 金幣推到你面前：「你這副窮酸相看得我難受。拿著。」', en: 'Grey Crane sighs and pushes ' + bet + ' gold to you: "Can\'t stand watching you this broke. Take it."' },
+          { zh: '灰鶴嘴角一揚：「又沒錢了？行，我這次不算利息。' + bet + ' 金。」', en: 'Grey Crane smirks: "Broke again? Fine, no interest this time. ' + bet + ' gold."' },
+          { zh: '灰鶴從貨箱底下翻出一個皮袋：「看在老朋友的份上——借你 ' + bet + '。」', en: 'Grey Crane digs a leather pouch from beneath a crate: "For old friends\' sake — ' + bet + ' gold."' },
+        ];
+        var ln = loanLines[Math.floor(Math.random() * loanLines.length)];
+        notify(L(ln.zh, ln.en));
+        renderStatus();
       }
       var introSteps = [
         { tag: L('骰子', 'DICE'), tagColor: 'tag-npc',
@@ -2933,7 +2968,7 @@ registerNode('r2_patrol', () => {
          ╲_╱   ╲_╱
   ════════════════════════════════
 </pre>`, delay: 800 },
-    { tag: '判斷', tagColor: 'tag-move', text: '採石場的怪物比迴廊更加兇猛。但你需要更多的戰鬥經驗來面對前方的挑戰。', textEn: 'Quarry monsters are fiercer than those in the corridor. But you need combat experience for the challenges ahead.', delay: 2200 },
+    { tag: '判斷', tagColor: 'tag-move', text: '採石場的怪物比迴廊更加兇猛——你得學會在它們的地盤上狩獵，才能活著前進。', textEn: 'Quarry monsters are fiercer than corridor prey — you must learn to hunt on their turf if you want to push forward alive.', delay: 2200 },
     { tag: '感知', tagColor: 'tag-sense', text: '你握緊武器，踏入了採石台之間的暗影。', textEn: 'You grip your weapon and step into the shadows between quarry platforms.', delay: 2000 },
   ], [
     { text: '開始探索', textEn: 'Begin exploring', action: () => startPatrol() },
@@ -4210,19 +4245,39 @@ registerNode('r2_camp_dinner', () => {
   autoExplore([
     { tag: '場景', tagColor: 'tag-sense',
       art: `<pre class="ascii-art gold">
-    ·  ˚  ✦  ˚  ·  ˚  ✦
-   ╭──────────────────────╮
-   │  🍲  ↑↑ 營火 ↑↑  🍲  │
-   ├──────────────────────┤
-   │ 老鑄  清露  鐵霜  你 │
-   ╰──────────────────────╯
+        ·  ˚  ✦  ˚  ·  ˚  ✦  ˚  ·
+             ·  ~  *  ~  ·
+                \\|/  \\|/
+              ) ( ) ( ) (      ← 火光上升
+             )  (   )  (
+       ╔════╤╤╤╤╤╤╤╤╤╤════╗
+       ║    ║▓▓▓▓▓▓▓▓║    ║    ← 鍋
+       ║    ╚═══════╝    ║
+       ║  ( )))   ((( )  ║    ← 柴火
+       ║ (((      ))) )  ║
+       ║    ▓▓▓▓▓▓▓▓▓    ║    ← 餘燼
+       ╚═════════════════╝
+         ╱            ╲
+       碗·匙        匙·碗       ← 餐具散放
+      ───────────────────
+      老鑄  清露  鐵霜   你
 </pre>`, artEn: `<pre class="ascii-art gold">
-    ·  ˚  ✦  ˚  ·  ˚  ✦
-   ╭──────────────────────╮
-   │  🍲  ↑↑ FIRE ↑↑  🍲  │
-   ├──────────────────────┤
-   │ Cast  Dew  Frost You │
-   ╰──────────────────────╯
+        ·  ˚  ✦  ˚  ·  ˚  ✦  ˚  ·
+             ·  ~  *  ~  ·
+                \\|/  \\|/
+              ) ( ) ( ) (      ← rising flames
+             )  (   )  (
+       ╔════╤╤╤╤╤╤╤╤╤╤════╗
+       ║    ║▓▓▓▓▓▓▓▓║    ║    ← pot
+       ║    ╚═══════╝    ║
+       ║  ( )))   ((( )  ║    ← firewood
+       ║ (((      ))) )  ║
+       ║    ▓▓▓▓▓▓▓▓▓    ║    ← embers
+       ╚═════════════════╝
+         ╱            ╲
+       bowl·spoon  spoon·bowl  ← dinnerware
+      ───────────────────
+      Cast   Dew   Frost   You
 </pre>`,
       text: '營火邊支著一口大鍋，老鑄正用一把生鏽的鐵勺攪動裡面灰綠色的東西。',
       textEn: 'A large pot hangs over the campfire. Old Cast stirs something grey-green with a rusted iron ladle.',

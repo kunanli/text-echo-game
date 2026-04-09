@@ -293,7 +293,10 @@ document.addEventListener('keyup', (e) => {
 function selectChoice(idx) {
   if (idx >= currentChoices.length) return;
   sfx.click();
-  const action = currentChoices[idx].action;
-  currentChoices = [];
-  action();
+  const choice = currentChoices[idx];
+  // Modal actions (opening endcard/leaderboard without navigating away) need
+  // to keep the choice list intact so buttons remain clickable after the
+  // modal is dismissed. Regular actions clear choices to prevent double-fire.
+  if (!choice.modal) currentChoices = [];
+  choice.action();
 }

@@ -115,10 +115,27 @@ var diceGame = (function() {
     { zh: '「少來了，開骰子！」灰鶴笑著探過身來，酒氣和草藥的味道撲面而來。', en: '"Nice try — show me!" Grey Crane leans in with a grin, the scent of liquor and herbs washing over you.' },
   ];
 
-  var CRANE_WIN_LINES = [
+  // Progressive win lines — Crane becomes increasingly smug/flirty as rounds accumulate
+  var CRANE_WIN_LINES_TIER1 = [
     { zh: '灰鶴得意地收起金幣，修長的手指在桌面上輕敲：「跟我賭？嫩了點。」', en: 'Grey Crane pockets the coins smugly, her slender fingers tapping the table: "Gambling with me? Too green."' },
     { zh: '「承讓承讓。」灰鶴笑得像隻狐狸，身子慵懶地往後一靠。', en: '"Better luck next time." Grey Crane grins like a fox, lounging back languidly.' },
     { zh: '灰鶴把金幣一枚一枚慢慢拾起，修長的手指在燭光下顯得格外好看：「想贏回去？那就再來啊。」', en: 'Grey Crane picks up the coins one by one, her slender fingers beautiful in the candlelight: "Want them back? Then play again."' },
+  ];
+  var CRANE_WIN_LINES_TIER2 = [
+    { zh: '灰鶴把金幣慢慢攬到自己面前，指尖在你的手背上輕輕劃了一下才收回去：「別氣餒——偶爾讓你贏一把也不是不行。」', en: 'Grey Crane slowly gathers the coins, her fingertip tracing across the back of your hand before pulling away: "Don\'t sulk — I can let you win one now and then."' },
+    { zh: '「又是我贏。」灰鶴身子前傾，下巴撐在手上看你，燭光在她的眼睛裡跳動：「再來嗎？我不介意多陪你玩幾把。」', en: '"Mine again." Grey Crane leans forward, chin on her palm, watching you — candlelight dancing in her eyes: "Again? I don\'t mind keeping you company."' },
+    { zh: '灰鶴把金幣串起來在指間轉著玩，偶爾抬眼打量你：「你輸得倒是蠻從容的。我喜歡。」', en: 'Grey Crane spins the coins through her fingers, glancing up at you now and then: "You lose with quite a grace. I like that."' },
+  ];
+  var CRANE_WIN_LINES_TIER3 = [
+    { zh: '灰鶴把金幣往自己這邊一掃，身體半側著靠向你的方向。斗篷滑落一邊，你能看見她鎖骨下那道淡淡的刀疤：「你是不是故意輸給我的？」她的聲音低了半度。', en: 'Grey Crane sweeps the coins to her side and leans toward you, cloak slipping off one shoulder — you can see the faint scar below her collarbone: "Are you losing to me on purpose?" Her voice drops half an octave.' },
+    { zh: '「你啊——」灰鶴輕笑一聲，伸手撥開你額前的一縷碎髮。她的指尖停留了一瞬，然後才慢慢放下：「輸得這麼爽快，是在討好我？」', en: '"You —" Grey Crane laughs softly, reaching up to brush a strand of hair from your forehead. Her fingertip lingers a moment before pulling away: "Losing so gracefully — are you trying to flatter me?"' },
+    { zh: '灰鶴把一枚金幣從指間彈給你：「拿去吧，權當我請你的。」她的眼神卻沒有離開你的嘴唇：「條件是——下一把還得陪我玩。」', en: 'Grey Crane flicks a coin back to you: "Keep this — consider it on me." But her eyes never leave your lips: "Condition is — you play the next round with me too."' },
+  ];
+  var CRANE_WIN_LINES_TIER4 = [
+    { zh: '灰鶴把金幣一股腦推到一邊，整個人傾過桌子靠近你。她的髮絲掃過你的臉頰，呼吸帶著烈酒的熱度：「我贏了多少把了，數不清了——你到底是真的輸不起，還是在拖時間？」', en: 'Grey Crane sweeps the coins aside and leans across the table toward you. Her hair brushes your cheek, her breath hot with liquor: "I\'ve won so many rounds I\'ve lost count — are you really this bad, or are you stalling for time?"' },
+    { zh: '「又贏了——」灰鶴把酒瓶塞到你嘴邊：「喝一口。輸家的懲罰。」瓶口還沾著她的體溫，酒液從你的嘴角滑落時，她用拇指慢慢幫你擦掉。', en: '"Won again —" Grey Crane presses the bottle to your lips: "Drink. Loser\'s penalty." The rim is still warm from her mouth. When liquor trickles from the corner of your mouth, she wipes it away with her thumb — slowly.' },
+    { zh: '灰鶴的手扣住你的手腕，把那幾枚金幣輕輕放進你的掌心，然後合上你的手指：「留著吧。一個輸光了錢的男人，夜裡誰陪他？」她的唇貼著你的耳朵說完這句話，然後才直起身子。', en: 'Grey Crane clasps your wrist and gently places the coins in your palm, then closes your fingers around them: "Keep them. Who would comfort a man who lost it all?" She murmurs the words against your ear before straightening up.' },
+    { zh: '「你的運氣怎麼這麼差？」灰鶴捏著你的下巴把你的臉抬起來，燭光下她的眼睛亮得危險：「還是說——你是故意讓我贏的，想看我得意的樣子？」她的拇指慢慢從你的下唇上擦過。', en: '"How is your luck this bad?" Grey Crane lifts your chin, her eyes dangerously bright in the candlelight: "Or are you losing on purpose — wanting to see me gloat?" Her thumb drags slowly across your lower lip.' },
   ];
 
   // Progressive lose lines — escalate body language with each player win
@@ -150,12 +167,31 @@ var diceGame = (function() {
     { zh: '「最後一把——」灰鶴的聲音已經帶了醉意的沙啞。她靠在你身上，手臂環過你的脖子去夠桌上的骰杯，整個人的重量和酒香都壓了過來。皮甲下的襯衣被汗浸透了，你能感覺到她的體溫。「如果我贏了——你今晚哪兒也不准去。」', en: '"Last round —" Grey Crane\'s voice is husky with drink. She leans against you, arm reaching around your neck for the dice cup, her weight and the scent of liquor pressing close. The shirt beneath her leather vest is soaked through — you can feel her warmth. "If I win — you\'re not going anywhere tonight."' },
   ];
 
-  function pickCraneLoseLine() {
+  // Tier progression uses total rounds (not just wins) so losing players
+  // still see Crane's relationship escalate — she gets smug/flirty regardless.
+  function _craneTier() {
+    var rounds = (state.flags.diceRounds || 0);
     var wins = (state.flags.diceWins || 0);
-    if (wins >= 7) return pickLine(CRANE_LOSE_LINES_TIER4);
-    if (wins >= 4) return pickLine(CRANE_LOSE_LINES_TIER3);
-    if (wins >= 2) return pickLine(CRANE_LOSE_LINES_TIER2);
+    // Wins count double toward progression, but rounds alone also progress
+    var progress = Math.max(wins, Math.floor(rounds / 2));
+    if (progress >= 7) return 4;
+    if (progress >= 4) return 3;
+    if (progress >= 2) return 2;
+    return 1;
+  }
+  function pickCraneLoseLine() {
+    var t = _craneTier();
+    if (t === 4) return pickLine(CRANE_LOSE_LINES_TIER4);
+    if (t === 3) return pickLine(CRANE_LOSE_LINES_TIER3);
+    if (t === 2) return pickLine(CRANE_LOSE_LINES_TIER2);
     return pickLine(CRANE_LOSE_LINES_TIER1);
+  }
+  function pickCraneWinLine() {
+    var t = _craneTier();
+    if (t === 4) return pickLine(CRANE_WIN_LINES_TIER4);
+    if (t === 3) return pickLine(CRANE_WIN_LINES_TIER3);
+    if (t === 2) return pickLine(CRANE_WIN_LINES_TIER2);
+    return pickLine(CRANE_WIN_LINES_TIER1);
   }
 
   var CRANE_CHEAT_CAUGHT = [
@@ -255,7 +291,7 @@ var diceGame = (function() {
         sfx.pass();
       } else {
         state.flags.gold = Math.max(0, gold - bet);
-        var line = pickLine(CRANE_WIN_LINES);
+        var line = pickCraneWinLine();
         steps.push({ tag: en ? 'LOSE' : '落敗', tagColor: 'tag-warn',
           text: L(line.zh + ' (-' + bet + '金幣)', line.en + ' (-' + bet + ' gold)'), delay: 2500 });
         sfx.fail();

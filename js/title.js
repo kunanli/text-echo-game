@@ -292,6 +292,10 @@ function _doStartGame() {
       if (globalStats.endings.compromise > 0) state.flags.ngEndingCompromise = true;
       if (globalStats.endings.lockdown > 0) state.flags.ngEndingLockdown = true;
       if (globalStats.endings.sacrifice > 0) state.flags.ngEndingSacrifice = true;
+      // Inherit banked gold from previous runs (NG+ only)
+      if (globalStats.bankedGold > 0) {
+        state.flags.gold = globalStats.bankedGold;
+      }
     }
     _ngPlusMode = false;
   }
