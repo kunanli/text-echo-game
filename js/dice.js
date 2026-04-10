@@ -167,32 +167,25 @@ var diceGame = (function() {
     { zh: '「最後一把——」灰鶴的聲音已經帶了醉意的沙啞。她靠在你身上，手臂環過你的脖子去夠桌上的骰杯，整個人的重量和酒香都壓了過來。皮甲下的襯衣被汗浸透了，你能感覺到她的體溫。「如果我贏了——你今晚哪兒也不准去。」', en: '"Last round —" Grey Crane\'s voice is husky with drink. She leans against you, arm reaching around your neck for the dice cup, her weight and the scent of liquor pressing close. The shirt beneath her leather vest is soaked through — you can feel her warmth. "If I win — you\'re not going anywhere tonight."' },
   ];
 
+  var _CRANE_WIN_TIERS = [CRANE_WIN_LINES_TIER1, CRANE_WIN_LINES_TIER2, CRANE_WIN_LINES_TIER3, CRANE_WIN_LINES_TIER4];
+  var _CRANE_LOSE_TIERS = [CRANE_LOSE_LINES_TIER1, CRANE_LOSE_LINES_TIER2, CRANE_LOSE_LINES_TIER3, CRANE_LOSE_LINES_TIER4];
+
   // Tier progression uses total rounds (not just wins) so losing players
   // still see Crane's relationship escalate — she gets smug/flirty regardless.
   function _craneTier() {
     var rounds = (state.flags.diceRounds || 0);
     var wins = (state.flags.diceWins || 0);
-    // Wins count double toward progression, but rounds alone also progress
     var progress = Math.max(wins, Math.floor(rounds / 2));
     if (progress >= 7) return 4;
     if (progress >= 4) return 3;
     if (progress >= 2) return 2;
     return 1;
   }
-  function pickCraneLoseLine() {
-    var t = _craneTier();
-    if (t === 4) return pickLine(CRANE_LOSE_LINES_TIER4);
-    if (t === 3) return pickLine(CRANE_LOSE_LINES_TIER3);
-    if (t === 2) return pickLine(CRANE_LOSE_LINES_TIER2);
-    return pickLine(CRANE_LOSE_LINES_TIER1);
+  function _pickCraneTiered(tiers) {
+    return pickLine(tiers[_craneTier() - 1]);
   }
-  function pickCraneWinLine() {
-    var t = _craneTier();
-    if (t === 4) return pickLine(CRANE_WIN_LINES_TIER4);
-    if (t === 3) return pickLine(CRANE_WIN_LINES_TIER3);
-    if (t === 2) return pickLine(CRANE_WIN_LINES_TIER2);
-    return pickLine(CRANE_WIN_LINES_TIER1);
-  }
+  function pickCraneLoseLine() { return _pickCraneTiered(_CRANE_LOSE_TIERS); }
+  function pickCraneWinLine()  { return _pickCraneTiered(_CRANE_WIN_TIERS); }
 
   var CRANE_CHEAT_CAUGHT = [
     { zh: '灰鶴一把抓住你的手腕，她的手指意外地有力：「嗯？你在幹什麼？」她沒有鬆手，拇指按在你的脈搏上：「心跳這麼快——心虛了吧。」', en: 'Grey Crane grabs your wrist — her grip is surprisingly strong: "Hm? What are you doing?" She doesn\'t let go, thumb pressing on your pulse: "Heart\'s racing — guilty conscience?"' },

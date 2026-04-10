@@ -2202,9 +2202,7 @@ registerNode('r3_crane', () => {
         ], { label: L('灰鶴的新貨', 'Grey Crane\'s new goods') });
       }});
     }
-    // Gambling — NG+ only (gold is an NG+ reward)
     if (state.flags.ngPlus) c.push({ text: L('來一把吹牛骰？', 'Fancy a game of Liar\'s Dice?'), action: () => {
-      // R3 uses a higher flat bet (河城賭注比營地大)
       var bet = 10;
       var gold = state.flags.gold || 0;
       if (gold < bet) {
@@ -2215,7 +2213,7 @@ registerNode('r3_crane', () => {
           { zh: '灰鶴搖頭笑了：「又空了？行，' + bet + ' 金——別輸光就行。」', en: 'Grey Crane shakes her head, laughing: "Empty again? Fine, ' + bet + ' gold — try not to lose it all."' },
           { zh: '灰鶴把一串金幣叮噹扔到桌上：「拿著。河城的朋友比金幣值錢多了。」', en: 'Grey Crane tosses a string of coins onto the table with a clink: "Take them. Friends in River City are worth more than gold."' },
         ];
-        var ln = loanLines[Math.floor(Math.random() * loanLines.length)];
+        var ln = loanLines[rng(0, loanLines.length - 1)];
         notify(L(ln.zh, ln.en));
         renderStatus();
       }

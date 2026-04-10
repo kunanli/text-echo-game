@@ -420,7 +420,7 @@ function generateEndCard() {
       '「即使是最勇敢的人，最終也會變成紀念碑。」',
       '「黑暗不會哀悼。它只是等待。」',
     ];
-    var quote = deathQuotes[Math.floor(Math.random() * deathQuotes.length)];
+    var quote = deathQuotes[rng(0, deathQuotes.length - 1)];
     curY += 30;
     ctx.font = '14px "Courier New", monospace';
     ctx.fillStyle = '#8a8a9a';

@@ -2689,9 +2689,7 @@ registerNode('r2_crane', () => {
         ], { label: L('灰鶴的貨物', 'Grey Crane\'s wares') });
       }});
     }
-    // Gambling — NG+ only (gold is an NG+ reward)
     if (state.flags.ngPlus) c.push({ text: L('來一把吹牛骰？', 'Fancy a game of Liar\'s Dice?'), action: () => {
-      // Flat bet keeps the loop stable regardless of win/loss streaks
       var bet = 5;
       var gold = state.flags.gold || 0;
       if (gold < bet) {
@@ -2704,7 +2702,7 @@ registerNode('r2_crane', () => {
           { zh: '灰鶴嘴角一揚：「又沒錢了？行，我這次不算利息。' + bet + ' 金。」', en: 'Grey Crane smirks: "Broke again? Fine, no interest this time. ' + bet + ' gold."' },
           { zh: '灰鶴從貨箱底下翻出一個皮袋：「看在老朋友的份上——借你 ' + bet + '。」', en: 'Grey Crane digs a leather pouch from beneath a crate: "For old friends\' sake — ' + bet + ' gold."' },
         ];
-        var ln = loanLines[Math.floor(Math.random() * loanLines.length)];
+        var ln = loanLines[rng(0, loanLines.length - 1)];
         notify(L(ln.zh, ln.en));
         renderStatus();
       }
