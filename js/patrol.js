@@ -1478,6 +1478,17 @@ var _patrolOnDiscovery = null;  // callback when player chooses to leave on firs
 var _firstPatrolEvents = [];    // special events during first-visit patrol
 var _firstPatrolDiscoveryCycle = 3; // cycle threshold for discovery prompt
 
+function _patrolLabel() {
+  var labels = [
+    { zh: '深入陰影搜索中', en: 'Prowling the Depths' },
+    { zh: '潛行於石脈之間', en: 'Stalking the Veins' },
+    { zh: '在廢墟中狩獵', en: 'Hunting the Ruins' },
+    { zh: '穿行於河城暗處', en: 'Roaming the Undercity' },
+  ];
+  var l = labels[state.region] || labels[0];
+  return L(l.zh, l.en);
+}
+
 // Discovery texts per region (shown after N cycles on first visit)
 var DISCOVERY_TEXTS = {
   0: { zh: '你注意到坑壁上方有一條向上延伸的裂縫——也許能通往更深的地方。', en: 'You notice a crack extending upward along the pit wall — perhaps it leads somewhere deeper.' },
@@ -1544,7 +1555,7 @@ function startPatrol(opts) {
   ambientAudio.setCombat(true);
   renderStatus();
   appendDivider();
-  showExploreBar(L('警戒探索中', 'Exploring'));
+  showExploreBar(_patrolLabel());
   autoClockTimer = setInterval(function() {
     autoElapsed += 200;
     updateExploreTimer();
@@ -1924,7 +1935,7 @@ function runPatrolCycleManual(monster) {
         state.mood = 'combat';
         ambientAudio.setCombat(true);
         appendDivider();
-        showExploreBar(L('警戒探索中', 'Exploring'));
+        showExploreBar(_patrolLabel());
         if (!autoClockTimer) {
           autoClockTimer = setInterval(function() {
             autoElapsed += 200;
