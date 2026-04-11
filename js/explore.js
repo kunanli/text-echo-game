@@ -48,7 +48,7 @@ var lastAmbientIdx = -1;
 function pickAmbient() {
   var pool = AMBIENT_POOL;
   var idx;
-  do { idx = Math.floor(Math.random() * pool.length); } while (idx === lastAmbientIdx);
+  do { idx = rng(0, pool.length - 1); } while (idx === lastAmbientIdx);
   lastAmbientIdx = idx;
   return Object.assign({}, pool[idx], { delay: rng(1800, 2800) });
 }

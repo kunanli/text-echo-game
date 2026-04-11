@@ -122,7 +122,7 @@ function showLeaderboard() {
     return;
   }
 
-  LEADERBOARD.fetch(20, function(entries) {
+  LEADERBOARD.fetch(10, function(entries) {
     $loading.style.display = 'none';
     if (entries.length === 0) {
       $list.innerHTML = '<div class="lb-empty">' + L('暫無記錄', 'No entries yet') + '</div>';
@@ -138,7 +138,7 @@ function showLeaderboard() {
     };
 
     var html = '<table class="lb-table">';
-    html += '<tr class="lb-header"><th>#</th><th>' + L('玩家', 'Player') + '</th><th>' + L('分數', 'Score') + '</th><th>' + L('卡片', 'Card') + '</th></tr>';
+    html += '<tr class="lb-header"><th>#</th><th>' + L('玩家', 'Player') + '</th><th>' + L('周目', 'Cycle') + '</th><th>' + L('分數', 'Score') + '</th><th>' + L('卡片', 'Card') + '</th></tr>';
 
     for (var i = 0; i < entries.length; i++) {
       var e = entries[i];
@@ -147,10 +147,14 @@ function showLeaderboard() {
       var rarityColor = rarity ? rarity.color : '#6a6a7a';
       var card = endingCards[e.ending];
       var cardName = card ? (en ? card.en : card.zh) : '--';
+      var cycleLabel = e.cycle <= 1 ? (en ? '1st' : '一周目') : (en ? e.cycle + 'nd' : e.cycle + '周目');
+      if (en && e.cycle === 3) cycleLabel = '3rd';
+      if (en && e.cycle >= 4) cycleLabel = e.cycle + 'th';
 
       html += '<tr class="lb-row' + rankClass + '">';
       html += '<td class="lb-rank">' + (i + 1) + '</td>';
       html += '<td class="lb-name">' + e.name + '</td>';
+      html += '<td class="lb-cycle">' + cycleLabel + '</td>';
       html += '<td class="lb-score" style="color:' + rarityColor + '">' + e.score + '</td>';
       html += '<td class="lb-card" style="color:' + rarityColor + '">' + cardName + '</td>';
       html += '</tr>';

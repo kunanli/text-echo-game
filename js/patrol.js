@@ -566,7 +566,7 @@ var R0_EVENTS = [
           },
           { text: L('走開', 'Walk away'), textEn: 'Walk away',
             action: function() {
-              patrolAppend(L('巡邏','Patrol'), 'tag-move',
+              patrolAppend(L('探索','Explore'), 'tag-move',
                 L('你移開目光，繼續前進。身後傳來一聲極輕的嘆息——或者只是風聲。', 'You look away and move on. A faint sigh drifts from behind — or perhaps it\'s just the wind.'), false);
             }
           }
@@ -623,7 +623,7 @@ var R0_EVENTS = [
           },
           { text: L('不值得冒險', 'Not worth the risk'), textEn: 'Not worth the risk',
             action: function() {
-              patrolAppend(L('巡邏','Patrol'), 'tag-move',
+              patrolAppend(L('探索','Explore'), 'tag-move',
                 L('你記下了裂縫的位置，繼續前進。也許以後會回來。', 'You note the crack\'s location and move on. Perhaps you\'ll return.'), false);
             }
           }
@@ -703,7 +703,7 @@ var R0_EVENTS = [
                         var sb = document.createElement('button');
                         sb.className = 'choice-btn'; sb.textContent = L('停下腳步','Stop and rest');
                         sb.addEventListener('click', stopPatrol); $choices.appendChild(sb);
-                        patrolAppend(L('巡邏','Patrol'), 'tag-move',
+                        patrolAppend(L('探索','Explore'), 'tag-move',
                           L('你把吊墜放回她腳邊。轉身時，彷彿又聽見了極輕的哼唱。', 'You place the locket back. As you turn, you think you hear a faint hum once more.'), false);
                         patrolTimers.push(setTimeout(runPatrolCycle, 2000));
                       });
@@ -720,7 +720,7 @@ var R0_EVENTS = [
           { text: L('忽略它', 'Ignore it'), textEn: 'Ignore it',
             pauseQueue: true,
             action: function() {
-              patrolAppend(L('巡邏','Patrol'), 'tag-move',
+              patrolAppend(L('探索','Explore'), 'tag-move',
                 L('你捂住耳朵，加快腳步離開。有些聲音不該去追。', 'You cover your ears and quicken your pace. Some sounds are best left unfollowed.'), false);
               patrolTimers.push(setTimeout(runPatrolCycle, 2000));
             }
@@ -785,7 +785,7 @@ var R1_EVENTS = [
               patrolAppend(L('事件','Event'), 'tag-event',
                 L('小貓小心翼翼地從你手裡叼走食物，吃完後用頭蹭了蹭你的腳踝。然後它跳上鐵軌，朝迴廊深處跑去——走了幾步又回頭看你一眼。', 'The cat delicately takes the food from your hand. After eating, it bumps its head against your ankle. Then it hops onto the rail and trots deeper into the corridor — pausing once to look back at you.'), false);
               patrolAppend(L('系統','System'), 'tag-system',
-                L('巡邏戰鬥中受到的傷害 -10%（貓會分散敵人注意力）。', 'Patrol combat damage taken -10% (cat distracts enemies).'), false);
+                L('探索戰鬥中受到的傷害 -10%（貓會分散敵人注意力）。', 'Exploration combat damage taken -10% (cat distracts enemies).'), false);
               if (state.flags.r1YingCompanion) {
                 patrolAppend(L('同伴','Ally'), 'tag-ally',
                   L('螢看著跑遠的小貓，又看看你：「……你比看起來心軟。」她的語氣裡有一絲你說不清的東西。', 'Ying watches the cat go, then looks at you: "...You\'re softer than you look." There\'s something in her tone you can\'t quite place.'), false);
@@ -795,7 +795,7 @@ var R1_EVENTS = [
           },
           { text: L('不理牠', 'Ignore it'), textEn: 'Ignore it',
             action: function() {
-              patrolAppend(L('巡邏','Patrol'), 'tag-move',
+              patrolAppend(L('探索','Explore'), 'tag-move',
                 L('你沒有停下腳步。小貓在你身後叫了兩聲，然後消失在陰影裡。', 'You don\'t stop. The cat calls twice behind you, then vanishes into shadow.'), false);
             }
           }
@@ -946,7 +946,7 @@ var R1_EVENTS = [
           },
           { text: L('離開，不看', 'Walk away — don\'t look'), textEn: 'Walk away — don\'t look',
             action: function() {
-              patrolAppend(L('巡邏','Patrol'), 'tag-move',
+              patrolAppend(L('探索','Explore'), 'tag-move',
                 L('你沒有看鏡子。有些真相，知道得太早並不是好事。', 'You leave the mirror alone. Some truths are best left unknown.'), false);
             }
           }
@@ -965,7 +965,7 @@ registerPatrolEvents(1, R1_EVENTS);
 var R2_EVENTS = [
   // ── Event 1: 古代自動販賣機 (幽默+金幣) ──
   {
-    id: 'r2_vending', flag: '_evt_r2_vending', region: 2,
+    id: 'r2_vending', flag: '_evt_r2_vending', region: 2, ngPlusOnly: true,
     buildQueue: function(queue) {
       queue.push({ art: '<pre class="ascii-art">\n' +
         '     ╔══════════════╗\n' +
@@ -987,19 +987,19 @@ var R2_EVENTS = [
       queue.push({ tag: L('抉擇','Choice'), color: 'tag-event',
         text: L('投幣口的大小剛好適合你的金幣。', 'The coin slot is just the right size for your gold.'),
         choices: [
-          { text: (state.flags._gold || 0) >= 5
+          { text: (state.flags.gold || 0) >= 5
               ? L('投入 5 金幣', 'Insert 5 gold')
               : L('金幣不夠（需要 5 枚）', 'Not enough gold (need 5)'),
-            textEn: (state.flags._gold || 0) >= 5
+            textEn: (state.flags.gold || 0) >= 5
               ? 'Insert 5 gold'
               : 'Not enough gold (need 5)',
             action: function() {
-              if ((state.flags._gold || 0) < 5) {
+              if ((state.flags.gold || 0) < 5) {
                 patrolAppend(L('系統','System'), 'tag-system',
                   L('你翻遍了口袋，金幣不夠。', 'You search your pockets — not enough gold.'), false);
                 return;
               }
-              state.flags._gold -= 5;
+              state.flags.gold -= 5;
               sfx.click();
               // 50/50 reward or penalty
               if (Math.random() < 0.5) {
@@ -1026,7 +1026,7 @@ var R2_EVENTS = [
           },
           { text: L('不碰它', 'Leave it alone'), textEn: 'Leave it alone',
             action: function() {
-              patrolAppend(L('巡邏','Patrol'), 'tag-move',
+              patrolAppend(L('探索','Explore'), 'tag-move',
                 L('你離開了販賣機。幾百年前的東西，誰知道裡面還裝著什麼。', 'You leave the machine. Who knows what\'s been sitting inside for centuries.'), false);
             }
           }
@@ -1108,7 +1108,7 @@ var R2_EVENTS = [
           },
           { text: L('不信任他，離開', 'Don\'t trust him — leave'), textEn: 'Don\'t trust him — leave',
             action: function() {
-              patrolAppend(L('巡邏','Patrol'), 'tag-move',
+              patrolAppend(L('探索','Explore'), 'tag-move',
                 L('你遠遠繞開了營火。在深淵裡，陌生人的善意可能是最危險的東西。', 'You give the fire a wide berth. In the abyss, a stranger\'s kindness may be the most dangerous thing of all.'), false);
             }
           }
@@ -1146,11 +1146,19 @@ var R2_EVENTS = [
                 patrolAppend(L('事件','Event'), 'tag-event',
                   L('你拔腿就跑。碎石在你身後轟然落下，氣浪推著你向前滾了兩圈——但你活下來了。', 'You sprint. Rubble crashes behind you, the blast wave rolling you forward — but you\'re alive.'), false);
                 if (result === 'crit') {
-                  state.flags._gold = (state.flags._gold || 0) + 3;
-                  patrolAppend(L('事件','Event'), 'tag-item',
-                    L('灰塵散去後，你發現腳邊有幾枚被震出來的金幣。', 'As the dust clears, you spot coins shaken loose near your feet.'), false);
-                  patrolAppend(L('系統','System'), 'tag-system',
-                    L('金幣 +3。', 'Gold +3.'), false);
+                  if (state.flags.ngPlus) {
+                    state.flags.gold = (state.flags.gold || 0) + 3;
+                    patrolAppend(L('事件','Event'), 'tag-item',
+                      L('灰塵散去後，你發現腳邊有幾枚被震出來的金幣。', 'As the dust clears, you spot coins shaken loose near your feet.'), false);
+                    patrolAppend(L('系統','System'), 'tag-system',
+                      L('金幣 +3。', 'Gold +3.'), false);
+                  } else {
+                    gainXp(6);
+                    patrolAppend(L('事件','Event'), 'tag-item',
+                      L('灰塵散去後，你發現腳邊有一塊震碎的石化結晶——對你來說是寶貴的觀察樣本。', 'As the dust clears, you spot a shattered petri-crystal at your feet — a valuable study piece.'), false);
+                    patrolAppend(L('系統','System'), 'tag-system',
+                      L('經驗 +6。', 'XP +6.'), false);
+                  }
                 }
               } else {
                 sfx.fail();
@@ -1204,7 +1212,7 @@ registerPatrolEvents(2, R2_EVENTS);
 var R3_EVENTS = [
   // ── Event 1: 碼頭賭局 (金幣+冒險) ──
   {
-    id: 'r3_gamble', flag: '_evt_r3_gamble', region: 3,
+    id: 'r3_gamble', flag: '_evt_r3_gamble', region: 3, ngPlusOnly: true,
     buildQueue: function(queue) {
       queue.push({ art: '<pre class="ascii-art">\n' +
         '     ╔═══════════════╗\n' +
@@ -1223,19 +1231,19 @@ var R3_EVENTS = [
       queue.push({ tag: L('抉擇','Choice'), color: 'tag-event',
         text: L('你要參加嗎？', 'Join?'),
         choices: [
-          { text: (state.flags._gold || 0) >= 3
+          { text: (state.flags.gold || 0) >= 3
               ? L('加入（3 金幣）', 'Join (3 gold)')
               : L('金幣不夠（需要 3 枚）', 'Not enough gold (need 3)'),
-            textEn: (state.flags._gold || 0) >= 3
+            textEn: (state.flags.gold || 0) >= 3
               ? 'Join (3 gold)'
               : 'Not enough gold (need 3)',
             action: function() {
-              if ((state.flags._gold || 0) < 3) {
+              if ((state.flags.gold || 0) < 3) {
                 patrolAppend(L('系統','System'), 'tag-system',
                   L('你攤了攤手。光頭大漢嗤笑了一聲：「沒錢就別來湊熱鬧。」', 'You show empty palms. The bruiser snorts: "No coin, no game."'), false);
                 return;
               }
-              state.flags._gold -= 3;
+              state.flags.gold -= 3;
               var roll = rng(1, 6);
               sfx.click();
               patrolAppend(L('事件','Event'), 'tag-event',
@@ -1243,7 +1251,7 @@ var R3_EVENTS = [
               if (roll >= 5) {
                 sfx.pass();
                 var win = roll === 6 ? 8 : 5;
-                state.flags._gold = (state.flags._gold || 0) + win;
+                state.flags.gold = (state.flags.gold || 0) + win;
                 patrolAppend(L('事件','Event'), 'tag-item',
                   L(roll === 6
                     ? '六點！滿堂彩！碼頭工人們鼓掌叫好。光頭大漢把一大把金幣推到你面前：「手氣不錯嘛。」'
@@ -1265,8 +1273,8 @@ var R3_EVENTS = [
           },
           { text: L('搖頭離開', 'Shake your head and leave'), textEn: 'Shake your head and leave',
             action: function() {
-              patrolAppend(L('巡邏','Patrol'), 'tag-move',
-                L('你擺了擺手，繼續巡邏。身後傳來嘲弄的口哨聲。', 'You wave them off and move on. A mocking whistle trails behind you.'), false);
+              patrolAppend(L('探索','Explore'), 'tag-move',
+                L('你擺了擺手，繼續前行。身後傳來嘲弄的口哨聲。', 'You wave them off and move on. A mocking whistle trails behind you.'), false);
             }
           }
         ]
@@ -1278,15 +1286,34 @@ var R3_EVENTS = [
   {
     id: 'r3_thief_kid', flag: '_evt_r3_thief_kid', region: 3,
     buildQueue: function(queue) {
-      queue.push({ art: '<pre class="ascii-art">\n' +
-        '      ╭──╮\n' +
-        '      │··│    ╔═══╗\n' +
-        '      │▿ │ ←──║蘋果║\n' +
-        '    ╭─┤  ├─╮  ╚═══╝\n' +
-        '    │ ╰──╯ │  攤位\n' +
-        '    │      │  ═══════\n' +
-        '    ╰─┬──┬─╯\n' +
-        '      │  │\n' +
+      queue.push({ art: '<pre class="ascii-art gold">\n' +
+        '                       ╔═══════════╗\n' +
+        '        ╭──╮           ║  水果攤   ║\n' +
+        '       ╱ ·· ╲          ╠═══════════╣\n' +
+        '      │ ╲╱ │           ║ ◯  ◯  ◯  ║  ← 蘋果\n' +
+        '      │ ══ │           ║ ◯  ◉  ◯  ║\n' +
+        '      ╰────╯           ║ ◯  ◯  ◯  ║\n' +
+        '    ╱──┤  ├──╲         ╚═════╤═════╝\n' +
+        '    │ ╱ ⚡╲ │◀──偷──────·◉·  │\n' +
+        '    │ 破衣  │                攤主\n' +
+        '    ╰─┬──┬─╯          ═════════════\n' +
+        '      ╱    ╲               市集地板\n' +
+        '     ╱      ╲\n' +
+        '    赤腳的小孩\n' +
+        '</pre>', artEn: '<pre class="ascii-art gold">\n' +
+        '                       ╔═══════════╗\n' +
+        '        ╭──╮           ║ Fruit Stand║\n' +
+        '       ╱ ·· ╲          ╠═══════════╣\n' +
+        '      │ ╲╱ │           ║ ◯  ◯  ◯  ║  ← apples\n' +
+        '      │ ══ │           ║ ◯  ◉  ◯  ║\n' +
+        '      ╰────╯           ║ ◯  ◯  ◯  ║\n' +
+        '    ╱──┤  ├──╲         ╚═════╤═════╝\n' +
+        '    │ ╱ ⚡╲ │◀──steal───·◉·  │\n' +
+        '    │ rags  │                vendor\n' +
+        '    ╰─┬──┬─╯          ═════════════\n' +
+        '      ╱    ╲              market floor\n' +
+        '     ╱      ╲\n' +
+        '    barefoot kid\n' +
         '</pre>', delay: 800 });
       queue.push({ tag: L('感知','Sense'), color: 'tag-sense',
         text: L('市場的水果攤旁，一個瘦得皮包骨的小孩正把一顆蘋果塞進破爛的衣服裡。動作很快——但不夠快。', 'By the market fruit stall, a skeletal child is stuffing an apple into their ragged clothes. Quick — but not quick enough.'),
@@ -1317,20 +1344,26 @@ var R3_EVENTS = [
           },
           { text: L('向攤主舉報', 'Report to the vendor'), textEn: 'Report to the vendor',
             action: function() {
-              state.flags._gold = (state.flags._gold || 0) + 3;
               sfx.click();
               patrolAppend(L('事件','Event'), 'tag-event',
                 L('你指了指小孩。攤主一把抓住了那條瘦弱的手臂。「小兔崽子——！」', 'You point at the child. The vendor grabs that skinny arm. "You little rat — !"'), false);
               patrolAppend(L('感知','Sense'), 'tag-sense',
                 L('小孩被拖走的時候回頭看了你一眼。那雙眼睛裡終於有了情緒——不是恨，是失望。', 'As the child is dragged away, they look back at you. Finally, emotion in those eyes — not hatred. Disappointment.'), false);
-              patrolAppend(L('系統','System'), 'tag-system',
-                L('攤主感謝你，給了你 3 金幣。', 'The vendor thanks you with 3 gold.'), false);
+              if (state.flags.ngPlus) {
+                state.flags.gold = (state.flags.gold || 0) + 3;
+                patrolAppend(L('系統','System'), 'tag-system',
+                  L('攤主感謝你，給了你 3 金幣。', 'The vendor thanks you with 3 gold.'), false);
+              } else {
+                addItem(L('蘋果', 'Apple'));
+                patrolAppend(L('系統','System'), 'tag-system',
+                  L('攤主感謝你，塞了一顆蘋果給你。', 'The vendor thanks you with an apple.'), false);
+              }
               renderStatus();
             }
           },
           { text: L('假裝沒看到', 'Pretend you didn\'t see'), textEn: 'Pretend you didn\'t see',
             action: function() {
-              patrolAppend(L('巡邏','Patrol'), 'tag-move',
+              patrolAppend(L('探索','Explore'), 'tag-move',
                 L('你移開視線，繼續走你的路。河城的規矩不關你的事。', 'You look away and continue on your path. River Port\'s rules aren\'t your concern.'), false);
             }
           }
@@ -1418,7 +1451,7 @@ var R3_EVENTS = [
           },
           { text: L('丟掉它', 'Discard it'), textEn: 'Discard it',
             action: function() {
-              patrolAppend(L('巡邏','Patrol'), 'tag-move',
+              patrolAppend(L('探索','Explore'), 'tag-move',
                 L('你把信扔進了路邊的火盆。匿名信從來不是好東西。', 'You toss the letter into a roadside brazier. Anonymous letters are never good news.'), false);
             }
           }
@@ -1445,12 +1478,23 @@ var _patrolOnDiscovery = null;  // callback when player chooses to leave on firs
 var _firstPatrolEvents = [];    // special events during first-visit patrol
 var _firstPatrolDiscoveryCycle = 3; // cycle threshold for discovery prompt
 
+function _patrolLabel() {
+  var labels = [
+    { zh: '深入陰影搜索中', en: 'Prowling the Depths' },
+    { zh: '潛行於石脈之間', en: 'Stalking the Veins' },
+    { zh: '在廢墟中狩獵', en: 'Hunting the Ruins' },
+    { zh: '穿行於河城暗處', en: 'Roaming the Undercity' },
+  ];
+  var l = labels[state.region] || labels[0];
+  return L(l.zh, l.en);
+}
+
 // Discovery texts per region (shown after N cycles on first visit)
 var DISCOVERY_TEXTS = {
   0: { zh: '你注意到坑壁上方有一條向上延伸的裂縫——也許能通往更深的地方。', en: 'You notice a crack extending upward along the pit wall — perhaps it leads somewhere deeper.' },
-  1: { zh: '巡邏途中，你發現前方的隧道分出了幾條岔路——迴廊的全貌逐漸在你眼前展開。', en: 'While patrolling, you spot tunnels branching ahead — the full layout of the corridor unfolds before you.' },
+  1: { zh: '你在石脈的陰影間穿梭時，發現前方的隧道分出了幾條岔路——迴廊的全貌逐漸在你眼前展開。', en: 'As you slip between the vein shadows, you spot tunnels branching ahead — the full layout of the corridor unfolds before you.' },
   2: { zh: '你登上一處高台，俯瞰整個採石場——遠處似乎有營火的光芒。', en: 'You climb a vantage point overlooking the quarry — in the distance, you spot the glow of campfires.' },
-  3: { zh: '巡邏中你發現了幾條尚未探索的巷道——河城比你想像的要大得多。', en: 'While patrolling, you discover unexplored alleyways — the river city is far larger than you imagined.' }
+  3: { zh: '你沿著潮濕的石牆行進時，發現了幾條尚未探索的巷道——河城比你想像的要大得多。', en: 'Skirting the damp stone walls, you discover unexplored alleyways — the river city is far larger than you imagined.' }
 };
 
 function clearPatrolTimers() {
@@ -1511,7 +1555,7 @@ function startPatrol(opts) {
   ambientAudio.setCombat(true);
   renderStatus();
   appendDivider();
-  showExploreBar(L('警戒巡邏中', 'Patrolling'));
+  showExploreBar(_patrolLabel());
   autoClockTimer = setInterval(function() {
     autoElapsed += 200;
     updateExploreTimer();
@@ -1590,7 +1634,7 @@ function runNarrativeEvent(evt) {
   // 1-2 patrol flavor lines (same as combat preamble)
   var patrolPool = getPatrolTexts();
   var p = patrolPool[rng(0, patrolPool.length - 1)];
-  queue.push({ tag: L('巡邏','Patrol'), color: 'tag-move',
+  queue.push({ tag: L('探索','Explore'), color: 'tag-move',
     text: L(p.text, p.textEn), delay: rng(1500, 2300) });
 
   // Event builds its own steps into the queue
@@ -1725,7 +1769,7 @@ function showPatrolDiscovery() {
 
   var btnContinue = document.createElement('button');
   btnContinue.className = 'choice-btn';
-  btnContinue.textContent = L('繼續巡邏', 'Continue patrolling');
+  btnContinue.textContent = L('繼續探索', 'Continue exploring');
   btnContinue.addEventListener('click', function() {
     sfx.click();
     // Mark cleared but continue patrolling — now show stop button
@@ -1804,7 +1848,7 @@ function runPatrolCycleManual(monster) {
     var idx; do { idx = rng(0, patrolPool.length - 1); } while (used.indexOf(idx) !== -1);
     used.push(idx);
     var p = patrolPool[idx];
-    queue.push({ tag: L('巡邏','Patrol'), color: 'tag-move', text: L(p.text, p.textEn), delay: rng(1500, 2300) });
+    queue.push({ tag: L('探索','Explore'), color: 'tag-move', text: L(p.text, p.textEn), delay: rng(1500, 2300) });
   }
 
   // Suspense line — tension build-up before encounter
@@ -1891,7 +1935,7 @@ function runPatrolCycleManual(monster) {
         state.mood = 'combat';
         ambientAudio.setCombat(true);
         appendDivider();
-        showExploreBar(L('警戒巡邏中', 'Patrolling'));
+        showExploreBar(_patrolLabel());
         if (!autoClockTimer) {
           autoClockTimer = setInterval(function() {
             autoElapsed += 200;
@@ -1981,7 +2025,7 @@ function runPatrolCycleAuto(monster) {
     var idx; do { idx = rng(0, patrolPool.length - 1); } while (used.indexOf(idx) !== -1);
     used.push(idx);
     var p = patrolPool[idx];
-    queue.push({ tag: L('巡邏','Patrol'), color: 'tag-move', text: L(p.text, p.textEn), delay: rng(1500, 2300) });
+    queue.push({ tag: L('探索','Explore'), color: 'tag-move', text: L(p.text, p.textEn), delay: rng(1500, 2300) });
   }
 
   // Suspense line
@@ -2053,8 +2097,8 @@ function runPatrolCycleAuto(monster) {
   });
 
   // Continue text
-  queue.push({ tag: L('巡邏','Patrol'), color: 'tag-move',
-    text: L('繼續巡邏……', 'Continuing patrol...'), delay: 2200 });
+  queue.push({ tag: L('探索','Explore'), color: 'tag-move',
+    text: L('繼續探索……', 'Continuing exploration...'), delay: 2200 });
 
   // Process queue sequentially with pending indicators
   var qi = 0;

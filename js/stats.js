@@ -18,6 +18,7 @@ var globalStats = {
   fastestRunMs: 0,
   currentRunStartMs: 0,
   bankedPoints: 0,
+  bankedGold: 0,          // NG+-only: persistent gold carried across cycles (best value)
   romanceHistory: {},     // { ying: { maxAffinity: 85, timesRomanced: 1 }, ... }
   romanceCarryOver: null, // last-run romance NPC id (for NG+ inheritance)
 };

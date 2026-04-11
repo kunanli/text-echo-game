@@ -126,68 +126,15 @@ registerNode('r3_look', () => {
     state.flags.r3CouncilUnlocked = true;
   }
 
-  // First-visit passive patrol: danger descriptions before mandatory patrol
-  if (!state.flags.r3PatrolCleared) {
-    steps.push({ tag: '警告', tagColor: 'tag-warn', text: '城市外圍的河岸隧道裡傳來令人不安的聲響——變異生物在那裡築巢。', textEn: 'Unsettling sounds drift from the river tunnels beyond the city\'s edge — mutants have nested there.', delay: 2500 });
-    steps.push({ tag: '感知', tagColor: 'tag-sense', text: '碼頭的守衛告訴你：「外圍隧道很危險，最好先清理一下再進城活動。」', textEn: 'A dock guard warns you: "The outer tunnels are dangerous. Best clear them out before moving around the city."', delay: 3000 });
-    steps.push({ tag: '判斷', tagColor: 'tag-move', text: '你決定先確保城市外圍的安全——這也是熟悉這片區域的好方法。', textEn: 'You decide to secure the city perimeter first — a good way to familiarize yourself with the area.', delay: 2500 });
+  // River City is a civilized zone — no wild encounters in the hub itself.
+  // Combat only happens if the player deliberately chooses to venture into
+  // the river tunnels (r3_patrol). First visit shows a hint about the tunnels
+  // but does not force the player into them.
+  if (firstVisit) {
+    steps.push({ tag: '情報', tagColor: 'tag-info', text: '城市本身相當安全——但北面的河岸隧道另當別論。守衛告訴你那裡棲息著變異生物，普通人都避而遠之。', textEn: 'The city itself is safe — but the river tunnels to the north are another matter. Guards say mutants nest there; ordinary people steer clear.', delay: 2800 });
   }
 
   autoExplore(steps, (function() {
-    // First visit: mandatory patrol (passive event)
-    if (!state.flags.r3PatrolCleared) {
-      return [{ text: L('進入河岸隧道巡邏……', 'Enter the river tunnels on patrol...'), textEn: 'Enter the river tunnels on patrol...', action: () => {
-        startPatrol({ firstVisit: true, onDiscovery: function() { stopPatrol(); },
-          firstVisitEvents: [
-            // Cycle 2: A dock guard is overwhelmed by mutants
-            { cycle: 2, buildQueue: function(queue) {
-              queue.push({ tag: L('感知','Sense'), color: 'tag-sense',
-                text: L('隧道深處傳來金屬碰撞聲和喊叫聲——有人在戰鬥。', 'Clanging metal and shouts echo from deep in the tunnel — someone is fighting.'),
-                delay: 2500, pending: true });
-              queue.push({ tag: L('遭遇','Encounter'), color: 'tag-combat',
-                text: L('一個碼頭守衛被三隻變異水蛭包圍，長矛已經折斷了一半。', 'A dock guard is surrounded by three mutant leeches, his spear half-broken.'),
-                delay: 2800, pending: true });
-              queue.push({
-                text: L('你要怎麼做？', 'What do you do?'),
-                choices: [
-                  { text: L('加入戰鬥！', 'Join the fight!'), textEn: 'Join the fight!', action: function() {
-                    sfx.hit();
-                    patrolAppend(L('戰鬥','Battle'), 'tag-combat',
-                      L('你從側翼殺入——兩面夾擊之下，水蛭們四散逃竄！', 'You strike from the flank — caught in a pincer, the leeches scatter!'), false);
-                    changeHp(-4); renderStatus();
-                    setTimeout(function() {
-                      patrolAppend(L('對話','Dialogue'), 'tag-info',
-                        L('守衛喘著氣：「多謝……你是外面來的？議會的銅鐘大人應該會想見你。碼頭和市場先逛逛，打聽打聽情況。」',
-                          '"Thanks... You\'re from outside? Councilor Bronze Bell would want to meet you. Check out the dock and market first, get the lay of the land."'), false);
-                      state.flags.r3GuardSaved = true;
-                      gainXp(5);
-                      renderStatus();
-                      patrolTimers.push(setTimeout(runPatrolCycle, 3000));
-                    }, 2800);
-                  }},
-                  { text: L('繞路避開', 'Take a detour'), textEn: 'Take a detour', action: function() {
-                    patrolAppend(L('感知','Sense'), 'tag-sense',
-                      L('你悄悄繞開了戰場。身後傳來守衛的慘叫聲——但你不能冒險。',
-                        'You quietly skirt the battlefield. The guard\'s screams echo behind you — but you can\'t take the risk.'), false);
-                    patrolTimers.push(setTimeout(runPatrolCycle, 2000));
-                  }}
-                ]
-              });
-            }},
-            // Cycle 4: Find contraband near the tunnels
-            { cycle: 4, buildQueue: function(queue) {
-              queue.push({ tag: L('發現','Find'), color: 'tag-explore',
-                text: L('隧道壁的暗洞裡藏著一個油布包裹——裡面是走私物資。', 'A hidden alcove in the tunnel wall holds an oilcloth bundle — smuggled goods.'),
-                delay: 2800, pending: true });
-              queue.push({ tag: L('物品','Item'), color: 'tag-item',
-                text: L('你找到了一瓶淨化液。也許是灰鶴的存貨？', 'You find a purification vial. Grey Crane\'s stash, perhaps?'),
-                delay: 2000, sfx: 'item',
-                effect: function() { addItem(L('淨化液', 'Purification Vial')); renderStatus(); } });
-            }}
-          ]
-        });
-      }}];
-    }
     var c = [];
     c.push({ text: '碼頭', textEn: 'Dock', action: () => loadNode('r3_dock') });
     c.push({ text: '市場', textEn: 'Market', action: () => loadNode('r3_market') });
@@ -206,9 +153,9 @@ registerNode('r3_look', () => {
     if (state.flags.r3MarketVisited && !state.flags.r3ZhouMet) {
       c.push({ text: '市場角落的老人', textEn: 'Old man in the market corner', action: () => loadNode('r3_zhou') });
     }
-    if (state.flags.r3BellQuest && !state.flags.r3Ending) {
-      c.push({ text: '回報銅鐘（任務進度）', textEn: 'Report to Bronze Bell (quest progress)', action: () => loadNode('r3_quest_check') });
-    }
+    // Note: "回報銅鐘（任務進度）" moved into r3_council submenu to avoid accidental
+    // spam-clicks from shifting hub positions. Player must deliberately enter Council Hall
+    // to report progress. See r3_council for the quest-check entry point.
     // Sub-hub: optional exploration nodes
     var hasR3Explore = !state.flags.r3UndergroundDone || !state.flags.r3TempleDone
       || !state.flags.r3LibraryDone || !state.flags.r3SlumDone
@@ -232,8 +179,9 @@ registerNode('r3_look', () => {
           npcEvents.concat([{ text: '返回', textEn: 'Return', action: () => loadNode('r3_look') }]));
       }});
     }
-    c.push({ text: '巡邏（練級）', textEn: 'Patrol (grind)', action: () => loadNode('r3_patrol') });
-    c.push({ text: '返回上升通道', textEn: 'Return to ascent shaft', action: () => loadNode('r2_gate') });
+    c.push({ text: '深入河岸隧道探索', textEn: 'Venture into the riverbank tunnels', action: () => loadNode('r3_patrol') });
+    // Removed "返回上升通道 → r2_gate" — R3 is the final region. Players clicking this
+    // accidentally jumped back to R2 mecha area. No legitimate reason to backtrack.
     return c;
   })(), { label: L('河城渡口', 'River City Ferry') });
 });
@@ -729,7 +677,7 @@ registerNode('r3_bell', () => {
             state.flags.r3BellQuest = true;
             loadNode('r3_look');
           }},
-          { text: '離開', textEn: 'Leave', action: () => loadNode('r3_council') },
+          { text: '離開', textEn: 'Leave', action: () => loadNode('r3_look') },
         ], { label: L('銅鐘的考驗', 'Bronze Bell\'s test') });
       }});
     }
@@ -768,7 +716,10 @@ registerNode('r3_bell', () => {
     if (state.flags.ngPlus && state.flags.r3BellNgMemory && !state.flags.r3BellNgGarden && typeof getNpcAffinityNum === 'function' && getNpcAffinityNum('bell') >= 85) {
       c.push({ text: '銅鐘邀你去議會花園走走', textEn: 'Bell invites you to walk in the Council garden', action: () => loadNode('r3_bell_ng_garden') });
     }
-    c.push({ text: '離開', textEn: 'Leave', action: () => loadNode(state.flags.r3BellQuest ? 'r3_look' : 'r3_council') });
+    // Leave always returns to the hub — prevents accidental re-entry into council
+    // chain after Bell dialog. Previously went to r3_council post-quest which added
+    // confusion since r3_council auto-shows the quest-check button.
+    c.push({ text: '離開', textEn: 'Leave', action: () => loadNode('r3_look') });
     return c;
   })(), { label: L('銅鐘', 'Bronze Bell') });
 });
@@ -2251,19 +2202,20 @@ registerNode('r3_crane', () => {
         ], { label: L('灰鶴的新貨', 'Grey Crane\'s new goods') });
       }});
     }
-    // Gambling — always available
-    c.push({ text: L('來一把吹牛骰？', 'Fancy a game of Liar\'s Dice?'), action: () => {
+    if (state.flags.ngPlus) c.push({ text: L('來一把吹牛骰？', 'Fancy a game of Liar\'s Dice?'), action: () => {
+      var bet = 10;
       var gold = state.flags.gold || 0;
-      // R3 bets are higher
-      var bet = Math.max(10, Math.min(40, Math.floor(gold / 3) + 10));
       if (gold < bet) {
-        if (gold < 10) {
-          state.flags.gold = 15;
-          gold = 15;
-          notify(L('灰鶴借了你 15 金幣：「河城的賭注可比營地大。」', 'Grey Crane lends you 15 gold: "Stakes are higher in River City."'));
-          renderStatus();
-        }
-        bet = 10;
+        state.flags.gold = bet;
+        gold = bet;
+        var loanLines = [
+          { zh: '灰鶴從斗篷內袋又摸出一把金幣：「河城的賭注大，我先給你墊 ' + bet + '。」', en: 'Grey Crane fishes more coins from her cloak pocket: "Stakes are bigger in River City — ' + bet + ' on me."' },
+          { zh: '灰鶴搖頭笑了：「又空了？行，' + bet + ' 金——別輸光就行。」', en: 'Grey Crane shakes her head, laughing: "Empty again? Fine, ' + bet + ' gold — try not to lose it all."' },
+          { zh: '灰鶴把一串金幣叮噹扔到桌上：「拿著。河城的朋友比金幣值錢多了。」', en: 'Grey Crane tosses a string of coins onto the table with a clink: "Take them. Friends in River City are worth more than gold."' },
+        ];
+        var ln = loanLines[rng(0, loanLines.length - 1)];
+        notify(L(ln.zh, ln.en));
+        renderStatus();
       }
       var introSteps = [];
       if (!state.flags.r3DicePlayed) {
@@ -2617,130 +2569,6 @@ registerNode('r3_crane_deal', () => {
         ], { label: L('灰鶴的決定', 'Grey Crane\'s decision') });
       }},
   ], { label: L('灰鶴的決定', 'Grey Crane\'s decision') });
-});
-
-// ═══════════════════════════════════════════════════
-//  NPC Sidequest — 灰鶴 (Grey Crane) Deep Arc (R3)
-// ═══════════════════════════════════════════════════
-
-// --- r3_crane_merchant: Secret warehouse with high-purity purifier ---
-registerNode('r3_crane_merchant', () => {
-  state.flags.r3CraneMerchant = true;
-  addNpcAffinity('crane', 8);
-  autoExplore([
-    { art: `<pre class="ascii-art gold">
-  ╔═══════════════════════════════╗
-  ║  河城暗巷 · 秘密倉庫          ║
-  ╠═══════════════════════════════╣
-  ║                               ║
-  ║   ┌─────────────────┐        ║
-  ║   │ ◆ ◆ ◆ ◆ ◆ ◆ ◆ │        ║
-  ║   │ 瓶 瓶 箱 箱 瓶  │        ║
-  ║   │ ◆ 走私物資 ◆    │        ║
-  ║   └─────────────────┘        ║
-  ║          灰鶴 ↓               ║
-  ║           ╱═╲                 ║
-  ║          │·˚·│                ║
-  ╚═══════════════════════════════╝
-</pre>`, artEn: `<pre class="ascii-art gold">
-  ╔═══════════════════════════════╗
-  ║  RIVER CITY ALLEY · WAREHOUSE ║
-  ╠═══════════════════════════════╣
-  ║                               ║
-  ║   ┌─────────────────┐        ║
-  ║   │ ◆ ◆ ◆ ◆ ◆ ◆ ◆ │        ║
-  ║   │ btl btl crt crt │        ║
-  ║   │ ◆ Smuggled ◆    │        ║
-  ║   └─────────────────┘        ║
-  ║        Grey Crane ↓           ║
-  ║           ╱═╲                 ║
-  ║          │·˚·│                ║
-  ╚═══════════════════════════════╝
-</pre>`, delay: 800 },
-    { tag: '灰鶴', tagColor: 'tag-npc', text: '灰鶴左右看了看，確認沒人跟蹤，然後從市場後面的暗巷一個接一個轉彎，最後在一扇鏽蝕的鐵門前停下。', textEn: 'Grey Crane checks both ways, confirms no one follows, then weaves through alleys behind the market, stopping at a rusted iron door.', delay: 3000 },
-    { tag: '灰鶴', tagColor: 'tag-npc', text: '「你救了我一次。我不習慣欠人情。」她掏出一把鑰匙。「所以——讓你看看我的真正家底。」', textEn: '"You saved me once. I don\'t like owing debts." She pulls out a key. "So — let me show you my real stock."', delay: 3000 },
-    { tag: '環境', tagColor: 'tag-sense', text: '門打開。裡面是一個不大的石室，但堆滿了箱子和瓶子。空氣裡瀰漫著一股濃烈的藥草味。', textEn: 'The door opens. Inside: a small stone room packed with crates and bottles. The air reeks of potent herbs.', delay: 2800 },
-    { tag: '灰鶴', tagColor: 'tag-npc', html: '灰鶴拿起一個深藍色的瓶子：「<b>高濃度淨化劑</b>——地表配方，不是河城那種稀釋貨。一瓶能把石化度壓二十個百分點。」', htmlEn: 'Grey Crane picks up a deep blue bottle: "<b>High-purity Purifier</b> — surface formula, not River City\'s diluted stuff. One bottle suppresses petrification by twenty percent."', delay: 3200 },
-    { tag: '物品', tagColor: 'tag-item', text: '她把瓶子塞到你手裡。「拿著。算是還你在採石場的人情。」', textEn: 'She pushes the bottle into your hands. "Take it. Pays back what you did at the quarry."', delay: 2500, effect: () => { addItem(L('高濃度淨化劑', 'High-purity Purifier')); changePetri(-20); } },
-    { tag: '效果', tagColor: 'tag-system', text: L('獲得高濃度淨化劑，石化度 -20%', 'Acquired High-purity Purifier, Petri -20%'), delay: 1500 },
-    { tag: '灰鶴', tagColor: 'tag-npc', text: '她看著滿倉的物資，表情有些複雜。「這些東西……都是走私的。藥劑、食物、工具。夠養活下面幾百個人一個月。」', textEn: 'She surveys the warehouse, expression conflicted. "All of this... smuggled. Medicine, food, tools. Enough to sustain hundreds below for a month."', delay: 3200 },
-    { tag: '灰鶴', tagColor: 'tag-npc', text: '「但如果議會知道了，我就完了。走私可是重罪。」她苦笑。「所以一直藏著。」', textEn: '"But if the Council finds out, I\'m done. Smuggling is a capital offense." She smiles bitterly. "So I kept it hidden."', delay: 3000 },
-  ], [
-    { text: '這些物資可以救很多人', textEn: 'These supplies could save many lives', action: () => {
-      gainXp(10);
-      notify(L('經驗 +10（灰鶴的秘密倉庫）', 'XP +10 (Grey Crane\'s secret warehouse)'));
-      loadNode('r3_crane');
-    }},
-  ], { label: L('秘密倉庫', 'Secret Warehouse') });
-});
-
-// --- r3_crane_past: Real name and someone on the surface ---
-registerNode('r3_crane_past', () => {
-  state.flags.r3CranePast = true;
-  addNpcAffinity('crane', 12);
-  autoExplore([
-    { art: npcPortrait.art('crane', { subtitle: '……' }) || `<pre class="ascii-art gold">
-       ·  ˚  灰鶴 — 月光下  ˚  ·
-              ╱═══╲
-             ╱ ·˚· ╲
-            │ ─  ─  │  ← 眼眶濕潤
-            │  ╲─╱  │
-             ╲──┬──╱
-          ╱░░░╲ │ ╱░░░╲
-         ╱░░░░░╲│╱░░░░░╲
-        │░  ╱──┤├──╲  ░│
-         ╲╱    ╲╱    ╲╱
-</pre>`, artEn: npcPortrait.art('crane', { subtitle: '...' }) || `<pre class="ascii-art gold">
-    ·  ˚  Grey Crane — Moonlight  ˚  ·
-              ╱═══╲
-             ╱ ·˚· ╲
-            │ ─  ─  │  ← eyes moist
-            │  ╲─╱  │
-             ╲──┬──╱
-          ╱░░░╲ │ ╱░░░╲
-         ╱░░░░░╲│╱░░░░░╲
-        │░  ╱──┤├──╲  ░│
-         ╲╱    ╲╱    ╲╱
-</pre>`, delay: 800 },
-    { tag: '灰鶴', tagColor: 'tag-npc', text: '灰鶴坐在碼頭邊，腳晃在水面上。她沒有喝酒——這是你第一次見她不喝酒。', textEn: 'Grey Crane sits at the dock\'s edge, feet dangling over the water. She isn\'t drinking — the first time you\'ve seen her sober.', delay: 2800 },
-    { tag: '灰鶴', tagColor: 'tag-npc', text: '「你知道追債人叫我什麼嗎？秋蘅。」她的聲音很平靜。「那是我的本名。灰鶴是做生意用的化名。」', textEn: '"You know what the debt collectors called me? Qiu Heng." Her voice is calm. "That\'s my real name. Grey Crane is just a trade alias."', delay: 3200 },
-    { tag: '灰鶴', tagColor: 'tag-npc', text: '「地表上——有一個叫秋蕓的女孩在等我回去。」她抬頭看黑暗的洞頂，像是在看天空。「我妹妹。」', textEn: '"On the surface — there\'s a girl named Qiu Yun waiting for me." She looks up at the dark cavern ceiling as if seeing sky. "My sister."', delay: 3200 },
-    { tag: '灰鶴', tagColor: 'tag-npc', text: '「她不知道我在地下。我寫信說我去遠方做生意了。」灰鶴的手指揪著衣角。「三年了。她大概以為我死了。」', textEn: '"She doesn\'t know I\'m underground. I wrote saying I went trading far away." Grey Crane twists her hem. "Three years. She probably thinks I\'m dead."', delay: 3500 },
-    { tag: '感知', tagColor: 'tag-sense', text: '碼頭的水面映著幽暗的磷光。灰鶴的表情不再是那個精明的商人——而是一個想回家的姐姐。', textEn: 'Phosphorescent light reflects off the dock water. Grey Crane\'s expression is no longer a shrewd merchant\'s — but an older sister who wants to go home.', delay: 3000 },
-    { tag: '灰鶴', tagColor: 'tag-npc', text: '「我欠的債——利滾利，現在大概是當初的十倍了。」她搖了搖頭。「但如果通道封了……我就永遠回不去了。」', textEn: '"My debt — with compounding interest, probably ten times the original by now." She shakes her head. "But if the passages are sealed... I can never go back."', delay: 3500 },
-    { tag: '灰鶴', tagColor: 'tag-npc', text: '「所以我才做走私。攢錢。想有一天……」她沒說完，但你懂了。', textEn: '"That\'s why I smuggle. Save money. Hoping one day..." She doesn\'t finish, but you understand.', delay: 2800 },
-  ], [
-    { text: '你會回去的。我幫你', textEn: 'You\'ll go back. I\'ll help you', action: () => {
-      gainXp(8);
-      notify(L('經驗 +8（灰鶴的信任）', 'XP +8 (Grey Crane\'s trust)'));
-      loadNode('r3_crane');
-    }},
-  ], { label: L('秋蘅的本名', 'Qiu Heng\'s True Name') });
-});
-
-// --- r3_crane_deal: Donate all smuggled supplies for amnesty ---
-registerNode('r3_crane_deal', () => {
-  state.flags.r3CraneDealDone = true;
-  addNpcAffinity('crane', 10);
-  autoExplore([
-    { tag: '灰鶴', tagColor: 'tag-npc', text: '灰鶴聽完你的提議，沉默了很久。她盯著碼頭的水面，好像在計算什麼。', textEn: 'Grey Crane listens to your proposal, then falls silent for a long time. She stares at the water, as if calculating something.', delay: 2800 },
-    { tag: '灰鶴', tagColor: 'tag-npc', text: '「把所有走私物資捐給議會？換赦免？」她重複了一遍，語氣複雜。「那可是我三年的全部家當。」', textEn: '"Donate all smuggled supplies to the Council? In exchange for amnesty?" She repeats it, tone conflicted. "That\'s everything I\'ve earned in three years."', delay: 3500 },
-    { tag: '灰鶴', tagColor: 'tag-npc', text: '「但如果銅鐘能保證議會不追究……」她捏了捏手臂上的舊疤。「我就不用再躲了。」', textEn: '"But if Bronze Bell can guarantee the Council won\'t prosecute..." She touches the old scars on her arm. "Then I won\'t need to hide anymore."', delay: 3200 },
-    { tag: '灰鶴', tagColor: 'tag-npc', text: '她站起來。眼神比你見過的任何時候都認真。', textEn: 'She stands. Her eyes are more serious than you\'ve ever seen.', delay: 2200 },
-    { tag: '灰鶴', tagColor: 'tag-npc', html: '「好。<b>全捐了</b>。藥劑、食物、工具——一箱都不留。」她的聲音在發抖，但拳頭攥得很緊。', htmlEn: '"Fine. <b>Donate everything</b>. Medicine, food, tools — not a single crate kept." Her voice shakes, but her fists are clenched tight.', delay: 3000 },
-    { tag: '灰鶴', tagColor: 'tag-npc', text: '「秋蕓在等我。我不需要錢——我需要一條回家的路。」', textEn: '"Qiu Yun is waiting for me. I don\'t need money — I need a way home."', delay: 2800 },
-    { tag: '效果', tagColor: 'tag-system', html: L('<b>灰鶴將全部走私物資捐給議會</b>。議會投票影響力 +2', '<b>Grey Crane donates all smuggled supplies to the Council</b>. Council vote influence +2'), delay: 2000 },
-    { tag: '灰鶴', tagColor: 'tag-npc', text: '灰鶴從脖子上解下一條細繩，上面掛著一枚磨損的銅幣。「這是秋蕓給我的護身符——我們從小一人一枚。」', textEn: 'Grey Crane unties a thin cord from her neck, bearing a worn copper coin. "Qiu Yun\'s charm — we each had one since childhood."', delay: 3200 },
-    { tag: '灰鶴', tagColor: 'tag-npc', text: '她把銅幣放在你掌心。「你拿著。到時候——如果我回不去——替我還給她。」', textEn: 'She places it in your palm. "Keep it. If I can\'t make it back — return it to her for me."', delay: 3000 },
-    { tag: '物品', tagColor: 'tag-item', text: L('獲得「秋蕓的銅幣」', 'Acquired "Qiu Yun\'s Coin"'), delay: 1500, effect: () => { addItem(L('秋蕓的銅幣', 'Qiu Yun\'s Coin')); } },
-  ], [
-    { text: '一言為定——你一定能回去', textEn: 'It\'s a promise — you\'ll make it back', action: () => {
-      gainXp(15);
-      changeStat('wil', 1);
-      notify(L('經驗 +15，意志 +1（灰鶴的交易）', 'XP +15, WIL +1 (Grey Crane\'s deal)'));
-      loadNode('r3_crane');
-    }},
-  ], { label: L('灰鶴的交易', 'Grey Crane\'s Deal') });
 });
 
 
@@ -3165,9 +2993,9 @@ registerNode('r3_patrol', () => {
     { tag: '判斷', tagColor: 'tag-move', text: '渡口外圍的河岸隧道裡棲息著各種變異生物。城市的守衛不會巡邏到那裡。', textEn: 'Mutated creatures nest in the river tunnels beyond the docks. City guards don\'t patrol there.', delay: 2200 },
     { tag: '感知', tagColor: 'tag-sense', text: '你握緊武器，踏入了河岸隧道的陰暗深處。', textEn: 'You grip your weapon and step into the dark river tunnels.', delay: 2000 },
   ], [
-    { text: '開始巡邏', textEn: 'Begin patrol', action: () => startPatrol() },
+    { text: '開始探索', textEn: 'Begin exploring', action: () => startPatrol() },
     { text: '返回', textEn: 'Return', action: () => loadNode('r3_look') },
-  ], { label: L('準備巡邏', 'Preparing patrol') });
+  ], { label: L('準備探索', 'Preparing exploration') });
 });
 
 // ═══════════════════════════════════════════════════
@@ -3314,11 +3142,13 @@ registerNode('r3_boss_prep', () => {
   }
 
   var bossChoices = [];
+  // Safe options first — prevent spam-click chain from r3_quest_check → r3_boss_prep → r3_boss
+  bossChoices.push({ text: '先去準備一下（補給、道別、支線）', textEn: 'Prepare first (supplies, farewells, sidequests)', action: () => loadNode('r3_look') });
   if (state.flags.r1YingCompanion && !state.flags.r3YingFarewell) {
     bossChoices.push({ text: '螢站在走廊盡頭看著你……', textEn: 'Ying stands at the corridor\'s end, watching you...', action: () => loadNode('r3_ying_farewell') });
   }
-  bossChoices.push({ text: '走向議會大廳', textEn: 'Head to the Council chamber', action: () => loadNode('r3_boss') });
-  bossChoices.push({ text: '先去準備一下', textEn: 'Prepare first', action: () => loadNode('r3_look') });
+  // Deliberate boss entry — ★ mark + warning label
+  bossChoices.push({ text: '★ 決意走向議會大廳（將直接面對鏽刃）', textEn: '★ Commit: walk to the Council chamber (will face Rust Blade)', action: () => loadNode('r3_boss') });
 
   autoExplore(steps, bossChoices, { label: L('決戰前夕', 'Eve of the showdown') });
 });
@@ -3329,52 +3159,59 @@ registerNode('r3_boss_prep', () => {
 
 registerNode('r3_boss', () => {
   var BOSS = {
-    name: '鏽刃', nameEn: 'Rust Blade',
+    name: '御前守衛 鏽刃', nameEn: 'Imperial Guard — Rust Blade',
     hp: 55, atkMin: 20, atkMax: 36, petriDmg: 8, xp: 45,
     empathyGoal: 3,
     art: [
-      '        ╭──╮',
-      '       ╱ ▪▪ ╲',
-      '      │ ═════ │',
-      '    ╭─╧───────╧─╮',
-      '    │ ▓ 鏽 刃 ▓ │',
-      '    │ ▓▓▓▓▓▓▓▓▓ │',
-      '    ╰─╤──╥──╥──╤─╯',
-      '    ╱╱ ╲ ║  ║╱╱ ╲',
-      '   ╱╱   ╲║  ║   ╲╲',
+      '        ╭───╮        ║',
+      '       ╱ ▪ ▪ ╲       ║',
+      '      │ ══╪══ │      ║',
+      '    ╭─┤       ├─╮    ║',
+      '    │ ╰───────╯ │    ╬═══╗',
+      '    │ ▓▓▓▓▓▓▓▓▓ │    ║   ║',
+      '    │ ▓ 御前守衛 ▓│   ║ 石 ║',
+      '    │ ▓▓▓▓▓▓▓▓▓ │    ║ 化 ║',
+      '    ╰─╥──┬┬──╥─╯    ║ 長 ║',
+      '      ║  ││  ║      ║ 矛 ║',
+      '     ╱╱  ╰╯  ╲╲     ║   ║',
     ],
     commune: [
       { zh: '你沒有舉起武器——而是看著鏽刃的眼睛。你在那裡看到了……恐懼。', en: 'You don\'t raise your weapon — you look into Rust Blade\'s eyes. You see... fear.' },
-      { zh: '「你不懂！」鏽刃的聲音發顫。「你沒見過石化瘟疫爬上親人的臉——」', en: '"You don\'t understand!" Rust Blade\'s voice trembles. "You haven\'t seen the plague crawl up a loved one\'s face —"' },
+      { zh: '「你不懂！」鏽刃的聲音發顫，石化長矛的矛尖微微搖晃。「你沒見過石化瘟疫爬上親人的臉——」', en: '"You don\'t understand!" Rust Blade\'s voice trembles, the petrified spearhead wavering. "You haven\'t seen the plague crawl up a loved one\'s face —"' },
       { zh: '他的攻勢漸漸變慢。你說：「我也在石化。但我不會因此放棄希望。」', en: 'His attacks slow. You say: "I\'m petrifying too. But I won\'t give up hope."' },
     ],
-    spareText: { zh: '鏽刃的劍落在地上。他單膝跪下，用手捂住了臉。「……我只是怕了。我怕我們都會死。」', en: 'Rust Blade\'s sword clatters to the ground. He kneels, face in his hands. "...I was just afraid. Afraid we\'d all die."' },
+    spareText: { zh: '鏽刃的長矛落在地上，發出沉悶的石響。他單膝跪下，用手捂住了臉。「……我只是怕了。我怕我們都會死。」', en: 'Rust Blade\'s spear clatters to the stone floor with a dull ring. He kneels, face in his hands. "...I was just afraid. Afraid we\'d all die."' },
   };
 
   var steps = [];
   steps.push({ tag: '移動', tagColor: 'tag-move', text: '你走向議會大廳的大門。', textEn: 'You approach the Council chamber\'s grand doors.', delay: 2000 });
   steps.push({ art: `<pre class="ascii-art red">
-        ╭──╮
-       ╱ ▪▪ ╲
-      │ ═════ │
-    ╭─╧───────╧─╮
-    │ ▓ 鏽 刃 ▓ │
-    │ ▓▓▓▓▓▓▓▓▓ │
-    ╰─╤──╥──╥──╤─╯
-    ╱╱ ╲ ║  ║╱╱ ╲
-   ╱╱   ╲║  ║   ╲╲
+        ╭───╮        ║
+       ╱ ▪ ▪ ╲       ║
+      │ ══╪══ │      ║
+    ╭─┤       ├─╮    ║
+    │ ╰───────╯ │    ╬═══╗
+    │ ▓▓▓▓▓▓▓▓▓ │    ║   ║
+    │ ▓ 御前守衛 ▓│   ║ 石 ║
+    │ ▓▓▓▓▓▓▓▓▓ │    ║ 化 ║
+    ╰─╥──┬┬──╥─╯    ║ 長 ║
+      ║  ││  ║      ║ 矛 ║
+     ╱╱  ╰╯  ╲╲     ║   ║
 </pre>`, artEn: `<pre class="ascii-art red">
-        ╭──╮
-       ╱ ▪▪ ╲
-      │ ═════ │
-    ╭─╧───────╧─╮
-    │ RUST BLADE │
-    │ ▓▓▓▓▓▓▓▓▓ │
-    ╰─╤──╥──╥──╤─╯
-    ╱╱ ╲ ║  ║╱╱ ╲
-   ╱╱   ╲║  ║   ╲╲
+        ╭───╮        ║
+       ╱ ▪ ▪ ╲       ║
+      │ ══╪══ │      ║
+    ╭─┤       ├─╮    ║
+    │ ╰───────╯ │    ╬═══╗
+    │ ▓▓▓▓▓▓▓▓▓ │    ║   ║
+    │ ▓ IMPERIAL ▓│   ║ P ║
+    │ ▓  GUARD  ▓│    ║ E ║
+    │ ▓▓▓▓▓▓▓▓▓ │    ║ T ║
+    ╰─╥──┬┬──╥─╯    ║ R ║
+      ║  ││  ║      ║ I ║
+     ╱╱  ╰╯  ╲╲     ║   ║
 </pre>`, delay: 800 });
-  steps.push({ tag: '遭遇', tagColor: 'tag-combat', html: '一個高大的男人擋在門前。全身鏽蝕的鎧甲，手中握著一把缺了口的長劍——<b>守衛隊長鏽刃</b>。', htmlEn: 'A tall man blocks the door. Rust-eaten armor, a chipped longsword in hand — <b>Guard Captain Rust Blade</b>.', delay: 2800 });
+  steps.push({ tag: '遭遇', tagColor: 'tag-combat', html: '一個高大的男人擋在門前。厚重的黑鐵鎧甲鏽跡斑駁，肩甲上嵌著議會的紋章——他雙手握著一柄兩人高的<b>石化長矛</b>，矛頭佈滿灰白色的結晶紋路。這是<b>御前守衛鏽刃</b>。', htmlEn: 'A tall man blocks the door. Heavy black-iron armor streaked with rust, the Council\'s crest inlaid on the pauldrons — he grips a <b>petrified spear</b> as tall as two men, its head veined with pale crystalline patterns. This is <b>Imperial Guard Rust Blade</b>.', delay: 3200 });
   steps.push({ tag: '遭遇', tagColor: 'tag-combat', text: '「外來者——你不屬於這裡。我不會讓你踏進這扇門。」', textEn: '"Outsider — you don\'t belong here. I won\'t let you through that door."', delay: 2500 });
   // NG+ memory: remembering Rust Blade
   if (state.flags.ngPlus) {
@@ -3396,9 +3233,9 @@ registerNode('r3_boss', () => {
           { tag: '記憶', tagColor: 'tag-petri', text: '你從懷中取出瘟疫起源的證據，遞到鏽刃面前。你的動作很平靜——因為你知道接下來會發生什麼。', textEn: 'You draw the plague origin evidence and hold it before Rust Blade. Your movements are calm — because you know what comes next.', delay: 3000 },
           { tag: '對話', tagColor: 'tag-npc', text: '「瘟疫不是從下面來的。是你們的人——議會特派員孔德業炸開封印導致的。」', textEn: '"The plague didn\'t come from below. It was your people — Council envoy Kong Deye who blew the seal."', delay: 3200 },
           { tag: '感知', tagColor: 'tag-sense', text: '鏽刃的手在發抖。不是因為憤怒——是因為他知道你說的是真的。', textEn: 'Rust Blade\'s hand shakes. Not from anger — because he knows you\'re telling the truth.', delay: 2800 },
-          { tag: '對話', tagColor: 'tag-npc', text: '「……你怎麼知道的？」他低聲問。劍尖已經落到了地面。', textEn: '"...How do you know all this?" he whispers. His sword tip has dropped to the floor.', delay: 2500 },
+          { tag: '對話', tagColor: 'tag-npc', text: '「……你怎麼知道的？」他低聲問。石化長矛的矛尖已經垂到了地面。', textEn: '"...How do you know all this?" he whispers. The petrified spear\'s tip has dropped to the floor.', delay: 2500 },
           { tag: '對話', tagColor: 'tag-npc', text: '你沒有回答。有些答案太荒謬了——「我上輩子經歷過」不是一個能讓人信服的理由。', textEn: 'You don\'t answer. Some answers are too absurd — "I lived through this before" isn\'t convincing.', delay: 2800 },
-          { tag: '感知', tagColor: 'tag-sense', text: '鏽刃看著證據，沉默了很久。然後他收起劍，讓開了路。', textEn: 'Rust Blade studies the evidence, silent for a long time. Then he sheathes his sword and steps aside.', delay: 2800 },
+          { tag: '感知', tagColor: 'tag-sense', text: '鏽刃看著證據，沉默了很久。然後他把長矛靠到牆邊，讓開了路。', textEn: 'Rust Blade studies the evidence, silent for a long time. Then he rests the spear against the wall and steps aside.', delay: 2800 },
           { tag: '對話', tagColor: 'tag-npc', text: '「進去吧。」他的聲音很疲憊。「告訴他們……告訴他們我也知道了。」', textEn: '"Go." His voice is weary. "Tell them... tell them I know now too."', delay: 2800 },
           { tag: '效果', tagColor: 'tag-system', text: L('跳過 Boss 戰！經驗 +25 | 鏽刃讓路', 'Boss fight skipped! XP +25 | Rust Blade steps aside'), delay: 2000, effect: () => {
             gainXp(25);
@@ -3421,8 +3258,8 @@ registerNode('r3_boss', () => {
           state.flags.r3YingSacrifice = true;
           autoExplore([
             { tag: '逃跑', tagColor: 'tag-warn',
-              text: L('你轉身逃跑——但鏽刃的劍已經劈了下來。你閉上眼睛，等著痛楚。',
-                     'You turn to flee — but Rust Blade\'s sword is already falling. You close your eyes, bracing for pain.'),
+              text: L('你轉身逃跑——但鏽刃的長矛已經橫掃而下。你閉上眼睛，等著痛楚。',
+                     'You turn to flee — but Rust Blade\'s spear is already sweeping down. You close your eyes, bracing for pain.'),
               delay: 2500 },
             { tag: '異變', tagColor: 'tag-petri',
               text: L('痛楚沒有來。取而代之的是一個熟悉的聲音：「——不准碰他！」',
@@ -3430,16 +3267,16 @@ registerNode('r3_boss', () => {
               delay: 2800 },
             { art: npcPortrait.art('ying', { subtitle: L('護盾', 'Shield') }) || '<pre class="ascii-art cyan">\n    ·˚· 螢 ·˚·\n      ╱═══╲\n     │ ◦  ◦ │ ← 決絕\n     │  ──  │\n      ╲═══╱\n   ╱──┤█████├──╲\n       石化盾\n</pre>', artEn: npcPortrait.art('ying', { subtitle: 'Shield' }) || '<pre class="ascii-art cyan">\n    ·˚· Ying ·˚·\n      ╱═══╲\n     │ ◦  ◦ │ ← resolve\n     │  ──  │\n      ╲═══╱\n   ╱──┤█████├──╲\n     Petri-Shield\n</pre>', delay: 800 },
             { tag: '感知', tagColor: 'tag-sense',
-              text: L('螢擋在了你面前。鏽刃的劍砍在了她舉起的手臂上——石化紋路從傷口像閃電一樣蔓延。',
-                     'Ying throws herself in front of you. Rust Blade\'s sword strikes her raised arm — petrification spreads from the wound like lightning.'),
+              text: L('螢擋在了你面前。鏽刃的長矛刺中了她舉起的手臂——石化紋路從傷口像閃電一樣蔓延。',
+                     'Ying throws herself in front of you. Rust Blade\'s spear pierces her raised arm — petrification spreads from the wound like lightning.'),
               delay: 3200 },
             { tag: '石化', tagColor: 'tag-petri',
               text: L('「走——快走！」螢的右臂已經完全石化了。她用左手把你推向走廊。她的臉上沒有恐懼——只有絕不讓你死在這裡的決心。',
                      '"Go — now!" Ying\'s right arm is completely petrified. She pushes you toward the corridor with her left. No fear on her face — only the resolve that you will not die here.'),
               delay: 3500 },
             { tag: '感知', tagColor: 'tag-sense',
-              text: L('鏽刃收回了劍。他看著螢石化的手臂，嘴裡嘟囔了一句「不值得」，轉身走回了大門。',
-                     'Rust Blade withdraws his sword. He glances at Ying\'s petrified arm, mutters "not worth it," and turns back to the doors.'),
+              text: L('鏽刃收回了長矛。他看著螢石化的手臂，嘴裡嘟囔了一句「不值得」，轉身走回了大門。',
+                     'Rust Blade pulls back his spear. He glances at Ying\'s petrified arm, mutters "not worth it," and turns back to the doors.'),
               delay: 3000 },
             { tag: '感知', tagColor: 'tag-sense',
               text: L('你扶著螢退進走廊。她的右臂像一截灰色的木頭一樣垂著。石化紋路已經蔓延到了肩膀。',
@@ -3487,16 +3324,16 @@ registerNode('r3_boss', () => {
           { tag: '行動', tagColor: 'tag-move', text: '「鏽刃隊長。你守護這座城多久了？」', textEn: '"Captain Rust Blade. How long have you guarded this city?"', delay: 2200 },
           { tag: '感知', tagColor: 'tag-sense', text: '他愣了一下：「……二十三年。」', textEn: 'He pauses: "...Twenty-three years."', delay: 2000 },
           { tag: '行動', tagColor: 'tag-move', text: '「二十三年。你見過多少人被石化瘟疫帶走？」', textEn: '"Twenty-three years. How many have you lost to the plague?"', delay: 2500 },
-          { tag: '感知', tagColor: 'tag-sense', text: '鏽刃的嘴唇微微顫抖。他的手握緊了劍柄——但沒有揮下。', textEn: 'Rust Blade\'s lips tremble. His hand grips the hilt — but doesn\'t swing.', delay: 2500 },
+          { tag: '感知', tagColor: 'tag-sense', text: '鏽刃的嘴唇微微顫抖。他的手握緊了矛桿——但沒有刺出。', textEn: 'Rust Blade\'s lips tremble. His hand grips the spear shaft — but doesn\'t strike.', delay: 2500 },
           { tag: '行動', tagColor: 'tag-move', text: '「封鎖通道不會讓瘟疫消失。它只會讓更多人在黑暗裡孤獨地死去。」', textEn: '"Sealing the passages won\'t stop the plague. It only means more people die alone in the dark."', delay: 3000 },
           { tag: '行動', tagColor: 'tag-move', text: '「如果你真的想保護這座城——就讓我進去，告訴議會真相。」', textEn: '"If you truly want to protect this city — let me in, and let me tell the Council the truth."', delay: 3000 },
-          { tag: '感知', tagColor: 'tag-sense', text: '鏽刃的劍慢慢放下了。他讓開了門。', textEn: 'Rust Blade slowly lowers his sword. He steps aside.', delay: 2500 },
+          { tag: '感知', tagColor: 'tag-sense', text: '鏽刃的長矛慢慢放下了。他讓開了門。', textEn: 'Rust Blade slowly lowers his spear. He steps aside.', delay: 2500 },
           { tag: '情報', tagColor: 'tag-info', text: '「……進去吧。但如果你說謊——我不會放過你。」', textEn: '"...Go. But if you lie — I won\'t forgive you."', delay: 2500 },
         ], [
           { text: '踏入議會大廳', textEn: 'Enter the Council chamber', action: () => {
             gainXp(20);
             changeStat('wil', 1);
-            notify(L('經驗 +20，意志 +1（以言語代替刀劍）', 'XP +20, WIL +1 (Words over swords)'));
+            notify(L('經驗 +20，意志 +1（以言語代替長矛）', 'XP +20, WIL +1 (Words over spears)'));
             loadNode('r3_vote');
           }},
         ], { label: L('說服鏽刃', 'Persuading Rust Blade') });
@@ -4045,13 +3882,16 @@ registerNode('r3_epilogue', () => {
   );
 
   autoExplore(steps, [
-    { text: '分享結局卡', textEn: 'Share Ending Card', action: function() {
+    { text: '分享結局卡', textEn: 'Share Ending Card', modal: true, action: function() {
       if (typeof showEndCard === 'function') showEndCard();
     }},
     { text: convertLabel, action: function() {
       // Bank points: keep the best conversion across runs
       if (typeof globalStats !== 'undefined') {
         globalStats.bankedPoints = Math.max(globalStats.bankedPoints || 0, banked);
+        // Bank gold: keep the best run's gold for the next cycle
+        var runGold = state.flags.gold || 0;
+        globalStats.bankedGold = Math.max(globalStats.bankedGold || 0, runGold);
         saveGlobalStats();
       }
       notify(convertDetail);

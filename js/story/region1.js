@@ -257,7 +257,7 @@ registerNode('r1_look', () => {
     if (hasR1Explore) {
       c.push({ text: '探索迴廊周邊的側道', textEn: 'Explore side passages around the corridor', action: () => loadNode('r1_explore') });
     }
-    c.push({ text: '在迴廊中巡邏練級', textEn: 'Patrol the corridor for experience', action: () => loadNode('r1_patrol') });
+    c.push({ text: '潛行於石脈之間，搜尋生機', textEn: 'Stalk deeper into the veins, hunting for signs of life', action: () => loadNode('r1_patrol') });
     return c;
   })(), { label: L('觀察迴廊', 'Surveying corridor') });
 });
@@ -810,8 +810,14 @@ registerNode('r1_deep', () => {
     steps.push({ tag: '感知', tagColor: 'tag-sense', text: '這一段的礦脈更加粗大，藍色冷光照亮了整條走廊。', textEn: 'The ore veins here are thicker, blue light illuminating the entire corridor.', delay: 2500 });
     steps.push({ tag: '環境', tagColor: 'tag-system', text: '空氣變得異常冰冷——你能看到自己的呼吸化為白霧。', textEn: 'The air turns bitterly cold — you can see your breath forming white mist.', delay: 2200 });
     steps.push({ tag: '探索', tagColor: 'tag-explore', text: '鐵軌在這裡分叉——一條通往左邊的礦工宿舍，一條通往前方的大門。', textEn: 'The rails fork — one track to a miners\' quarters on the left, another to a great door ahead.', delay: 2500 });
+    // Stronger hint: guide player into the quarters so Zhou is not missed
+    steps.push({ tag: '感知', tagColor: 'tag-sense', text: '你停下腳步——宿舍方向傳來一聲微弱的咳嗽。緊接著是壓抑的喘息聲。', textEn: 'You pause — a faint cough drifts from the quarters. Then a stifled breath.', delay: 2500 });
+    steps.push({ tag: '感知', tagColor: 'tag-sense', text: '這裡有活人。', textEn: 'Someone is alive in there.', delay: 1800 });
   } else {
     steps.push({ tag: '移動', tagColor: 'tag-move', text: '你回到了迴廊深處的分叉路口。冰冷的空氣和藍色礦脈光依舊如初。', textEn: 'You return to the deep corridor fork. Cold air and blue ore-glow remain unchanged.', delay: 1800 });
+    if (!state.flags.r1SurvivorMet) {
+      steps.push({ tag: '感知', tagColor: 'tag-sense', text: '宿舍方向仍然傳來那陣微弱的咳嗽聲——那個人還在等人找到他。', textEn: 'That faint cough still drifts from the quarters — whoever it is, they\'re still waiting to be found.', delay: 2200 });
+    }
   }
   // ── Foreshadowing: traces of Ying (螢) ──
   if (!state.flags.r1YingHintSeen) {
@@ -2384,7 +2390,7 @@ registerNode('r1_patrol', () => {
   ░░░║      ╱   ╲    ╱??╲    ║░░░
   ░░░║  ══════════════════    ║░░░
   ═══╩════════════════════════╩═══
-         迴 廊 巡 邏
+         潛 行 於 石 脈
 </pre>`, artEn: `<pre class="ascii-art blue">
   ═══╦════════════════════════╦═══
   ░░░║  .:*~*:.    .:*~*:.   ║░░░
@@ -2395,14 +2401,14 @@ registerNode('r1_patrol', () => {
   ░░░║      ╱   ╲    ╱??╲    ║░░░
   ░░░║  ══════════════════    ║░░░
   ═══╩════════════════════════╩═══
-       Corridor Patrol
+      Stalking the Veins
 </pre>`, delay: 800 },
-    { tag: '判斷', tagColor: 'tag-move', text: '迴廊中的怪物比坑底更強，但也能提供更好的戰鬥經驗。', textEn: 'Corridor monsters are tougher, but offer better combat experience.', delay: 2000 },
+    { tag: '判斷', tagColor: 'tag-move', text: '石脈深處藏著更兇惡的生物——但狩獵它們或許能讓你活得更久。', textEn: 'The deep veins harbour fouler things — but hunting them may keep you alive longer.', delay: 2000 },
     { tag: '感知', tagColor: 'tag-sense', text: '你握緊武器，沿著礦脈的冷光前進。', textEn: 'You grip your weapon and advance by the cold glow of ore veins.', delay: 2000 },
   ], [
-    { text: '開始巡邏', textEn: 'Begin patrol', action: () => startPatrol() },
+    { text: '開始探索', textEn: 'Begin exploring', action: () => startPatrol() },
     { text: '返回', textEn: 'Return', action: () => loadNode('r1_look') },
-  ], { label: L('準備巡邏', 'Preparing patrol') });
+  ], { label: L('準備探索', 'Preparing exploration') });
 });
 
 // ── Minecart Track ──

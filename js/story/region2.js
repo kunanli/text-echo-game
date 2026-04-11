@@ -120,6 +120,36 @@ registerNode('r2_look', () => {
       var yP = isMale ? L('她', 'she') : L('他', 'he');
       steps.push({ tag: '遭遇', tagColor: 'tag-explore', text: '「——等等我！」', textEn: '"— Wait for me!"', delay: 2200 });
       steps.push({ tag: '感知', tagColor: 'tag-sense', text: '身後傳來急促的腳步聲和喘息。你轉過身——', textEn: 'Hurried footsteps and panting from behind. You turn —', delay: 2000 });
+      steps.push({
+        art: npcPortrait.art('ying', { subtitle: L('追上你了', 'Caught up') }) || `<pre class="ascii-art cyan">
+           ·˚·  螢  ·˚·
+              ╱▔▔╲
+             │ o o│   ← 氣喘
+             │ ~~ │
+              ╲──╱
+           ╱──┤  ├──╲
+             ╱    ╲
+            ╱  📖  ╲        ← 緊抱手冊
+            ════════
+           石階    ↗↗
+           ═══════════
+              ↑   ↑
+           跑上來
+</pre>`, artEn: npcPortrait.art('ying', { subtitle: L('追上你了', 'Caught up') }) || `<pre class="ascii-art cyan">
+           ·˚·  Ying  ·˚·
+              ╱▔▔╲
+             │ o o│   ← panting
+             │ ~~ │
+              ╲──╱
+           ╱──┤  ├──╲
+             ╱    ╲
+            ╱  📖  ╲        ← notebook
+            ════════
+           stairs   ↗↗
+           ═══════════
+              ↑   ↑
+           running up
+</pre>`, delay: 700 });
       steps.push({ tag: '遭遇', tagColor: 'tag-explore', html: '<b>螢</b>從入口的階梯上跑來，滿臉灰塵，衣角還沾著礦石碎屑。' + yP + '手裡緊抱著那本手冊。', htmlEn: '<b>Ying</b> rushes up the entrance stairs, face dusty, clothes flecked with mineral debris. ' + (isMale ? 'She' : 'He') + ' clutches that notebook tight.', delay: 2800 });
       steps.push({ tag: '感知', tagColor: 'tag-sense', text: '「哈……哈……我從側隧道繞上來的。差點被一隻石化蟒吃了。」螢彎著腰喘氣，但眼睛裡帶著笑意。', textEn: '"Ha... ha... I came up through a side tunnel. Nearly got eaten by a petrified python." Ying doubles over panting, but ' + (isMale ? 'her' : 'his') + ' eyes are smiling.', delay: 3200 });
       steps.push({ tag: '感知', tagColor: 'tag-sense', text: yP + '直起身，四下張望，然後深吸一口氣——', textEn: (isMale ? 'She' : 'He') + ' straightens up, looks around, takes a deep breath —', delay: 2200 });
@@ -219,7 +249,7 @@ registerNode('r2_look', () => {
     if (hasR2Explore) {
       c.push({ text: '探索採石場其他角落', textEn: 'Explore other corners of the quarry', action: () => loadNode('r2_explore') });
     }
-    c.push({ text: '巡邏採石場', textEn: 'Patrol the quarry', action: () => loadNode('r2_patrol') });
+    c.push({ text: '深入採石場的廢墟尋獵', textEn: 'Hunt through the quarry\'s ruined depths', action: () => loadNode('r2_patrol') });
     c.push({ text: '返回石脈迴廊', textEn: 'Return to Vein Corridor', action: () => loadNode('r1_deep') });
     return c;
   })(), { label: L('觀察採石場', 'Surveying quarry') });
@@ -783,6 +813,9 @@ registerNode('r2_camp', () => {
       c.push({ text: '夜深了，鐵霜還坐在營火邊', textEn: 'Late night — Iron Frost still sits by the fire', action: () => loadNode('r2_frost_vigil') });
     }
     c.push({ text: '在營地休息', textEn: 'Rest at the camp', action: () => loadNode('r2_rest') });
+    if (state.flags.r2MachineCore && !state.flags.r2BossDefeated && state.flags.r2ChiefTalked) {
+      c.push({ text: '★ 前往上升通道——挑戰石化巨獸', textEn: '★ Head to the ascent shaft — challenge the Colossus', action: () => loadNode('r2_boss_prep') });
+    }
     c.push({ text: '過橋返回', textEn: 'Cross back', action: () => loadNode('r2_look') });
     return c;
   })(), { label: L('倖存者營地', 'Survivor camp') });
@@ -959,9 +992,6 @@ registerNode('r2_camp_chief', () => {
   }
   autoExplore(steps, (function() {
     var c = [];
-    if (state.flags.r2MachineCore && !state.flags.r2BossDefeated) {
-      c.push({ text: '「我準備好了，一起去挑戰巨獸。」', textEn: '"I\'m ready. Let\'s challenge the colossus."', action: () => loadNode('r2_boss_prep') });
-    }
     if (state.flags.r2ChengAwake && (state.flags.r2ChengTrainCount || 0) < 3) {
       c.push({ text: '◆ 和承鋼一起訓練', textEn: '◆ Train with Cheng Gang', action: () => loadNode('r2_cheng_train') });
     }
@@ -2659,19 +2689,22 @@ registerNode('r2_crane', () => {
         ], { label: L('灰鶴的貨物', 'Grey Crane\'s wares') });
       }});
     }
-    // Gambling — always available after first meeting
-    c.push({ text: L('來一把吹牛骰？', 'Fancy a game of Liar\'s Dice?'), action: () => {
+    if (state.flags.ngPlus) c.push({ text: L('來一把吹牛骰？', 'Fancy a game of Liar\'s Dice?'), action: () => {
+      var bet = 5;
       var gold = state.flags.gold || 0;
-      var bet = Math.max(5, Math.min(20, Math.floor(gold / 3) + 5));
       if (gold < bet) {
-        // Give starting gold if broke
-        if (gold < 5) {
-          state.flags.gold = 10;
-          gold = 10;
-          notify(L('灰鶴借了你 10 金幣：「沒錢怎麼賭？先借你。」', 'Grey Crane lends you 10 gold: "Can\'t gamble with nothing. I\'ll spot you."'));
-          renderStatus();
-        }
-        bet = 5;
+        state.flags.gold = bet;
+        gold = bet;
+        // Rotating flavor loan lines — Crane never runs out of cash
+        var loanLines = [
+          { zh: '灰鶴從腰間又摸出幾枚金幣：「沒錢怎麼賭？先借你 ' + bet + '——算我投資。」', en: 'Grey Crane pulls more coins from her belt: "Can\'t gamble broke. ' + bet + ' on me — call it an investment."' },
+          { zh: '灰鶴嘆了口氣，把 ' + bet + ' 金幣推到你面前：「你這副窮酸相看得我難受。拿著。」', en: 'Grey Crane sighs and pushes ' + bet + ' gold to you: "Can\'t stand watching you this broke. Take it."' },
+          { zh: '灰鶴嘴角一揚：「又沒錢了？行，我這次不算利息。' + bet + ' 金。」', en: 'Grey Crane smirks: "Broke again? Fine, no interest this time. ' + bet + ' gold."' },
+          { zh: '灰鶴從貨箱底下翻出一個皮袋：「看在老朋友的份上——借你 ' + bet + '。」', en: 'Grey Crane digs a leather pouch from beneath a crate: "For old friends\' sake — ' + bet + ' gold."' },
+        ];
+        var ln = loanLines[rng(0, loanLines.length - 1)];
+        notify(L(ln.zh, ln.en));
+        renderStatus();
       }
       var introSteps = [
         { tag: L('骰子', 'DICE'), tagColor: 'tag-npc',
@@ -2759,338 +2792,6 @@ function offerCraneSword(onDone) {
   ], { label: L('灰鶴的餽贈', 'Grey Crane\'s gift') });
 }
 
-// ═══════════════════════════════════════════════════
-//  NPC Sidequest — 灰鶴 (Grey Crane) Past
-// ═══════════════════════════════════════════════════
-
-// --- r2_crane_scar: Player asks about bloodletting scars ---
-registerNode('r2_crane_scar', () => {
-  state.flags.r2CraneScar = true;
-  var isMale = state.sex === 'male';
-  var cP = isMale ? L('他','he') : L('她','she');
-  autoExplore([
-    { tag: '情報', tagColor: 'tag-info',
-      text: L('你趁灰鶴整理貨物的時候，看見她袖子滑落，露出手臂內側密密麻麻的刀疤。',
-             'While Grey Crane sorts her wares, her sleeve slips, revealing a lattice of scars along her inner arm.'),
-      delay: 2800 },
-    { tag: '情報', tagColor: 'tag-info',
-      text: L('那不是戰鬥留下的傷——太規律了，像是某種……儀式。',
-             'Not battle wounds — too regular, almost like some kind of... ritual.'),
-      delay: 2500 },
-    { tag: '對話', tagColor: 'tag-npc',
-      html: L('灰鶴注意到你的目光，迅速拉下袖子。她的笑容消失了一瞬。<br>「看夠了？」',
-             'Grey Crane notices your gaze and yanks down her sleeve. Her smile vanishes for an instant.<br>"Seen enough?"'),
-      delay: 2800 },
-    { tag: '對話', tagColor: 'tag-npc',
-      text: L('「……那是舊帳。」灰鶴低聲說，目光移開。「地表的舊帳。」',
-             '"...Old debts." Grey Crane murmurs, looking away. "Old debts from the surface."'),
-      delay: 2800 },
-    { tag: '對話', tagColor: 'tag-npc',
-      text: L('她沉默了好一會兒，然後像是做了某個決定，把袖子捲了上去。',
-             'She goes quiet for a long moment, then — as if making a decision — rolls her sleeve up.'),
-      delay: 2500 },
-    { art: `<pre class="ascii-art gold">
-      ╱══════════════════════════╲
-     ╱  灰鶴的手臂               ╲
-    │                              │
-    │  ───╱╲───╱╲───╱╲───         │
-    │  ╳╳╳╳╳╳╳╳╳╳╳╳╳╳╳╳╳         │
-    │  ╱╲╱╲  放血刀疤  ╱╲╱╲      │
-    │  ╳╳╳╳╳╳╳╳╳╳╳╳╳╳╳╳╳         │
-    │  ───╱╲───╱╲───╱╲───         │
-    │                              │
-    │  ·˚· 不是戰鬥……是代價 ·˚·  │
-     ╲                            ╱
-      ╲══════════════════════════╱
-</pre>`, artEn: `<pre class="ascii-art gold">
-      ╱══════════════════════════╲
-     ╱  Grey Crane's arm          ╲
-    │                              │
-    │  ───╱╲───╱╲───╱╲───         │
-    │  ╳╳╳╳╳╳╳╳╳╳╳╳╳╳╳╳╳         │
-    │  ╱╲╱╲ Bloodletting  ╱╲╱╲   │
-    │  ╳╳╳╳╳╳╳╳╳╳╳╳╳╳╳╳╳         │
-    │  ───╱╲───╱╲───╱╲───         │
-    │                              │
-    │  ·˚·  Not battle—a price ·˚·│
-     ╲                            ╱
-      ╲══════════════════════════╱
-</pre>`, delay: 800 },
-    { tag: '對話', tagColor: 'tag-npc',
-      text: L('「我以前不叫灰鶴。我叫——算了，那個名字已經死了。」',
-             '"I used to have a different name. I was called — forget it. That name is dead."'),
-      delay: 3000 },
-    { tag: '對話', tagColor: 'tag-npc',
-      text: L('「在地表的時候，我跟一群人借了錢做生意。當然，做賠了。」灰鶴的語氣平淡得像在說別人的事。',
-             '"Up on the surface, I borrowed money from some people to start a business. Naturally, it went bust." Her tone is flat, like she\'s talking about someone else.'),
-      delay: 3200 },
-    { tag: '對話', tagColor: 'tag-npc',
-      text: L('「他們的討債方式很有創意——每拖一天，就割一刀。不是要殺你，是要你記住。」',
-             '"Their collection method was creative — one cut for every day overdue. Not to kill, just to make you remember."'),
-      delay: 3200 },
-    { tag: '對話', tagColor: 'tag-npc',
-      text: L('「所以我跑了。一頭扎進地底，想著他們總不會追到深淵裡來吧。」灰鶴苦笑了一聲。',
-             '"So I ran. Dove straight underground, figuring they\'d never chase me into the abyss." Grey Crane laughs bitterly.'),
-      delay: 3000 },
-    { tag: '對話', tagColor: 'tag-npc',
-      text: L('「結果呢——在地底做了商人，反而比地表做得好。」她又恢復了那副商人笑容，但眼底有某種東西不一樣了。',
-             '"And then — trading underground turned out better than anything I did topside." The merchant\'s grin returns, but something in her eyes has changed.'),
-      delay: 3000 },
-  ], [
-    { text: '那些人不會追到這裡吧？', textEn: 'They won\'t follow you here, right?',
-      action: () => {
-        autoExplore([
-          { tag: '對話', tagColor: 'tag-npc',
-            text: L('灰鶴頓了一下。她沒笑了。',
-                   'Grey Crane pauses. No smile now.'),
-            delay: 2000 },
-          { tag: '對話', tagColor: 'tag-npc',
-            text: L('「……希望不會。」',
-                   '"...I hope not."'),
-            delay: 2500 },
-        ], [
-          { text: '返回', textEn: 'Back', action: () => loadNode('r2_crane') },
-        ], { label: L('灰鶴的過去', 'Grey Crane\'s past') });
-      }},
-    { text: '你不欠他們了', textEn: 'You don\'t owe them anymore',
-      action: () => {
-        autoExplore([
-          { tag: '對話', tagColor: 'tag-npc',
-            text: L('灰鶴看了你一眼，沉默了很久。',
-                   'Grey Crane looks at you for a long time, saying nothing.'),
-            delay: 2500 },
-          { tag: '對話', tagColor: 'tag-npc',
-            text: L('「……謝了。」她輕聲說。這是你第一次聽她說謝謝，不帶任何商人的算計。',
-                   '"...Thanks." She says quietly. It\'s the first time you\'ve heard her say thanks without a merchant\'s calculation behind it.'),
-            delay: 3000 },
-        ], [
-          { text: '返回', textEn: 'Back', action: () => loadNode('r2_crane') },
-        ], { label: L('灰鶴的過去', 'Grey Crane\'s past') });
-      }},
-  ], { label: L('灰鶴的刀疤', 'Grey Crane\'s scars') });
-});
-
-// --- r2_crane_debt: Debt collector arrives at quarry ---
-registerNode('r2_crane_debt', () => {
-  state.flags.r2CraneDebt = true;
-  var isMale = state.sex === 'male';
-  var playerTitle = isMale ? L('少年','youth') : L('少女','maiden');
-  autoExplore([
-    { tag: '緊張', tagColor: 'tag-warn',
-      text: L('你回到營地時，氣氛明顯不對。幾個營地居民圍在入口處竊竊私語。',
-             'The camp feels wrong when you return. Residents cluster near the entrance, whispering.'),
-      delay: 2500 },
-    { tag: '緊張', tagColor: 'tag-warn',
-      text: L('營地入口站著兩個陌生人——穿著地表款式的皮甲，手裡拿著鐵棍。一看就不是深淵的人。',
-             'Two strangers stand at the entrance — surface-style leather armor, iron clubs in hand. Clearly not from the abyss.'),
-      delay: 3000 },
-    { art: `<pre class="ascii-art">
-    ╔═══════════════════════════════╗
-    ║     追債人 × 2                ║
-    ╠═══════════════════════════════╣
-    ║                               ║
-    ║    ╱══╲      ╱══╲            ║
-    ║   │▪  ▪│    │▪  ▪│           ║
-    ║   │ ── │    │ ── │           ║
-    ║    ╲══╱      ╲══╱            ║
-    ║   ╱████╲    ╱████╲           ║
-    ║  │██████│  │██████│          ║
-    ║  │█ 鐵棍█│  │█鐵棍 █│       ║
-    ║                               ║
-    ║     「灰鶴在哪？」            ║
-    ╚═══════════════════════════════╝
-</pre>`, artEn: `<pre class="ascii-art">
-    ╔═══════════════════════════════╗
-    ║     DEBT COLLECTORS × 2      ║
-    ╠═══════════════════════════════╣
-    ║                               ║
-    ║    ╱══╲      ╱══╲            ║
-    ║   │▪  ▪│    │▪  ▪│           ║
-    ║   │ ── │    │ ── │           ║
-    ║    ╲══╱      ╲══╱            ║
-    ║   ╱████╲    ╱████╲           ║
-    ║  │██████│  │██████│          ║
-    ║  │█ club █│ │█ club █│       ║
-    ║                               ║
-    ║     "Where's Grey Crane?"    ║
-    ╚═══════════════════════════════╝
-</pre>`, delay: 800 },
-    { tag: '遭遇', tagColor: 'tag-explore',
-      text: L('「我們找一個叫灰鶴的女人——欠了地表張三爺一大筆錢。」為首的男人掃視營地。「聽說她在這附近做生意。」',
-             '"We\'re looking for a woman called Grey Crane — owes Master Zhang a fortune topside." The lead man scans the camp. "Heard she trades around here."'),
-      delay: 3500 },
-    { tag: '遭遇', tagColor: 'tag-explore',
-      text: L('你看見灰鶴躲在一堆貨箱後面，臉色慘白。她對你做了個「噓」的手勢。',
-             'You spot Grey Crane hiding behind a stack of crates, face pale. She puts a finger to her lips.'),
-      delay: 2800 },
-  ], [
-    { text: '站出來幫灰鶴（意志說服）', textEn: 'Step in and talk them down (WIL)',
-      action: () => {
-        var result = statCheck('wil', 8);
-        if (result === 'fail') {
-          autoExplore([
-            { tag: '檢定', tagColor: 'tag-warn',
-              text: L('【意志檢定 DC8 — 失敗】', '[WIL check DC8 — FAIL]'),
-              delay: 1500, effect: () => sfx.fail() },
-            { tag: '對話', tagColor: 'tag-npc',
-              text: L('「少管閒事，' + playerTitle + '。」為首的男人推了你一把。',
-                     '"Mind your own business, ' + playerTitle + '." The lead man shoves you.'),
-              delay: 2500 },
-            { tag: '戰鬥', tagColor: 'tag-combat',
-              text: L('說服失敗——追債人動手了！',
-                     'Persuasion failed — the collectors attack!'),
-              delay: 2000 },
-          ], [
-            { text: L('應戰', 'Fight'), action: () => {
-              var enemy = {
-                name: '追債人', nameEn: 'Debt Collector',
-                hp: 22, atkMin: 4, atkMax: 8, petriDmg: 0, xp: 12,
-                empathyGoal: 3,
-                art: [
-                  '   ╱══╲ ',
-                  '  │▪  ▪│',
-                  '  │ ── │',
-                  '   ╲══╱ ',
-                  '  ╱████╲',
-                  ' │██████│',
-                  ' │█鐵棍█│',
-                ],
-                commune: [
-                  { zh: '追債人猶豫了一下——他似乎也不想在這麼深的地方打架。', en: 'The collector hesitates — he doesn\'t want to fight this deep underground either.' },
-                  { zh: '「……你替她還錢的話，也不是不行。」', en: '"...If you pay her debt, that works too."' },
-                ],
-                spareText: { zh: '追債人罵罵咧咧地走了：「跟張三爺說，找不到人。」', en: 'The collectors leave cursing: "Tell Master Zhang we couldn\'t find her."' }
-              };
-              enemy = scaleEnemyNgPlus(enemy);
-              startCombat(enemy, function() {
-                autoExplore([
-                  { tag: '結果', tagColor: 'tag-info',
-                    text: L('追債人被你打跑了。灰鶴從貨箱後面走出來，手還在發抖。',
-                           'The collectors flee. Grey Crane emerges from behind the crates, hands still shaking.'),
-                    delay: 2500 },
-                  { tag: '對話', tagColor: 'tag-npc',
-                    text: L('「……我欠你一條命。」灰鶴的聲音很輕。這不是商人在談交易。',
-                           '"...I owe you my life." Grey Crane\'s voice is barely a whisper. This isn\'t a merchant making a deal.'),
-                    delay: 3000 },
-                  { tag: '效果', tagColor: 'tag-system',
-                    text: L('灰鶴好感 ↑↑ | 經驗 +12', 'Grey Crane bond ↑↑ | XP +12'),
-                    delay: 1500, effect: () => { state.flags.r2CraneDebtSaved = true; gainXp(12); } },
-                ], [
-                  { text: '返回', textEn: 'Back', action: () => loadNode('r2_crane') },
-                ], { label: L('灰鶴的債', 'Grey Crane\'s debt') });
-              }, null);
-            }},
-          ], { label: L('追債人', 'Debt collectors') });
-        } else {
-          autoExplore([
-            { tag: '檢定', tagColor: 'tag-info',
-              text: L('【意志檢定 DC8 — ' + (result === 'crit' ? '大成功' : '成功') + '】',
-                     '[WIL check DC8 — ' + (result === 'crit' ? 'CRITICAL' : 'PASS') + ']'),
-              delay: 1500, effect: () => sfx.pass() },
-            { tag: '對話', tagColor: 'tag-npc',
-              text: L('你攔住追債人，直視他的眼睛。「灰鶴不在這裡。你們走錯路了。」',
-                     'You block the collectors, staring him down. "Grey Crane isn\'t here. You took a wrong turn."'),
-              delay: 2800 },
-            { tag: '對話', tagColor: 'tag-npc',
-              text: result === 'crit'
-                ? L('追債人被你的氣場鎮住了。「……算了，跟張三爺說這條路死了人，沒找到。」他們退後了幾步。',
-                   'Your presence overwhelms them. "...Forget it, tell Master Zhang the route caved in, nobody found." They back off.')
-                : L('為首的男人遲疑了。「……你認識她？」他看了看身後的深淵隧道，又看了看你。「在這種鬼地方打架不值得。」',
-                   'The lead man hesitates. "...You know her?" He looks at the abyss tunnel behind him, then back at you. "Not worth fighting in a place like this."'),
-              delay: 3500 },
-            { tag: '遭遇', tagColor: 'tag-explore',
-              text: L('追債人互相看了一眼，轉身離開了。你聽到他們的腳步聲漸漸遠去。',
-                     'The collectors exchange a glance and turn to leave. Their footsteps fade into the distance.'),
-              delay: 2800 },
-            { tag: '對話', tagColor: 'tag-npc',
-              text: L('灰鶴從貨箱後面走出來。她的商人笑容不見了——取而代之的是你從未見過的表情。',
-                     'Grey Crane steps out from behind the crates. The merchant\'s grin is gone — replaced by an expression you\'ve never seen from her.'),
-              delay: 3000 },
-            { tag: '對話', tagColor: 'tag-npc',
-              text: L('「……你不用幫我的。」灰鶴低聲說。「我的爛帳，跟你沒關係。」',
-                     '"...You didn\'t have to do that." Grey Crane says quietly. "My mess, nothing to do with you."'),
-              delay: 3000 },
-            { tag: '對話', tagColor: 'tag-npc',
-              text: L('她沉默了一會兒，然後做了一件你意想不到的事——灰鶴抱了你一下。很快，就一下。',
-                     'She\'s silent for a moment, then does something unexpected — Grey Crane hugs you. Brief, just once.'),
-              delay: 3000 },
-            { tag: '對話', tagColor: 'tag-npc',
-              text: L('「謝了。」她放開你，又恢復了那副吊兒郎當的語氣。「但你要是跟別人說我哭了——我宰了你。」',
-                     '"Thanks." She lets go, slipping back to her casual tone. "But if you tell anyone I cried — I\'ll gut you."'),
-              delay: 3200 },
-            { tag: '效果', tagColor: 'tag-system',
-              text: L('灰鶴好感 ↑↑↑ | 經驗 +15 | 意志 +1', 'Grey Crane bond ↑↑↑ | XP +15 | WIL +1'),
-              delay: 1500, effect: () => {
-                state.flags.r2CraneDebtSaved = true;
-                gainXp(15);
-                changeStat('wil', 1);
-              }},
-          ], [
-            { text: '返回', textEn: 'Back', action: () => loadNode('r2_crane') },
-          ], { label: L('灰鶴的債', 'Grey Crane\'s debt') });
-        }
-      }},
-    { text: '直接動手趕走他們（力量）', textEn: 'Physically drive them off (STR)',
-      action: () => {
-        var enemy = {
-          name: '追債人', nameEn: 'Debt Collector',
-          hp: 22, atkMin: 4, atkMax: 8, petriDmg: 0, xp: 12,
-          empathyGoal: 3,
-          art: [
-            '   ╱══╲ ',
-            '  │▪  ▪│',
-            '  │ ── │',
-            '   ╲══╱ ',
-            '  ╱████╲',
-            ' │██████│',
-            ' │█鐵棍█│',
-          ],
-          commune: [
-            { zh: '追債人猶豫了一下——他似乎也不想在這麼深的地方打架。', en: 'The collector hesitates — he doesn\'t want to fight this deep underground either.' },
-            { zh: '「……你替她還錢的話，也不是不行。」', en: '"...If you pay her debt, that works too."' },
-          ],
-          spareText: { zh: '追債人罵罵咧咧地走了：「跟張三爺說，找不到人。」', en: 'The collectors leave cursing: "Tell Master Zhang we couldn\'t find her."' }
-        };
-        enemy = scaleEnemyNgPlus(enemy);
-        startCombat(enemy, function() {
-          autoExplore([
-            { tag: '結果', tagColor: 'tag-info',
-              text: L('追債人被你打跑了。灰鶴從貨箱後面走出來，手還在發抖。',
-                     'The collectors flee. Grey Crane emerges from behind the crates, hands still shaking.'),
-              delay: 2500 },
-            { tag: '對話', tagColor: 'tag-npc',
-              text: L('「……你還真是直接。」灰鶴勉強擠出一個笑容。「我欠你一條命。不開玩笑的那種。」',
-                     '"...You really are direct." Grey Crane manages a smile. "I owe you my life. No joke this time."'),
-              delay: 3000 },
-            { tag: '效果', tagColor: 'tag-system',
-              text: L('灰鶴好感 ↑↑ | 經驗 +12', 'Grey Crane bond ↑↑ | XP +12'),
-              delay: 1500, effect: () => { state.flags.r2CraneDebtSaved = true; gainXp(12); } },
-          ], [
-            { text: '返回', textEn: 'Back', action: () => loadNode('r2_crane') },
-          ], { label: L('灰鶴的債', 'Grey Crane\'s debt') });
-        }, null);
-      }},
-    { text: '不介入', textEn: 'Don\'t get involved',
-      action: () => {
-        autoExplore([
-          { tag: '遭遇', tagColor: 'tag-explore',
-            text: L('你退到一邊，看著事態發展。追債人最終在營地裡搜了一圈，沒找到灰鶴——她躲得很好。',
-                   'You step aside and watch. The collectors search the camp but don\'t find Grey Crane — she hides well.'),
-            delay: 3000 },
-          { tag: '遭遇', tagColor: 'tag-explore',
-            text: L('他們走後，灰鶴從暗處鑽出來。她看了你一眼，什麼也沒說。',
-                   'After they leave, Grey Crane slips out of the shadows. She looks at you once, says nothing.'),
-            delay: 2500 },
-          { tag: '對話', tagColor: 'tag-npc',
-            text: L('商人的笑容回到她臉上——但這一次，你知道那只是面具。',
-                   'The merchant\'s grin returns — but this time, you know it\'s just a mask.'),
-            delay: 2500 },
-        ], [
-          { text: '返回', textEn: 'Back', action: () => loadNode('r2_crane') },
-        ], { label: L('灰鶴的債', 'Grey Crane\'s debt') });
-      }},
-  ], { label: L('追債人來了', 'The debt collectors') });
-});
 
 // ═══════════════════════════════════════════════════
 //  NPC Continuation — 老周 (Old Zhou) traces
@@ -3265,12 +2966,12 @@ registerNode('r2_patrol', () => {
          ╲_╱   ╲_╱
   ════════════════════════════════
 </pre>`, delay: 800 },
-    { tag: '判斷', tagColor: 'tag-move', text: '採石場的怪物比迴廊更加兇猛。但你需要更多的戰鬥經驗來面對前方的挑戰。', textEn: 'Quarry monsters are fiercer than those in the corridor. But you need combat experience for the challenges ahead.', delay: 2200 },
+    { tag: '判斷', tagColor: 'tag-move', text: '採石場的怪物比迴廊更加兇猛——你得學會在它們的地盤上狩獵，才能活著前進。', textEn: 'Quarry monsters are fiercer than corridor prey — you must learn to hunt on their turf if you want to push forward alive.', delay: 2200 },
     { tag: '感知', tagColor: 'tag-sense', text: '你握緊武器，踏入了採石台之間的暗影。', textEn: 'You grip your weapon and step into the shadows between quarry platforms.', delay: 2000 },
   ], [
-    { text: '開始巡邏', textEn: 'Begin patrol', action: () => startPatrol() },
+    { text: '開始探索', textEn: 'Begin exploring', action: () => startPatrol() },
     { text: '返回', textEn: 'Return', action: () => loadNode('r2_look') },
-  ], { label: L('準備巡邏', 'Preparing patrol') });
+  ], { label: L('準備探索', 'Preparing exploration') });
 });
 
 // ═══════════════════════════════════════════════════
@@ -4542,19 +4243,39 @@ registerNode('r2_camp_dinner', () => {
   autoExplore([
     { tag: '場景', tagColor: 'tag-sense',
       art: `<pre class="ascii-art gold">
-    ·  ˚  ✦  ˚  ·  ˚  ✦
-   ╭──────────────────────╮
-   │  🍲  ↑↑ 營火 ↑↑  🍲  │
-   ├──────────────────────┤
-   │ 老鑄  清露  鐵霜  你 │
-   ╰──────────────────────╯
+        ·  ˚  ✦  ˚  ·  ˚  ✦  ˚  ·
+             ·  ~  *  ~  ·
+                \\|/  \\|/
+              ) ( ) ( ) (      ← 火光上升
+             )  (   )  (
+       ╔════╤╤╤╤╤╤╤╤╤╤════╗
+       ║    ║▓▓▓▓▓▓▓▓║    ║    ← 鍋
+       ║    ╚═══════╝    ║
+       ║  ( )))   ((( )  ║    ← 柴火
+       ║ (((      ))) )  ║
+       ║    ▓▓▓▓▓▓▓▓▓    ║    ← 餘燼
+       ╚═════════════════╝
+         ╱            ╲
+       碗·匙        匙·碗       ← 餐具散放
+      ───────────────────
+      老鑄  清露  鐵霜   你
 </pre>`, artEn: `<pre class="ascii-art gold">
-    ·  ˚  ✦  ˚  ·  ˚  ✦
-   ╭──────────────────────╮
-   │  🍲  ↑↑ FIRE ↑↑  🍲  │
-   ├──────────────────────┤
-   │ Cast  Dew  Frost You │
-   ╰──────────────────────╯
+        ·  ˚  ✦  ˚  ·  ˚  ✦  ˚  ·
+             ·  ~  *  ~  ·
+                \\|/  \\|/
+              ) ( ) ( ) (      ← rising flames
+             )  (   )  (
+       ╔════╤╤╤╤╤╤╤╤╤╤════╗
+       ║    ║▓▓▓▓▓▓▓▓║    ║    ← pot
+       ║    ╚═══════╝    ║
+       ║  ( )))   ((( )  ║    ← firewood
+       ║ (((      ))) )  ║
+       ║    ▓▓▓▓▓▓▓▓▓    ║    ← embers
+       ╚═════════════════╝
+         ╱            ╲
+       bowl·spoon  spoon·bowl  ← dinnerware
+      ───────────────────
+      Cast   Dew   Frost   You
 </pre>`,
       text: '營火邊支著一口大鍋，老鑄正用一把生鏽的鐵勺攪動裡面灰綠色的東西。',
       textEn: 'A large pot hangs over the campfire. Old Cast stirs something grey-green with a rusted iron ladle.',
