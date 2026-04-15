@@ -282,10 +282,6 @@ function _doStartGame() {
   if (_ngPlusMode) {
     state.flags.ngPlus = true;
     state.flags.ngPlusRun = (typeof globalStats !== 'undefined' ? globalStats.totalRuns : 1);
-    var ngRun = state.flags.ngPlusRun;
-    var ngHpBonus = 10 * ngRun; // +10/+20/+30... per cycle
-    state.maxHp = 50 + ngHpBonus;
-    state.hp = state.maxHp;
     // Record which endings were achieved previously
     if (typeof globalStats !== 'undefined') {
       if (globalStats.endings.dawn > 0) state.flags.ngEndingDawn = true;
@@ -299,6 +295,10 @@ function _doStartGame() {
     }
     _ngPlusMode = false;
   }
+
+  // Apply WIL/level/NG+ bonuses to max HP (must be after stats are assigned)
+  state.maxHp = getBaseMaxHp();
+  state.hp = state.maxHp;
 
   var titleScreen = document.getElementById('title-screen');
   titleScreen.classList.add('hidden');

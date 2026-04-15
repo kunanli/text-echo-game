@@ -497,15 +497,139 @@ var R3_PATROL_TEXTS = [
   { text: '河面上倒映著頭頂岩層的結晶光，波紋讓它們看起來像在呼吸。這座城市建在一個活物的身體裡。', textEn: 'Crystal light from the ceiling reflects off the river, ripples making it look like breathing. This city is built inside something alive.' },
 ];
 
+// ── R4 冥河深淵 Monster Pool ──
+var R4_MONSTERS = [
+  { name: '封印碎片', nameEn: 'Seal Fragment', hp: 45, atkMin: 20, atkMax: 34, petriDmg: 10, xp: 30,
+    art: [
+      '      ╔══════╗',
+      '     ╱ ◆◆◆◆ ╲',
+      '    ║ ≡≡≡≡≡≡ ║',
+      '    ║ ◇  ◇◇ ║',
+      '     ╲ ◆◆◆◆ ╱',
+      '      ╚══════╝',
+    ],
+    commune: [
+      { zh: '你伸出手觸碰碎片表面的符文——它微微發光，脈動放緩了。', en: 'You reach out to touch the runes on its surface — it glows faintly, its pulse slowing.' },
+      { zh: '碎片內部傳來微弱的嗡鳴，像是封印殘留的意志在回應你。', en: 'A faint hum emanates from within, as if the seal\'s residual will responds to you.' },
+      { zh: '它不再旋轉。符文暗淡下去，碎片靜靜地懸浮在你面前。', en: 'It stops spinning. The runes dim and it hovers silently before you.' },
+    ],
+    spareText: { zh: '封印碎片緩緩降落在地面上，符文完全熄滅——回歸為一塊普通的石頭。', en: 'The seal fragment drifts to the ground, runes extinguished — returning to an ordinary stone.' },
+  },
+  { name: '深淵水蛭', nameEn: 'Abyssal Leech', hp: 38, atkMin: 18, atkMax: 38, petriDmg: 14, xp: 28,
+    art: [
+      '    ╭━━━━━━━╮',
+      '   ╱ ●══════ ╲',
+      '  │ ╰──○──╯ ░░░│',
+      '  │ ░░░░░░░░░░░ │',
+      '   ╲░░░░░░░░░░╱',
+      '    ╰━━━━━━━╮╱',
+      '            ╰╯',
+    ],
+    commune: [
+      { zh: '你蹲下身，把手伸入冥河的黑水中……水蛭緩緩靠近，觸鬚停止了攻擊姿態。', en: 'You crouch and dip your hand into the black water... the leech drifts closer, its feelers relaxing.' },
+      { zh: '它的身體發出深紫色的微光——在這片死寂的水域裡，它是唯一的活物。', en: 'Its body emits a deep purple glow — in these dead waters, it is the only living thing.' },
+      { zh: '水蛭繞著你的手腕游了一圈，然後鬆開了。不是放棄——是接受。', en: 'The leech circles your wrist once, then releases. Not surrender — acceptance.' },
+    ],
+    spareText: { zh: '深淵水蛭沉入冥河深處，紫色微光在黑水中漸漸消失——像一顆沉沒的星星。', en: 'The abyssal leech sinks into the depths, its purple glow fading in the black water — like a drowning star.' },
+  },
+  { name: '古代衛兵殘骸', nameEn: 'Ancient Guard Husk', hp: 55, atkMin: 22, atkMax: 36, petriDmg: 8, xp: 32,
+    empathyGoal: 4,
+    art: [
+      '       ╔═╗',
+      '      ╱●═●╲',
+      '     ║ ═══ ║',
+      '     ║ ▓▓▓ ║',
+      '    ╱║ ▓▓▓ ║╲',
+      '   ╱ ║═════║ ╲',
+      '      ╱   ╲',
+      '     ╱     ╲',
+    ],
+    commune: [
+      { zh: '「……守……護……」殘骸的石化喉嚨發出斷斷續續的聲音。它還記得自己的職責。', en: '"...Pro...tect..." Broken sounds from the husk\'s petrified throat. It still remembers its duty.' },
+      { zh: '你舉起雙手表示沒有敵意。殘骸的眼窩中，石化的晶體閃了閃。', en: 'You raise both hands in peace. In the husk\'s eye sockets, petrified crystals flicker.' },
+      { zh: '它放下了手中殘破的長矛。石化的手指一根一根地鬆開——像是在學習放手。', en: 'It lowers its broken spear. Petrified fingers uncurl one by one — as if learning to let go.' },
+      { zh: '殘骸單膝跪地。三百年的守衛任務，終於有人來接替了。', en: 'The husk kneels. Three hundred years of guard duty — someone has finally come to relieve it.' },
+    ],
+    spareText: { zh: '古代衛兵殘骸緩緩跪倒，石化的身體碎裂成塵埃。在塵埃散去的一瞬間，你彷彿看見了一個年輕士兵的微笑。', en: 'The ancient guard husk slowly kneels and crumbles to dust. In the instant the dust clears, you glimpse the smile of a young soldier.' },
+  },
+  { name: '記憶幻影', nameEn: 'Memory Phantom', hp: 42, atkMin: 16, atkMax: 40, petriDmg: 15, xp: 35,
+    art: [
+      '      ╭─·─╮',
+      '     ╱ ? ? ╲',
+      '    │  ═══  │',
+      '    │ ░░░░░ │',
+      '     ╲ ░░░ ╱',
+      '      ╰─·─╯',
+      '       │░│',
+      '      ╱   ╲',
+    ],
+    commune: [
+      { zh: '幻影停下了——它的臉在你和某個陌生人之間不斷切換。它在尋找自己是誰。', en: 'The phantom pauses — its face flickers between yours and a stranger\'s. It\'s searching for who it is.' },
+      { zh: '你喊出自己的名字。幻影愣住了——它聽懂了。那是一個它曾經擁有但已經遺忘的東西。', en: 'You call out your own name. The phantom freezes — it understands. A name is something it once had, now forgotten.' },
+      { zh: '幻影伸出透明的手碰了碰你的胸口。它在感受心跳——一種它不再擁有的節奏。', en: 'The phantom reaches a translucent hand to your chest. It\'s feeling a heartbeat — a rhythm it no longer possesses.' },
+    ],
+    spareText: { zh: '記憶幻影的身形漸漸透明，最後融入了空氣。在消散的一刻，你聽見了一聲幾乎聽不到的「謝謝」。', en: 'The phantom fades to transparency, dissolving into the air. In its last moment, you hear an almost inaudible "thank you."' },
+  },
+  { name: '冥河魚群', nameEn: 'Styx Fish Swarm', hp: 30, atkMin: 24, atkMax: 42, petriDmg: 12, xp: 26,
+    art: [
+      '   ><>  ><>   ><>',
+      '     ><>    ><>',
+      '  ><>   ><>   ><>',
+      '    ><>   ><>',
+      '  ><>  ><>    ><>',
+    ],
+    commune: [
+      { zh: '你蹲在水邊，輕輕拍打水面。魚群的陣型散開了——好奇心戰勝了攻擊本能。', en: 'You crouch by the water, gently tapping the surface. The swarm\'s formation breaks — curiosity overcomes aggression.' },
+      { zh: '一條較大的魚浮出水面，用冰冷的嘴唇碰了碰你的手指。它的眼睛裡有微弱的光。', en: 'A larger fish surfaces, cold lips brushing your fingertips. A faint light glows in its eyes.' },
+      { zh: '魚群開始繞著你的手游圈。牠們的鱗片反射出深淵底部的幽光——美得令人心悸。', en: 'The swarm circles your hand. Their scales reflect the abyss\'s faint glow — hauntingly beautiful.' },
+    ],
+    spareText: { zh: '魚群散入黑水深處，鱗片的光芒像滿天星辰一樣緩緩熄滅。', en: 'The swarm disperses into the black water, their scales\' glow fading like stars winking out.' },
+  },
+  { name: '石化胎兒', nameEn: 'Petrified Embryo', hp: 50, atkMin: 14, atkMax: 30, petriDmg: 20, xp: 34,
+    empathyGoal: 2,
+    art: [
+      '      ╭═══╮',
+      '     ╱ ◎ ◎ ╲',
+      '    ║ ╭───╮ ║',
+      '    ║ │ ∞ │ ║',
+      '    ║ ╰───╯ ║',
+      '     ╲░░░░░╱',
+      '      ╰═══╯',
+    ],
+    commune: [
+      { zh: '它不是怪物——它是古代實驗未完成的產物。蜷縮在結晶殼裡，像一個永遠無法出生的嬰兒。', en: 'It\'s not a monster — it\'s an unfinished product of ancient experiments. Curled in its crystal shell, like a child that can never be born.' },
+      { zh: '你輕聲哼唱——任何旋律都好。結晶殼的脈動慢慢同步了你的節奏。它在聽。', en: 'You hum softly — any melody will do. The crystal shell\'s pulse slowly syncs with your rhythm. It\'s listening.' },
+    ],
+    spareText: { zh: '石化胎兒的結晶殼發出柔和的光，然後緩緩沉入地面。你不知道它是死了還是終於安睡了。', en: 'The embryo\'s crystal shell emits a soft glow, then slowly sinks into the ground. You don\'t know if it died or finally found sleep.' },
+  },
+];
+
+var R4_PATROL_TEXTS = [
+  { text: '黑曜石地面在你腳下發出空洞的回響，像是走在一個巨大生物的骨骼上。', textEn: 'The obsidian floor echoes hollowly beneath you, as if walking on the bones of some vast creature.' },
+  { text: '牆壁上的古代符文偶爾會閃爍——它們在三百年後依然運作著。', textEn: 'Ancient runes on the walls flicker occasionally — still functioning after three hundred years.' },
+  { text: '空氣中瀰漫著一種奇異的甜味，像是石化結晶在緩慢蒸發。', textEn: 'A strange sweetness hangs in the air, as if petrification crystals are slowly evaporating.' },
+  { text: '你的石化紋路在這裡發出微弱的光。身體裡的石化能量正在回應某種更古老的東西。', textEn: 'Your petrification marks glow faintly here. The stone energy in your body responds to something far older.' },
+  { text: '遠處傳來低沉的嗡鳴——不是機器，不是生物。是封印本身在呼吸。', textEn: 'A deep hum reverberates in the distance — not machine, not creature. The seal itself is breathing.' },
+  { text: '冥河的黑水在你身邊無聲流過，水面上映出的不是你的倒影——而是一個石化的人形。', textEn: 'The black water of the Styx flows silently beside you. The reflection is not yours — but a petrified figure.' },
+  { text: '一扇半開的石門後，你瞥見了一排排石化的人體標本。每個的臉上都帶著微笑。', textEn: 'Through a half-open stone door, you glimpse rows of petrified human specimens. Every face wears a smile.' },
+  { text: '腳下的地面突然變得溫暖。越往深處走，溫度越高——像是接近一顆仍在跳動的心臟。', textEn: 'The ground grows warm underfoot. The deeper you go, the warmer it gets — as if approaching a still-beating heart.' },
+  { text: '你撿起一塊地上的碎片——上面刻著「第七次校準」。和祭獻坑祭壇上的字一模一樣。', textEn: 'You pick up a shard from the floor — engraved "Calibration VII." Identical to the inscription on the Sacrificial Pit altar.' },
+  { text: '一個石化的手從牆壁裡伸出來，手指指向深處。它在給你指路，還是在警告你回頭？', textEn: 'A petrified hand protrudes from the wall, fingers pointing deeper. Is it guiding you, or warning you to turn back?' },
+  { text: '頭頂的穹頂上雕刻著星圖——但不是你認識的星空。這個文明觀測的是另一片天。', textEn: 'Star charts are carved into the vaulted ceiling — but not any sky you know. This civilization observed different heavens.' },
+  { text: '你經過一面巨大的銅鏡。鏡中的你看起來更年輕，石化紋路更少——那是過去的你，還是可能的未來？', textEn: 'You pass a massive bronze mirror. Your reflection looks younger, less petrified — is that your past, or a possible future?' },
+];
+
 // ── Register pools into centralized registry (from registry.js) ──
 registerMonsterPool(0, R0_MONSTERS);
 registerMonsterPool(1, R1_MONSTERS);
 registerMonsterPool(2, R2_MONSTERS);
 registerMonsterPool(3, R3_MONSTERS);
+registerMonsterPool(4, R4_MONSTERS);
 registerPatrolTexts(0, R0_PATROL_TEXTS);
 registerPatrolTexts(1, R1_PATROL_TEXTS);
 registerPatrolTexts(2, R2_PATROL_TEXTS);
 registerPatrolTexts(3, R3_PATROL_TEXTS);
+registerPatrolTexts(4, R4_PATROL_TEXTS);
 
 // ═══════════════════════════════════════════════════
 //  Narrative Patrol Events — R0 祭獻坑
@@ -1484,6 +1608,7 @@ function _patrolLabel() {
     { zh: '潛行於石脈之間', en: 'Stalking the Veins' },
     { zh: '在廢墟中狩獵', en: 'Hunting the Ruins' },
     { zh: '穿行於河城暗處', en: 'Roaming the Undercity' },
+    { zh: '探索封印深淵', en: 'Delving the Sealed Abyss' },
   ];
   var l = labels[state.region] || labels[0];
   return L(l.zh, l.en);
@@ -1928,6 +2053,12 @@ function runPatrolCycleManual(monster) {
     if (autoClockTimer) { clearInterval(autoClockTimer); autoClockTimer = null; }
     hideExploreBar();
 
+    // Freeze the patrol loop while manual combat owns the UI. This prevents
+    // any stale processNext / runPatrolCycle timers from overwriting the
+    // combat scene mid-fight. patrolActive is restored in onPatrolWin.
+    patrolActive = false;
+    clearPatrolTimers();
+
     startCombat(
       monster,
       function onPatrolWin() {
@@ -1952,7 +2083,7 @@ function runPatrolCycleManual(monster) {
           $choices.appendChild(btn);
         }
         patrolActive = true;
-        patrolTimers.push(setTimeout(runPatrolCycle, 1200));
+        patrolTimers.push(setTimeout(runPatrolCycle, 1500));
       },
       function onPatrolFlee() {
         patrolActive = false;

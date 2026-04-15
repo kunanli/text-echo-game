@@ -211,7 +211,37 @@ var ambientAudio = (function() {
     pushRegionLayer(activity, 0.03, 3);
   }
 
-  var regionBuilders = [buildRegion0, buildRegion1, buildRegion2, buildRegion3];
+  // Region 4: 冥河深淵 — Ultra-deep abyss drone, seal pulse, haunting void
+  function buildRegion4() {
+    // Layer 1: Sub-bass — the abyss itself vibrating
+    var sub = makeOscDrone(isMobile ? 60 : 30, 'sine');
+    pushRegionLayer(sub, isMobile ? 0.3 : 0.25, 3);
+
+    // Layer 2: Seal pulse — slow rhythmic throb (LFO-modulated gain)
+    var pulse = makeOscDrone(isMobile ? 100 : 48, 'sine');
+    var pulseLfo = ctx.createOscillator();
+    pulseLfo.type = 'sine';
+    pulseLfo.frequency.value = 0.3; // slow heartbeat-like pulse
+    var pulseLfoGain = ctx.createGain();
+    pulseLfoGain.gain.value = 0.15;
+    pulseLfo.connect(pulseLfoGain);
+    pulseLfoGain.connect(pulse.gain.gain);
+    pulseLfo.start();
+    pulse._extraNodes = [pulseLfo, pulseLfoGain];
+    pushRegionLayer(pulse, 0.18, 2.5);
+
+    // Layer 3: Void wind — filtered noise, very sparse
+    var brown = makeBrownNoise(3);
+    var voidWind = makeFilteredNoise(brown, 'bandpass', isMobile ? 250 : 150, 0.5, 0.3);
+    pushRegionLayer(voidWind, isMobile ? 0.3 : 0.2, 2);
+
+    // Layer 4: High ethereal shimmer — ancient runes still humming
+    var white = makeWhiteNoise(2);
+    var runes = makeFilteredNoise(white, 'bandpass', isMobile ? 4500 : 3800, 12, 0.02);
+    pushRegionLayer(runes, 0.03, 4);
+  }
+
+  var regionBuilders = [buildRegion0, buildRegion1, buildRegion2, buildRegion3, buildRegion4];
 
   // ══════════════════════════════════════════
   //  Combat / Patrol Layer

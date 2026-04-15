@@ -627,6 +627,26 @@
     font-size: .85rem;
     border-bottom: none;
   }
+  .inv-qty {
+    color: #d4a843;
+    font-size: .78rem;
+    margin-left: 4px;
+  }
+  .inventory-list li.inv-usable {
+    cursor: pointer;
+    transition: background .15s, color .15s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .inventory-list li.inv-usable:hover {
+    background: #1a1a28;
+    color: #e6e6f4;
+  }
+  .inventory-list li.inv-usable::after {
+    content: " \2764";
+    color: #6a9a6a;
+    font-size: .7rem;
+    margin-left: 4px;
+  }
   .equip-row {
     padding: 3px 0;
     font-size: .85rem;

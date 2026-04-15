@@ -96,6 +96,61 @@ var EQUIP_DATA = {
 
 function getEquipData(itemName) { return EQUIP_DATA[itemName] || null; }
 
+// ── Consumable Items ──
+// Items listed here can be used from the inventory panel (click the item).
+// Each entry: { hp, petri, xp, str/agi/wil } — only listed fields are applied.
+// Both zh and en names must be registered.
+var CONSUMABLE_DATA = {
+  '黑麵包':       { hp: 15, label: 'HP +15' },
+  'Black Bread':  { hp: 15, label: 'HP +15' },
+  '礦工口糧':     { hp: 20, label: 'HP +20' },
+  "Miner's Ration": { hp: 20, label: 'HP +20' },
+  '礦工烈酒':     { hp: 10, petri: -3, label: 'HP +10, 石化 -3%', labelEn: 'HP +10, Petri -3%' },
+  "Miner's Spirits": { hp: 10, petri: -3, label: 'HP +10, Petri -3%' },
+  '乾燥草藥':     { hp: 8, petri: -5, label: 'HP +8, 石化 -5%', labelEn: 'HP +8, Petri -5%' },
+  'Dried Herbs':  { hp: 8, petri: -5, label: 'HP +8, Petri -5%' },
+  '急救草藥':     { hp: 15, label: 'HP +15' },
+  'Emergency Herbs': { hp: 15, label: 'HP +15' },
+  '淨化藥劑':     { petri: -15, label: '石化 -15%', labelEn: 'Petri -15%' },
+  'Purification Elixir': { petri: -15, label: 'Petri -15%' },
+  '濃縮淨化液':   { petri: -25, label: '石化 -25%', labelEn: 'Petri -25%' },
+  'Concentrated Purifier': { petri: -25, label: 'Petri -25%' },
+  '河城淨化液':   { petri: -20, label: '石化 -20%', labelEn: 'Petri -20%' },
+  'River City Purifier': { petri: -20, label: 'Petri -20%' },
+  '抗石化藥膏':   { petri: -10, hp: 5, label: '石化 -10%, HP +5', labelEn: 'Petri -10%, HP +5' },
+  'Anti-Petri Salve': { petri: -10, hp: 5, label: 'Petri -10%, HP +5' },
+  '河城草藥包':   { hp: 20, petri: -5, label: 'HP +20, 石化 -5%', labelEn: 'HP +20, Petri -5%' },
+  'River City Herb Pack': { hp: 20, petri: -5, label: 'HP +20, Petri -5%' },
+  '石化抑制劑':   { petri: -20, label: '石化 -20%', labelEn: 'Petri -20%' },
+  'Petri Suppressant': { petri: -20, label: 'Petri -20%' },
+  '清露的特製藥劑': { hp: 30, petri: -15, label: 'HP +30, 石化 -15%', labelEn: 'HP +30, Petri -15%' },
+  "Dew's Special Elixir": { hp: 30, petri: -15, label: 'HP +30, Petri -15%' },
+};
+
+function getConsumableData(itemName) { return CONSUMABLE_DATA[itemName] || null; }
+
+function isConsumable(itemName) { return !!CONSUMABLE_DATA[itemName]; }
+
+// Consume the item, apply effects, remove one copy from inventory.
+// Returns true if consumed, false otherwise.
+function useInventoryItem(itemName) {
+  var data = CONSUMABLE_DATA[itemName];
+  if (!data) return false;
+  if (!hasItem(itemName)) return false;
+  removeItem(itemName);
+  if (data.hp) changeHp(data.hp);
+  if (data.petri) changePetri(data.petri);
+  if (data.xp) gainXp(data.xp);
+  if (data.str) changeStat('str', data.str);
+  if (data.agi) changeStat('agi', data.agi);
+  if (data.wil) changeStat('wil', data.wil);
+  sfx.item();
+  var label = (state.lang === 'en' && data.labelEn) ? data.labelEn : data.label;
+  notify(L('使用：', 'Used: ') + itemName + (label ? '  (' + label + ')' : ''));
+  if (typeof renderStatus === 'function') renderStatus();
+  return true;
+}
+
 // Get currently equipped item for a slot
 function getEquipped(slot) { return state.flags['equip_' + slot] || ''; }
 

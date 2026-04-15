@@ -16,12 +16,12 @@ function notify(msg) {
 function hasItem(name) { return state.inventory.includes(name); }
 
 function addItem(name) {
-  if (!hasItem(name)) {
-    state.inventory.push(name);
-    sfx.item();
-    notify(L('獲得物品：', 'Acquired: ') + name);
-    if (typeof tryAutoEquip === 'function') tryAutoEquip(name);
-  }
+  var wasFirst = !hasItem(name);
+  state.inventory.push(name);
+  sfx.item();
+  notify(L('獲得物品：', 'Acquired: ') + name);
+  // Only auto-equip on first acquisition to avoid re-equipping duplicates
+  if (wasFirst && typeof tryAutoEquip === 'function') tryAutoEquip(name);
 }
 
 function removeItem(name) {
@@ -189,6 +189,15 @@ function changePetri(delta) {
 
 function changeStat(stat, delta) {
   state[stat] = Math.max(1, state[stat] + delta);
+  // Raising WIL grows the max HP pool (+3 per point). Drop bonus HP along with the stat.
+  if (stat === 'wil' && delta !== 0) {
+    var pen = petriPenalty();
+    var allowedMax = Math.floor(getBaseMaxHp() * pen.maxHpMult);
+    var hpDelta = allowedMax - state.maxHp;
+    state.maxHp = allowedMax;
+    if (hpDelta > 0) state.hp = Math.min(state.hp + hpDelta, state.maxHp);
+    else state.hp = Math.min(state.hp, state.maxHp);
+  }
 }
 
 // ── Petrification Penalty System (5 Stages) ──
@@ -215,11 +224,13 @@ function effectiveStat(stat) {
   return Math.max(1, state[stat] + (pen[stat] || 0) + eqBonus);
 }
 
-// Base max HP before petri reduction (accounts for NG+ run and level)
+// Base max HP before petri reduction (accounts for NG+ run, level, and WIL)
+// WIL contributes +3 HP per point above base (3) — pure WIL build gets ~+18 HP at creation
 function getBaseMaxHp() {
   var ngRun = state.flags.ngPlusRun || 0;
   var base = 50 + (ngRun > 0 ? 10 * ngRun : 0);
   base += (state.level - 1) * 5;
+  base += Math.max(0, (state.wil || 0) - 3) * 3;
   return base;
 }
 
