@@ -234,6 +234,15 @@ function getBaseMaxHp() {
   return base;
 }
 
+// Recompute maxHp from current state (formula may change across versions — call
+// after load paths to migrate pre-v2.3.4l saves to the new WIL-aware formula).
+// Caps current hp to the new maxHp but never reduces it beyond the cap.
+function recalcMaxHp() {
+  var pen = petriPenalty();
+  state.maxHp = Math.floor(getBaseMaxHp() * pen.maxHpMult);
+  state.hp = Math.min(state.hp, state.maxHp);
+}
+
 // Get NG+ scaling factor based on run number (2x, 4x, 8x...)
 function getNgPlusScale() {
   if (!state.flags.ngPlus) return 1;

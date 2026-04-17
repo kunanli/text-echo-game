@@ -66,6 +66,7 @@ function loadSave() {
     state.mood = data.mood || 'normal';
     state.skills = data.skills || [];
     state.romance = data.romance || null;
+    recalcMaxHp();
     return true;
   } catch (e) {
     return false;
@@ -322,6 +323,7 @@ function importSeedV2(code) {
     for (var i = 0; i < all.length; i++) cksum = (cksum + all.charCodeAt(i)) % 36;
     if (code[p] !== B36[cksum]) return false;
     state.mood = 'normal';
+    recalcMaxHp();
     saveGame();
     return true;
   } catch (e) {
@@ -371,6 +373,7 @@ function importSeedV1(code) {
     for (var i = 0; i < all.length; i++) cksum = (cksum + all.charCodeAt(i)) % 36;
     if (code[p] !== B36[cksum]) return false;
     state.mood = 'normal';
+    recalcMaxHp();
     saveGame();
     return true;
   } catch (e) {
@@ -400,6 +403,7 @@ function importLegacy(code) {
     state.deathCount = d.dc || 0;
     state.lang = d.l || 'zh';
     state.mood = 'normal';
+    recalcMaxHp();
     saveGame();
     return true;
   } catch (e) {
@@ -463,6 +467,7 @@ function loadFromSlot(n) {
     state.mood = data.mood || 'normal';
     state.skills = data.skills || [];
     state.romance = data.romance || null;
+    recalcMaxHp();
     saveGame();
     return true;
   } catch (e) { return false; }
