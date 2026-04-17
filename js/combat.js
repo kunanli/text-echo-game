@@ -8,6 +8,9 @@ function startCombat(enemy, onWin, onFlee) {
   if (typeof statsTrackCombat === 'function') statsTrackCombat();
   // NG+ scaling: 1.5x enemy stats
   enemy = scaleEnemyNgPlus(enemy);
+  // Track current opponent so death attribution can name them
+  state.flags._currentEnemyZh = enemy.name;
+  state.flags._currentEnemyEn = enemy.nameEn || enemy.name;
   let enemyHp = enemy.hp;
   const eName = enemy.name;
   let observed = false;   // next attack deals 2x

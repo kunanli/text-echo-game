@@ -120,6 +120,11 @@ function changeHp(delta) {
     state.flags._hpWarn33 = false;
   }
   if (state.hp <= 0) {
+    // Capture death cause before die() resets mood
+    state.flags._deathCause = state.mood === 'combat' ? 'combat' : 'environmental';
+    state.flags._deathEnemyZh = state.flags._currentEnemyZh || null;
+    state.flags._deathEnemyEn = state.flags._currentEnemyEn || null;
+    state.flags._deathRegion = state.region;
     die(L('你的生命力耗盡，倒在了冰冷的石地上……', 'Your life force fades... You collapse on the cold stone floor...'));
     return true; // dead
   }
@@ -255,6 +260,10 @@ function changePetri(delta) {
     }
   }
   if (state.petri >= 100) {
+    state.flags._deathCause = 'petri';
+    state.flags._deathEnemyZh = null;
+    state.flags._deathEnemyEn = null;
+    state.flags._deathRegion = state.region;
     die(L('你的身體已完全化為冰冷的石頭……', 'Your body has completely turned to cold stone...'));
     return true; // dead
   }

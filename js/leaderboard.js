@@ -26,6 +26,9 @@ var LEADERBOARD = {
       seconds: seconds,
       region: state.region || 0,
       level: state.level || 1,
+      cause: state.flags._deathCause || null,
+      enemy: state.flags._deathEnemyZh || null,
+      enemyEn: state.flags._deathEnemyEn || null,
       timestamp: Date.now()
     };
     var url = this.dbUrl + '/leaderboard.json';
@@ -70,7 +73,10 @@ var LEADERBOARD = {
               ending: d.ending || '',
               cycle: d.cycle || 1,
               region: typeof d.region === 'number' ? d.region : -1,
-              level: d.level || 1
+              level: d.level || 1,
+              cause: d.cause || null,
+              enemy: d.enemy || null,
+              enemyEn: d.enemyEn || null
             });
           }
         }
@@ -107,34 +113,51 @@ function prefetchFallenTravelers() {
   _ensureFallenCache();
 }
 
+// Render a single fallen traveler into an epitaph-like line
+function _formatEpitaph(e, en) {
+  var cyc = e.cycle <= 1 ? (en ? '1st' : '一周目') : (e.cycle + (en ? 'th' : '周目'));
+  var who = e.name + '（' + cyc + '・Lv.' + e.level + '）';
+  // Cause-of-death phrasing
+  var enemyName = en ? (e.enemyEn || e.enemy) : (e.enemy || e.enemyEn);
+  if (e.cause === 'combat' && enemyName) {
+    return en
+      ? who + ' fell to ' + enemyName
+      : who + ' 死於「' + enemyName + '」之手';
+  }
+  if (e.cause === 'petri') {
+    return en
+      ? who + ' turned entirely to stone'
+      : who + ' 徹底化為冰冷的石像';
+  }
+  if (e.cause === 'combat') {
+    return en ? who + ' fell in battle' : who + ' 戰死於此';
+  }
+  if (e.cause === 'environmental') {
+    return en ? who + ' was claimed by the abyss' : who + ' 被深淵吞噬';
+  }
+  return who;
+}
+
 // Called when player enters a new region (state.maxRegion just advanced)
-// Shows a story log entry listing fallen travelers with count + up to 3 names.
+// Shows a story log entry listing fallen travelers with count + up to 3 epitaphs.
 function showFallenTravelers(region) {
   _ensureFallenCache(function(fallen) {
     if (!fallen || fallen.length === 0) return;
-    // Travelers who died IN this region (their graveyard is here)
     var here = fallen.filter(function(e) { return e.region === region; });
-    // Travelers who died BEFORE this region (surpassed)
     var surpassed = fallen.filter(function(e) { return e.region < region; });
     if (here.length === 0 && surpassed.length === 0) return;
 
     var en = state.lang === 'en';
-    var REGION_NAMES = [
-      { zh: '祭獻坑', en: 'Sacrificial Pit' },
-      { zh: '石脈迴廊', en: 'Vein Corridor' },
-      { zh: '大採石場', en: 'Great Quarry' },
-      { zh: '河城渡口', en: 'River City' },
-      { zh: '冥河深淵', en: 'Styx Abyss' }
-    ];
     var lines = [];
     if (here.length > 0) {
+      // Show up to 3 epitaphs, one per line for readability
       var sample = here.slice(0, 3).map(function(e) {
-        var cyc = e.cycle <= 1 ? (en ? '1st' : '一周目') : (e.cycle + (en ? 'th' : '周目'));
-        return e.name + '（' + cyc + '・Lv.' + e.level + '）';
-      }).join('、');
-      lines.push(en
-        ? here.length + ' traveler' + (here.length > 1 ? 's have' : ' has') + ' perished here: ' + sample
-        : '在此地，已有 ' + here.length + ' 位旅者的魂魄凝在石中：' + sample);
+        return '· ' + _formatEpitaph(e, en);
+      }).join('<br>&nbsp;&nbsp;&nbsp;');
+      var header = en
+        ? here.length + ' traveler' + (here.length > 1 ? 's have' : ' has') + ' perished here:'
+        : '在此地，已有 ' + here.length + ' 位旅者的魂魄凝在石中：';
+      lines.push(header + '<br>&nbsp;&nbsp;&nbsp;' + sample);
     }
     if (surpassed.length > 0) {
       lines.push(en
@@ -143,7 +166,6 @@ function showFallenTravelers(region) {
     }
     if (lines.length === 0) return;
 
-    // Append directly to story log so it appears in the current narrative
     if (!$story) return;
     var wrap = document.createElement('div');
     wrap.className = 'log-line fallen-travelers';
@@ -161,10 +183,42 @@ function showFallenTravelers(region) {
 
 // ── Leaderboard UI ──
 
+// Rate-limit low-value death submissions to avoid ballooning the backend
+// with trivial early-game deaths. Only submit deaths that meet at least one
+// bar: level ≥ 2 OR score ≥ 20 OR reached region ≥ 1 OR it's a non-death ending.
+// Also throttle per-browser: 1 submission every 5 minutes even if meaningful.
+var LB_THROTTLE_KEY = 'petriabyss_lb_last_submit';
+var LB_THROTTLE_MS = 5 * 60 * 1000; // 5 minutes
+function _meetsSubmitBar(ending, score) {
+  if (ending !== 'death') return true;  // any ending always submits
+  if ((state.level || 1) >= 2) return true;
+  if (score >= 20) return true;
+  if ((state.region || 0) >= 1) return true;
+  return false;
+}
+function _isThrottled() {
+  try {
+    var last = parseInt(localStorage.getItem(LB_THROTTLE_KEY), 10) || 0;
+    return (Date.now() - last) < LB_THROTTLE_MS;
+  } catch (e) { return false; }
+}
+function _markSubmitted() {
+  try { localStorage.setItem(LB_THROTTLE_KEY, String(Date.now())); } catch (e) {}
+}
+
 function submitToLeaderboard() {
   if (!LEADERBOARD.isEnabled()) return;
   var ending = state.flags.r3Ending || 'death';
   var score = (typeof calculateEndScore === 'function') ? calculateEndScore() : 0;
+  if (!_meetsSubmitBar(ending, score)) {
+    console.log('[Leaderboard] submission skipped — below bar');
+    return;
+  }
+  if (_isThrottled()) {
+    console.log('[Leaderboard] submission throttled');
+    return;
+  }
+  _markSubmitted();
   LEADERBOARD.submit(state.name, score, ending, function(ok) {
     if (ok) {
       notify(L('分數已提交到排行榜！', 'Score submitted to leaderboard!'));
