@@ -224,7 +224,7 @@ function renderScene(text, choices) {
     // Voice narration for scene text
     voiceNarrator.speak(text, state.lang);
     $story.appendChild(block);
-    $story.scrollTop = $story.scrollHeight;
+    scrollStoryToBottom();
     renderStatus();
     showChoices(choices);
   }, 500);
@@ -266,7 +266,7 @@ function showChoices(choices) {
   currentChoices = choices;
   // Re-scroll story after choices animate in and focus first button for keyboard nav
   setTimeout(function() {
-    $story.scrollTop = $story.scrollHeight;
+    scrollStoryToBottom();
     var firstBtn = $choices.querySelector('.choice-btn');
     if (firstBtn) firstBtn.focus();
   }, 80 * choices.length + 120);

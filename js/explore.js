@@ -142,7 +142,7 @@ function showPending() {
   $pendingEl.className = 'pending-indicator';
   $pendingEl.innerHTML = '<span class="dot">░</span><span class="dot">░</span><span class="dot">▒</span><span class="dot">░</span><span class="dot">░</span>';
   $story.appendChild($pendingEl);
-  $story.scrollTop = $story.scrollHeight;
+  scrollStoryToBottom();
 }
 
 function removePending() {
@@ -270,7 +270,7 @@ function autoExplore(steps, choices, opts) {
       if (step.effect) { try { step.effect(); renderStatus(); } catch(e) { DEBUG && console.warn('Step effect error:', e); } }
       $story.appendChild(line);
     }
-    $story.scrollTop = $story.scrollHeight;
+    scrollStoryToBottom();
   }
 
   function renderStep(step) {
@@ -285,7 +285,7 @@ function autoExplore(steps, choices, opts) {
       // Run side effect
       if (step.effect) { try { step.effect(); renderStatus(); } catch(e) { DEBUG && console.warn('Step effect error:', e); } }
       $story.appendChild(line);
-      $story.scrollTop = $story.scrollHeight;
+      scrollStoryToBottom();
       _autoResume = function() { showNext(); };
       autoTimer = setTimeout(showNext, stepDelay);
     } else {
@@ -316,7 +316,7 @@ function autoExplore(steps, choices, opts) {
       if (step.effect) { try { step.effect(); renderStatus(); } catch(e) { DEBUG && console.warn('Step effect error:', e); } }
 
       $story.appendChild(line);
-      $story.scrollTop = $story.scrollHeight;
+      scrollStoryToBottom();
 
       // Voice narration — speak when typewriter begins
       voiceNarrator.speak(textContent || htmlContent, state.lang);
@@ -335,7 +335,7 @@ function autoExplore(steps, choices, opts) {
         if (autoSkipAll) {
           // Long-press — finish instantly, no delay before next
           if (isHtml) { contentSpan.innerHTML = fullHtml; } else { contentSpan.textContent = fullText; }
-          $story.scrollTop = $story.scrollHeight;
+          scrollStoryToBottom();
           showNext();
           return;
         }
@@ -343,7 +343,7 @@ function autoExplore(steps, choices, opts) {
           // User tapped — finish THIS line's typewriter instantly, then wait normal delay
           autoFast = false;
           if (isHtml) { contentSpan.innerHTML = fullHtml; } else { contentSpan.textContent = fullText; }
-          $story.scrollTop = $story.scrollHeight;
+          scrollStoryToBottom();
           _autoResume = function() { showNext(); };
           autoTimer = setTimeout(showNext, stepDelay);
           return;
@@ -355,19 +355,19 @@ function autoExplore(steps, choices, opts) {
           if (typeBuf.length >= TYPE_BATCH || ci >= chars.length) {
             contentSpan.textContent += typeBuf;
             typeBuf = '';
-            $story.scrollTop = $story.scrollHeight;
+            scrollStoryToBottom();
           }
           // Resume = finish this line's text instantly, then continue
           _autoResume = function() {
             if (isHtml) { contentSpan.innerHTML = fullHtml; } else { contentSpan.textContent = fullText; }
-            $story.scrollTop = $story.scrollHeight;
+            scrollStoryToBottom();
             showNext();
           };
           autoTimer = setTimeout(typeChar, typeSpeed);
         } else {
           // Typing done — swap to full html if needed (to restore <b> tags etc)
           if (isHtml) { contentSpan.innerHTML = fullHtml; }
-          $story.scrollTop = $story.scrollHeight;
+          scrollStoryToBottom();
           _autoResume = function() { showNext(); };
           autoTimer = setTimeout(showNext, stepDelay);
         }

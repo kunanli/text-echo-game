@@ -226,7 +226,10 @@ function loadNode(id) {
   state.node = id;
   if (!state.visitedNodes) state.visitedNodes = {};
   state.visitedNodes[id] = true;
-  if (state.region > (state.maxRegion || 0)) state.maxRegion = state.region;
+  if (state.region > (state.maxRegion || 0)) {
+    state.maxRegion = state.region;
+    if (typeof showFallenTravelers === 'function') showFallenTravelers(state.region);
+  }
   if (typeof saveGame === 'function') saveGame();
   // Check achievements on node transitions
   if (typeof triggerAchievementCheck === 'function') triggerAchievementCheck();

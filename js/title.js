@@ -60,6 +60,7 @@ document.getElementById('phase-splash').addEventListener('click', function(e) {
       if (loadSave()) {
         applyLang();
         if (typeof statsStartRun === 'function') statsStartRun();
+        if (typeof prefetchFallenTravelers === 'function') prefetchFallenTravelers();
         var titleScreen = document.getElementById('title-screen');
         titleScreen.classList.add('hidden');
         setTimeout(function() { titleScreen.style.display = 'none'; }, 800);
@@ -308,6 +309,7 @@ function _doStartGame() {
   setTimeout(updateAudioBtn, 200);
 
   if (typeof statsStartRun === 'function') statsStartRun();
+  if (typeof prefetchFallenTravelers === 'function') prefetchFallenTravelers();
   renderStatus();
   loadNode('r0_start');
 }
@@ -463,6 +465,7 @@ function buildChapterMap(container, mapPre, onSelect) {
       document.getElementById('chapter-map'),
       function(ch) {
         state.region = ch.id;
+        if (typeof prefetchFallenTravelers === 'function') prefetchFallenTravelers();
         var titleScreen = document.getElementById('title-screen');
         titleScreen.classList.add('hidden');
         setTimeout(function() { titleScreen.style.display = 'none'; }, 800);

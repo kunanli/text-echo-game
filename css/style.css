@@ -98,6 +98,7 @@
     border-right: 1px solid #1e1e2e;
     min-height: 0;
     overflow: hidden;
+    position: relative;
   }
 
   .region-label {
@@ -377,6 +378,26 @@
 
   .petri-sensory { color: #9090c0; font-style: italic; }
   .hp-sensory    { color: #d87070; font-style: italic; }
+
+  /* ── "Back to latest" button (appears when player scrolls up) ── */
+  .scroll-bottom-btn {
+    position: absolute;
+    right: 16px;
+    bottom: 90px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(40, 40, 55, 0.9);
+    color: #c8b878;
+    border: 1px solid #4a4a5a;
+    font-size: 1.2rem;
+    cursor: pointer;
+    display: none;
+    z-index: 20;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+  }
+  .scroll-bottom-btn.active { display: block; }
+  .scroll-bottom-btn:hover  { background: rgba(60, 60, 80, 0.95); }
 
   /* ── Explore status bar (ASCII style) ── */
   .explore-bar {

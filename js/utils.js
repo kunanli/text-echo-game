@@ -139,7 +139,7 @@ function _hpSensory(msg) {
   txt.textContent = ' ' + msg;
   line.appendChild(txt);
   $story.appendChild(line);
-  $story.scrollTop = $story.scrollHeight;
+  scrollStoryToBottom();
 }
 
 // Check if a blocking UI overlay (e.g. level-up) is active — loops should defer
@@ -147,6 +147,40 @@ function isBlockingOverlayActive() {
   var ov = document.getElementById('levelup-overlay');
   return !!(ov && ov.classList.contains('active'));
 }
+
+// ── Story auto-scroll (respects manual scroll-up so the player can re-read) ──
+var _storyScrolledUp = false;
+var _storyScrollInit = false;
+function _initStoryScrollListener() {
+  if (_storyScrollInit || !$story) return;
+  _storyScrollInit = true;
+  $story.addEventListener('scroll', function() {
+    var delta = $story.scrollHeight - $story.scrollTop - $story.clientHeight;
+    _storyScrolledUp = delta > 80;
+    var btn = document.getElementById('scroll-bottom-btn');
+    if (btn) btn.classList.toggle('active', _storyScrolledUp);
+  }, { passive: true });
+}
+function scrollStoryToBottom(force) {
+  _initStoryScrollListener();
+  if (!$story) return;
+  if (force || !_storyScrolledUp) {
+    $story.scrollTop = $story.scrollHeight;
+  }
+}
+function forceScrollStoryToBottom() {
+  _storyScrolledUp = false;
+  if ($story) $story.scrollTop = $story.scrollHeight;
+  var btn = document.getElementById('scroll-bottom-btn');
+  if (btn) btn.classList.remove('active');
+}
+(function() {
+  var btn = document.getElementById('scroll-bottom-btn');
+  if (btn) btn.addEventListener('click', function(e) {
+    e.stopPropagation();
+    forceScrollStoryToBottom();
+  });
+})();
 
 // Append a sensory description line to the story log when crossing petri thresholds
 function _petriSensory(msg) {
@@ -161,7 +195,7 @@ function _petriSensory(msg) {
   txt.textContent = ' ' + msg;
   line.appendChild(txt);
   $story.appendChild(line);
-  $story.scrollTop = $story.scrollHeight;
+  scrollStoryToBottom();
 }
 
 function changePetri(delta) {

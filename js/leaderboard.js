@@ -24,6 +24,8 @@ var LEADERBOARD = {
       ending: ending,
       cycle: cycle + 1,
       seconds: seconds,
+      region: state.region || 0,
+      level: state.level || 1,
       timestamp: Date.now()
     };
     var url = this.dbUrl + '/leaderboard.json';
@@ -66,7 +68,9 @@ var LEADERBOARD = {
               score: d.score || 0,
               seconds: d.seconds || 0,
               ending: d.ending || '',
-              cycle: d.cycle || 1
+              cycle: d.cycle || 1,
+              region: typeof d.region === 'number' ? d.region : -1,
+              level: d.level || 1
             });
           }
         }
@@ -80,6 +84,80 @@ var LEADERBOARD = {
     });
   }
 };
+
+// ── Fallen travelers cache (death entries from leaderboard) ──
+var FALLEN_CACHE = null;
+var FALLEN_FETCHING = false;
+function _ensureFallenCache(cb) {
+  if (FALLEN_CACHE) { if (cb) cb(FALLEN_CACHE); return; }
+  if (FALLEN_FETCHING) { setTimeout(function() { _ensureFallenCache(cb); }, 300); return; }
+  if (!LEADERBOARD.isEnabled()) { FALLEN_CACHE = []; if (cb) cb([]); return; }
+  FALLEN_FETCHING = true;
+  LEADERBOARD.fetch(100, function(entries) {
+    FALLEN_FETCHING = false;
+    FALLEN_CACHE = (entries || []).filter(function(e) {
+      return e.ending === 'death' && e.region >= 0 && e.name && e.name !== (state && state.name);
+    });
+    if (cb) cb(FALLEN_CACHE);
+  });
+}
+
+// Prefetch on game start — called from title.js / boot
+function prefetchFallenTravelers() {
+  _ensureFallenCache();
+}
+
+// Called when player enters a new region (state.maxRegion just advanced)
+// Shows a story log entry listing fallen travelers with count + up to 3 names.
+function showFallenTravelers(region) {
+  _ensureFallenCache(function(fallen) {
+    if (!fallen || fallen.length === 0) return;
+    // Travelers who died IN this region (their graveyard is here)
+    var here = fallen.filter(function(e) { return e.region === region; });
+    // Travelers who died BEFORE this region (surpassed)
+    var surpassed = fallen.filter(function(e) { return e.region < region; });
+    if (here.length === 0 && surpassed.length === 0) return;
+
+    var en = state.lang === 'en';
+    var REGION_NAMES = [
+      { zh: '祭獻坑', en: 'Sacrificial Pit' },
+      { zh: '石脈迴廊', en: 'Vein Corridor' },
+      { zh: '大採石場', en: 'Great Quarry' },
+      { zh: '河城渡口', en: 'River City' },
+      { zh: '冥河深淵', en: 'Styx Abyss' }
+    ];
+    var lines = [];
+    if (here.length > 0) {
+      var sample = here.slice(0, 3).map(function(e) {
+        var cyc = e.cycle <= 1 ? (en ? '1st' : '一周目') : (e.cycle + (en ? 'th' : '周目'));
+        return e.name + '（' + cyc + '・Lv.' + e.level + '）';
+      }).join('、');
+      lines.push(en
+        ? here.length + ' traveler' + (here.length > 1 ? 's have' : ' has') + ' perished here: ' + sample
+        : '在此地，已有 ' + here.length + ' 位旅者的魂魄凝在石中：' + sample);
+    }
+    if (surpassed.length > 0) {
+      lines.push(en
+        ? 'You have surpassed ' + surpassed.length + ' fallen traveler' + (surpassed.length > 1 ? 's' : '') + '.'
+        : '你已超越了 ' + surpassed.length + ' 位葬身深淵的旅者。');
+    }
+    if (lines.length === 0) return;
+
+    // Append directly to story log so it appears in the current narrative
+    if (!$story) return;
+    var wrap = document.createElement('div');
+    wrap.className = 'log-line fallen-travelers';
+    var tagEl = document.createElement('span');
+    tagEl.className = 'log-tag tag-system';
+    tagEl.textContent = '[' + (en ? 'Stele' : '石碑') + ']';
+    wrap.appendChild(tagEl);
+    var body = document.createElement('span');
+    body.innerHTML = ' ' + lines.join('<br>&nbsp;&nbsp;&nbsp;');
+    wrap.appendChild(body);
+    $story.appendChild(wrap);
+    if (typeof scrollStoryToBottom === 'function') scrollStoryToBottom();
+  });
+}
 
 // ── Leaderboard UI ──
 

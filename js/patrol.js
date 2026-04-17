@@ -787,7 +787,7 @@ var R0_EVENTS = [
                   '    ···╰──┴──┴──╯···\n' +
                   '</pre>';
                 $story.appendChild(singerArt);
-                $story.scrollTop = $story.scrollHeight;
+                scrollStoryToBottom();
                 patrolTimers.push(setTimeout(function() {
                   patrolAppend(L('感知','Sense'), 'tag-sense',
                     L('死路的盡頭，坐著一個完全石化的女人。她的姿勢像是在抱著什麼——但懷裡是空的。', 'At the dead end sits a fully petrified woman. She seems to be holding something — but her arms are empty.'), false);
@@ -1644,7 +1644,7 @@ function patrolAppend(tag, tagColor, content, isHtml) {
   if (isHtml) cs.innerHTML = content; else cs.textContent = content;
   line.appendChild(cs);
   $story.appendChild(line);
-  $story.scrollTop = $story.scrollHeight;
+  scrollStoryToBottom();
 }
 
 function patrolAppendArt(artLines, className) {
@@ -1652,7 +1652,7 @@ function patrolAppendArt(artLines, className) {
   pre.className = 'ascii-art ' + (className || '');
   pre.textContent = artLines.join('\n');
   $story.appendChild(pre);
-  $story.scrollTop = $story.scrollHeight;
+  scrollStoryToBottom();
 }
 
 function startPatrol(opts) {
@@ -1841,7 +1841,7 @@ function runNarrativeEvent(evt) {
           var div = document.createElement('div');
           div.innerHTML = step.art;
           $story.appendChild(div);
-          $story.scrollTop = $story.scrollHeight;
+          scrollStoryToBottom();
         } else {
           patrolAppendArt(step.art, step.artClass || '');
         }
