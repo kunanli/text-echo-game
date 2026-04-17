@@ -399,6 +399,45 @@
   .scroll-bottom-btn.active { display: block; }
   .scroll-bottom-btn:hover  { background: rgba(60, 60, 80, 0.95); }
 
+  /* ── First-run tap/hold tutorial toast ── */
+  .tap-hint-toast {
+    position: fixed;
+    left: 50%;
+    bottom: 90px;
+    transform: translateX(-50%);
+    background: rgba(20, 20, 30, 0.96);
+    border: 1px solid #4a4a60;
+    color: #d4c89a;
+    padding: 14px 20px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    line-height: 1.6;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
+    z-index: 1500;
+    pointer-events: none;
+    animation: tht-in 0.4s ease-out;
+    max-width: 85vw;
+  }
+  .tap-hint-toast .tht-line { white-space: nowrap; }
+  .tap-hint-toast .tht-line b { color: #f0d888; }
+  .tap-hint-toast .tht-close {
+    margin-top: 6px;
+    color: #7a7a90;
+    font-size: 0.75rem;
+    text-align: center;
+  }
+  .tap-hint-toast.fade-out {
+    animation: tht-out 0.4s ease-in forwards;
+  }
+  @keyframes tht-in {
+    from { opacity: 0; transform: translate(-50%, 12px); }
+    to   { opacity: 1; transform: translate(-50%, 0); }
+  }
+  @keyframes tht-out {
+    from { opacity: 1; }
+    to   { opacity: 0; }
+  }
+
   /* ── Explore status bar (ASCII style) ── */
   .explore-bar {
     font-family: "Courier New", Courier, monospace;
@@ -438,6 +477,22 @@
     color: #4a5a6a;
     margin-left: auto;
     font-variant-numeric: tabular-nums;
+  }
+  .explore-bar .eb-hint {
+    color: #3a5a4a;
+    font-size: .65rem;
+    letter-spacing: .5px;
+    margin-left: 8px;
+    opacity: .7;
+    animation: eb-hint-pulse 3s ease-in-out infinite;
+  }
+  @keyframes eb-hint-pulse {
+    0%, 100% { opacity: .35; }
+    50%      { opacity: .85; }
+  }
+  .explore-bar.done .eb-hint { display: none; }
+  @media (max-width: 520px) {
+    .explore-bar .eb-hint { display: none; }
   }
   .explore-bar.done {
     border-left-color: #4a4a2a;

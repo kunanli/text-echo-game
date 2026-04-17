@@ -111,6 +111,40 @@ function hideExploreBar() {
   stopDots();
 }
 
+// ── First-run tutorial hint (tap/hold controls) ──
+var TAP_HINT_KEY = 'petriabyss_tap_hint_seen';
+function showTapHintOnce() {
+  try {
+    if (localStorage.getItem(TAP_HINT_KEY)) return;
+  } catch (e) { return; }
+  if (document.getElementById('tap-hint-toast')) return;
+  var toast = document.createElement('div');
+  toast.id = 'tap-hint-toast';
+  toast.className = 'tap-hint-toast';
+  var en = state.lang === 'en';
+  toast.innerHTML = en
+    ? '<div class="tht-line">▶ <b>Tap</b> story — skip current line</div>'
+      + '<div class="tht-line">▶ <b>Hold</b> story — fast-forward all</div>'
+      + '<div class="tht-close">(tap anywhere to dismiss)</div>'
+    : '<div class="tht-line">▶ <b>點擊劇情</b> — 跳過當前這句</div>'
+      + '<div class="tht-line">▶ <b>長按劇情</b> — 快轉全部文字</div>'
+      + '<div class="tht-close">（點一下任意處關閉）</div>';
+  document.body.appendChild(toast);
+  var dismiss = function() {
+    try { localStorage.setItem(TAP_HINT_KEY, '1'); } catch (e) {}
+    toast.classList.add('fade-out');
+    setTimeout(function() { if (toast.parentNode) toast.parentNode.removeChild(toast); }, 400);
+    document.removeEventListener('click', dismiss, true);
+    document.removeEventListener('touchstart', dismiss, true);
+  };
+  setTimeout(function() {
+    document.addEventListener('click', dismiss, true);
+    document.addEventListener('touchstart', dismiss, true);
+  }, 300);
+  // Auto-dismiss after 12s
+  setTimeout(dismiss, 12000);
+}
+
 // ── Stop everything ──
 function stopAuto() {
   if (autoTimer) { clearTimeout(autoTimer); autoTimer = null; }
@@ -164,6 +198,8 @@ function autoExplore(steps, choices, opts) {
   autoFast = false;
   autoSkipAll = false;
   autoRunning = true;
+  // First-run tap/hold tutorial hint
+  showTapHintOnce();
   // New narrative after a user action — reset scroll-up state so fresh content
   // is always visible (user can still scroll up mid-narrative to re-read)
   if (typeof forceScrollStoryToBottom === 'function') forceScrollStoryToBottom();
