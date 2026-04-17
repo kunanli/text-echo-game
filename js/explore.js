@@ -232,6 +232,15 @@ function autoExplore(steps, choices, opts) {
   var idx = 0;
 
   function showNext() {
+    // Abort if player died mid-sequence (effect callbacks may call die())
+    var dOv2 = document.getElementById('death-overlay');
+    if (state.hp <= 0 || (dOv2 && dOv2.classList.contains('active'))) {
+      removePending();
+      autoRunning = false;
+      if (autoClockTimer) { clearInterval(autoClockTimer); autoClockTimer = null; }
+      hideExploreBar();
+      return;
+    }
     // Defer if a blocking UI overlay (level-up) is up — poll until dismissed
     if (typeof isBlockingOverlayActive === 'function' && isBlockingOverlayActive()) {
       autoTimer = setTimeout(showNext, 400);

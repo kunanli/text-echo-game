@@ -210,6 +210,11 @@ function renderStatus() {
 // Legacy renderScene: for simple scenes (combat results etc)
 function renderScene(text, choices) {
   stopAuto();
+  // Bail if player just died synchronously — don't render narrative over death overlay
+  var dOv = document.getElementById('death-overlay');
+  if (state.hp <= 0 || (dOv && dOv.classList.contains('active'))) {
+    return;
+  }
   hideExploreBar();
   removePending();
   if (typeof forceScrollStoryToBottom === 'function') forceScrollStoryToBottom();
