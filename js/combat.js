@@ -97,6 +97,7 @@ function startCombat(enemy, onWin, onFlee) {
     var weaponBonus = (state.flags.weaponDmg || 0) + eqStats.dmg;
     var effStr = effectiveStat('str');
     var effAgi = effectiveStat('agi');
+    var effWil = effectiveStat('wil');
     var baseDmg = rng(3, 6) + Math.floor(effStr * 1.2) + weaponBonus;
     // Multiplier: charge(3x) > observed(2x) > base(1x); pierce adds +30%
     var mult = chargeActive ? 3 : (observed ? 2 : 1);
@@ -105,10 +106,12 @@ function startCombat(enemy, onWin, onFlee) {
     var wasCharged = chargeActive;
     observed = false;
     chargeActive = false;
+    // AGI dodges a flat amount; WIL adds mental-fortitude reduction (up to 25%)
     var rawEnemyDmg = Math.max(0, rng(enemy.atkMin, enemy.atkMax) - Math.floor(effAgi * 0.3));
+    var wilReduction = Math.min(0.25, effWil * 0.02); // 2% per WIL, capped at 25%
     var armorDef = eqStats.def / 100;
     var mercy = getMercyReduction();
-    var totalReduction = Math.min(0.7, armorDef + mercy);
+    var totalReduction = Math.min(0.75, armorDef + mercy + wilReduction);
     var enemyDmg = totalReduction > 0 ? Math.max(1, Math.floor(rawEnemyDmg * (1 - totalReduction))) : rawEnemyDmg;
     // Shield: halve incoming damage
     if (shieldActive) { enemyDmg = Math.max(1, Math.floor(enemyDmg / 2)); shieldActive = false; }
@@ -149,7 +152,9 @@ function startCombat(enemy, onWin, onFlee) {
     if (dead && hasSkills) {
       if (skillSystem.tryUndying()) { dead = false; log += skillSystem.undyingLog(); }
     }
-    var petriDmg = enemy.petriDmg ? Math.max(0, enemy.petriDmg - eqStats.petriResist) : 0;
+    // WIL resists petri damage: 1 point per 4 WIL (stacks with equipment)
+    var wilPetriResist = Math.floor(effWil / 4);
+    var petriDmg = enemy.petriDmg ? Math.max(0, enemy.petriDmg - eqStats.petriResist - wilPetriResist) : 0;
     // Absorb: convert petri damage to HP
     if (!dead && petriDmg > 0 && hasSkills && skillSystem.tryAbsorb()) {
       var hpGain = petriDmg;

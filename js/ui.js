@@ -1,5 +1,19 @@
 // ══ UI Rendering ══
 
+// Single delegated click handler on the inventory list — fires useInventoryItem
+// for any <li> tagged with .inv-usable. Bound once at module load so we don't
+// re-attach listeners on every renderStatus() call.
+$inv.addEventListener('click', function(e) {
+  var t = e.target;
+  while (t && t !== $inv && !(t.classList && t.classList.contains('inv-usable'))) {
+    t = t.parentElement;
+  }
+  if (t && t !== $inv && t.classList && t.classList.contains('inv-usable')) {
+    var name = t.getAttribute('data-item');
+    if (name && typeof useInventoryItem === 'function') useInventoryItem(name);
+  }
+});
+
 // ═══════════════════════════════════════════════════
 //  Render UI
 // ═══════════════════════════════════════════════════
@@ -61,10 +75,24 @@ function renderStatus() {
   if (state.inventory.length === 0) {
     $inv.innerHTML = '<li class="inventory-empty">' + L('空', 'Empty') + '</li>';
   } else {
-    $inv.innerHTML = state.inventory.map(function(it) {
+    // Group duplicates so they render with a ×N count
+    var counts = {};
+    var order = [];
+    for (var ii = 0; ii < state.inventory.length; ii++) {
+      var n = state.inventory[ii];
+      if (counts[n] == null) { counts[n] = 0; order.push(n); }
+      counts[n]++;
+    }
+    $inv.innerHTML = order.map(function(it) {
       var rarity = (typeof getItemRarity === 'function') ? getItemRarity(it) : 'common';
-      return '<li class="rarity-' + rarity + '">' + it + '</li>';
+      var usable = (typeof isConsumable === 'function') && isConsumable(it);
+      var qty = counts[it];
+      var qtyLabel = qty > 1 ? ' <span class="inv-qty">×' + qty + '</span>' : '';
+      var cls = 'rarity-' + rarity + (usable ? ' inv-usable' : '');
+      var attrs = usable ? ' data-item="' + it.replace(/"/g, '&quot;') + '" title="' + L('點擊使用', 'Click to use') + '"' : '';
+      return '<li class="' + cls + '"' + attrs + '>' + it + qtyLabel + '</li>';
     }).join('');
+    // Click handling is via a delegated listener on $inv bound at module load.
   }
 
   // Equipment display
