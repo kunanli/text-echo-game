@@ -134,9 +134,16 @@ registerNode('r1_look', () => {
   }
 
   autoExplore(steps, (function() {
-    // First visit: mandatory patrol (passive event)
+    // First visit: mandatory patrol (passive event) + allow some safe exploration first
     if (!state.flags.r1PatrolCleared) {
-      return [{ text: L('深入這片未知的迴廊……', 'Venture into the unknown corridor...'), textEn: 'Venture into the unknown corridor...', action: () => {
+      var fvc = [];
+      if (!state.flags.r1ShrineDone) {
+        fvc.push({ text: '◇ 側道盡頭似乎有微光……', textEn: '◇ A faint glow at the end of a side passage...', action: () => loadNode('r1_shrine') });
+      }
+      if (!state.flags.r1RiverDone) {
+        fvc.push({ text: '◇ 遠處傳來潺潺水聲', textEn: '◇ The sound of running water in the distance', action: () => loadNode('r1_underground_river') });
+      }
+      fvc.push({ text: L('⚠ 深入這片未知的迴廊……', '⚠ Venture into the unknown corridor...'), textEn: '⚠ Venture into the unknown corridor...', action: () => {
         startPatrol({ firstVisit: true, onDiscovery: function() { stopPatrol(); },
           firstVisitEvents: [
             // Cycle 2: Encounter Grey Crane being cornered by a stone creature
@@ -238,10 +245,27 @@ registerNode('r1_look', () => {
                 text: L('你將紙頁折好收起。也許之後能找到這個人。',
                   'You fold the page and pocket it. Perhaps you\'ll find this person later.'),
                 delay: 2000, effect: function() { state.flags.r1YingHintSeen = true; gainXp(3); } });
+            }},
+            // Cycle 6: Discover abandoned miner's first-aid cache (mid-patrol healing)
+            { cycle: 6, buildQueue: function(queue) {
+              queue.push({ tag: L('感知','Sense'), color: 'tag-sense',
+                text: L('你靠在石壁上喘息——牆面上有一道不自然的裂縫，裡面塞著什麼東西。',
+                  'You lean against the wall to catch your breath — an unnatural crack in the stone, something stuffed inside.'),
+                delay: 2500, pending: true });
+              queue.push({ tag: L('發現','Find'), color: 'tag-item',
+                text: L('礦工的急救暗格！裡面有繃帶和一瓶混濁的液體——聞起來像草藥。',
+                  'A miner\'s hidden first-aid cache! Bandages and a murky bottle inside — smells like herbs.'),
+                delay: 2200 });
+              queue.push({ tag: L('恢復','Recovery'), color: 'tag-explore',
+                text: L('你用繃帶包紮傷口，喝下草藥液。傷勢好多了。HP +20，石化度 -5%',
+                  'You bandage your wounds and drink the herbal liquid. Much better. HP +20, Petri -5%'),
+                delay: 2000, sfx: 'item',
+                effect: function() { changeHp(20); changePetri(-5); renderStatus(); } });
             }}
           ]
         });
-      }}];
+      }});
+      return fvc;
     }
     var c = [];
     c.push({ text: '探索北面鍛造間', textEn: 'Explore the forge room to the north', action: () => loadNode('r1_forge') });
@@ -622,7 +646,7 @@ registerNode('r1_guard_fight', () => {
   var gName = L('石脈守衛', 'Vein Guardian');
   var gDesc = L('石脈守衛緩慢但攻擊力極強，每次重擊都帶有強烈的石化效果。', 'The Vein Guardian is slow but hits hard. Each blow carries intense petrification.');
   startCombat(
-    { name: gName, hp: 55, atkMin: 16, atkMax: 28, petriDmg: 8, xp: 30, desc: gDesc },
+    { name: gName, hp: 45, atkMin: 12, atkMax: 22, petriDmg: 6, xp: 30, desc: gDesc },
     () => {
       state.flags.r1GuardDefeated = true;
       changeStat('str', 2);

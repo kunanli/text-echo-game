@@ -212,6 +212,22 @@ registerNode('r2_look', () => {
                 ]
               });
             }},
+            // Cycle 3: Find emergency supplies in a collapsed tool shed
+            { cycle: 3, buildQueue: function(queue) {
+              queue.push({ tag: L('感知','Sense'), color: 'tag-sense',
+                text: L('採石場邊緣有一間半塌的工具棚——門歪了，但裡面好像有東西。',
+                  'A half-collapsed tool shed at the quarry\'s edge — the door is crooked, but something\'s inside.'),
+                delay: 2500, pending: true });
+              queue.push({ tag: L('發現','Find'), color: 'tag-item',
+                text: L('急救箱！裡面有乾淨的繃帶和一份草藥包。看來礦工們有備無患。',
+                  'A first-aid kit! Clean bandages and an herb pack inside. The miners came prepared.'),
+                delay: 2200 });
+              queue.push({ tag: L('恢復','Recovery'), color: 'tag-explore',
+                text: L('你處理了傷口，吞下草藥。好多了。HP +20，石化度 -5%',
+                  'You tend your wounds and swallow the herbs. Much better. HP +20, Petri -5%'),
+                delay: 2000, sfx: 'item',
+                effect: function() { changeHp(20); changePetri(-5); renderStatus(); } });
+            }},
             // Cycle 4: Spot campfire in the distance
             { cycle: 4, buildQueue: function(queue) {
               queue.push({ tag: L('發現','Discovery'), color: 'tag-explore',
