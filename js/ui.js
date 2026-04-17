@@ -212,6 +212,7 @@ function renderScene(text, choices) {
   stopAuto();
   hideExploreBar();
   removePending();
+  if (typeof forceScrollStoryToBottom === 'function') forceScrollStoryToBottom();
   appendDivider();
   $choices.innerHTML = '';
   currentChoices = [];

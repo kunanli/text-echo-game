@@ -154,9 +154,19 @@ function removePending() {
 
 function autoExplore(steps, choices, opts) {
   stopAuto();
+  // Guard: don't start new narrative if player just died synchronously
+  // (some node code calls changeHp before autoExplore; die() would have opened
+  // the death overlay and we must not overwrite it with fresh story)
+  var dOv = document.getElementById('death-overlay');
+  if (state.hp <= 0 || (dOv && dOv.classList.contains('active'))) {
+    return;
+  }
   autoFast = false;
   autoSkipAll = false;
   autoRunning = true;
+  // New narrative after a user action — reset scroll-up state so fresh content
+  // is always visible (user can still scroll up mid-narrative to re-read)
+  if (typeof forceScrollStoryToBottom === 'function') forceScrollStoryToBottom();
   appendDivider();
   $choices.innerHTML = '';
   currentChoices = [];
