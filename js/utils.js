@@ -94,13 +94,58 @@ function showLevelUpChoice() {
 })();
 
 function changeHp(delta) {
+  var prevHp = state.hp;
   state.hp = clamp(state.hp + delta, 0, state.maxHp);
   if (delta < 0) sfx.hurt();
+  // HP threshold warnings — fire when crossing DOWN past 50% / 33%
+  if (delta < 0 && state.hp > 0) {
+    var half = state.maxHp * 0.5;
+    var third = state.maxHp / 3;
+    if (!state.flags._hpWarn50 && prevHp > half && state.hp <= half && state.hp > third) {
+      _hpSensory(L(
+        '鮮血順著手臂淌下，石化的傷口不願癒合。你感到一陣暈眩——不能再這樣下去了。',
+        'Blood trickles down your arm — petrified wounds refuse to close. A wave of dizziness washes over you. You can\'t keep taking hits like this.'));
+      state.flags._hpWarn50 = true;
+    }
+    if (!state.flags._hpWarn33 && prevHp > third && state.hp <= third) {
+      _hpSensory(L(
+        '視線開始模糊，耳鳴像潮水一樣漫上來。每一次呼吸都像吞下碎石——你的身體正在逼近極限。',
+        'Your vision blurs; a tinnitus surges like a rising tide. Every breath feels like swallowing gravel — your body is at its limit.'));
+      state.flags._hpWarn33 = true;
+    }
+  }
+  // Rearm warnings when healed well above half
+  if (state.hp > state.maxHp * 0.6) {
+    state.flags._hpWarn50 = false;
+    state.flags._hpWarn33 = false;
+  }
   if (state.hp <= 0) {
     die(L('你的生命力耗盡，倒在了冰冷的石地上……', 'Your life force fades... You collapse on the cold stone floor...'));
     return true; // dead
   }
   return false;
+}
+
+// Append a sensory HP warning line to the story log
+function _hpSensory(msg) {
+  if (!$story) return;
+  var line = document.createElement('div');
+  line.className = 'log-line hp-sensory';
+  var tagEl = document.createElement('span');
+  tagEl.className = 'log-tag tag-warn';
+  tagEl.textContent = '[' + L('身體', 'Body') + ']';
+  line.appendChild(tagEl);
+  var txt = document.createElement('span');
+  txt.textContent = ' ' + msg;
+  line.appendChild(txt);
+  $story.appendChild(line);
+  $story.scrollTop = $story.scrollHeight;
+}
+
+// Check if a blocking UI overlay (e.g. level-up) is active — loops should defer
+function isBlockingOverlayActive() {
+  var ov = document.getElementById('levelup-overlay');
+  return !!(ov && ov.classList.contains('active'));
 }
 
 // Append a sensory description line to the story log when crossing petri thresholds

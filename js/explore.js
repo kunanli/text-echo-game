@@ -186,6 +186,11 @@ function autoExplore(steps, choices, opts) {
   var idx = 0;
 
   function showNext() {
+    // Defer if a blocking UI overlay (level-up) is up — poll until dismissed
+    if (typeof isBlockingOverlayActive === 'function' && isBlockingOverlayActive()) {
+      autoTimer = setTimeout(showNext, 400);
+      return;
+    }
     if (idx >= expanded.length) {
       removePending();
       autoRunning = false;

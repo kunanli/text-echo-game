@@ -1769,6 +1769,11 @@ function runNarrativeEvent(evt) {
   var qi = 0;
   function processNext() {
     if (!patrolActive) return;
+    // Defer if a blocking UI overlay (level-up) is up
+    if (typeof isBlockingOverlayActive === 'function' && isBlockingOverlayActive()) {
+      patrolTimers.push(setTimeout(processNext, 400));
+      return;
+    }
     if (qi >= queue.length) {
       // Event finished — resume patrol cycle
       patrolTimers.push(setTimeout(runPatrolCycle, 1500));
@@ -1918,6 +1923,11 @@ function showPatrolDiscovery() {
 
 function runPatrolCycle() {
   if (!patrolActive) return;
+  // Defer if a blocking UI overlay (level-up) is up
+  if (typeof isBlockingOverlayActive === 'function' && isBlockingOverlayActive()) {
+    patrolTimers.push(setTimeout(runPatrolCycle, 400));
+    return;
+  }
 
   _patrolCycles++;
 
@@ -2015,6 +2025,10 @@ function runPatrolCycleManual(monster) {
   var qi = 0;
   function processNext() {
     if (!patrolActive) return;
+    if (typeof isBlockingOverlayActive === 'function' && isBlockingOverlayActive()) {
+      patrolTimers.push(setTimeout(processNext, 400));
+      return;
+    }
     if (qi >= queue.length) {
       beginManualCombat();
       return;
@@ -2235,6 +2249,10 @@ function runPatrolCycleAuto(monster) {
   var qi = 0;
   function processNext() {
     if (!patrolActive) return;
+    if (typeof isBlockingOverlayActive === 'function' && isBlockingOverlayActive()) {
+      patrolTimers.push(setTimeout(processNext, 400));
+      return;
+    }
     if (qi >= queue.length) {
       patrolTimers.push(setTimeout(runPatrolCycle, 500));
       return;
