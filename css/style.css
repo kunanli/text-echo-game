@@ -710,20 +710,73 @@
     font-size: .78rem;
     margin-left: 4px;
   }
-  .inventory-list li.inv-usable {
+  /* All inventory items are clickable (open detail popup) */
+  .inventory-list li.inv-clickable {
     cursor: pointer;
-    transition: background .15s, color .15s;
+    transition: background .15s, color .15s, padding-left .15s;
     -webkit-tap-highlight-color: transparent;
+    position: relative;
   }
-  .inventory-list li.inv-usable:hover {
+  .inventory-list li.inv-clickable:hover {
     background: #1a1a28;
     color: #e6e6f4;
+    padding-left: 10px;
   }
+  .inventory-list li.inv-clickable::before {
+    content: "›";
+    color: #5a5a6a;
+    font-size: .9rem;
+    margin-right: 4px;
+    opacity: .7;
+  }
+  /* Usable (consumable) marker — appended heart icon */
   .inventory-list li.inv-usable::after {
     content: " \2764";
     color: #6a9a6a;
     font-size: .7rem;
     margin-left: 4px;
+  }
+
+  /* ── Item detail popup ── */
+  .item-detail-dialog {
+    max-width: 420px;
+    text-align: center;
+  }
+  .item-detail-name {
+    font-size: 1.15rem;
+    font-weight: 600;
+    margin-bottom: 6px;
+    letter-spacing: 1px;
+  }
+  .item-detail-type {
+    font-size: .8rem;
+    color: #8a8aa4;
+    margin-bottom: 10px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+  }
+  .item-detail-effect {
+    font-size: .95rem;
+    color: #c8c8dc;
+    line-height: 1.7;
+    padding: 10px 16px;
+    background: #10101a;
+    border-left: 2px solid #4a4a5a;
+    margin-bottom: 8px;
+    text-align: left;
+  }
+  .item-detail-qty {
+    font-size: .8rem;
+    color: #7a7a8a;
+    margin-bottom: 4px;
+  }
+  #item-detail-use-btn {
+    background: #2a4a2a;
+    color: #d4e4a8;
+    border: 1px solid #4a6a4a;
+  }
+  #item-detail-use-btn:hover {
+    background: #3a5a3a;
   }
   .equip-row {
     padding: 3px 0;

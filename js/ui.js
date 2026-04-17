@@ -1,16 +1,14 @@
 // ══ UI Rendering ══
 
-// Single delegated click handler on the inventory list — fires useInventoryItem
-// for any <li> tagged with .inv-usable. Bound once at module load so we don't
-// re-attach listeners on every renderStatus() call.
+// Delegated click on inventory list — any clickable item opens the detail popup
 $inv.addEventListener('click', function(e) {
   var t = e.target;
-  while (t && t !== $inv && !(t.classList && t.classList.contains('inv-usable'))) {
+  while (t && t !== $inv && !(t.classList && t.classList.contains('inv-clickable'))) {
     t = t.parentElement;
   }
-  if (t && t !== $inv && t.classList && t.classList.contains('inv-usable')) {
+  if (t && t !== $inv && t.classList && t.classList.contains('inv-clickable')) {
     var name = t.getAttribute('data-item');
-    if (name && typeof useInventoryItem === 'function') useInventoryItem(name);
+    if (name && typeof showItemDetail === 'function') showItemDetail(name);
   }
 });
 
@@ -88,11 +86,14 @@ function renderStatus() {
       var usable = (typeof isConsumable === 'function') && isConsumable(it);
       var qty = counts[it];
       var qtyLabel = qty > 1 ? ' <span class="inv-qty">×' + qty + '</span>' : '';
-      var cls = 'rarity-' + rarity + (usable ? ' inv-usable' : '');
-      var attrs = usable ? ' data-item="' + it.replace(/"/g, '&quot;') + '" title="' + L('點擊使用', 'Click to use') + '"' : '';
+      // All items are clickable (open detail popup); usable items get extra marker
+      var cls = 'rarity-' + rarity + ' inv-clickable' + (usable ? ' inv-usable' : '');
+      var title = usable
+        ? L('點擊查看 · 可使用', 'Click for details · usable')
+        : L('點擊查看', 'Click for details');
+      var attrs = ' data-item="' + it.replace(/"/g, '&quot;') + '" title="' + title + '"';
       return '<li class="' + cls + '"' + attrs + '>' + it + qtyLabel + '</li>';
     }).join('');
-    // Click handling is via a delegated listener on $inv bound at module load.
   }
 
   // Equipment display
@@ -244,6 +245,102 @@ function _extractLoadNodeTarget(fn) {
     var m = src.match(/loadNode\(\s*['"]([^'"]+)['"]\s*\)/);
     return m ? m[1] : null;
   } catch (e) { return null; }
+}
+
+// ── Item detail popup ──
+// Backdrop click + Escape dismiss the item detail overlay (bound once)
+(function() {
+  var $ov = document.getElementById('item-detail-overlay');
+  if (!$ov) return;
+  $ov.addEventListener('click', function(e) {
+    if (e.target === $ov) $ov.classList.remove('active');
+  });
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && $ov.classList.contains('active')) {
+      $ov.classList.remove('active');
+    }
+  });
+})();
+
+function showItemDetail(itemName) {
+  var $ov = document.getElementById('item-detail-overlay');
+  if (!$ov) return;
+  var $name = document.getElementById('item-detail-name');
+  var $type = document.getElementById('item-detail-type');
+  var $effect = document.getElementById('item-detail-effect');
+  var $qty = document.getElementById('item-detail-qty');
+  var $useBtn = document.getElementById('item-detail-use-btn');
+  var $closeBtn = document.getElementById('item-detail-close-btn');
+  var en = state.lang === 'en';
+
+  // Classify the item
+  var consData = (typeof getConsumableData === 'function') ? getConsumableData(itemName) : null;
+  var equipData = (typeof getEquipData === 'function') ? getEquipData(itemName) : null;
+
+  // Count duplicates
+  var qty = 0;
+  for (var i = 0; i < state.inventory.length; i++) {
+    if (state.inventory[i] === itemName) qty++;
+  }
+
+  // Apply rarity color to name
+  var rarity = (typeof getItemRarity === 'function') ? getItemRarity(itemName) : 'common';
+  $name.className = 'item-detail-name rarity-' + rarity;
+  $name.textContent = itemName;
+
+  // Type label + effect description
+  var typeLabel = '';
+  var effectText = '';
+  if (consData) {
+    typeLabel = en ? 'Consumable' : '消耗品';
+    effectText = (en && consData.labelEn) ? consData.labelEn : (consData.label || '');
+  } else if (equipData) {
+    var slotNames = {
+      weapon: { zh: '武器', en: 'Weapon' },
+      armor:  { zh: '護甲', en: 'Armor' },
+      acc:    { zh: '飾品', en: 'Accessory' }
+    };
+    var sn = slotNames[equipData.slot] || { zh: '裝備', en: 'Equipment' };
+    typeLabel = en ? sn.en : sn.zh;
+    var parts = [];
+    if (equipData.dmg)         parts.push((en ? 'Attack +' : '攻擊 +') + equipData.dmg);
+    if (equipData.def)         parts.push((en ? 'Defense +' : '防禦 +') + equipData.def + '%');
+    if (equipData.petriResist) parts.push((en ? 'Petri Resist ' : '抗石化 ') + '-' + equipData.petriResist);
+    if (equipData.str)         parts.push('STR +' + equipData.str);
+    if (equipData.agi)         parts.push('AGI +' + equipData.agi);
+    if (equipData.wil)         parts.push('WIL +' + equipData.wil);
+    effectText = parts.join('，');
+    // Check if equipped
+    var equippedName = state.flags['equip_' + equipData.slot];
+    if (equippedName === itemName) {
+      effectText += (en ? '\n(Currently equipped)' : '\n（目前已裝備）');
+    }
+  } else {
+    typeLabel = en ? 'Key Item' : '關鍵物品';
+    effectText = en
+      ? 'A curious item. No active effect — but it may unlock something, somewhere.'
+      : '某種意義不明的物件。沒有主動效果——但也許能在某處派上用場。';
+  }
+  $type.textContent = typeLabel;
+  $effect.textContent = effectText;
+  $qty.textContent = qty > 1 ? (en ? 'Quantity: ×' + qty : '持有：×' + qty) : '';
+
+  // Button wiring
+  if (consData) {
+    $useBtn.style.display = '';
+    $useBtn.textContent = en ? 'Use' : '使用';
+    $useBtn.onclick = function() {
+      $ov.classList.remove('active');
+      if (typeof useInventoryItem === 'function') useInventoryItem(itemName);
+    };
+  } else {
+    $useBtn.style.display = 'none';
+    $useBtn.onclick = null;
+  }
+  $closeBtn.textContent = consData ? (en ? 'Cancel' : '取消') : (en ? 'Close' : '關閉');
+  $closeBtn.onclick = function() { $ov.classList.remove('active'); };
+
+  $ov.classList.add('active');
 }
 
 function showChoices(choices) {
