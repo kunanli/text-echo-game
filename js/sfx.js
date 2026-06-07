@@ -199,6 +199,25 @@ var sfx = (function() {
     osc.stop(t + 0.2);
   }
 
+  // ── Typewriter blip: ultra-short, quiet tick fired as text types out ──
+  function type() {
+    if (!enabled) return;
+    var c = ensureCtx(); if (!c) return;
+    var t = c.currentTime;
+    var osc = c.createOscillator();
+    var lp = c.createBiquadFilter();
+    var g = makeGain(c, 0.045, t);   // very quiet — it plays many times rapidly
+    lp.type = 'lowpass';
+    lp.frequency.setValueAtTime(2600, t);
+    osc.type = 'square';
+    osc.frequency.setValueAtTime(1150 + Math.random() * 500, t); // slight jitter = organic
+    g.gain.exponentialRampToValueAtTime(0.001, t + 0.028);        // ~28ms
+    osc.connect(lp);
+    lp.connect(g);
+    osc.start(t);
+    osc.stop(t + 0.03);
+  }
+
   return {
     click: click,
     hit: hit,
@@ -209,6 +228,7 @@ var sfx = (function() {
     item: item,
     pass: pass,
     fail: fail,
+    type: type,
     setEnabled: function(v) { enabled = !!v; },
     isEnabled: function() { return enabled; },
     setVolume: function(v) { volume = Math.max(0, Math.min(1, v)); }

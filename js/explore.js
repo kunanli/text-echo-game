@@ -408,6 +408,8 @@ function autoExplore(steps, choices, opts) {
           ci++;
           // Flush buffer to DOM every TYPE_BATCH chars or at end
           if (typeBuf.length >= TYPE_BATCH || ci >= chars.length) {
+            // Typewriter blip — only for batches with a visible glyph (skip pure whitespace)
+            if (typeof sfx !== 'undefined' && sfx.type && /\S/.test(typeBuf)) sfx.type();
             contentSpan.textContent += typeBuf;
             typeBuf = '';
             scrollStoryToBottom();
