@@ -1,0 +1,49 @@
+name: Build Windows (PETRIABYSS)
+
+# 在 GitHub 雲端的 Windows 機器上自動打包桌面版 .exe，
+# 不需要你本機裝 Node 或有 Windows。
+#  - 手動觸發：到 Actions 分頁按「Run workflow」
+#  - 或推一個 v* 標籤（如 v2.3.4）→ 自動建立 Release 並附上 .exe
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write   # 推標籤時建立 Release 需要
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - name: 取得原始碼
+        uses: actions/checkout@v4
+
+      - name: 安裝 Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: 安裝相依套件
+        working-directory: desktop
+        run: npm install
+
+      - name: 打包 Windows .exe（安裝版 + 免安裝版）
+        working-directory: desktop
+        run: npm run dist
+
+      - name: 上傳 .exe 成品（可從這次執行頁面下載）
+        uses: actions/upload-artifact@v4
+        with:
+          name: PETRIABYSS-windows
+          path: |
+            desktop/dist/*.exe
+          if-no-files-found: error
+
+      - name: 若是 v* 標籤則建立 Release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: desktop/dist/*.exe
