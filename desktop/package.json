@@ -1,0 +1,60 @@
+{
+  "name": "petriabyss-desktop",
+  "productName": "PETRIABYSS",
+  "version": "2.3.4",
+  "description": "石化深淵 PETRIABYSS — Windows 全屏桌面版（Electron 包裝，供 Playnite 使用）",
+  "main": "main.js",
+  "author": "PETRIABYSS",
+  "license": "MIT",
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder --win",
+    "dist:portable": "electron-builder --win portable"
+  },
+  "devDependencies": {
+    "electron": "^32.0.0",
+    "electron-builder": "^24.13.3"
+  },
+  "build": {
+    "appId": "com.petriabyss.game",
+    "productName": "PETRIABYSS",
+    "directories": {
+      "output": "dist",
+      "buildResources": "build"
+    },
+    "files": [
+      "main.js",
+      "build/icon.png"
+    ],
+    "extraResources": [
+      {
+        "from": "..",
+        "to": "app",
+        "filter": [
+          "index.html",
+          "favicon.svg",
+          "css/**/*",
+          "js/**/*",
+          "assets/**/*"
+        ]
+      }
+    ],
+    "win": {
+      "target": [
+        { "target": "nsis", "arch": ["x64"] },
+        { "target": "portable", "arch": ["x64"] }
+      ],
+      "icon": "build/icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "shortcutName": "PETRIABYSS"
+    },
+    "portable": {
+      "artifactName": "PETRIABYSS-${version}-portable.exe"
+    }
+  }
+}

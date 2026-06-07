@@ -1,0 +1,132 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1920 1080">
+  <defs>
+    <radialGradient id="sky" cx="50%" cy="30%" r="75%">
+      <stop offset="0%" stop-color="#1e0c33"/>
+      <stop offset="45%" stop-color="#120a20"/>
+      <stop offset="100%" stop-color="#000000"/>
+    </radialGradient>
+    <radialGradient id="abyssGlow" cx="50%" cy="92%" r="55%">
+      <stop offset="0%" stop-color="#3a0a5e" stop-opacity="0.85"/>
+      <stop offset="45%" stop-color="#1a0530" stop-opacity="0.5"/>
+      <stop offset="100%" stop-color="#000000" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="vignetteL" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#000" stop-opacity="0.75"/>
+      <stop offset="32%" stop-color="#000" stop-opacity="0"/>
+      <stop offset="68%" stop-color="#000" stop-opacity="0"/>
+      <stop offset="100%" stop-color="#000" stop-opacity="0.75"/>
+    </linearGradient>
+    <linearGradient id="vignetteV" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#000" stop-opacity="0.6"/>
+      <stop offset="22%" stop-color="#000" stop-opacity="0"/>
+      <stop offset="78%" stop-color="#000" stop-opacity="0"/>
+      <stop offset="100%" stop-color="#000" stop-opacity="0.85"/>
+    </linearGradient>
+    <linearGradient id="stone" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#5a4f47"/>
+      <stop offset="50%" stop-color="#3a322c"/>
+      <stop offset="100%" stop-color="#15110d"/>
+    </linearGradient>
+    <linearGradient id="stoneDark" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#2e2822"/>
+      <stop offset="100%" stop-color="#0a0805"/>
+    </linearGradient>
+    <linearGradient id="crystal" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#e3c4ff"/>
+      <stop offset="45%" stop-color="#b06bf0"/>
+      <stop offset="100%" stop-color="#5e1f9e"/>
+    </linearGradient>
+    <radialGradient id="crystalCore" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#f3e3ff" stop-opacity="0.95"/>
+      <stop offset="60%" stop-color="#a155e6" stop-opacity="0.4"/>
+      <stop offset="100%" stop-color="#5e1f9e" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="soft" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="6"/>
+    </filter>
+    <filter id="softBig" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="22"/>
+    </filter>
+    <filter id="titleGlow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="4" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <!-- Base sky / abyss -->
+  <rect width="1920" height="1080" fill="url(#sky)"/>
+  <ellipse cx="960" cy="1000" rx="1100" ry="620" fill="url(#abyssGlow)"/>
+
+  <!-- Distant crystal haze in the depths -->
+  <circle cx="960" cy="940" r="360" fill="url(#crystalCore)" filter="url(#softBig)" opacity="0.7"/>
+
+  <!-- Left chasm wall -->
+  <path d="M0,0 L470,0 L360,250 L430,470 L330,690 L420,900 L300,1080 L0,1080 Z" fill="url(#stoneDark)"/>
+  <path d="M0,0 L300,0 L210,300 L290,560 L180,820 L250,1080 L0,1080 Z" fill="url(#stone)" opacity="0.85"/>
+  <!-- Right chasm wall -->
+  <path d="M1920,0 L1450,0 L1560,250 L1490,470 L1590,690 L1500,900 L1620,1080 L1920,1080 Z" fill="url(#stoneDark)"/>
+  <path d="M1920,0 L1620,0 L1710,300 L1630,560 L1740,820 L1670,1080 L1920,1080 Z" fill="url(#stone)" opacity="0.85"/>
+
+  <!-- Crystal veins on left wall -->
+  <g opacity="0.9">
+    <polygon points="300,300 330,250 318,360 286,395" fill="url(#crystal)" filter="url(#soft)"/>
+    <polygon points="250,560 280,520 270,640 240,610" fill="url(#crystal)" filter="url(#soft)"/>
+    <polygon points="340,780 372,742 360,870 328,838" fill="url(#crystal)" filter="url(#soft)"/>
+  </g>
+  <!-- Crystal veins on right wall -->
+  <g opacity="0.9">
+    <polygon points="1620,330 1592,280 1606,400 1640,372" fill="url(#crystal)" filter="url(#soft)"/>
+    <polygon points="1680,600 1652,556 1664,690 1700,652" fill="url(#crystal)" filter="url(#soft)"/>
+    <polygon points="1590,820 1560,780 1576,910 1610,876" fill="url(#crystal)" filter="url(#soft)"/>
+  </g>
+
+  <!-- Petrified silhouettes standing at the abyss rim -->
+  <g fill="#0c0a14">
+    <g transform="translate(720,720)">
+      <ellipse cx="0" cy="-92" rx="22" ry="26"/>
+      <path d="M-26,-66 Q0,-78 26,-66 L34,80 Q0,96 -34,80 Z"/>
+      <rect x="-44" y="-58" width="20" height="120" rx="9" transform="rotate(12 -34 0)"/>
+      <rect x="24" y="-58" width="20" height="120" rx="9" transform="rotate(-12 34 0)"/>
+    </g>
+    <g transform="translate(1180,748) scale(1.15)">
+      <ellipse cx="0" cy="-92" rx="22" ry="26"/>
+      <path d="M-26,-66 Q0,-78 26,-66 L34,80 Q0,96 -34,80 Z"/>
+      <rect x="-46" y="-54" width="20" height="118" rx="9" transform="rotate(20 -36 0)"/>
+      <rect x="26" y="-54" width="20" height="118" rx="9" transform="rotate(-8 36 0)"/>
+    </g>
+    <g transform="translate(960,690) scale(0.9)" opacity="0.96">
+      <ellipse cx="0" cy="-92" rx="22" ry="26"/>
+      <path d="M-26,-66 Q0,-78 26,-66 L34,80 Q0,96 -34,80 Z"/>
+      <rect x="-42" y="-58" width="18" height="116" rx="8" transform="rotate(-14 -32 0)"/>
+      <rect x="24" y="-58" width="18" height="116" rx="8" transform="rotate(16 34 0)"/>
+    </g>
+  </g>
+  <!-- faint crystal rim light on the central figure -->
+  <path d="M934,598 Q960,586 986,598 L992,690 Q960,702 928,690 Z" fill="url(#crystal)" opacity="0.18" filter="url(#soft)"/>
+
+  <!-- Falling petri-dust motes -->
+  <g fill="#c8a0ff">
+    <circle cx="540" cy="220" r="2.2" opacity="0.7"/>
+    <circle cx="700" cy="380" r="1.6" opacity="0.5"/>
+    <circle cx="1260" cy="300" r="2.4" opacity="0.7"/>
+    <circle cx="1400" cy="180" r="1.5" opacity="0.45"/>
+    <circle cx="980" cy="260" r="1.8" opacity="0.6"/>
+    <circle cx="860" cy="150" r="1.4" opacity="0.4"/>
+    <circle cx="1120" cy="460" r="1.7" opacity="0.5"/>
+    <circle cx="620" cy="520" r="1.5" opacity="0.45"/>
+    <circle cx="1340" cy="540" r="1.6" opacity="0.5"/>
+    <circle cx="760" cy="640" r="1.4" opacity="0.4"/>
+  </g>
+
+  <!-- Vignettes -->
+  <rect width="1920" height="1080" fill="url(#vignetteV)"/>
+  <rect width="1920" height="1080" fill="url(#vignetteL)"/>
+
+  <!-- Title -->
+  <g filter="url(#titleGlow)" text-anchor="middle" font-family="'WenQuanYi Zen Hei','Noto Serif CJK TC',serif">
+    <text x="960" y="200" font-size="118" font-weight="700" letter-spacing="14"
+          fill="#efe6ff" opacity="0.97">石化深淵</text>
+    <text x="960" y="262" font-size="40" font-weight="400" letter-spacing="26"
+          fill="#b487e8" opacity="0.9">P E T R I A B Y S S</text>
+  </g>
+</svg>

@@ -4,3 +4,8 @@ _render.js
 package.json
 package-lock.json
 *.zip
+
+# Keep the Electron desktop wrapper's manifest (overrides the global package.json ignore above)
+!desktop/package.json
+# Build output for the desktop wrapper
+desktop/dist/
